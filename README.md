@@ -2,18 +2,18 @@
 
 *This project is about creating a website for the mightly Pong contest !*
 
-___Technologies used___
+## Technologies used
 
 **Front-End**
-	* Framework: NextJS
-	* Pong: PixiJS
+	*Framework: NextJS
+	*Pong: PixiJS
 
 **Back-end**
-	* Database: PostgreSQL
-	* Framework: NestJS
-	* Socket: Socket.IO
+	*Database: PostgreSQL
+	*Framework: NestJS
+	*Socket: Socket.IO
 
-___Launch the project___
+## Launch the project
 
 ```
 docker-compose up --build
