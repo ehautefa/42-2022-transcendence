@@ -5,13 +5,13 @@
 ## Technologies used
 
 **Front-End**
-	*Framework: NextJS
-	*Pong: PixiJS
+*Framework: NextJS
+*Pong: PixiJS
 
 **Back-end**
-	*Database: PostgreSQL
-	*Framework: NestJS
-	*Socket: Socket.IO
+*Database: PostgreSQL
+*Framework: NestJS
+*Socket: Socket.IO
 
 ## Launch the project
 
