@@ -5,7 +5,7 @@
 
 FROM        node:current-alpine As development
 
-ARG 		SRC_APP_DIR=./data_to_container
+ARG 		SRC_APP_DIR=./data_to_container/nextjs-docker
 ARG 		DST_APP_DIR=/usr/src/app
 ARG 		USER=node
 
