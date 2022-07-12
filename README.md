@@ -6,7 +6,6 @@
 
 **Front-End**
 *Framework: NextJS
-*Pong: PixiJS
 
 **Back-end**
 *Database: PostgreSQL
