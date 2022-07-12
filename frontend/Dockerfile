@@ -9,8 +9,6 @@ ARG 		SRC_APP_DIR=./data_to_container
 ARG 		DST_APP_DIR=/usr/src/app
 ARG 		USER=node
 
-ENV		PORT 3000
-
 # Create app directory
 WORKDIR     ${DST_APP_DIR}
 
@@ -21,14 +19,15 @@ WORKDIR     ${DST_APP_DIR}
 COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN         npm install
+RUN         npm install \
+			&& chown -R ${USER}:${USER} ${DST_APP_DIR}
 
 # Bundle app source
 COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR} ${DST_APP_DIR}
 
 
 # Use the node user from the image (instead of the root user)
-# USER        ${USER}
+USER        ${USER}
 
 ###################
 # BUILD FOR PRODUCTION
