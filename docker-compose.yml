@@ -35,7 +35,7 @@ services:
     networks:
       - nesjs-network
     volumes:
-      - ./backend/data_to_container/app:/usr/src/app
+      - ./backend/data_to_container/pong:/usr/src/app
           #- /usr/src/app/node_modules
     restart: unless-stopped
 
@@ -55,7 +55,7 @@ services:
     networks:
         - nesjs-network
     volumes:
-      - ./backend/data_to_container/app:/usr/src/app
+      - ./backend/data_to_container/pong:/usr/src/app
     restart: unless-stopped
 
   postgres:

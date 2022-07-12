@@ -31,7 +31,6 @@ WORKDIR     ${DST_APP_DIR}
 COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN         npm install -g @nestjs/cli
 RUN         npm ci
 
 # Bundle app source
