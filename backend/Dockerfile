@@ -17,7 +17,7 @@
 
 FROM        node:current-alpine As development
 
-ARG 		SRC_APP_DIR=./data_to_container/app
+ARG 		SRC_APP_DIR=./data_to_container/pong
 ARG 		DST_APP_DIR=/usr/src/app
 ARG 		USER=node
 
@@ -36,7 +36,6 @@ RUN         npm ci
 # Bundle app source
 COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR} ${DST_APP_DIR}
 
-
 # Use the node user from the image (instead of the root user)
 USER        ${USER}
 
@@ -46,7 +45,7 @@ USER        ${USER}
 
 FROM        node:current-alpine As build
 
-ARG 		SRC_APP_DIR=./data_to_container/app
+ARG 		SRC_APP_DIR=./data_to_container/pong
 ARG 		DST_APP_DIR=/usr/src/app
 ARG 		USER=node
 
@@ -82,7 +81,7 @@ USER        ${USER}
 
 FROM        node:current-alpine As production
 
-ARG 		SRC_APP_DIR=./data_to_container/app
+ARG 		SRC_APP_DIR=./data_to_container/pong
 ARG 		DST_APP_DIR=/usr/src/app
 ARG 		USER=node
 
