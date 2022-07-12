@@ -31,7 +31,7 @@ WORKDIR     ${DST_APP_DIR}
 COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN         npm ci
+RUN         npm install
 
 # Bundle app source
 COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR} ${DST_APP_DIR}

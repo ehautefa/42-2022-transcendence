@@ -7,7 +7,7 @@ services:
     # depends_on:
     #   - back_dev
     build:
-      context: ./frontend/
+      context: ./frontend
       target: development
       dockerfile: ./Dockerfile
     command: npm run dev
@@ -16,7 +16,7 @@ services:
     networks:
       - nesjs-network
     volumes:
-      - ./frontend/data_to_container/nextjs-docker:/usr/src/app
+      - ./frontend/data_to_container/src:/usr/src/app/src
     restart: unless-stopped
     
   back_dev:
