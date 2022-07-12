@@ -1,19 +1,63 @@
-version: '3'
+
+#https://dev.to/erezhod/setting-up-a-nestjs-project-with-docker-for-back-end-development-30lg
+
+version: '3.8'
 services:
-  frontend:
-    build: ./frontend
-    volumes:
-      - /app/nodes_modules
-      - ./frontend:/app
-    ports:
-      -80:3000
-      
+  #frontend:
+  #  build: ./frontend
+  #  volumes:
+  #    - /app/nodes_modules
+  #    - ./frontend:/app
+  #  ports:
+  #    - 80:3000
   #   depends_on:
   #     - backend
     
-  # backend:
-  #   build: ./backend
-  #   ports:
-  #     -80:8080
-  #   depends_on:
-  #     - db
+  back_dev:
+#    depends_on:
+#      - postgres
+    container_name: nestjs_api_dev
+    image: nestjs-api-dev:1.0.0
+    build:
+      context: ./backend
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:dev
+    ports:
+      - 3000:3000
+      #- 9229:9229
+    networks:
+      - nesjs-network
+    volumes:
+      - ./backend/data_to_container/app:/usr/src/app
+          #- /usr/src/app/node_modules
+    restart: unless-stopped
+
+  back_prod:
+    depends_on:
+      - postgres
+    container_name: nestjs_api_prod
+    image: nestjs-api-prod:1.0.0
+    build:
+      context: ./backend
+      target: production
+      dockerfile: ./Dockerfile
+    command: npm run start:prod
+    ports:
+        - 3000:3000
+        #- 9229:9229
+    networks:
+        - nesjs-network
+    volumes:
+      - ./backend/data_to_container/app:/usr/src/app
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: rails_user
+      POSTGRES_PASSWORD: rails_password
+      POSTGRES_DB: rails_db
+
+networks:
+    nesjs-network:
