@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { io } from "socket.io-client";
 
 //define type loginInfo
 
@@ -15,7 +14,8 @@ const initialState: loginInfo = {
 	isError: false
 };
 
-export default function LoginForm() {
+export default function LoginForm({socket}: any) {
+	console.log("LoginForm", socket.id);
 	const [loginInfo, setLoginInfo] = useState(initialState);
 
 	const setUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,17 +27,9 @@ export default function LoginForm() {
 	}
 
 	const handleSubmit = () => {
-		console.log("Username ", loginInfo.username, " Password ", loginInfo.password);
-		const socket = io("deb:3000");
-		//Connect to server
-		socket.on("connect", (e) => {
-			console.log("connection established");
-
-			socket.emit("login", { name: username }, (data) => {
-				console.log(data);
-			});
-		});
-
+	console.log("handle", socket.id);
+	console.log("Username ", loginInfo.username, " Password ", loginInfo.password);
+		socket.emit('custom-event', "coucou");
 	}
 
 	return (
@@ -56,7 +48,7 @@ export default function LoginForm() {
 					onChange={setPassword}
 					autoComplete="on"
 					required />
-				<button type="submit" onClick={handleSubmit}>Login</button>
+				<button type="button" onClick={handleSubmit}>Login</button>
 			</form>
 		</div>
 	)

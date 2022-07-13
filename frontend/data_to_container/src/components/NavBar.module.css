@@ -1,0 +1,25 @@
+/* Important stuff here! Look at the bottom!!! (Line 133 to 136) */
+/* *,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+} */
+
+/* body {
+  --nav-bg: #03000e;
+  --main-clr: dodgerblue;
+  --nav-shadow: 0px 3px var(--main-clr);
+} */
+
+#navBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: fixed;
+  width: 100%;
+  background: #03000e;
+  /* box-shadow: var(--nav-shadow); */
+}
