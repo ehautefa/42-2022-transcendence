@@ -1,6 +1,5 @@
-import { SocketAddress } from 'net';
 import { useState } from 'react';
-// import io from 'socket.io-client'
+import { io } from "socket.io-client";
 
 //define type loginInfo
 
@@ -29,15 +28,15 @@ export default function LoginForm() {
 
 	const handleSubmit = () => {
 		console.log("Username ", loginInfo.username, " Password ", loginInfo.password);
-		// const socket = io();
-		// //Connect to server
-		// socket.on("connect", (e) => {
-		// 	console.log("connection established");
+		const socket = io("deb:3000");
+		//Connect to server
+		socket.on("connect", (e) => {
+			console.log("connection established");
 
-		// 	socket.emit("login", { name: username }, (data) => {
-		// 		console.log(data);
-		// 	});
-		// });
+			socket.emit("login", { name: username }, (data) => {
+				console.log(data);
+			});
+		});
 
 	}
 

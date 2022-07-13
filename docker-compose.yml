@@ -13,8 +13,8 @@ services:
     command: npm run dev
     ports:
        - 3000:3000
-    networks:
-      - nesjs-network
+    # links:
+    #   - back_dev
     volumes:
       - ./frontend/data_to_container/src:/usr/src/app/src
     restart: unless-stopped
@@ -32,13 +32,20 @@ services:
     command: npm run start:dev
     ports:
       - 3000:3000
-      #- 9229:9229
-    networks:
-      - nesjs-network
+      - 3001:3001
+    links:
+      - postgres
     volumes:
       - ./backend/data_to_container/pong/src/:/usr/src/app/src
           #- /usr/src/app/node_modules
     restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: rails_user
+      POSTGRES_PASSWORD: rails_password
+      POSTGRES_DB: rails_db
 
   back_prod:
     depends_on:
@@ -50,21 +57,14 @@ services:
       target: production
       dockerfile: ./Dockerfile
     command: npm run start:prod
-    ports:
-        - 3000:3000
+    # ports:
+        # - 3000:3000
         #- 9229:9229
     networks:
         - nesjs-network
     volumes:
       - ./backend/data_to_container/pong:/usr/src/app
     restart: unless-stopped
-
-  postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: rails_user
-      POSTGRES_PASSWORD: rails_password
-      POSTGRES_DB: rails_db
 
 networks:
     nesjs-network:
