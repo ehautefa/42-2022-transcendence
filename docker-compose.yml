@@ -28,15 +28,16 @@ services:
       context: ./backend
       target: development
       dockerfile: ./Dockerfile
-    #command: ls -la
-    command: npm run start:dev
+    command: sh /home/node/dev_entrypoint.sh
+    #command: npm run start:dev
     ports:
       - 3000:3000
       - 3001:3001
     links:
       - postgres
     volumes:
-      - ./backend/data_to_container/pong/src/:/usr/src/app/src
+      #- ./backend/data_to_container/pong/src/:/usr/src/app/src
+      - ./backend/data_to_container/pong/:/usr/src/app/
           #- /usr/src/app/node_modules
     restart: unless-stopped
 
