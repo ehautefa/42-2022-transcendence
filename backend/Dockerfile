@@ -37,6 +37,7 @@ RUN         npm ci
 
 # Bundle app source
 COPY 		${SRC_APP_DIR} ${DST_APP_DIR}
+COPY 		./dev_entrypoint.sh /home/node
 
 
 ###################
