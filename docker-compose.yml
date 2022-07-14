@@ -4,8 +4,8 @@
 version: '3.8'
 services:
   front_dev:
-    # depends_on:
-    #   - back_dev
+    depends_on:
+      - back_dev
     build:
       context: ./frontend
       target: development
@@ -31,10 +31,7 @@ services:
     command: sh /home/node/dev_entrypoint.sh
     #command: npm run start:dev
     ports:
-      - 3000:3000
       - 3001:3001
-    links:
-      - postgres
     volumes:
       #- ./backend/data_to_container/pong/src/:/usr/src/app/src
       - ./backend/data_to_container/pong/:/usr/src/app/
@@ -48,24 +45,24 @@ services:
       POSTGRES_PASSWORD: rails_password
       POSTGRES_DB: rails_db
 
-  back_prod:
-    depends_on:
-      - postgres
-    container_name: nestjs_api_prod
-    image: nestjs-api-prod:1.0.0
-    build:
-      context: ./backend
-      target: production
-      dockerfile: ./Dockerfile
-    command: npm run start:prod
-    # ports:
-        # - 3000:3000
-        #- 9229:9229
-    networks:
-        - nesjs-network
-    volumes:
-      - ./backend/data_to_container/pong:/usr/src/app
-    restart: unless-stopped
+  # back_prod:
+  #   depends_on:
+  #     - postgres
+  #   container_name: nestjs_api_prod
+  #   image: nestjs-api-prod:1.0.0
+  #   build:
+  #     context: ./backend
+  #     target: production
+  #     dockerfile: ./Dockerfile
+  #   command: npm run start:prod
+  #   # ports:
+  #       # - 3000:3000
+  #       #- 9229:9229
+  #   networks:
+  #       - nesjs-network
+  #   volumes:
+  #     - ./backend/data_to_container/pong:/usr/src/app
+  #   restart: unless-stopped
 
 networks:
     nesjs-network:

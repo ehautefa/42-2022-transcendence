@@ -7,7 +7,7 @@ import styles from '../styles/Home.module.css'
 
 const config = require('../.env')
 
-export const socket = io("http://deb:3000");
+export const socket = io("http://localhost:3001");
 
 const Home: NextPage = () => {
 	//Connect to server

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: csejault <csejault@student.42.fr>          +#+  +:+       +#+         #
+#    By: ehautefa <ehautefa@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/15 16:20:24 by csejault          #+#    #+#              #
-#    Updated: 2022/06/16 14:06:25 by csejault         ###   ########.fr        #
+#    Updated: 2022/07/14 16:02:43 by ehautefa         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ ARG 		DST_APP_DIR=/usr/src/app
 ARG 		USER=node
 
 # Use the node user from the image (instead of the root user)
-USER        ${USER}
+# USER        ${USER}
 
 # Create app directory
 WORKDIR     ${DST_APP_DIR}
