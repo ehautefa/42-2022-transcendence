@@ -1,24 +1,21 @@
-import './NavBar.module.css'
+import styles from '../styles/NavBar.module.css'
 
 function navBar() {
-	return (<nav id="navBar">
-			<div>
-				<a href="http://localhost:3000">Something</a>
-			</div>
-			<div>
-				<ul id="nav">
-					<li><a href="#">Home</a></li>
-					<li><a href="#">About</a></li>
-					<li><a href="#">Contact</a></li>
-					<li><a href="#">Services</a></li>
-				</ul>
-			</div>
-			<div class="menu" id="menu">
-				<span></span>
-				<span></span>
-				<span></span>
-			</div>
-		</nav>)
+	return (<div className={styles.nav}>
+				<div id="nav-header">
+					<a href="http://localhost:3000">
+						Transcendence
+					</a>
+				</div>
+				<div className={styles.navButton}>
+				</div>
+
+				<div className={styles.navLinks}>
+					<a href="//github.io/jo_geek" target="_blank">Game</a>
+					<a href="http://stackoverflow.com/users/4084003/" target="_blank">Chat</a>
+					<a href="https://in.linkedin.com/in/jonesvinothjoseph" target="_blank">Mon Profil</a>
+				</div>
+		</div>)
 }
 
 export default navBar;

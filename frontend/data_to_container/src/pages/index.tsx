@@ -1,9 +1,11 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import LoginForm from '../components/login-form'
+import NavBar from "../components/NavBar"
 import mainPage from './mainPage';
 import { io } from "socket.io-client";
 import styles from '../styles/Home.module.css'
+
+const config = require('../.env')
 
 export const socket = io("http://deb:3000");
 
@@ -22,7 +24,8 @@ const Home: NextPage = () => {
 			</Head>
 
 			<main className={styles.main}>
-				<mainPage socket={socket} />
+				<a href="https://api.intra.42.fr">Try to connect</a>
+				<NavBar />
 			</main>
 
 			<footer className={styles.footer}>
