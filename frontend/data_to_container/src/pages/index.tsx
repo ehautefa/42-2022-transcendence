@@ -4,8 +4,8 @@ import NavBar from "../components/NavBar"
 import mainPage from './mainPage';
 import { io } from "socket.io-client";
 import styles from '../styles/Home.module.css'
-import { Auth0Provider } from "@auth0/auth0-react";
 import App from '../components/App';
+import ClientOAuth2 from 'client-oauth2';
 
 // export const socket = io("http://localhost:3001");
 
@@ -16,6 +16,16 @@ const Home: NextPage = () => {
 	// 	sessionStorage.setItem("socket", socket);
 	// });
 
+	console.log("Home page", process.env.AUTH0_CLIENT_ID);
+	var auth42 = new ClientOAuth2({
+		clientId: process.env.AUTH0_CLIENT_ID,
+		clientSecret: process.env.AUTH0_SECRET,
+		accessTokenUri: "https://api.intra.42.fr/oauth/token",
+		authorizationUri: "https://api.intra.42.fr/oauth/authorize",
+		redirectUri: "https://localhost:3000/mainPage",
+	})
+
+	var url = auth42.token.getUri();
 	return (
 		<div className={styles.container}>
 			<Head>
@@ -25,19 +35,9 @@ const Home: NextPage = () => {
 			</Head>
 			<NavBar />
 			<main className={styles.login}>
-				<a href="https://api.intra.42.fr/oauth/authorize?client_id=95976106d24d16c4735c8b3f39334abfb699b1295edc3ecb1b149054e27373b4&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2FmainPage&response_type=code">Try to connect</a>
-				{/* <Auth0Provider
-					domain="https://api.intra.42.fr/oauth"
-					clientId="95976106d24d16c4735c8b3f39334abfb699b1295edc3ecb1b149054e27373b4"
-					redirectUri="https://localhost:3000/mainPage"
-					// scope="public"
-				>
-					<App />
-				</Auth0Provider> */}
+				{/* <a href="https://api.intra.42.fr/oauth/authorize?client_id=95976106d24d16c4735c8b3f39334abfb699b1295edc3ecb1b149054e27373b4&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2FmainPage&response_type=code">Try to connect</a> */}
+				<a href={url}>Try to connect</a>
 			</main>
-
-			<footer className={styles.footer}>
-			</footer>
 		</div>
 	)
 
