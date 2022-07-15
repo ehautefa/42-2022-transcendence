@@ -1,13 +1,13 @@
-import {useEffect, useState} from "next";
+import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const Profile = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [userMetadata, setUserMetadata] = useState(null);
 
-  seEffect(() => {
+  useEffect(() => {
 	const getUserMetadata = async () => {
-	  const domain = "YOUR_DOMAIN";
+	  const domain = "localhost:3000";
   
 	  try {
 		const accessToken = await getAccessTokenSilently({
