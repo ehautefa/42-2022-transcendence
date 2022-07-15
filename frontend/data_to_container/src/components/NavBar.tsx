@@ -3,7 +3,7 @@ import styles from '../styles/NavBar.module.css'
 function navBar() {
 	return (<div className={styles.nav}>
 				<div id="nav-header">
-					<a href="http://localhost:3000">
+					<a href="https://localhost:3000">
 						Transcendence
 					</a>
 				</div>
