@@ -22,11 +22,11 @@ WORKDIR     ${DST_APP_DIR}
 COPY 		${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
+RUN         npm ci
 
 # Bundle app source
 COPY 		${SRC_APP_DIR} ${DST_APP_DIR}
 
-RUN         npm ci
 
 
 ###################

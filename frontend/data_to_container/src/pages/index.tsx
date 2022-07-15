@@ -5,16 +5,15 @@ import mainPage from './mainPage';
 import { io } from "socket.io-client";
 import styles from '../styles/Home.module.css'
 
-const config = require('../.env')
-
-export const socket = io("http://localhost:3001");
+// export const socket = io("http://localhost:3001");
 
 const Home: NextPage = () => {
 	//Connect to server
-	socket.on("connect", () => {
-		console.log("connection established ", socket.id);
-		sessionStorage.setItem("socket", socket);
-	});
+	// socket.on("connect", () => {
+	// 	console.log("connection established ", socket.id);
+	// 	sessionStorage.setItem("socket", socket);
+	// });
+	
 	return (
 		<div className={styles.container}>
 			<Head>
@@ -24,7 +23,7 @@ const Home: NextPage = () => {
 			</Head>
 
 			<main className={styles.main}>
-				<a href="https://api.intra.42.fr">Try to connect</a>
+				<a href="https://api.intra.42.fr/oauth/authorize?client_id=95976106d24d16c4735c8b3f39334abfb699b1295edc3ecb1b149054e27373b4&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2FmainPage&response_type=code">Try to connect</a>
 				<NavBar />
 			</main>
 
@@ -32,6 +31,7 @@ const Home: NextPage = () => {
 			</footer>
 		</div>
 	)
+	
 }
 
 export default Home
