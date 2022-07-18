@@ -7,25 +7,32 @@ import styles from '../styles/Home.module.css'
 import App from '../components/App';
 import ClientOAuth2 from 'client-oauth2';
 
+// Create a socket to communicate with the backend
 // export const socket = io("http://localhost:3001");
 
 const Home: NextPage = () => {
-	//Connect to server
+
+	// Connect socket to the backend
 	// socket.on("connect", () => {
 	// 	console.log("connection established ", socket.id);
-	// 	sessionStorage.setItem("socket", socket);
 	// });
 
-	console.log("Home page", process.env.AUTH0_CLIENT_ID);
+	// Create a new instance of the OAuth 2.0 client
+	// process.env permet de recuperer les variables d'environnement
 	var auth42 = new ClientOAuth2({
 		clientId: process.env.AUTH0_CLIENT_ID,
-		clientSecret: process.env.AUTH0_SECRET,
+		clientSecret: process.env.AUTH0_CLIENT_SECRET,
 		accessTokenUri: "https://api.intra.42.fr/oauth/token",
 		authorizationUri: "https://api.intra.42.fr/oauth/authorize",
 		redirectUri: "https://localhost:3000/mainPage",
+		responseType: "code",
 	})
 
-	var url = auth42.token.getUri();
+	// Get the URL to which the user will be redirected for authorization
+	var url:string = auth42.token.getUri();
+	url = url.replace("token", "code");
+	console.log("URL", url);
+
 	return (
 		<div className={styles.container}>
 			<Head>
