@@ -1,0 +1,76 @@
+.mainComposant {
+	position: fixed;
+	top: 50px;
+	width: 80%;
+	height: auto;
+	margin: 5% auto;
+	left: 0;
+	right: 0;
+}
+
+.flex {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	margin: 50px;
+	justify-content: space-between;
+}
+
+.info {
+	background-color: rgba(0, 0, 0, 0.5);
+	box-shadow: 5px 5px 10px #000;
+	border-radius: 10px;
+	width: 60%;
+}
+
+.mainComposant h3 {
+	font-size: 1.5em;
+	text-align: left;
+	margin: 0;
+	padding: 20px 40px;
+}
+
+.pp {
+	width: 200px;
+	height: 200px;
+	border-radius: 100px;
+	box-shadow: 5px 5px 10px #000;
+	margin: 40px;
+	padding: 0;
+	background-image: url(../public/default_avatar.png);
+	background-size: cover;
+	border: 1px double #FA0197;
+}
+
+.pp:hover a {
+	display:block;
+}
+
+.pp:hover {
+	background-image: none;
+	background-color: black;
+}
+
+.pp a {
+	line-height: 200px;
+	display:none;
+	text-decoration: underline;
+	font-size: 1.5em;
+	text-align: center;
+	text-shadow: none;
+}
+
+.friends {
+	background-color: rgba(0, 0, 0, 0.5);
+	box-shadow: 5px 5px 10px #000;
+	border-radius: 10px;
+	width: 45%;
+}
+
+.stats {
+	background-color: rgba(0, 0, 0, 0.5);
+	box-shadow: 5px 5px 10px #000;
+	border-radius: 10px;
+	width: 45%;
+
+}
