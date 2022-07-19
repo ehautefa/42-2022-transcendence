@@ -1,37 +1,36 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import NavBar from "../components/NavBar"
-import mainPage from './mainPage';
 import { io } from "socket.io-client";
 import styles from '../styles/Home.module.css'
-import App from '../components/App';
 import ClientOAuth2 from 'client-oauth2';
 
 // Create a socket to communicate with the backend
-// export const socket = io("http://localhost:3001");
+export const socket = io("http://localhost:3001");
+
+// Create a new instance of the OAuth 2.0 client
+// process.env permet de recuperer les variables d'environnement
+export var auth42 = new ClientOAuth2({
+	clientId: process.env.AUTH0_CLIENT_ID,
+	clientSecret: process.env.AUTH0_CLIENT_SECRET,
+	accessTokenUri: "https://api.intra.42.fr/oauth/token",
+	authorizationUri: "https://api.intra.42.fr/oauth/authorize",
+	redirectUri: "https://localhost:3000/mainPage",
+})
+
+export function getSocket() {
+	return socket;
+}
 
 const Home: NextPage = () => {
 
 	// Connect socket to the backend
-	// socket.on("connect", () => {
-	// 	console.log("connection established ", socket.id);
-	// });
-
-	// Create a new instance of the OAuth 2.0 client
-	// process.env permet de recuperer les variables d'environnement
-	var auth42 = new ClientOAuth2({
-		clientId: process.env.AUTH0_CLIENT_ID,
-		clientSecret: process.env.AUTH0_CLIENT_SECRET,
-		accessTokenUri: "https://api.intra.42.fr/oauth/token",
-		authorizationUri: "https://api.intra.42.fr/oauth/authorize",
-		redirectUri: "https://localhost:3000/mainPage",
-		responseType: "code",
-	})
+	socket.on("connect", () => {
+		console.log("connection established ", socket.id);
+	});
 
 	// Get the URL to which the user will be redirected for authorization
-	var url:string = auth42.token.getUri();
-	url = url.replace("token", "code");
-	console.log("URL", url);
+	var url:string = auth42.code.getUri();
 
 	return (
 		<div className={styles.container}>
@@ -42,12 +41,10 @@ const Home: NextPage = () => {
 			</Head>
 			<NavBar />
 			<main className={styles.login}>
-				{/* <a href="https://api.intra.42.fr/oauth/authorize?client_id=95976106d24d16c4735c8b3f39334abfb699b1295edc3ecb1b149054e27373b4&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2FmainPage&response_type=code">Try to connect</a> */}
 				<a href={url}>Try to connect</a>
 			</main>
 		</div>
 	)
-
 }
 
-export default Home
+export default Home;
