@@ -11,9 +11,9 @@ function navBar() {
 				</div>
 
 				<div className={styles.navLinks}>
-					<a href="//github.io/jo_geek" target="_blank">Game</a>
-					<a href="http://stackoverflow.com/users/4084003/" target="_blank">Chat</a>
-					<a href="/monProfil" >Mon Profil</a>
+					<a href="/Game">Game</a>
+					<a href="/Chat">Chat</a>
+					<a href="/myProfile" >My Profile</a>
 				</div>
 		</div>)
 }

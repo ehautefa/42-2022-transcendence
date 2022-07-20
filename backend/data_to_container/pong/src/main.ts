@@ -12,7 +12,7 @@ const httpsOptions = createServer({
 });
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule, { httpsOptions });
+	const app = await NestFactory.create(AppModule);
 	// await app.listen(3001);
 }
 bootstrap();
@@ -33,5 +33,9 @@ io.on("connection", (socket) => {
 	console.log(socket.id)
 	socket.on('token', (token) => {
 		console.log(" token received =", token)
+	})
+	socket.on("message", (msg:string) => {
+		console.log("message received =", msg)
+		io.emit("message", msg);
 	})
 })

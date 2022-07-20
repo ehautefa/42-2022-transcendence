@@ -23,6 +23,34 @@
 	width: 60%;
 }
 
+.info ul {
+	list-style: none;
+	margin-left: 40px;
+	line-height: 30px;
+	color: #FAE3E3;
+}
+
+.info ul a {
+	text-align: right;
+	color:#FA0197;
+}
+
+.info button {
+	margin-left: 50%;
+	padding: 5px 10px;
+	background-color: rgba(0,0,0,0);
+	border-radius: 10px;
+	color: #FA0197;
+	border: 2px solid #FA0197;
+	box-shadow: 1px 1px 5px #FA0197;
+	font-size: 15px;
+	cursor: pointer;
+}
+
+.info button:hover {
+	border-color: #fef45b;
+}
+
 .mainComposant h3 {
 	font-size: 1.5em;
 	text-align: left;
