@@ -2,13 +2,15 @@ import NavBar from "../components/NavBar"
 import Head from 'next/head'
 import styles from "../styles/Chat.module.css"
 import { getSocket } from "./index"
+import { useState } from 'react'
 
 function Game() {
 	// Recuperation de la socket initialiser dans index
 	const socket = getSocket();
-	var message:string;
+	var message: string;
+	const [messages, setMessages] = useState([]);
 
-	function handleChange (event) {
+	function handleChange(event) {
 		message = event.target.value;
 	}
 
@@ -20,8 +22,9 @@ function Game() {
 		}
 	}
 
-	socket.on("message", function(msg:string) {
+	socket.on("message", function (msg: string) {
 		console.log("Message recu : ", msg);
+		setMessages([...messages, msg]);
 	})
 
 	return (<div>
@@ -36,9 +39,13 @@ function Game() {
 				<h3>Name</h3>
 			</div>
 			<div className={styles.chat}>
-				<ul id="messages"></ul>
+				<div className={styles.messages}>
+					<ul>
+						{messages.map((message: string) => (<li>Pika: {message}</li>))}
+					</ul>
+				</div>
 				<form id="form" action="">
-					<input 
+					<input
 						id="input"
 						autoComplete="off"
 						type="text"

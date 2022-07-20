@@ -27,6 +27,16 @@
     overflow-y: scroll;
 }
 
+.chat li {
+    list-style: none;
+    margin: 10px 0px;
+    color: #fae3fa;
+    padding: 5px;
+}
+
+.messages {
+}
+
 .chat form {
     width:100%;
     display: flex;
