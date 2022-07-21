@@ -43,8 +43,8 @@
 	text-shadow: px 1px 1px #fef45b;
 }
 
-.nav>#nav-check {
-	display: none;
+.check {
+	/* display: none; */
 }
 
 @media (max-width:600px) {
@@ -55,33 +55,29 @@
 		top: 0px;
 	}
 
-	.nav>.nav-btn>label {
+	.navButton label {
 		display: inline-block;
-		width: 50px;
-		height: 50px;
 		padding: 13px;
+		height: 4vh;
 	}
 
-	.nav>.nav-btn>label:hover,
-	.nav #nav-check:checked~.nav-btn>label {
-		background-color: rgba(0, 0, 0, 0.3);
-	}
-
-	.nav>.nav-btn>label>span {
+	.navButton span {
 		display: block;
 		width: 25px;
 		height: 10px;
-		border-top: 2px solid #eee;
+		border-top: 2px solid #FA0197;
 	}
 
 	.navLinks {
 		position: absolute;
 		display: block;
 		width: 100%;
-		background-color: #333;
+		background-color: #250021;
+		border-top: 1px solid #fef45b;
 		height: 0px;
 		transition: all 0.3s ease-in;
 		overflow-y: hidden;
+		overflow-x: hidden;
 		top: 50px;
 		left: 0px;
 	}
@@ -91,11 +87,11 @@
 		width: 100%;
 	}
 
-	.nav>#nav-check:not(:checked)~.nav-links {
+	.check:not(:checked) ~ .navLinks {
 		height: 0px;
 	}
 
-	.nav>#nav-check:checked~.nav-links {
+	.check:checked ~ .navLinks {
 		height: calc(100vh - 50px);
 		overflow-y: auto;
 	}

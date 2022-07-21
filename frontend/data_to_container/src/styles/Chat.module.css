@@ -1,14 +1,15 @@
 .mainComposant {
     width: 80%;
+    height: 80vh;
     margin: 60px auto;
     display: flex;
     flex-direction: row;
 }
 
 .channel {
-    width: 20%;
-    margin: 10px;
+    width: 100%;
     height: 100%;
+    margin: 10px 0;
     border-radius: 10px;
     background-color: rgba(0,0,0,0.5);
     overflow-y: scroll;
@@ -18,13 +19,20 @@
     margin: 10px;
 }
 
+.box {
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    width:30%;
+}
+
 .chat {
+    display: flex;
+    flex-direction: column;
     width: 80%;
     margin: 10px;
-    height: 700px;
     border-radius: 10px;
     background-color: rgba(0,0,0,0.5);
-    overflow-y: scroll;
 }
 
 .chat li {
@@ -35,6 +43,8 @@
 }
 
 .messages {
+    height: 100%;
+    overflow-y: scroll;
 }
 
 .chat form {
@@ -67,4 +77,49 @@
     color: #fae3fa;
     border: none;
     cursor: pointer;
+}
+
+@media screen and (max-width: 1024px) and (min-width: 600px) {
+    .mainComposant {
+        width: 98%;
+        margin-top: 10px;
+        height: 92vh;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .mainComposant{
+        flex-direction: column-reverse;
+        width: 100%;
+        margin: 0;
+        height: 110vh;
+        padding: 0;
+    }
+
+    .box {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .chat {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow-y: scroll;
+    }
+
+    .chat button {
+        width: 20%;
+    }
+    
+    .chat li {
+        margin: 0;
+    }
+
+    .chat ul {
+        margin: 0;
+        padding: 2px;
+    }
 }

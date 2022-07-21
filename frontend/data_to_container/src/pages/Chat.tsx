@@ -17,7 +17,7 @@ function Game() {
 	function sendMessage() {
 		if (message) {
 			console.log("Message a envoyer : ", message);
-			socket.emit("message", message);
+			socket.emit("message", socket.id + ": " + message);
 			message = "";
 		}
 	}
@@ -35,13 +35,18 @@ function Game() {
 		</Head>
 		<NavBar />
 		<div className={styles.mainComposant}>
-			<div className={styles.channel}>
-				<h3>Name</h3>
+			<div className={styles.box}>
+				<div className={styles.channel}>
+					<h3>Channel</h3>
+				</div>
+				<div className={styles.channel}>
+					<h3>Members</h3>
+				</div>
 			</div>
 			<div className={styles.chat}>
 				<div className={styles.messages}>
 					<ul>
-						{messages.map((message: string) => (<li>Pika: {message}</li>))}
+						{messages.map((message: string) => (<li>{message}</li>))}
 					</ul>
 				</div>
 				<form id="form" action="">
@@ -50,6 +55,7 @@ function Game() {
 						autoComplete="off"
 						type="text"
 						onChange={handleChange}
+						autofocus
 					/>
 					<button type="reset" onClick={sendMessage}>
 						Send
