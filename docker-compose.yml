@@ -32,6 +32,7 @@ services:
     #command: npm run start:dev
     ports:
       - 3001:3001
+      - 3380:3380
     volumes:
       #- ./backend/data_to_container/pong/src/:/usr/src/app/src
       - ./backend/data_to_container/pong/:/usr/src/app/
