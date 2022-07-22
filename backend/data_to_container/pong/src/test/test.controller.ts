@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, Post, UsePipes, ValidationPipe } from 
 import { CreateQuizDto } from './dto/createQuizz.dto';
 import { TestService } from './test.service';
 
-@Controller()
+@Controller('/test')
 export class TestController {
     // public i: number = 0;
     constructor(private readonly test_service: TestService) { }

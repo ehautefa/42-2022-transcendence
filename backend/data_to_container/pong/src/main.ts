@@ -13,11 +13,11 @@ const httpsOptions = createServer({
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
-		await app.listen(3380);
+		await app.listen(3011);
 }
 bootstrap();
 
-const io = require("socket.io")(3001, {
+const io = require("socket.io")(3010, {
 	cors: {
 		origin: ["https://localhost:3000"],
 	},

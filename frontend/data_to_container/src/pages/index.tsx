@@ -6,13 +6,13 @@ import styles from '../styles/Home.module.css'
 import ClientOAuth2 from 'client-oauth2';
 
 // Create a socket to communicate with the backend
-export const socket = io("http://localhost:3001");
+export const socket = io("http://localhost:3010");
 
 // Create a new instance of the OAuth 2.0 client
 // process.env permet de recuperer les variables d'environnement
 export var auth42 = new ClientOAuth2({
 	clientId: process.env.AUTH0_CLIENT_ID,
-	clientSecret: process.env.AUTH0_CLIENT_SECRET,
+	// clientSecret: process.env.AUTH0_CLIENT_SECRET,
 	accessTokenUri: "https://api.intra.42.fr/oauth/token",
 	authorizationUri: "https://api.intra.42.fr/oauth/authorize",
 	redirectUri: "https://localhost:3000/mainPage",
