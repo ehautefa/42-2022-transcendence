@@ -55,7 +55,7 @@ function Game() {
 						autoComplete="off"
 						type="text"
 						onChange={handleChange}
-						autofocus
+						autoFocus
 					/>
 					<button type="reset" onClick={sendMessage}>
 						Send
