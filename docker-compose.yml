@@ -10,13 +10,13 @@ services:
       context: ./frontend
       target: development
       dockerfile: ./Dockerfile
-    command: npm run start
+    command: npm start
     ports:
        - 3000:3000
     # links:
     #   - back_dev
     volumes:
-      - ./frontend/data_to_container/src:/usr/src/app/src
+      - ./frontend/react/src:/usr/src/app/src
     restart: unless-stopped
     
   back_dev:

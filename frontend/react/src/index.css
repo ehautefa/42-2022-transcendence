@@ -1,0 +1,67 @@
+html,
+body {
+	padding: 0;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	color: #FA0197;
+}
+
+body {
+	background-color: #250021;
+	background-image: url("../public/synthwave-wallpaper.jpg");
+	background-repeat: no-repeat;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+a:hover {
+	text-shadow: 1px 1px 1px #fef45b;
+}
+
+.login a {
+	font-size: 3rem;
+	font-weight: bolder;
+	position: fixed;
+	bottom: 50%;
+	width: 100%;
+	color: #FA0197;
+	width: 100%;
+	text-align: center;
+}
+
+.login h1 {
+	font-size: 3rem;
+	font-weight: bolder;
+	position: fixed;
+	bottom: 50%;
+	width: 100%;
+	color: #FA0197;
+	width: 100%;
+	text-align: center;
+}
+
+.login a:hover {
+	text-shadow: 1px 1px 1px #fef45b;
+}
+
+.text {
+	position: fixed;
+	bottom: 0px;
+	background-color: #FA0197;
+}
+
+.text button {
+	background-color: #FA0197;
+	color: #fef45b;
+	border: none;
+	padding: 10px;
+	font-size: 1.5rem;
+	font-weight: bolder;
+	border-radius: 5px;
+	width: 100%;
+	text-align: center;
+}
