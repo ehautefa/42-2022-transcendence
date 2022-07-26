@@ -4,65 +4,59 @@
 version: '3.8'
 services:
   front_dev:
-    # depends_on:
-    #   - back_dev
+    depends_on:
+      - back_dev
+    container_name: front_dev
     build:
       context: ./frontend
       target: development
       dockerfile: ./Dockerfile
     command: npm start
-    ports:
-       - 3000:3000
     # links:
     #   - back_dev
     volumes:
       - ./frontend/react/src:/usr/src/app/src
     restart: unless-stopped
+    env_file:
+    - ./frontend/frontend.env
+    ports:
+       - 3000:3000
     
   back_dev:
-#    depends_on:
-#      - postgres
+    depends_on:
+    - postgres
     container_name: nestjs_api_dev
     image: nestjs-api-dev:1.0.0
     build:
       context: ./backend
       target: development
       dockerfile: ./Dockerfile
-    command: sh /home/node/dev_entrypoint.sh
-    #command: npm run start:dev
-    ports:
-      - 3001:3001
     volumes:
-      #- ./backend/data_to_container/pong/src/:/usr/src/app/src
       - ./backend/data_to_container/pong/:/usr/src/app/
-          #- /usr/src/app/node_modules
+    command: sh /home/node/dev_entrypoint.sh
     restart: unless-stopped
+    env_file:
+    - ./backend/backend.env
+    ports:
+      - 3010:3010
+      - 3011:3011
 
   postgres:
+    container_name: postgres_dev
     image: postgres:latest
-    environment:
-      POSTGRES_USER: rails_user
-      POSTGRES_PASSWORD: rails_password
-      POSTGRES_DB: rails_db
+    restart: always
+    env_file:
+    - ./postgres/postgres.env
+    ports:
+      - "3020:3020"
 
-  # back_prod:
-  #   depends_on:
-  #     - postgres
-  #   container_name: nestjs_api_prod
-  #   image: nestjs-api-prod:1.0.0
-  #   build:
-  #     context: ./backend
-  #     target: production
-  #     dockerfile: ./Dockerfile
-  #   command: npm run start:prod
-  #   # ports:
-  #       # - 3000:3000
-  #       #- 9229:9229
-  #   networks:
-  #       - nesjs-network
-  #   volumes:
-  #     - ./backend/data_to_container/pong:/usr/src/app
-  #   restart: unless-stopped
-
-networks:
-    nesjs-network:
+  pg_admin:
+    depends_on:
+    - postgres
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+    - pg_admin/pg_admin.env
+    ports:
+      - "3030:80"
