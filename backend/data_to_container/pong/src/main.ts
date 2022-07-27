@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as fs from 'fs';
-import { Server } from "socket.io"
+// import { Server } from "socket.io"
 import { readFileSync } from "fs";
 import { createServer } from 'https';
 
@@ -17,25 +17,20 @@ async function bootstrap() {
 }
 bootstrap();
 
-const io = require("socket.io")(3010, {
-	cors: {
-		origin: ["http://localhost:3000"],
-	},
-})
-
-// const io = new Server(httpsOptions, {
+// const io = require("socket.io")(3010, {
 // 	cors: {
-// 		origin: ["https://localhost:3000"],
+// 		origin: ["http://localhost:3000"],
 // 	},
 // })
 
-io.on("connection", (socket) => {
-	console.log(socket.id)
-	socket.on('token', (token) => {
-		console.log(" token received =", token)
-	})
-	socket.on("message", (msg:string) => {
-		console.log("message received =", msg)
-		io.emit("message", msg);
-	})
-})
+
+// io.on("connection", (socket) => {
+// 	console.log(socket.id)
+// 	socket.on('token', (token) => {
+// 		console.log(" token received =", token)
+// 	})
+// 	socket.on("message", (msg:string) => {
+// 		console.log("message received =", msg)
+// 		io.emit("message", msg);
+// 	})
+// })

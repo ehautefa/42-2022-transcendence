@@ -1,16 +1,52 @@
-.GameWindow {
+#GameBoard {
 	background-color: rgba(0, 0, 0, 0.5);
+	background-image: linear-gradient(#FA0197, #fef45b);
+	background-size: 2px 100%;
+	background-repeat: no-repeat;
 	border-radius: 10px;
+	background-position: 50% center;
 	width: 100%;
 	height: 70vh;
+	border: #fef45b solid 1px;
+}
+
+.Paddle {
+	width: 2vw;
+	height: 30%;
+	background-color: #fef45b;
+	border-radius: 5px;
+	position: absolute;
+	transform: translate(-50%, -50%);
+
 }
 
 .Ball {
-	width: 20px;
-	height: 20px;
+	width: 30px;
+	height: 30px;
 	background-color: #FA0197;
-	border-radius: 10px;
+	border-radius: 100px;
 	position: absolute;
-	/* top: 200px;
-	left: 200px; */
+}
+
+.Score {
+	position: absolute;
+	top: 0;
+	/* margin: 100px 0; */
+	text-align: center;
+	width: 50%;
+	/* background-color: aqua; */
+	height: 100%;
+	color: rgba(229, 52,148 , 0.4);
+	font-size: 10vw;
+	font-weight: bolder;
+	text-align: center;
+	/* text-shadow: 1px 1px 1px #fef45b; */
+}
+
+.Left {
+	left: 0;
+}
+
+.Right {
+	right: 0;
 }
