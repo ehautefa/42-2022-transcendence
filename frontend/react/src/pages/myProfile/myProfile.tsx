@@ -7,11 +7,6 @@ function myProfile() {
 	// const socket = getSocket();
 
 	return (<div>
-		<head>
-			<title>My Profile</title>
-			<meta name="description" content="My profile" />
-			<link rel="icon" href="./public/favicon.ico" />
-		</head>
 		<NavBar />
 		<div className="mainComposant">
 			<div className="flex">

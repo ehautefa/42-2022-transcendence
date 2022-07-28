@@ -6,8 +6,8 @@ class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
 		return <div
 			style={{
-				top: `${this.props.y}px`,
-				left: `${this.props.x}px`,
+				top: `${this.props.y}%`,
+				left: `${this.props.x}%`,
 			}}
 			className="Ball" />
 	}
@@ -55,11 +55,11 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 			ballY: 0,
 			ballX: 0,
 			// randomly choose the direction
-			ballSpeedX: 5 * (Math.random() < 0.5 ? 1 : -1),
-			ballSpeedY: 5 * (Math.random() < 0.5 ? 1 : -1),
+			ballSpeedX: 2 * (Math.random() < 0.5 ? 1 : -1),
+			ballSpeedY: 2 * (Math.random() < 0.5 ? 1 : -1),
 			scoreLeft: 0,
 			scoreRight: 0,
-			gameLoopTimeout: 50, // time between game loops
+			gameLoopTimeout:50, // time between game loops
 			timeoutId: 0,
 			paddleLeftY: 50,
 			paddleLeftX: 1,
@@ -86,8 +86,8 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		let maxX = minX + width;
 		let minY = 0;
 		let maxY = minY + height;
-		let ballX = Math.floor(width * 0.5);
-		let ballY = Math.floor(height * 0.5);
+		let ballX = 50;
+		let ballY = 50;
 
 		this.setState({
 			ballX,
@@ -103,6 +103,11 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		let timeoutId = setTimeout(() => {
 			if (!this.state.isGameOver) {
 				this.moveBall();
+				if (this.state.scoreLeft == 10 || this.state.scoreRight == 10) {
+					this.setState({ isGameOver: true });
+					this.resetGame();
+
+				}
 			}
 			this.gameLoop();
 		}, this.state.gameLoopTimeout);
@@ -122,31 +127,38 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		let scoreLeft = this.state.scoreLeft;
 		let scoreRight = this.state.scoreRight;
 
+		let width = document.getElementById("GameBoard")!.clientWidth;
+		let height = document.getElementById("GameBoard")!.clientHeight;
+		
 		// Check if the ball hits the left paddle
-		if (ballX <= Math.ceil(window.innerWidth * (this.state.paddleLeftX + 1)/ 100)
-			&& (ballY >= Math.floor((this.state.paddleLeftY - 15) * (this.state.maxY - this.state.minY) / 100))
-			&& (ballY <= Math.ceil((this.state.paddleLeftY + 15) * (this.state.maxY - this.state.minY) / 100))) {
+		if (ballX * width / 100 < Math.ceil(window.innerWidth * (this.state.paddleLeftX + 1)/ 100)
+		&& (ballY * height / 100 > Math.floor((this.state.paddleLeftY - 15) * (this.state.maxY - this.state.minY) / 100))
+		&& (ballY * height / 100 < Math.ceil((this.state.paddleLeftY + 15) * (this.state.maxY - this.state.minY) / 100))) {
 			ballSpeedX = -ballSpeedX;
+			console.log("1");
 		} // Check if the ball hits the right paddle
-		else if (ballX >= Math.floor(window.innerWidth * (this.state.paddleRightX - 1) / 100) - 30
-			&& (ballY >= Math.floor((this.state.paddleRightY - 15) * (this.state.maxY - this.state.minY) / 100))
-			&& (ballY <= Math.ceil((this.state.paddleRightY + 15) * (this.state.maxY - this.state.minY) / 100))) {
+		else if (ballX * width / 100 > Math.floor(window.innerWidth * (this.state.paddleRightX - 1) / 100) - 30
+		&& (ballY * height / 100 > Math.floor((this.state.paddleRightY - 15) * (this.state.maxY - this.state.minY) / 100))
+		&& (ballY * height / 100 < Math.ceil((this.state.paddleRightY + 15) * (this.state.maxY - this.state.minY) / 100))) {
 			ballSpeedX = -ballSpeedX;
+			console.log("2");
 		} else {
-			if (ballX <= this.state.minX) { // Check if the ball hits the left wall
+			if (ballX * width / 100 < this.state.minX) { // Check if the ball hits the left wall
 				ballSpeedX = -ballSpeedX;
 				scoreRight++;
-			} else if (ballX >= this.state.maxX - 30) { // Check if the ball hits the right wall
+				console.log("3");
+			} else if (ballX * width / 100 > this.state.maxX - 30) { // Check if the ball hits the right wall
 				// 30 is ball diameter
 				ballSpeedX = -ballSpeedX;
 				scoreLeft++;
-			}
-
-			if (ballY <= this.state.minY) { // Check if the ball hits the top wall
+				console.log("4");
+			} else if (ballY * height / 100 < this.state.minY) { // Check if the ball hits the top wall
 				ballSpeedY = -ballSpeedY;
-			} else if (ballY >= this.state.maxY - 30) { // Check if the ball hits the bottom wall
+				console.log("5");
+			} else if (ballY * height / 100 > this.state.maxY - 30) { // Check if the ball hits the bottom wall
 				// 30 is ball diameter
 				ballSpeedY = -ballSpeedY;
+				console.log("6");
 			}
 		}
 		// Update the ball position
@@ -180,6 +192,29 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 			deltaPaddleR = 0;
 		// Update the paddle position
 		this.setState({ paddleLeftY: paddleLeftY + deltaPaddleL, paddleRightY: paddleRightY + deltaPaddleR });
+	}
+
+	resetGame() {
+		this.setState = {
+			ballY: 0,
+			ballX: 0,
+			// randomly choose the direction
+			ballSpeedX: 2 * (Math.random() < 0.5 ? 1 : -1),
+			ballSpeedY: 2 * (Math.random() < 0.5 ? 1 : -1),
+			scoreLeft: 0,
+			scoreRight: 0,
+			gameLoopTimeout:50, // time between game loops
+			timeoutId: 0,
+			paddleLeftY: 50,
+			paddleLeftX: 1,
+			paddleRightX: 79,
+			paddleRightY: 50,
+			minX: 0,
+			maxX: 0,
+			minY: 0,
+			maxY: 0,
+			isGameOver: false
+		};
 	}
 
 	render() {
