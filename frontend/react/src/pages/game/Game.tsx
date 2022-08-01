@@ -1,6 +1,28 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import React from 'react'
+import { io } from 'socket.io-client'
+
+// Create my socket 
+const socket = io('http://localhost:3011');
+
+// Connect my socket to server
+socket.on("connect", () => {
+	console.log("SOCKET FRONT:", socket.id, " : ", socket.connected); 
+});
+
+// Send Gamewindow to connected client
+const submitGame = (data: GameWindowState) => {
+	socket.emit('game', data);
+}
+
+var receivedGame: GameWindowState = GameWindow.state;
+
+// Receive GameWindow from the other player
+socket.on('game', (data: GameWindowState) => {
+	console.log(data);
+	receivedGame = data;
+})
 
 class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
@@ -103,7 +125,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		let timeoutId = setTimeout(() => {
 			if (!this.state.isGameOver) {
 				this.moveBall();
-				if (this.state.scoreLeft == 10 || this.state.scoreRight == 10) {
+				if (this.state.scoreLeft === 10 || this.state.scoreRight === 10) {
 					this.setState({ isGameOver: true });
 					this.resetGame();
 
@@ -122,6 +144,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 	moveBall() {
 		let ballX = this.state.ballX + this.state.ballSpeedX;
 		let ballY = this.state.ballY + this.state.ballSpeedY;
+		// console.log("BALL COOR", ballX, ballY);
 		let ballSpeedX = this.state.ballSpeedX;
 		let ballSpeedY = this.state.ballSpeedY;
 		let scoreLeft = this.state.scoreLeft;
@@ -135,34 +158,36 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		&& (ballY * height / 100 > Math.floor((this.state.paddleLeftY - 15) * (this.state.maxY - this.state.minY) / 100))
 		&& (ballY * height / 100 < Math.ceil((this.state.paddleLeftY + 15) * (this.state.maxY - this.state.minY) / 100))) {
 			ballSpeedX = -ballSpeedX;
-			console.log("1");
+			// console.log("1");
 		} // Check if the ball hits the right paddle
 		else if (ballX * width / 100 > Math.floor(window.innerWidth * (this.state.paddleRightX - 1) / 100) - 30
 		&& (ballY * height / 100 > Math.floor((this.state.paddleRightY - 15) * (this.state.maxY - this.state.minY) / 100))
 		&& (ballY * height / 100 < Math.ceil((this.state.paddleRightY + 15) * (this.state.maxY - this.state.minY) / 100))) {
 			ballSpeedX = -ballSpeedX;
-			console.log("2");
+			// console.log("2");
 		} else {
 			if (ballX * width / 100 < this.state.minX) { // Check if the ball hits the left wall
 				ballSpeedX = -ballSpeedX;
 				scoreRight++;
-				console.log("3");
+				// console.log("3");
 			} else if (ballX * width / 100 > this.state.maxX - 30) { // Check if the ball hits the right wall
 				// 30 is ball diameter
 				ballSpeedX = -ballSpeedX;
 				scoreLeft++;
-				console.log("4");
+				// console.log("4");
 			} else if (ballY * height / 100 < this.state.minY) { // Check if the ball hits the top wall
 				ballSpeedY = -ballSpeedY;
-				console.log("5");
+				// console.log("5");
 			} else if (ballY * height / 100 > this.state.maxY - 30) { // Check if the ball hits the bottom wall
 				// 30 is ball diameter
 				ballSpeedY = -ballSpeedY;
-				console.log("6");
+				// console.log("6");
 			}
 		}
 		// Update the ball position
 		this.setState({ ballX, ballY, ballSpeedX, ballSpeedY, scoreLeft, scoreRight });
+		submitGame(this.state); // Send GameWindow to other user
+		this.setState({paddleLeftY: receivedGame.paddleRightY})
 	}
 
 	handleKeyDown(event: KeyboardEvent) {
@@ -195,26 +220,26 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 	}
 
 	resetGame() {
-		this.setState = {
-			ballY: 0,
-			ballX: 0,
-			// randomly choose the direction
-			ballSpeedX: 2 * (Math.random() < 0.5 ? 1 : -1),
-			ballSpeedY: 2 * (Math.random() < 0.5 ? 1 : -1),
-			scoreLeft: 0,
-			scoreRight: 0,
-			gameLoopTimeout:50, // time between game loops
-			timeoutId: 0,
-			paddleLeftY: 50,
-			paddleLeftX: 1,
-			paddleRightX: 79,
-			paddleRightY: 50,
-			minX: 0,
-			maxX: 0,
-			minY: 0,
-			maxY: 0,
-			isGameOver: false
-		};
+		// this.setState = {
+		// 	ballY: 0,
+		// 	ballX: 0,
+		// 	// randomly choose the direction
+		// 	ballSpeedX: 2 * (Math.random() < 0.5 ? 1 : -1),
+		// 	ballSpeedY: 2 * (Math.random() < 0.5 ? 1 : -1),
+		// 	scoreLeft: 0,
+		// 	scoreRight: 0,
+		// 	gameLoopTimeout:50, // time between game loops
+		// 	timeoutId: 0,
+		// 	paddleLeftY: 50,
+		// 	paddleLeftX: 1,
+		// 	paddleRightX: 79,
+		// 	paddleRightY: 50,
+		// 	minX: 0,
+		// 	maxX: 0,
+		// 	minY: 0,
+		// 	maxY: 0,
+		// 	isGameOver: false
+		// };
 	}
 
 	render() {
