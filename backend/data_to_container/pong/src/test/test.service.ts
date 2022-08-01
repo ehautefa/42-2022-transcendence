@@ -13,6 +13,10 @@ export class TestService {
         nb_to_ret++;
         return ("nb = " + nb_to_ret);
     }
+    async getQuizByUd(id: number) : Promise<Quiz> {
+        // return await this.qr.findOne(id, {relations: ['questions']});
+        return await this.qr.findOne(id);
+    }
 
     async createNewQuiz(quiz : CreateQuizDto) {
         console.log('yoooooo')
