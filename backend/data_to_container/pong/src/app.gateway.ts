@@ -116,6 +116,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
+		if (game.player1 === client.id) {
+			game.player1 = undefined;
+		} else if (game.player2 === client.id) {
+			game.player2 = undefined;
+		}
 	}
 	  
 	handleConnection(client: Socket, ...args: any[]) {

@@ -65,9 +65,8 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 
 		this.state = {
-			ballY: 0,
-			ballX: 0,
-			// randomly choose the direction
+			ballY: 48,
+			ballX: 46.7,
 			ballSpeedX: 0,
 			ballSpeedY: 0,
 			scoreLeft: 0,
