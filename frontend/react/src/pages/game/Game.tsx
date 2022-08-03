@@ -120,10 +120,6 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 				paddleLeftY: data.paddleLeftY,
 				paddleRightY: data.paddleRightY});
 		});
-		// Receive GameWindow from the other player
-		// socket.on('game', (data: GameWindowState) => {
-		// 	console.log("BALL:", data.ballX, data.ballY);
-		// })
 	}
 
 	handleKeyDown(event: KeyboardEvent) {
@@ -142,22 +138,19 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 	}
 
 	resetGame() {
-		// this.setState = {
-		// 	ballY: 0,
-		// 	ballX: 0,
-		// 	// randomly choose the direction
-		// 	ballSpeedX: 2 * (Math.random() < 0.5 ? 1 : -1),
-		// 	ballSpeedY: 2 * (Math.random() < 0.5 ? 1 : -1),
-		// 	scoreLeft: 0,
-		// 	scoreRight: 0,
-		// 	gameLoopTimeout:50, // time between game loops
-		// 	timeoutId: 0,
-		// 	paddleLeftY: 50,
-		// 	paddleLeftX: 1,
-		// 	paddleRightX: 79,
-		// 	paddleRightY: 50,
-		// 	isGameOver: false
-		// };
+	console.log("RESET GAME");
+		this.setState({ballSpeedX: 0, ballSpeedY:0});
+		
+		socket.emit('getGame', this.state, (data:GameWindowState) => {
+			this.setState({ballX: data.ballX,
+				ballY: data.ballY,
+				ballSpeedX: data.ballSpeedX,
+				ballSpeedY: data.ballSpeedY,
+				scoreLeft: data.scoreLeft,
+				scoreRight: data.scoreRight,
+				paddleLeftY: data.paddleLeftY,
+				paddleRightY: data.paddleRightY});
+		});
 	}
 
 	render() {
@@ -167,6 +160,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 			<div className={"Score" + " " + "Right"}>{String(this.state.scoreRight).padStart(2, '0')}</div>
 			<div className={"Score" + " " + "Left"}>{String(this.state.scoreLeft).padStart(2, '0')}</div>
 			<Ball x={this.state.ballX} y={this.state.ballY} />
+			<button onClick={() => this.resetGame()}>Reset</button>
 		</div>
 	}
 }

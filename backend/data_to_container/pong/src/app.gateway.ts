@@ -53,6 +53,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('getGame')
 	handleGame(client: Socket, data: GameWindowState): GameWindowState {
+		if (data.ballSpeedX === 0 && data.ballSpeedY === 0)
+			return this.resetGame();
 		game.ballX = game.ballX + game.ballSpeedX;
 		game.ballY = game.ballY + game.ballSpeedY;
 
@@ -108,6 +110,26 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (game.paddleRightY + deltaPaddleY >= 15 && game.paddleRightY + deltaPaddleY <= 85)
 				game.paddleRightY += deltaPaddleY;
 		}
+	}
+
+	resetGame() {
+		console.log("RESET GAME");
+		game.ballX = 48.2;
+		game.ballY = 46;
+		game.ballSpeedX = 1 * (Math.random() < 0.5 ? 1 : -1);
+		game.ballSpeedY = 1 * (Math.random() < 0.5 ? 1 : -1);
+		game.scoreLeft = 0;
+		game.scoreRight = 0;
+		game.gameLoopTimeout =100; // time between game loops
+		game.timeoutId = 0;
+		game.paddleLeftY = 50;
+		game.paddleLeftX = 1;
+		game.paddleRightX = 79;
+		game.paddleRightY = 50;
+		game.isGameOver = false;
+		game.player1 = undefined;
+		game.player2 = undefined;
+		return game; 
 	}
 
 	afterInit(server: Server) {
