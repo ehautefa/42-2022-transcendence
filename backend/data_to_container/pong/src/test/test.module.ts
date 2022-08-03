@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Quiz } from './quiz.entity';
 import { TestController } from './test.controller';
 import { QuestionController } from './question.controller';
 import { TestService } from './test.service';
 import { QuestionService } from './question.service'
-import { Question } from './question.entity';
+import { BddModule } from 'src/bdd/bdd.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Quiz, Question])],
+  imports: [BddModule],
   controllers: [TestController, QuestionController],
   providers: [TestService, QuestionService]
 })

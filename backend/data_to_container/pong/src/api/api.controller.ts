@@ -1,14 +1,14 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Param, Post } from '@nestjs/common';
 import { ApiService } from './api.service';
 
 @Controller('api')
 export class ApiController {
     constructor(private readonly apiService : ApiService) {}
 
-    @Post('code')
+    @Post('code/:value')
     receiveCode()
     {
-        return this.apiService.receive_code()
+        // return this.apiService.receiveCode()
     }
 
 }

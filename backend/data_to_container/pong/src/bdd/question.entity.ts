@@ -1,6 +1,6 @@
 
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
-import { Quiz } from './quiz.entity';
+import { Quiz } from '../bdd/quiz.entity';
 @Entity('questions')
 export class Question extends BaseEntity {
 
