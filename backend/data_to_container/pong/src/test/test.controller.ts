@@ -22,7 +22,7 @@ export class TestController {
     @Post('/create')
     @UsePipes(ValidationPipe)
     @HttpCode(200)
-    createQuizz(@Body() quizData : CreateQuizDto) {
-        return { data : quizData };
+    async createQuizz(@Body() quizData : CreateQuizDto) {
+        return await this.test_service.createNewQuiz(quizData);
     }
 }
