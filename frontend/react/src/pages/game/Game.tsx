@@ -1,23 +1,9 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import React from 'react'
-import { io } from 'socket.io-client'
+import { getSocket } from "../../App"
 
-// Create my socket 
-const socket = io("http://localhost:3011");
-
-// Connect my socket to server
-socket.on("connect", () => {
-	console.log("SOCKET FRONT:", socket.id, " : ", socket.connected); 
-});
-
-// Send Gamewindow to connected client
-const submitGame = (data: GameWindowState) => {
-	socket.emit('game', data, (data:GameWindowState) => {
-		return (data);
-	});
-
-}
+const socket = getSocket();
 
 class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
@@ -54,7 +40,8 @@ interface GameWindowState {
 	paddleLeftX: number,
 	paddleRightX: number,
 	paddleRightY: number,
-	isGameOver: boolean
+	isGameOver: boolean,
+	matchMaking: boolean,
 }
 
 
@@ -77,21 +64,20 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 			paddleLeftX: 3,
 			paddleRightX: 77,
 			paddleRightY: 50,
-			isGameOver: false
+			isGameOver: false,
+			matchMaking: false,
 		};
 	}
 
 	componentDidMount() {
-		this.initGame();
 		window.addEventListener("keydown", this.handleKeyDown);
 		this.gameLoop();
 	}
 
-	initGame() {}
 
 	gameLoop() {
 		let timeoutId = setTimeout(() => {
-			if (!this.state.isGameOver) {
+			if (!this.state.isGameOver && this.state.matchMaking) {
 				this.moveBall();
 				// if (this.state.scoreLeft === 10 || this.state.scoreRight === 10) {
 				// 	this.setState({ isGameOver: true });
@@ -109,7 +95,6 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 	}
 
 	moveBall() {
-		// submitGame(this.state); // Send GameWindow to other user
 		socket.emit('getGame', this.state, (data:GameWindowState) => {
 			this.setState({ballX: data.ballX,
 				ballY: data.ballY,
@@ -118,7 +103,9 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 				scoreLeft: data.scoreLeft,
 				scoreRight: data.scoreRight,
 				paddleLeftY: data.paddleLeftY,
-				paddleRightY: data.paddleRightY});
+				paddleRightY: data.paddleRightY,
+				isGameOver: data.isGameOver	
+			});
 		});
 	}
 
@@ -167,10 +154,14 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 
 
 function Game() {
+	function matchMaking() {
+		
+	}
 	return (<div>
 		<NavBar />
 		<div className="mainComposantGame">
 			<GameWindow />
+			<button className="matchMakingButton" onClick={() => matchMaking()}>Find another player</button>
 		</div>
 	</div>)
 }

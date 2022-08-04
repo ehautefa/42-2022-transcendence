@@ -51,6 +51,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	server: Server;
 	private logger: Logger = new Logger('AppGateway');
 
+	@SubscribeMessage('joinRoom')
+	joinRoom(client: Socket): string {
+		this.logger.log('joinRoom');
+		var uid: string = "1";
+		client.join(uid);
+		return (uid);
+	}
+
 	@SubscribeMessage('getGame')
 	handleGame(client: Socket, data: GameWindowState): GameWindowState {
 		if (data.ballSpeedX === 0 && data.ballSpeedY === 0)
@@ -104,8 +112,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				console.log("Hits the bottom wall", game.ballY);
 			}
 		}
-
-		// this.server.emit('game', data); // broadcast to all clients in the server
 		return game;
 	}
 

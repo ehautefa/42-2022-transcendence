@@ -19,8 +19,4 @@ export class match extends BaseEntity {
 
     @Column('smallint')
     score2: number;
-
-    @OneToMany(() => user, (usr) => usr.userId)
-    viewers: user[];
-
 }
