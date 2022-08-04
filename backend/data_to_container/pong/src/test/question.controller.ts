@@ -7,12 +7,12 @@ import { TestService } from './test.service';
 
 @Controller('question')
 export class QuestionController {
-    constructor(private readonly qs: QuestionService, private readonly ts : TestService ) { }
+    constructor(private qs: QuestionService, private ts : TestService ) { }
 
-    // @Post('')
-    // @UsePipes(ValidationPipe)
-    // async postQuestion(@Body() question : QuestionDto) : Promise<Question >{
-        // const quiz = await this.ts.getQuizByUd(question.quizId)
-        // return this.qs.postQuestion(question, quiz);
-    // }
+    @Post('')
+    @UsePipes(ValidationPipe)
+    async postQuestion(@Body() question : QuestionDto) : Promise<Question >{
+        const quiz = await this.ts.getQuizByUd(question.quizId)
+        return this.qs.postQuestion(question, quiz);
+    }
 }

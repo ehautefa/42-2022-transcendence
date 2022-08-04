@@ -7,9 +7,10 @@ import { TestModule } from './test/test.module';
 import { PongGateway } from './app.gateway';
 import { ApiModule } from './api/api.module';
 import { BddModule } from './bdd/bdd.module';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [TestModule, ApiModule, BddModule],
+  imports: [TestModule, ApiModule, BddModule, UserModule],
   controllers: [AppController],
   providers: [AppService, PongGateway],
 })

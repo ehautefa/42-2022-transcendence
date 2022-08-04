@@ -16,6 +16,7 @@ export class QuestionService {
             question_name : question.question_name,
         });
         quiz.questions = [...quiz.questions, new_question];
+
         await quiz.save();
         return new_question;
     }

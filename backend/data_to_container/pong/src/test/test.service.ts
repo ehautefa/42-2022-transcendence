@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository} from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateQuizDto } from './dto/createQuizz.dto';
 import { Quiz } from '../bdd/quiz.entity';
 
@@ -13,14 +13,17 @@ export class TestService {
         nb_to_ret++;
         return ("nb = " + nb_to_ret);
     }
-    // async getQuizByUd(id: number) : Promise<Quiz> {
-        // return await this.qr.findOne(id, {relations: ['questions']});
+    async getQuizByUd(qid: number): Promise<Quiz> {
+        return await this.qr.findOne({
+            where: {
+                id: qid,
+            },
+            relations: ['questions']
+        })
         // return await this.qr.findOne(id);
-    // }
-// 
-    async createNewQuiz(quiz : CreateQuizDto) {
+    }
+    async createNewQuiz(quiz: CreateQuizDto) {
         console.log('yoooooo')
         return await this.qr.save(quiz);
-
     }
 }

@@ -7,7 +7,7 @@ export class Quiz extends BaseEntity {
     @PrimaryGeneratedColumn({
     comment: 'The quiz unique identifier'
 })
-id: number
+id: number;
 
 @Column({
     type: 'varchar',
@@ -20,7 +20,6 @@ title: string;
 description: string;
 
 @OneToMany(() => Question, (question) => question.quiz)
-questions: Question[]
-
+questions: Question[];
 
 }
