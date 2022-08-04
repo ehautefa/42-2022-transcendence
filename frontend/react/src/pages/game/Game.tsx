@@ -4,7 +4,7 @@ import React from 'react'
 import { io } from 'socket.io-client'
 
 // Create my socket 
-const socket = io('http://localhost:3011');
+const socket = io("http://localhost:3011");
 
 // Connect my socket to server
 socket.on("connect", () => {
@@ -65,17 +65,17 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 
 		this.state = {
-			ballY: 48,
-			ballX: 46.7,
+			ballY: 46.3,
+			ballX: 48,
 			ballSpeedX: 0,
 			ballSpeedY: 0,
 			scoreLeft: 0,
 			scoreRight: 0,
-			gameLoopTimeout:100, // time between game loops
+			gameLoopTimeout:50, // time between game loops
 			timeoutId: 0,
 			paddleLeftY: 50,
-			paddleLeftX: 1,
-			paddleRightX: 79,
+			paddleLeftX: 3,
+			paddleRightX: 77,
 			paddleRightY: 50,
 			isGameOver: false
 		};
@@ -93,10 +93,10 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		let timeoutId = setTimeout(() => {
 			if (!this.state.isGameOver) {
 				this.moveBall();
-				if (this.state.scoreLeft === 10 || this.state.scoreRight === 10) {
-					this.setState({ isGameOver: true });
-					this.resetGame();
-				}
+				// if (this.state.scoreLeft === 10 || this.state.scoreRight === 10) {
+				// 	this.setState({ isGameOver: true });
+				// 	this.resetGame();
+				// }
 			}
 			this.gameLoop();
 		}, this.state.gameLoopTimeout);
@@ -155,24 +155,21 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 
 	render() {
 		return <div className="GameWindow" id="GameBoard">
+			<button className="ResetButton" onClick={() => this.resetGame()}>Reset</button>
 			<Paddle x={this.state.paddleLeftX} y={this.state.paddleLeftY} />
 			<Paddle x={this.state.paddleRightX} y={this.state.paddleRightY} />
 			<div className={"Score" + " " + "Right"}>{String(this.state.scoreRight).padStart(2, '0')}</div>
 			<div className={"Score" + " " + "Left"}>{String(this.state.scoreLeft).padStart(2, '0')}</div>
 			<Ball x={this.state.ballX} y={this.state.ballY} />
-			<button onClick={() => this.resetGame()}>Reset</button>
 		</div>
 	}
 }
 
 
 function Game() {
-	// Recuperation de la socket initialiser dans index
-	// const socket = getSocket();
-
 	return (<div>
 		<NavBar />
-		<div className="mainComposant">
+		<div className="mainComposantGame">
 			<GameWindow />
 		</div>
 	</div>)

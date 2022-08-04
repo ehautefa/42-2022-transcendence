@@ -21,14 +21,14 @@ interface GameWindowState {
 }
 
 var game:GameWindowState = {
-	ballY: 46,
+	ballY: 46.3,
 	ballX: 48.2,
 	// randomly choose the direction
 	ballSpeedX: 1 * (Math.random() < 0.5 ? 1 : -1),
 	ballSpeedY: 1 * (Math.random() < 0.5 ? 1 : -1),
 	scoreLeft: 0,
 	scoreRight: 0,
-	gameLoopTimeout:100, // time between game loops
+	gameLoopTimeout:50, // time between game loops
 	timeoutId: 0,
 	paddleLeftY: 50,
 	paddleLeftX: 1,
@@ -59,35 +59,46 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		game.ballY = game.ballY + game.ballSpeedY;
 
 		// Check if the ball hits the left paddle
-		if (game.ballX <= 2.0
+		if (game.ballX <= 5.2
 		&& game.ballY  >= game.paddleLeftY - 15
 		&& game.ballY <= game.paddleLeftY + 15) {
-			if (game.ballSpeedX < 0) // check if we have already hit the paddle
+			if (game.ballSpeedX < 0 && game.ballY >= game.paddleLeftY - 14 && game.ballY <= game.paddleLeftY + 14) // check if we have already hit the paddle
 				game.ballSpeedX = -game.ballSpeedX;
-			console.log("Hit left paddle", game.ballX, game.ballY);
-		} // Check if the ball hits the right paddle
-		else if (game.ballX >= 94.0
-		&& game.ballY >= game.paddleRightY - 15
-		&& game.ballY <= game.paddleRightY + 15) {
-			if (game.ballSpeedX > 0) // check if we have already hit the paddle
-				game.ballSpeedX = -game.ballSpeedX;
-			console.log("Hit right paddle", game.ballX, game.ballY);
-		} else {
-			if (game.ballX <= 0.1) { // Check if the ball hits the left wall
+			else if ((game.ballSpeedY > 0 && game.ballY <= game.paddleLeftY) // check if we are above the paddle
+				|| (game.ballSpeedY < 0 && game.ballY >= game.paddleLeftY)) { // check if we are below the paddle
+				game.ballSpeedY = -game.ballSpeedY;
 				if (game.ballSpeedX < 0)
 					game.ballSpeedX = -game.ballSpeedX;
+			}
+			console.log("Hit left paddle", game.ballX, game.ballY);
+		} // Check if the ball hits the right paddle
+		else if (game.ballX >= 91.8
+			&& game.ballY  >= game.paddleRightY - 15
+			&& game.ballY <= game.paddleRightY + 15) {
+				if (game.ballSpeedX > 0 && game.ballY >= game.paddleRightY - 14 && game.ballY <= game.paddleRightY + 14) // check if we have already hit the paddle
+					game.ballSpeedX = -game.ballSpeedX;
+				else if ((game.ballSpeedY > 0 && game.ballY <= game.paddleRightY) // check if we are above the paddle
+					|| (game.ballSpeedY < 0 && game.ballY >= game.paddleRightY)) { // check if we are below the paddle
+					game.ballSpeedY = -game.ballSpeedY;
+					if (game.ballSpeedX > 0) // chck if we have already hit the paddle
+						game.ballSpeedX = -game.ballSpeedX;
+			}
+			console.log("Hit right paddle", game.ballX, game.ballY);
+			console.log("PADLLE", game.paddleRightY - 15, game.paddleRightY + 15);
+		} else {
+			if (game.ballX <= 0.2) { // Check if the ball hits the left wall
+				this.endpoint();
 				game.scoreRight++;
 				console.log("Hits the left wall", game.ballX);
-			} else if (game.ballX >= 96.1) { // Check if the ball hits the right wall
-				if (game.ballSpeedX > 0)
-					game.ballSpeedX = -game.ballSpeedX;
+			} else if (game.ballX >= 95.9) { // Check if the ball hits the right wall
+				this.endpoint();
 				game.scoreLeft++;
 				console.log("Hits the right wall", game.ballX);
-			} else if (game.ballY <= 0.2) { // Check if the ball hits the top wall
+			} else if (game.ballY <= 0.1) { // Check if the ball hits the top wall
 				if (game.ballSpeedY < 0)
 					game.ballSpeedY = -game.ballSpeedY;
 				console.log("Hits the top wall", game.ballY);
-			} else if (game.ballY >= 92.0) { // Check if the ball hits the bottom wall
+			} else if (game.ballY >= 92.5) { // Check if the ball hits the bottom wall
 				if (game.ballSpeedY > 0)
 					game.ballSpeedY = -game.ballSpeedY;
 				console.log("Hits the bottom wall", game.ballY);
@@ -98,9 +109,23 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		return game;
 	}
 
+	endpoint() {
+		game.ballX = 48.2;
+		if (game.scoreLeft == 10 || game.scoreRight == 10) {
+			game.ballY = 46;
+			game.isGameOver = true;
+			game.ballSpeedX = 0;
+			game.ballSpeedY = 0;
+		} else {
+			game.ballY = Math.random() * 80 + 10;
+			game.ballSpeedX = 0.5 * (Math.random() < 0.5 ? 1 : -1);
+			game.ballSpeedY = 0.5 * (Math.random() < 0.5 ? 1 : -1);
+		}
+	}
+
 	@SubscribeMessage('handlePaddle')
 	handlePaddle(client: Socket, deltaPaddleY: number): void {
-		console.log("client", client.id);
+		console.log("client", client.id, game.player1);
 
 		if (client.id == game.player1) {
 			if (game.paddleLeftY + deltaPaddleY >= 15 && game.paddleLeftY + deltaPaddleY <= 85)
@@ -127,8 +152,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		game.paddleRightX = 79;
 		game.paddleRightY = 50;
 		game.isGameOver = false;
-		game.player1 = undefined;
-		game.player2 = undefined;
+		// game.player1 = undefined;
+		// game.player2 = undefined;
 		return game; 
 	}
 
