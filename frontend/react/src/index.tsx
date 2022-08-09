@@ -8,7 +8,6 @@ import MainPage from "./pages/mainPage/mainPage";
 import Game from "./pages/game/Game";
 import Chat from "./pages/chat/Chat";
 import MyProfile from './pages/myProfile/myProfile';
-import "./fonts/bit5x5.ttf";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
