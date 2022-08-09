@@ -44,6 +44,8 @@ services:
   postgres:
     container_name: postgres_dev
     image: postgres:latest
+    volumes:
+      - pgVolume:/var/lib/postgresql/data
     restart: always
     env_file:
     - ./postgres/postgres.env
@@ -60,3 +62,6 @@ services:
     - pg_admin/pg_admin.env
     ports:
       - "3030:80"
+
+volumes:
+  pgVolume:
