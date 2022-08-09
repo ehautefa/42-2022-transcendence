@@ -65,7 +65,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 			paddleRightX: 77,
 			paddleRightY: 50,
 			isGameOver: false,
-			matchMaking: false,
+			matchMaking: true,
 		};
 	}
 
@@ -161,7 +161,7 @@ function Game() {
 		<NavBar />
 		<div className="mainComposantGame">
 			<GameWindow />
-			<button className="matchMakingButton" onClick={() => matchMaking()}>Find another player</button>
+			{/* <button className="matchMakingButton" onClick={() => matchMaking()}>Find another player</button> */}
 		</div>
 	</div>)
 }
