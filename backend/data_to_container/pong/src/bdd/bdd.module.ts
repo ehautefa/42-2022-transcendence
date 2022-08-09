@@ -8,5 +8,6 @@ import { Question } from './question.entity';
 
 @Module({
     imports: [TypeOrmModule.forRoot(typeOrmConfig),TypeOrmModule.forFeature([user, match, Quiz, Question])],
+    exports: [TypeOrmModule]
 })
 export class BddModule {}

@@ -13,14 +13,13 @@ export class user extends BaseEntity {
     @Column('boolean')
     twoFfactorAuth: boolean;
 
-
     @Column('smallint')
     wins: number;
 
     @Column('smallint')
     losses: number;
 
-    @ManyToMany(() => user, usr => usr.friends)
+    @ManyToMany(() => user, usr => usr.userId)
     @JoinTable()
     friends: user[];
 

@@ -6,6 +6,6 @@ export class QuestionDto {
     @IsNotEmpty({message: "Question should have a name"})
     question_name: string;
 
-    @IsNotEmpty({message: "THE QUIZZZZID should have a name"})
+    @IsNotEmpty({message: "THE QUIZZZZID should have a number"})
     quizId: number;
 }
