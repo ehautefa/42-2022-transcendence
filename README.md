@@ -14,6 +14,10 @@
 
 ## Launch the project
 
+## CONNECT TO PG ADMIN
+
+
+
 ```
 docker-compose up --build
 ```

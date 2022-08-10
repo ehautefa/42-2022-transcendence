@@ -1,33 +1,10 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { useState, useEffect } from "react";
 
-function MyComponent() {
 
-	useEffect(() => {
-		var myHeaders = new Headers();
-		myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-		var urlencoded = new URLSearchParams();
-		urlencoded.append("userName", "pika");
-
-		const requestOptions = {
-			method: 'POST',
-			headers: myHeaders,
-			body: urlencoded
-		};
-
-		fetch("http://localhost:3011/user/create", requestOptions)
-			.then(response => response.text())
-			.then(result => console.log(result))
-			.catch(error => console.log('error', error));
-	}, [])
-	return <div>hello</div>
-}
 
 
 function myProfile() {
-	MyComponent();
 	return (<div>
 		<NavBar />
 		<div className="mainComposant">
