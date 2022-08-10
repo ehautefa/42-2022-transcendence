@@ -3,6 +3,7 @@ import './index.css';
 import { io } from 'socket.io-client'
 import { useState, useEffect } from "react";
 
+
 type user = {
 	userId: string;
 	userName: string;
@@ -22,10 +23,10 @@ export function getSocket() {
 
 export function FetchUser(uid: string) {
 	const [user, setUser] = useState();
-
+	
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
+	
 	var url:string = "http://localhost:3011/user/" + uid;
 	var requestOptions = {
 		method: 'GET',
@@ -36,15 +37,16 @@ export function FetchUser(uid: string) {
 		.then(response => response.text())
 		.then(result => console.log(result))
 		.catch(error => console.log('error', error));
-	console.log("USER", user);
-	return (user);
+		console.log("USER", user);
+		return (user);
 }
 
 export function getMyUid() {
-
+	
 }
 
 export default function App() {
+	console.log('heere');
 
 	// Connect my socket to server
 	socket.on("connect", () => {
