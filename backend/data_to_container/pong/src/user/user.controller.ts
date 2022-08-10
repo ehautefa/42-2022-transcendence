@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user } from 'src/bdd/users.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
@@ -9,15 +9,15 @@ import { UserService } from './user.service';
 export class UserController {
     constructor( private readonly UserService : UserService ) {}
 
-    @Get()
-    @UsePipes(ValidationPipe)
-    async getUser(@Body() userUid : getUserDto) : Promise<user> {
-        return await this.UserService.getUser(userUid);
-    }
-
     @Get('all')
     async getAllUser() : Promise<user[]>{
         return await this.UserService.getAllUser();
+    }
+
+    @Get('/:userUid')
+    @UsePipes(ValidationPipe)
+    async getUser(@Param('userUid') userUid : string) : Promise<user> {
+        return await this.UserService.getUser(userUid);
     }
 
     @Post('create')
