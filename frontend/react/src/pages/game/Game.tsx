@@ -2,6 +2,7 @@ import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import React from 'react'
 import { getSocket } from "../../App"
+import { useState } from "react"
 
 const socket = getSocket();
 
@@ -65,7 +66,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 			paddleRightX: 77,
 			paddleRightY: 50,
 			isGameOver: false,
-			matchMaking: true,
+			matchMaking: false,
 		};
 	}
 
@@ -154,14 +155,23 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 
 
 function Game() {
+	const [displaying, setDisplaying] = useState({display: "block"});
 	function matchMaking() {
-		
+		socket.emit('getPlayer', (id: number) => {
+			console.log(id);
+			setDisplaying({display:"none"});
+
+		});
 	}
 	return (<div>
 		<NavBar />
 		<div className="mainComposantGame">
 			<GameWindow />
-			{/* <button className="matchMakingButton" onClick={() => matchMaking()}>Find another player</button> */}
+			<button style={displaying}
+				 className="matchMakingButton"
+				  onClick={() => matchMaking()}>
+					Find another player
+			</button>
 		</div>
 	</div>)
 }
