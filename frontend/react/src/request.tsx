@@ -1,16 +1,9 @@
 import { useState } from "react";
+import { User } from "./type";
 
-type User = {
-	userId?: string;
-	userName?: string;
-	twoFfactorAuth?: boolean;
-	wins?: number;
-	losses?: number;
-	friends?: User[];
-}
-
-export function FetchUser(uid: string) {
-	const [user, setUser] = useState();
+export function FetchUser(uid: string) : User {
+	let emptyUser: User = {userId: ""};
+	const [user, setUser] = useState(emptyUser);
 
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -28,8 +21,9 @@ export function FetchUser(uid: string) {
 	return (user);
 }
 
-export function CreateUser() {
-	const [user, setUser] = useState();
+export function CreateUser() : string {
+	let emptyUser: User = {userId: ""};
+	const [user, setUser] = useState(emptyUser);
 
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -47,6 +41,6 @@ export function CreateUser() {
 		.then(response => response.text())
 		.then(result => setUser(JSON.parse(result)))
 		.catch(error => console.log('error', error));
-    const uid = user?.userId;
+    const uid = user.userId;
     return (uid);
 }

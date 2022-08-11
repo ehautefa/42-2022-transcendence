@@ -1,7 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import React from 'react'
-import { useState } from 'react'
 import { getSocket } from "../../App"
 
 const socket = getSocket();
@@ -29,7 +28,6 @@ class Paddle extends React.Component<{ x: number, y: number }> {
 }
 
 interface GameWindowState {
-	id: number,
 	ballX: number,
 	ballY: number,
 	ballSpeedX: number,
@@ -54,31 +52,26 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 
 		this.state = {
-			id: 0,
 			ballY: 46.3,
 			ballX: 48,
 			ballSpeedX: 0,
 			ballSpeedY: 0,
 			scoreLeft: 0,
 			scoreRight: 0,
-			gameLoopTimeout: 50, // time between game loops
+			gameLoopTimeout:50, // time between game loops
 			timeoutId: 0,
 			paddleLeftY: 50,
 			paddleLeftX: 3,
 			paddleRightX: 77,
 			paddleRightY: 50,
 			isGameOver: false,
-			matchMaking: false,
+			matchMaking: true,
 		};
 	}
 
 	componentDidMount() {
 		window.addEventListener("keydown", this.handleKeyDown);
 		this.gameLoop();
-	}
-
-	launchGame() {
-		this.setState({ matchMaking: true });
 	}
 
 
@@ -102,9 +95,8 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 	}
 
 	moveBall() {
-		socket.emit('getGame', this.state, (data: GameWindowState) => {
-			this.setState({
-				ballX: data.ballX,
+		socket.emit('getGame', this.state, (data:GameWindowState) => {
+			this.setState({ballX: data.ballX,
 				ballY: data.ballY,
 				ballSpeedX: data.ballSpeedX,
 				ballSpeedY: data.ballSpeedY,
@@ -112,7 +104,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 				scoreRight: data.scoreRight,
 				paddleLeftY: data.paddleLeftY,
 				paddleRightY: data.paddleRightY,
-				isGameOver: data.isGameOver
+				isGameOver: data.isGameOver	
 			});
 		});
 	}
@@ -133,20 +125,18 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 	}
 
 	resetGame() {
-		console.log("RESET GAME");
-		this.setState({ ballSpeedX: 0, ballSpeedY: 0 });
-
-		socket.emit('getGame', this.state, (data: GameWindowState) => {
-			this.setState({
-				ballX: data.ballX,
+	console.log("RESET GAME");
+		this.setState({ballSpeedX: 0, ballSpeedY:0});
+		
+		socket.emit('getGame', this.state, (data:GameWindowState) => {
+			this.setState({ballX: data.ballX,
 				ballY: data.ballY,
 				ballSpeedX: data.ballSpeedX,
 				ballSpeedY: data.ballSpeedY,
 				scoreLeft: data.scoreLeft,
 				scoreRight: data.scoreRight,
 				paddleLeftY: data.paddleLeftY,
-				paddleRightY: data.paddleRightY
-			});
+				paddleRightY: data.paddleRightY});
 		});
 	}
 
@@ -164,21 +154,14 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 
 
 function Game() {
-	const [isActive, setIsActive] = useState(true);
-
 	function matchMaking() {
-		setIsActive(false);
-		console.log(socket.id, " is looking for a player");
-		socket.emit('getPlayer', (id: number) => {
-			console.log(socket.id, " find game ", id);
-		})
-
+		
 	}
 	return (<div>
 		<NavBar />
 		<div className="mainComposantGame">
 			<GameWindow />
-			<button style={{ display: isActive ? 'block' : 'none' }} className="matchMakingButton" onClick={() => matchMaking()}>Find another player</button>
+			{/* <button className="matchMakingButton" onClick={() => matchMaking()}>Find another player</button> */}
 		</div>
 	</div>)
 }
