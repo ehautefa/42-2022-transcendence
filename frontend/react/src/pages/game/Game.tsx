@@ -81,12 +81,7 @@ class GameWindow extends React.Component<{id:number}, GameWindowState> {
 			if (!this.state.isGameOver
 				&& this.props.id != -1
 				&& this.props.id != undefined) {
-				// console.log("game loop", this.props.id);
 				this.moveBall();
-				// if (this.state.scoreLeft === 10 || this.state.scoreRight === 10) {
-				// 	this.setState({ isGameOver: true });
-				// 	this.resetGame();
-				// }
 			}
 			this.gameLoop();
 		}, this.state.gameLoopTimeout);
@@ -125,7 +120,7 @@ class GameWindow extends React.Component<{id:number}, GameWindowState> {
 				break;
 		}
 		if (deltaPaddleY !== 0) {
-			socket.emit('handlePaddle', deltaPaddleY);
+			socket.emit('handlePaddle', deltaPaddleY, this.props.id);
 		}
 	}
 

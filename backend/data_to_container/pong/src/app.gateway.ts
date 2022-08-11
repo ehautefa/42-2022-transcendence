@@ -25,8 +25,6 @@ interface GameWindowState {
 
 var games: GameWindowState[] = [];
 
-
-// @WebSocketGateway(3000, {  namespace: "pong" })
 @WebSocketGateway({
 	cors: {
 		origin: '*',
@@ -111,11 +109,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	
 	@SubscribeMessage('getGame')
 	handleGame(client: Socket, data: GameWindowState): GameWindowState {
-		// if (data.ballSpeedX === 0 && data.ballSpeedY === 0)
-		// 	return this.resetGame(id);
 		var id:number  = data.id;
-		if (id == undefined || games.length < id || games[id].matchMaking == false)
+		if (id == undefined || games.length < id) 
 			return data;
+		console.log("id", id);
+		if (games[id].matchMaking == false)
+			return games[id];
 		games[id].ballX = games[id].ballX + games[id].ballSpeedX;
 		games[id].ballY = games[id].ballY + games[id].ballSpeedY;
 
@@ -183,8 +182,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('handlePaddle')
-	handlePaddle(client: Socket, deltaPaddleY: number): void {
-		var id:number  = 0;
+	handlePaddle(client: Socket, args: any): void {
+		var id:number  = args[1];
+		var deltaPaddleY:number = args[0];
 		console.log("client", client.id, games[id].player1);
 
 		if (client.id == games[id].player1) {
@@ -223,20 +223,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
-		// if (game.player1 === client.id) {
-		// 	game.player1 = undefined;
-		// } else if (game.player2 === client.id) {
-		// 	game.player2 = undefined;
-		// }
 	}
 	  
 	handleConnection(client: Socket, ...args: any[]) {
 		this.logger.log(`Client connected: ${client.id}`);
-		// if (game.player1 === undefined) {
-		// 	game.player1 = client.id;
-		// } else if (game.player2 === undefined) {
-		// 	game.player2 = client.id;
-		// }
-		// console.log("PLAYERS", game.player1, game.player2);
 	}
 }
