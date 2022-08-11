@@ -8,9 +8,10 @@ import { PongGateway } from './app.gateway';
 import { ApiModule } from './api/api.module';
 import { BddModule } from './bdd/bdd.module';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [TestModule, ApiModule, BddModule, UserModule],
+  imports: [TestModule, ApiModule, BddModule, UserModule, AuthModule],
   controllers: [AppController],
   providers: [AppService, PongGateway],
 })

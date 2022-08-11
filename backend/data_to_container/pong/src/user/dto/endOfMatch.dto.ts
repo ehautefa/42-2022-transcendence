@@ -3,8 +3,8 @@ import { IsNotEmpty, Length } from "class-validator";
 export class EndOfMatchDto {
 
     @IsNotEmpty()
-    winnerUid: string;
+    winnerUuid: string;
 
     @IsNotEmpty()
-    loserUid: string;
+    loserUuid: string;
 }

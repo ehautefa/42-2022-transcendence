@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, Req, UsePipes, ValidationPipe } fro
 import { user } from 'src/bdd/users.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
-import { getUserDto } from './dto/getUser';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -32,10 +31,4 @@ export class UserController {
         return await this.UserService.endOfMatch(players);
     }
 
-    // @Post('changeName')
-    // @UsePipes(ValidationPipe)
-    // async changeUserName(@Body() body)
-    // {
-        // return await this.UserService.changeUserName(body);
-    // }
 }
