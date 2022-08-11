@@ -18,7 +18,9 @@ interface GameWindowState {
 	paddleRightY: number,
 	isGameOver: boolean
 	player1: string,
-	player2: string
+	player2: string,
+	id: number,
+	matchMaking: boolean,
 }
 
 var games: GameWindowState[] = [];
@@ -42,10 +44,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (games[i].player2 === undefined) {
 				games[i].player2 = client.id;
 				client.join(i.toString());
+				games[i].matchMaking = true;
 				return i;
 			}
 		}
 		var game:GameWindowState = {
+			id: i,
 			ballY: 46.3,
 			ballX: 48.2,
 			// randomly choose the direction
@@ -61,9 +65,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			paddleRightY: 50,
 			isGameOver: false,
 			player1: client.id,
-			player2: undefined
+			player2: undefined,
+			matchMaking: false
 		};
 		games.push(game);
+		console.log("GAMES[",i,"]", games[i]);
 		client.join(i.toString());
 		return i;
 	}
@@ -72,6 +78,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	joinRoom(client: Socket, id: number): number {
 		if (id == undefined) {
 			var game:GameWindowState = {
+				id: -1,
 				ballY: 46.3,
 				ballX: 48.2,
 				// randomly choose the direction
@@ -87,7 +94,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				paddleRightY: 50,
 				isGameOver: false,
 				player1: client.id,
-				player2: undefined
+				player2: undefined,
+				matchMaking: false
 			};
 
 			id = games.push(game) - 1; // push return the new length of games
@@ -100,11 +108,14 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.logger.log('joinRoom');
 		return (id);
 	}
-
+	
 	@SubscribeMessage('getGame')
-	handleGame(client: Socket, data: GameWindowState, id: number): GameWindowState {
-		if (data.ballSpeedX === 0 && data.ballSpeedY === 0)
-			return this.resetGame(id);
+	handleGame(client: Socket, data: GameWindowState): GameWindowState {
+		// if (data.ballSpeedX === 0 && data.ballSpeedY === 0)
+		// 	return this.resetGame(id);
+		var id:number  = data.id;
+		if (id == undefined || games.length < id || games[id].matchMaking == false)
+			return data;
 		games[id].ballX = games[id].ballX + games[id].ballSpeedX;
 		games[id].ballY = games[id].ballY + games[id].ballSpeedY;
 
@@ -172,7 +183,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('handlePaddle')
-	handlePaddle(client: Socket, deltaPaddleY: number, id: number): void {
+	handlePaddle(client: Socket, deltaPaddleY: number): void {
+		var id:number  = 0;
 		console.log("client", client.id, games[id].player1);
 
 		if (client.id == games[id].player1) {

@@ -41,18 +41,19 @@ interface GameWindowState {
 	paddleLeftX: number,
 	paddleRightX: number,
 	paddleRightY: number,
-	isGameOver: boolean,
-	matchMaking: boolean,
+	id: number,
+	isGameOver: boolean
 }
 
 
-class GameWindow extends React.Component<{}, GameWindowState> {
+class GameWindow extends React.Component<{id:number}, GameWindowState> {
 	constructor(props: any) {
 		super(props);
 
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 
 		this.state = {
+			id : 0,
 			ballY: 46.3,
 			ballX: 48,
 			ballSpeedX: 0,
@@ -65,8 +66,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 			paddleLeftX: 3,
 			paddleRightX: 77,
 			paddleRightY: 50,
-			isGameOver: false,
-			matchMaking: false,
+			isGameOver: false
 		};
 	}
 
@@ -78,7 +78,10 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 
 	gameLoop() {
 		let timeoutId = setTimeout(() => {
-			if (!this.state.isGameOver && this.state.matchMaking) {
+			if (!this.state.isGameOver
+				&& this.props.id != -1
+				&& this.props.id != undefined) {
+				// console.log("game loop", this.props.id);
 				this.moveBall();
 				// if (this.state.scoreLeft === 10 || this.state.scoreRight === 10) {
 				// 	this.setState({ isGameOver: true });
@@ -96,6 +99,7 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 	}
 
 	moveBall() {
+		this.setState({id: this.props.id});
 		socket.emit('getGame', this.state, (data:GameWindowState) => {
 			this.setState({ballX: data.ballX,
 				ballY: data.ballY,
@@ -156,17 +160,19 @@ class GameWindow extends React.Component<{}, GameWindowState> {
 
 function Game() {
 	const [displaying, setDisplaying] = useState({display: "block"});
+	const [id, setId] = useState(-1);
 	function matchMaking() {
-		socket.emit('getPlayer', (id: number) => {
-			console.log(id);
+		socket.emit('getPlayer', (id_game: number, launch: boolean) => {
 			setDisplaying({display:"none"});
+			setId(id_game);
+			console.log(id, id_game);
 
 		});
 	}
 	return (<div>
 		<NavBar />
 		<div className="mainComposantGame">
-			<GameWindow />
+			<GameWindow id={id}/>
 			<button style={displaying}
 				 className="matchMakingButton"
 				  onClick={() => matchMaking()}>
