@@ -3,8 +3,6 @@ import "./Match.css"
 import { useState } from "react"
 import { GameWindowState } from "../../type";
 import { getSocket } from "../../App"
-import { GameWindow } from "../game/Game"
-import { Game } from "../test/Test"
 
 const socket = getSocket();
 
@@ -17,9 +15,8 @@ function Match() {
 	socket.emit("getGames", (games:GameWindowState[]) => {
 		setGames(games);
 	});
-	function redirectGame(id:number) {
-		return <GameWindow id={id}/>;
-	}
+
+
 	return (<>
 		<NavBar />
 		<div className="tableMatch">
@@ -38,9 +35,7 @@ function Match() {
 					{games.map((game:GameWindowState) => {
 						return (<tr key="{game.id}">
 							<td>
-								<button onClick={() =>Game(0)}>
-									{game.id}
-								</button>
+								<a href="./game">{game.id}</a>
 							</td>
 							<td>Pika</td>
 							<td>Elise</td>
