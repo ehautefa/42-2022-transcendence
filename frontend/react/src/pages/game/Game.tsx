@@ -3,6 +3,7 @@ import "./Game.css"
 import React from 'react'
 import { getSocket } from "../../App"
 import { useState } from "react"
+import { useLocation } from "react-router-dom"
 
 const socket = getSocket();
 
@@ -154,8 +155,12 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 
 
 function Game() {
-	const [displaying, setDisplaying] = useState({display: "block"});
-	const [id, setId] = useState(-1);
+	const index = new URLSearchParams(useLocation().search).get('id');
+	var id_state : number = index === null ? -1 : parseInt(index);
+	const displaying_state = index === null ? {display: "block"} : {display: "none"};
+	const [displaying, setDisplaying] = useState(displaying_state);
+	const [id, setId] = useState(id_state);
+
 	function matchMaking() {
 		socket.emit('getPlayer', (id_game: number, launch: boolean) => {
 			setDisplaying({display:"none"});
