@@ -7,8 +7,8 @@ import { UserService } from './user.service';
 
 @Module({
   imports: [BddModule],
-  exports: [UserService],
   controllers: [UserController],
-  providers: [UserService]
+  providers: [UserService],
+  exports: [UserService]
 })
 export class UserModule {}

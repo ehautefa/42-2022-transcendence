@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user } from 'src/bdd/users.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
-import { getUserDto } from './dto/getUser';
 
 @Injectable()
 export class UserService {
@@ -17,14 +16,14 @@ export class UserService {
         return await this.UserRepository.find({});
     }
 
-    async getUser(userUid: string): Promise<user> {
-        return await this.UserRepository.findOne({ where: { userId: userUid } });
+    async getUser(userUuid: string): Promise<user> {
+        return await this.UserRepository.findOne({ where: { userUuid: userUuid } });
     }
-
 
     async createUser(userToCreate: CreateUserDto): Promise<user> {
         return await this.UserRepository.save({
             userName: userToCreate.userName,
+            userPassword: userToCreate.userPassword,
             twoFfactorAuth: false,
             wins: 0,
             losses: 0,
@@ -32,18 +31,7 @@ export class UserService {
     }
 
     async endOfMatch(players: EndOfMatchDto) : Promise<void> {
-        await this.UserRepository.increment({ userId: players.loserUid }, "losses", 1)
-        await this.UserRepository.increment({ userId: players.winnerUid }, "wins", 1)
+        await this.UserRepository.increment({ userUuid: players.loserUuid }, "losses", 1)
+        await this.UserRepository.increment({ userUuid: players.winnerUuid }, "wins", 1)
     }
 }
-
-    // async changeUserName(body) {
-        // let tochange: user = await this.UserRepository.findOne({
-            // where: {
-                // userId: body.userId
-            // }
-        // })
-        // tochange.userName = body.newName;
-        // await tochange.save();
-        // return tochange;
-    // }

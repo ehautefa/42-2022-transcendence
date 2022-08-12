@@ -5,10 +5,13 @@ import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany, JoinTabl
 export class user extends BaseEntity {
 
     @PrimaryGeneratedColumn("uuid")
-    userId: string;
+    userUuid: string;
 
     @Column('varchar')
     userName: string;
+
+    @Column('varchar')
+    userPassword: string;
 
     @Column('boolean')
     twoFfactorAuth: boolean;
@@ -19,12 +22,13 @@ export class user extends BaseEntity {
     @Column('smallint')
     losses: number;
 
-    @ManyToMany(() => user, usr => usr.userId)
+    @ManyToMany(() => user, usr => usr.userUuid)
     @JoinTable()
     friends: user[];
 
 
     // @Column()
+
     // match_history
 
 
