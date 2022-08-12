@@ -1,6 +1,5 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Chat.css"
-// import { getSocket } from "../to_import"
 import { useState } from 'react'
 
 function Game() {
@@ -8,7 +7,7 @@ function Game() {
 	// const socket = getSocket();
 	var message: string;
 	const [messages, setMessages] = useState([]);
-
+	setMessages([]);
 	function handleChange(event:any) {
 		message = event.target.value;
 	}
@@ -21,10 +20,6 @@ function Game() {
 		}
 	}
 
-	// socket.on("message", function (msg: string) {
-	// 	console.log("Message recu : ", msg);
-	// 	setMessages([...messages, msg]);
-	// })
 
 	return (<div>
 		<NavBar />

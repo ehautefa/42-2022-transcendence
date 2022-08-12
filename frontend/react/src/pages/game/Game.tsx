@@ -80,8 +80,8 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 	gameLoop() {
 		let timeoutId = setTimeout(() => {
 			if (!this.state.isGameOver
-				&& this.props.id != -1
-				&& this.props.id != undefined) {
+				&& this.props.id !== -1
+				&& this.props.id !== undefined) {
 				this.moveBall();
 			}
 			this.gameLoop();
@@ -146,8 +146,8 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 			<button className="ResetButton" onClick={() => this.resetGame()}>Reset</button>
 			<Paddle x={this.state.paddleLeftX} y={this.state.paddleLeftY} />
 			<Paddle x={this.state.paddleRightX} y={this.state.paddleRightY} />
-			<div className={"Score" + " " + "Right"}>{String(this.state.scoreRight).padStart(2, '0')}</div>
-			<div className={"Score" + " " + "Left"}>{String(this.state.scoreLeft).padStart(2, '0')}</div>
+			<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
+			<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 			<Ball x={this.state.ballX} y={this.state.ballY} />
 		</div>
 	}
