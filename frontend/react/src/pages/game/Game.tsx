@@ -46,7 +46,7 @@ interface GameWindowState {
 }
 
 
-class GameWindow extends React.Component<{id:number}, GameWindowState> {
+export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 	constructor(props: any) {
 		super(props);
 

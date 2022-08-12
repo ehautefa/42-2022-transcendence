@@ -8,6 +8,8 @@ import MainPage from "./pages/mainPage/mainPage";
 import Game from "./pages/game/Game";
 import Chat from "./pages/chat/Chat";
 import MyProfile from './pages/myProfile/myProfile';
+import Match from "./pages/match/Match"
+import Test from "./pages/test/Test";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -20,6 +22,8 @@ root.render(
 			<Route path="game" element={<Game />} />
 			<Route path="chat" element={<Chat />} />
 			<Route path="myProfile" element={<MyProfile />} />
+			<Route path="match" element={<Match />} />
+			{/* <Route path="test" element={<Test(0) />} /> */}
 		</Routes>
 	</BrowserRouter>
 );

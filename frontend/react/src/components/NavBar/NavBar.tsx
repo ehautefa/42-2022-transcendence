@@ -18,6 +18,7 @@ function navBar() {
 		</div>
 
 		<div className="navLinks">
+			<a href="/Match">MATCH</a>
 			<a href="/Game">GAME</a>
 			<a href="/Chat">CHAT</a>
 			<a href="/myProfile" >PROFILE</a>

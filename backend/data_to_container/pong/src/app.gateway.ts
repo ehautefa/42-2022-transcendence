@@ -8,13 +8,9 @@ interface GameWindowState {
 	ballY: number,
 	ballSpeedX: number,
 	ballSpeedY: number,
-	gameLoopTimeout: number,
-	timeoutId: any,
 	scoreLeft: number,
 	scoreRight: number,
 	paddleLeftY: number,
-	paddleLeftX: number,
-	paddleRightX: number,
 	paddleRightY: number,
 	isGameOver: boolean
 	player1: string,
@@ -24,6 +20,10 @@ interface GameWindowState {
 }
 
 var games: GameWindowState[] = [];
+
+export function getGames(): GameWindowState[] {
+	return games;
+}
 
 @WebSocketGateway({
 	cors: {
@@ -55,11 +55,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			ballSpeedY: 1 * (Math.random() < 0.5 ? 1 : -1),
 			scoreLeft: 0,
 			scoreRight: 0,
-			gameLoopTimeout:50, // time between game loops
-			timeoutId: 0,
 			paddleLeftY: 50,
-			paddleLeftX: 1,
-			paddleRightX: 79,
 			paddleRightY: 50,
 			isGameOver: false,
 			player1: client.id,
@@ -70,6 +66,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("GAMES[",i,"]", games[i]);
 		client.join(i.toString());
 		return i;
+	}
+
+	@SubscribeMessage('getGames')
+	getGames(client: Socket): GameWindowState[] {
+		return games;
 	}
 	
 	@SubscribeMessage('joinRoom')
@@ -84,11 +85,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				ballSpeedY: 1 * (Math.random() < 0.5 ? 1 : -1),
 				scoreLeft: 0,
 				scoreRight: 0,
-				gameLoopTimeout:50, // time between game loops
-				timeoutId: 0,
 				paddleLeftY: 50,
-				paddleLeftX: 1,
-				paddleRightX: 79,
 				paddleRightY: 50,
 				isGameOver: false,
 				player1: client.id,
@@ -112,7 +109,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		var id:number  = data.id;
 		if (id == undefined || games.length < id) 
 			return data;
-		console.log("id", id);
 		if (games[id].matchMaking == false)
 			return games[id];
 		games[id].ballX = games[id].ballX + games[id].ballSpeedX;
@@ -205,11 +201,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		games[id].ballSpeedY = 1 * (Math.random() < 0.5 ? 1 : -1);
 		games[id].scoreLeft = 0;
 		games[id].scoreRight = 0;
-		games[id].gameLoopTimeout =100; // time between game loops
-		games[id].timeoutId = 0;
 		games[id].paddleLeftY = 50;
-		games[id].paddleLeftX = 1;
-		games[id].paddleRightX = 79;
 		games[id].paddleRightY = 50;
 		games[id].isGameOver = false;
 		// game.player1 = undefined;
