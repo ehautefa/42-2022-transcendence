@@ -18,7 +18,7 @@ function myProfile() {
 				<div className="info container">
 					<h3>Profile</h3>
 					<ul>
-						<li>Name : {user.userName} <a>(edit)</a></li>
+						<li>Name : {user.userName} <a href="/myProfile">(edit)</a></li>
 						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>

@@ -35,7 +35,7 @@ function Match() {
 					{games.map((game:GameWindowState) => {
 						return (<tr key="{game.id}">
 							<td>
-								<a href="./game">{game.id}</a>
+								<a href={"./game?id=" + game.id}>{game.id}</a>
 							</td>
 							<td>Pika</td>
 							<td>Elise</td>
