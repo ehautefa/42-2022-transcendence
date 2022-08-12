@@ -8,13 +8,12 @@ import MainPage from "./pages/mainPage/mainPage";
 import Game from "./pages/game/Game";
 import Chat from "./pages/chat/Chat";
 import MyProfile from './pages/myProfile/myProfile';
-import "./fonts/bit5x5.ttf";
+import Match from "./pages/match/Match"
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
 	<BrowserRouter>
     	<Routes>
 			<Route path="/" element={<App />} />
@@ -22,9 +21,9 @@ root.render(
 			<Route path="game" element={<Game />} />
 			<Route path="chat" element={<Chat />} />
 			<Route path="myProfile" element={<MyProfile />} />
+			<Route path="match" element={<Match />} />
 		</Routes>
 	</BrowserRouter>
-  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

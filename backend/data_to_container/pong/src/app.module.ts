@@ -9,10 +9,12 @@ import { ApiModule } from './api/api.module';
 import { BddModule } from './bdd/bdd.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { GameController } from './game/game.controller';
+import { GameModule } from './game/game.module';
 
 @Module({
-  imports: [TestModule, ApiModule, BddModule, UserModule, AuthModule],
-  controllers: [AppController],
+  imports: [TestModule, ApiModule, BddModule, UserModule, AuthModule, GameModule],
+  controllers: [AppController, GameController],
   providers: [AppService, PongGateway],
 })
 export class AppModule {} 

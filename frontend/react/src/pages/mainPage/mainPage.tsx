@@ -3,15 +3,6 @@ import "../../index.css"
 
 
 function mainPage() {
-	// var router = useRouter();
-	// var token = router.query["code"];
-
-	// Recuperation de la socket initialiser dans index
-	// const socket = getSocket();
-	// if (token) {
-	// 	socket.emit("token", token);
-	// }
-	
 	return (<div>
 		<NavBar />
 			<div className="login" >
