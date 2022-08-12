@@ -5,11 +5,11 @@ import { User } from "../../type";
 
 
 function myProfile() {
-	const uid = localStorage.getItem('uid');
+	// const uid = localStorage.getItem('uid');
 	
 	let user: User = {userId: ""}; 
-	if (uid)
-		user = FetchUser(uid);
+	// if (uid)
+	// 	user = FetchUser(uid);
 
 	return (<div>
 		<NavBar />
