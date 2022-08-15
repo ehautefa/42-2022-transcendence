@@ -11,13 +11,13 @@ services:
       context: ./frontend
       target: development
       dockerfile: ./Dockerfile
-    command: npm start
-    # links:
-    #   - back_dev
+    command: sh /home/node/scripts/dev_entrypoint.sh
     volumes:
-      - ./frontend/react/src:/usr/src/app/src
+      - ./frontend/react:/usr/src/app/
+      - ./frontend/scripts/:/home/node/scripts/
     restart: unless-stopped
     env_file:
+    - ./api.env
     - ./frontend/frontend.env
     ports:
        - 3000:3000
@@ -36,6 +36,8 @@ services:
     command: sh /home/node/dev_entrypoint.sh
     restart: unless-stopped
     env_file:
+    - ./.secret.env
+    - ./api.env
     - ./backend/backend.env
     ports:
       - 3010:3010
