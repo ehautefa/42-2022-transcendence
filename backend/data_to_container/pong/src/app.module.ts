@@ -11,9 +11,10 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GameController } from './game/game.controller';
 import { GameModule } from './game/game.module';
+import { MatchModule } from './match/match.module';
 
 @Module({
-  imports: [TestModule, ApiModule, BddModule, UserModule, AuthModule, GameModule],
+  imports: [TestModule, ApiModule, BddModule, UserModule, AuthModule, GameModule, MatchModule],
   controllers: [AppController, GameController],
   providers: [AppService, PongGateway],
 })
