@@ -1,7 +1,7 @@
 import React from 'react';
 import './index.css';
 import { io } from 'socket.io-client'
-import { CreateUser } from "/usr/src/app/src/request"
+import { CreateUser } from "./pages/myProfile/request";
 
 // Create my socket 
 const socket = io("http://localhost:3011");

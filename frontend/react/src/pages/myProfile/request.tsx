@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User } from "./type";
+import { User } from "../../type";
 
 export function FetchUser(uid: string) : User {
 	let emptyUser: User = {userId: ""};

@@ -1,6 +1,12 @@
 import { IsNotEmpty } from "class-validator";
 
-export class EndOfMatchDto {
+export class SaveScoreDto {
+
+    @IsNotEmpty({message: "winnerUuid should be declared"})
+    winnerUuid: string;
+
+    @IsNotEmpty({message: "loserUuid should be declared"})
+    loserUuid: string;
 
     @IsNotEmpty({message: "score1 should be declared"})
     score1: number;

@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { FetchUser } from "../../request"
+import { FetchUser } from "./request"
 import { User } from "../../type";
 
 
