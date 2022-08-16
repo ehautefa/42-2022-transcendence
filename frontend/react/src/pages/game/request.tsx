@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-export function createMatch() : string {
+export function createMatch(user1uid:string, user2uid:string) : string {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
     var urlencoded = new URLSearchParams();
-    urlencoded.append("userName", "Elise");
+    urlencoded.append("user1uid", user1uid);
+    urlencoded.append("user2uid", user2uid);
 
     const requestOptions = {
         method: 'POST',
