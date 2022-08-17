@@ -3,9 +3,11 @@ import "./Game.css"
 import React from 'react'
 import { getSocket } from "../../App"
 import { useState } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom";
 
 const socket = getSocket();
+const GAME_LOOP_TIMEOUT = 100; // time between each game loop
+const PADDLE_GAP = 3; // in %
 
 class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
@@ -34,7 +36,6 @@ interface GameWindowState {
 	ballY: number,
 	ballSpeedX: number,
 	ballSpeedY: number,
-	gameLoopTimeout: number,
 	timeoutId: any,
 	scoreLeft: number,
 	scoreRight: number,
@@ -43,7 +44,9 @@ interface GameWindowState {
 	paddleRightX: number,
 	paddleRightY: number,
 	id: number,
-	isGameOver: boolean
+	isGameOver: boolean,
+	playerLeft: string,
+	playerRight: string
 }
 
 
@@ -52,7 +55,6 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 		super(props);
 
 		this.handleKeyDown = this.handleKeyDown.bind(this);
-
 		this.state = {
 			id : 0,
 			ballY: 46.3,
@@ -61,16 +63,17 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 			ballSpeedY: 0,
 			scoreLeft: 0,
 			scoreRight: 0,
-			gameLoopTimeout:50, // time between game loops
 			timeoutId: 0,
 			paddleLeftY: 50,
-			paddleLeftX: 3,
-			paddleRightX: 77,
+			paddleLeftX: PADDLE_GAP,
+			paddleRightX: 80 - PADDLE_GAP,
 			paddleRightY: 50,
-			isGameOver: false
+			isGameOver: false,
+			playerLeft: "",
+			playerRight: "",
 		};
 	}
-
+	
 	componentDidMount() {
 		window.addEventListener("keydown", this.handleKeyDown);
 		this.gameLoop();
@@ -84,8 +87,18 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 				&& this.props.id !== undefined) {
 				this.moveBall();
 			}
+			if (this.state.isGameOver) {
+				var winner:boolean;
+				if ((this.state.playerLeft === socket.id && this.state.scoreRight > this.state.scoreLeft)
+					|| (this.state.playerRight === socket.id && this.state.scoreLeft > this.state.scoreRight)) {
+						winner = false;
+				} else {
+					winner = true;
+				}
+				socket.emit('resetGame', this.props.id);
+			}
 			this.gameLoop();
-		}, this.state.gameLoopTimeout);
+		}, GAME_LOOP_TIMEOUT);
 		this.setState({ timeoutId });
 	}
 
@@ -105,7 +118,9 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 				scoreRight: data.scoreRight,
 				paddleLeftY: data.paddleLeftY,
 				paddleRightY: data.paddleRightY,
-				isGameOver: data.isGameOver	
+				isGameOver: data.isGameOver,
+				playerLeft: data.playerLeft,
+				playerRight: data.playerRight
 			});
 		});
 	}
@@ -125,25 +140,8 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 		}
 	}
 
-	resetGame() {
-	console.log("RESET GAME");
-		this.setState({ballSpeedX: 0, ballSpeedY:0});
-		
-		socket.emit('getGame', this.state, (data:GameWindowState) => {
-			this.setState({ballX: data.ballX,
-				ballY: data.ballY,
-				ballSpeedX: data.ballSpeedX,
-				ballSpeedY: data.ballSpeedY,
-				scoreLeft: data.scoreLeft,
-				scoreRight: data.scoreRight,
-				paddleLeftY: data.paddleLeftY,
-				paddleRightY: data.paddleRightY});
-		});
-	}
-
 	render() {
 		return <div className="GameWindow" id="GameBoard">
-			<button className="ResetButton" onClick={() => this.resetGame()}>Reset</button>
 			<Paddle x={this.state.paddleLeftX} y={this.state.paddleLeftY} />
 			<Paddle x={this.state.paddleRightX} y={this.state.paddleRightY} />
 			<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
