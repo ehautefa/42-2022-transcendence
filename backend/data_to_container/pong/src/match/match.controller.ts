@@ -8,11 +8,23 @@ import { SaveScoreDto } from './dto/saveScore.dto';
 export class MatchController {
 	constructor( private readonly MatchService : MatchService ) {}
 
+	@Get('all')
+    async getAllMatch() : Promise<match[]>{
+        return await this.MatchService.getAllMatch();
+    }
+
 	@Get('/:matchUid')
 	@UsePipes(ValidationPipe)
 	async getMatch(@Param('matchUid') matchUid : string) : Promise<match> {
 		return await this.MatchService.getMatch(matchUid);
 	}
+
+	@Get('/user/:userUid')
+	@UsePipes(ValidationPipe)
+	async getMatchHistory(@Param('userUid') userUid : string) : Promise<match[]> {
+		return await this.MatchService.getMatchHistory(userUid);
+	}
+
 
 	@Post('create')
 	@UsePipes(ValidationPipe)

@@ -92,7 +92,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 					this.moveBall();
 					this.setState({loading: true})
 				}
-			if (this.state.matchMaking == true)	
+			if (this.state.matchMaking === true)	
 					this.setState({loading: false})
 			if (this.state.isGameOver) {
 				var winner: boolean;
@@ -102,7 +102,22 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				} else {
 					winner = true;
 				}
-				// socket.emit('resetGame', this.props.id);
+				// socket.emit('resetGame', this.props.id, (data: GameWindowState) => {
+				// 	this.setState({
+				// 		ballX: data.ballX,
+				// 		ballY: data.ballY,
+				// 		ballSpeedX: data.ballSpeedX,
+				// 		ballSpeedY: data.ballSpeedY,
+				// 		scoreLeft: data.scoreLeft,
+				// 		scoreRight: data.scoreRight,
+				// 		paddleLeftY: data.paddleLeftY,
+				// 		paddleRightY: data.paddleRightY,
+				// 		isGameOver: data.isGameOver,
+				// 		playerLeft: data.playerLeft,
+				// 		playerRight: data.playerRight,
+				// 		matchMaking: data.matchMaking,
+				// 	});
+				// });
 			}
 			this.gameLoop();
 		}, GAME_LOOP_TIMEOUT);
@@ -175,9 +190,10 @@ function Game() {
 	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
 	const [id, setId] = useState(id_state);
+	const uid = localStorage.getItem('uid');
 
 	function matchMaking() {
-		socket.emit('getPlayer', (id_game: number, launch: boolean) => {
+		socket.emit('getPlayer', uid,  (id_game: number, launch: boolean) => {
 			setDisplaying({ display: "none" });
 			setId(id_game);
 		});

@@ -7,7 +7,7 @@ import { User } from "../../type";
 function myProfile() {
 	const uid = localStorage.getItem('uid');
 	
-	let user: User = {userId: ""}; 
+	let user: User = {userUuid: ""}; 
 	if (uid)
 		user = FetchUser(uid);
 

@@ -1,6 +1,8 @@
 import { IsNotEmpty } from "class-validator";
 
 export class SaveScoreDto {
+    @IsNotEmpty()
+    matchId: string;
 
     @IsNotEmpty({message: "winnerUuid should be declared"})
     winnerUuid: string;

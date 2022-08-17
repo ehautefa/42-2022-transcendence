@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { User } from "../../type";
 
+let i: number = 0;
+
 export function FetchUser(uid: string) : User {
-	let emptyUser: User = {userId: ""};
+	let emptyUser: User = {userUuid: ""};
 	const [user, setUser] = useState(emptyUser);
 
 	var myHeaders = new Headers();
@@ -22,7 +24,8 @@ export function FetchUser(uid: string) : User {
 }
 
 export function CreateUser() : string {
-	let emptyUser: User = {userId: ""};
+	console.log("create", i, "users");
+	let emptyUser: User = {userUuid: ""};
 	const [user, setUser] = useState(emptyUser);
 
 	var myHeaders = new Headers();
@@ -30,6 +33,7 @@ export function CreateUser() : string {
 	
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("userName", "Elise");
+	urlencoded.append("userPassword", "bidule");
 	
 	const requestOptions = {
 		method: 'POST',
@@ -41,6 +45,6 @@ export function CreateUser() : string {
 		.then(response => response.text())
 		.then(result => setUser(JSON.parse(result)))
 		.catch(error => console.log('error', error));
-    const uid = user.userId;
+    const uid = user.userUuid;
     return (uid);
 }

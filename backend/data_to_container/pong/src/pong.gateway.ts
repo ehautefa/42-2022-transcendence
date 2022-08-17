@@ -1,6 +1,7 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
+import { MatchService } from 'src/match/match.service;
 
 
 const END_SCORE = 5;
@@ -8,7 +9,8 @@ const PADDLE_SIZE = 15; // in %
 const BALL_SPEED = 1; // in %
 
 interface GameWindowState {
-  ballX: number,
+	matchId: string,
+  	ballX: number,
 	ballY: number,
 	ballSpeedX: number,
 	ballSpeedY: number,
@@ -16,7 +18,9 @@ interface GameWindowState {
 	scoreRight: number,
 	paddleLeftY: number,
 	paddleRightY: number,
-	isGameOver: boolean
+	isGameOver: boolean,
+	playerLeftUid: string,
+	playerRightUid: string,
 	playerLeft: string,
 	playerRight: string,
 	id: number,
@@ -31,17 +35,28 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	server: Server;
 	private logger: Logger = new Logger('AppGateway');
 
+	@Inject('MatchService')
+	private readonly matchService : MatchService;
+
+
 	@SubscribeMessage('getPlayer')
-	getPlayer(client: Socket): number {
+	getPlayer(client: Socket, clientUid: string): number {
 		for (var i:number = 0; i < games.length; i++) {
 			if (games[i].playerRight === undefined) {
 				games[i].playerRight = client.id;
 				client.join(i.toString());
 				games[i].matchMaking = true;
+				games[i].matchId = this.matchService.createMatch({
+					user1uid: games[i].playerLeftUid, // user1 is client Left
+					user2uid: clientUid // user2 is client Right
+				}).matchId;
 				return i;
 			}
 		}
 		var game:GameWindowState = {
+			matchId: undefined,
+			playerLeftUid: clientUid,
+			playerRightUid: undefined,
 			id: i,
 			ballY: 46.3,
 			ballX: 48.2,

@@ -14,12 +14,13 @@ export function getSocket() {
 
 
 export default function App() {
-	var uid: string = "";
+	var uid :string = localStorage.getItem('uid') !== null ? localStorage.getItem('uid')! : "";
 	// Connect my socket to server
 	socket.on("connect", () => {
 		console.log("SOCKET FRONT:", socket.id, " : ", socket.connected);
 	});
-	if (localStorage.getItem('uid') == null) {
+	console.log ("uid:", uid);
+	if (uid === "") {
 		uid = CreateUser();
 		console.log ("uid:", uid);
 		localStorage.setItem('uid', uid);

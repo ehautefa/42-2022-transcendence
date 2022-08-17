@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 export function createMatch(user1uid:string, user2uid:string) : string {
+    console.log("create matches", user1uid, "and", user2uid);
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 

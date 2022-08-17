@@ -14,9 +14,22 @@ export class MatchService {
 	constructor(
 		@InjectRepository(match) private MatchRepository: Repository<match>,
 	) { }
+
+	async getAllMatch(): Promise<match[]> {
+		return await this.MatchRepository.find({});
+	}
 	
 	async getMatch(matchId: string): Promise<match> {
 		return await this.MatchRepository.findOne({ where: { matchId: matchId } });
+	}
+
+	async getMatchHistory(userUid: string): Promise<match[]> {
+		var to_find: user = await this.userService.getUser(userUid);
+		return await this.MatchRepository.find({ 
+			where: [
+				{ user1: to_find },
+				{ user2: to_find }
+			]});
 	}
 
 	async createMatch(matchToCreate: CreateMatchDto): Promise<match> {
@@ -31,9 +44,7 @@ export class MatchService {
 	}
 
 	async endOfMatch(saveScore: SaveScoreDto): Promise<void> {
-		await this.MatchRepository.save({
-			score1: saveScore.score1,
-			score2: saveScore.score2,
-		})
+		await this.MatchRepository.increment({ matchId: saveScore.matchId }, "score1", saveScore.score1);
+		await this.MatchRepository.increment({ matchId: saveScore.matchId }, "score2", saveScore.score2);
 	}
 }
