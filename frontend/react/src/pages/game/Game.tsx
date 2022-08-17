@@ -46,19 +46,21 @@ interface GameWindowState {
 	id: number,
 	isGameOver: boolean,
 	playerLeft: string,
-	playerRight: string
+	playerRight: string,
+	loading: boolean,
+	matchMaking: boolean,
 }
 
 
-export class GameWindow extends React.Component<{id:number}, GameWindowState> {
+export class GameWindow extends React.Component<{ id: number }, GameWindowState> {
 	constructor(props: any) {
 		super(props);
 
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 		this.state = {
-			id : 0,
+			id: 0,
 			ballY: 46.3,
-			ballX: 48,
+			ballX: 48.2,
 			ballSpeedX: 0,
 			ballSpeedY: 0,
 			scoreLeft: 0,
@@ -71,9 +73,11 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 			isGameOver: false,
 			playerLeft: "",
 			playerRight: "",
+			loading: false,
+			matchMaking: false,
 		};
 	}
-	
+
 	componentDidMount() {
 		window.addEventListener("keydown", this.handleKeyDown);
 		this.gameLoop();
@@ -85,17 +89,20 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 			if (!this.state.isGameOver
 				&& this.props.id !== -1
 				&& this.props.id !== undefined) {
-				this.moveBall();
-			}
+					this.moveBall();
+					this.setState({loading: true})
+				}
+			if (this.state.matchMaking == true)	
+					this.setState({loading: false})
 			if (this.state.isGameOver) {
-				var winner:boolean;
+				var winner: boolean;
 				if ((this.state.playerLeft === socket.id && this.state.scoreRight > this.state.scoreLeft)
 					|| (this.state.playerRight === socket.id && this.state.scoreLeft > this.state.scoreRight)) {
-						winner = false;
+					winner = false;
 				} else {
 					winner = true;
 				}
-				socket.emit('resetGame', this.props.id);
+				// socket.emit('resetGame', this.props.id);
 			}
 			this.gameLoop();
 		}, GAME_LOOP_TIMEOUT);
@@ -108,9 +115,10 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 	}
 
 	moveBall() {
-		this.setState({id: this.props.id});
-		socket.emit('getGame', this.state, (data:GameWindowState) => {
-			this.setState({ballX: data.ballX,
+		this.setState({ id: this.props.id });
+		socket.emit('getGame', this.state, (data: GameWindowState) => {
+			this.setState({
+				ballX: data.ballX,
 				ballY: data.ballY,
 				ballSpeedX: data.ballSpeedX,
 				ballSpeedY: data.ballSpeedY,
@@ -120,7 +128,8 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 				paddleRightY: data.paddleRightY,
 				isGameOver: data.isGameOver,
 				playerLeft: data.playerLeft,
-				playerRight: data.playerRight
+				playerRight: data.playerRight,
+				matchMaking: data.matchMaking,
 			});
 		});
 	}
@@ -142,11 +151,19 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 
 	render() {
 		return <div className="GameWindow" id="GameBoard">
-			<Paddle x={this.state.paddleLeftX} y={this.state.paddleLeftY} />
-			<Paddle x={this.state.paddleRightX} y={this.state.paddleRightY} />
-			<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
-			<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
-			<Ball x={this.state.ballX} y={this.state.ballY} />
+			{this.state.loading ? (
+				<div className="loader-container">
+					<div className="spinner"></div>
+				</div>
+			) : (
+				<>
+					<Paddle x={this.state.paddleLeftX} y={this.state.paddleLeftY} />
+					<Paddle x={this.state.paddleRightX} y={this.state.paddleRightY} />
+					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
+					<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
+					<Ball x={this.state.ballX} y={this.state.ballY} />
+				</>
+			)}
 		</div>
 	}
 }
@@ -154,27 +171,25 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 
 function Game() {
 	const index = new URLSearchParams(useLocation().search).get('id');
-	var id_state : number = index === null ? -1 : parseInt(index);
-	const displaying_state = index === null ? {display: "block"} : {display: "none"};
+	var id_state: number = index === null ? -1 : parseInt(index);
+	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
 	const [id, setId] = useState(id_state);
 
 	function matchMaking() {
 		socket.emit('getPlayer', (id_game: number, launch: boolean) => {
-			setDisplaying({display:"none"});
+			setDisplaying({ display: "none" });
 			setId(id_game);
-			console.log(id, id_game);
-
 		});
 	}
 	return (<div>
 		<NavBar />
 		<div className="mainComposantGame">
-			<GameWindow id={id}/>
+			<GameWindow id={id} />
 			<button style={displaying}
-				 className="matchMakingButton"
-				  onClick={() => matchMaking()}>
-					Find another player
+				className="matchMakingButton"
+				onClick={() => matchMaking()}>
+				Find another player
 			</button>
 		</div>
 	</div>)

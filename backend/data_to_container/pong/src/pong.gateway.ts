@@ -3,7 +3,7 @@ import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
 
-const END_SCORE = 1;
+const END_SCORE = 5;
 const PADDLE_SIZE = 15; // in %
 const BALL_SPEED = 1; // in %
 
@@ -59,7 +59,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		};
 		games.push(game);
 		console.log("GAMES[",i,"]", games[i]);
-		client.join(i.toString());
+		// client.join(i.toString());
 		return i;
 	}
 
@@ -71,7 +71,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('getGame')
 	handleGame(client: Socket, data: GameWindowState): GameWindowState {
 		var id:number  = data.id;
-		if (id == undefined || games.length < id) 
+		if (id == undefined)
 			return data;
 		if (games[id].matchMaking == false)
 			return games[id];
@@ -130,7 +130,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	endpoint(id: number) {
 		games[id].ballX = 48.2;
 		if (games[id].scoreLeft == END_SCORE || games[id].scoreRight == END_SCORE) {
-			games[id].ballY = 46;
+			games[id].ballY = 46.3;
 			games[id].isGameOver = true;
 			games[id].ballSpeedX = 0;
 			games[id].ballSpeedY = 0;
