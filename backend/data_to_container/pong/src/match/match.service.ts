@@ -7,6 +7,7 @@ import { CreateMatchDto } from './dto/createMatch.dto';
 import { SaveScoreDto } from './dto/saveScore.dto';
 import { UserService } from 'src/user/user.service';
 
+
 @Injectable()
 export class MatchService {
 	@Inject(UserService)
@@ -27,12 +28,12 @@ export class MatchService {
 		var to_find: user = await this.userService.getUser(userUid);
 		return await this.MatchRepository.find({ 
 			where: [
-				{ user1: to_find },
-				{ user2: to_find }
+				{ score1 : 0}
 			]});
 	}
 
 	async createMatch(matchToCreate: CreateMatchDto): Promise<match> {
+		console.log("Try to create match");
 		var user1: user = await this.userService.getUser(matchToCreate.user1uid);
 		var user2: user = await this.userService.getUser(matchToCreate.user2uid);
 		return await this.MatchRepository.save({

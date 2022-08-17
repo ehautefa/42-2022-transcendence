@@ -1,7 +1,7 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
-import { MatchService } from 'src/match/match.service;
+// import { MatchService } from 'src/match/match.service';
 
 
 const END_SCORE = 5;
@@ -35,8 +35,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	server: Server;
 	private logger: Logger = new Logger('AppGateway');
 
-	@Inject('MatchService')
-	private readonly matchService : MatchService;
+	// @Inject('MatchService')
+	// private readonly matchService : MatchService;
 
 
 	@SubscribeMessage('getPlayer')
@@ -46,10 +46,10 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				games[i].playerRight = client.id;
 				client.join(i.toString());
 				games[i].matchMaking = true;
-				games[i].matchId = this.matchService.createMatch({
-					user1uid: games[i].playerLeftUid, // user1 is client Left
-					user2uid: clientUid // user2 is client Right
-				}).matchId;
+				// this.matchService.createMatch({
+				// 	user1uid: games[i].playerLeftUid, // user1 is client Left
+				// 	user2uid: clientUid // user2 is client Right
+				// }).then(match => console.log(match));
 				return i;
 			}
 		}

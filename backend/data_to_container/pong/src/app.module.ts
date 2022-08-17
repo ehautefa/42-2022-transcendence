@@ -10,11 +10,11 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MatchModule } from './match/match.module';
 import { PongModule } from './pong/pong.module';
-import { PongGateway } from './pong.gateway';
+// import { PongGateway } from './pong/pong.gateway';
 
 @Module({
   imports: [TestModule, ApiModule, BddModule, UserModule, AuthModule, MatchModule, PongModule],
   controllers: [AppController],
-  providers: [AppService, PongGateway],
+  providers: [AppService],
 })
 export class AppModule {} 
