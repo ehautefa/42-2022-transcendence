@@ -74,7 +74,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		};
 		games.push(game);
 		console.log("GAMES[",i,"]", games[i]);
-		// client.join(i.toString());
+		client.join(i.toString());
 		return i;
 	}
 
