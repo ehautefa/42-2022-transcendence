@@ -13,7 +13,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* position: fixed; */
+	border-radius: 10px;
     background: rgba(0, 0, 0, 0.834);
     z-index: 1;
 }
@@ -61,7 +61,7 @@
 
 .Ball {
 	aspect-ratio: 1 / 1;
-	width: 4%;
+	width: 3%;
 	height: auto;
 	background-color: #FA0197;
 	border-radius: 100px;

@@ -1,11 +1,12 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
+import { Interval } from '@nestjs/schedule';
 // import { MatchService } from 'src/match/match.service';
 
 
 const END_SCORE = 5;
-const PADDLE_SIZE = 15; // in %
+const PADDLE_SIZE = 10; // in %
 const BALL_SPEED = 1; // in %
 
 interface GameWindowState {
@@ -82,14 +83,24 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	getGames(client: Socket): GameWindowState[] {
 		return games;
 	}
+
+	@Interval(200)
+	GameLoop() {
+		while (true) {
+			for (let i = 0; i < games.length; i++) {
+				if (games[i].isGameOver == false
+					&& games[i].playerLeft != undefined
+					&& games[i].playerRight != undefined) {
+					console.log("GAME", i, games[i]);
+					this.sendGametoRoom(games[i].id);
+				}
+			}
+		}
+	}
 		
-	@SubscribeMessage('getGame')
-	handleGame(client: Socket, data: GameWindowState): GameWindowState {
-		var id:number  = data.id;
-		if (id == undefined)
-			return data;
-		if (games[id].matchMaking == false)
-			return games[id];
+	sendGametoRoom(id: number)  {
+		if (id == undefined || games[id].matchMaking == false)
+			return ;
 		games[id].ballX = games[id].ballX + games[id].ballSpeedX;
 		games[id].ballY = games[id].ballY + games[id].ballSpeedY;
 
@@ -97,23 +108,33 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (games[id].ballX <= 5.2
 		&& games[id].ballY  >= games[id].paddleLeftY - PADDLE_SIZE
 		&& games[id].ballY <= games[id].paddleLeftY + PADDLE_SIZE) {
-			if (games[id].ballSpeedX < 0 && games[id].ballY >= games[id].paddleLeftY - (PADDLE_SIZE-1) && games[id].ballY <= games[id].paddleLeftY + (PADDLE_SIZE-1)) // check if we have already hit the paddle
-				games[id].ballSpeedX = -games[id].ballSpeedX;
-			else if ((games[id].ballSpeedY > 0 && games[id].ballY <= games[id].paddleLeftY) // check if we are above the paddle
-				|| (games[id].ballSpeedY < 0 && games[id].ballY >= games[id].paddleLeftY)) { // check if we are below the paddle
-				games[id].ballSpeedY = -games[id].ballSpeedY;
-				if (games[id].ballSpeedX < 0)
+			if (games[id].ballSpeedX < 0
+				&& games[id].ballY >= games[id].paddleLeftY - (PADDLE_SIZE-1)
+				&& games[id].ballY <= games[id].paddleLeftY + (PADDLE_SIZE-1))
+				// check if we have already hit the paddle
 					games[id].ballSpeedX = -games[id].ballSpeedX;
+			else if ((games[id].ballSpeedY > 0
+				&& games[id].ballY <= games[id].paddleLeftY) // check if we are above the paddle
+				|| (games[id].ballSpeedY < 0
+				&& games[id].ballY >= games[id].paddleLeftY)) { // check if we are below the paddle
+					games[id].ballSpeedY = -games[id].ballSpeedY;
+					if (games[id].ballSpeedX < 0) // check if we have already hit the paddle
+						games[id].ballSpeedX = -games[id].ballSpeedX;
 			}
 			console.log("Hit left paddle", games[id].ballX, games[id].ballY);
 		} // Check if the ball hits the right paddle
 		else if (games[id].ballX >= 91.8
 			&& games[id].ballY  >= games[id].paddleRightY - PADDLE_SIZE
 			&& games[id].ballY <= games[id].paddleRightY + PADDLE_SIZE) {
-				if (games[id].ballSpeedX > 0 && games[id].ballY >= games[id].paddleRightY - (PADDLE_SIZE-1) && games[id].ballY <= games[id].paddleRightY + (PADDLE_SIZE-1)) // check if we have already hit the paddle
+				if (games[id].ballSpeedX > 0
+					&& games[id].ballY >= games[id].paddleRightY - (PADDLE_SIZE-1)
+					&& games[id].ballY <= games[id].paddleRightY + (PADDLE_SIZE-1))
+					// check if we have already hit the paddle
 					games[id].ballSpeedX = -games[id].ballSpeedX;
-				else if ((games[id].ballSpeedY > 0 && games[id].ballY <= games[id].paddleRightY) // check if we are above the paddle
-					|| (games[id].ballSpeedY < 0 && games[id].ballY >= games[id].paddleRightY)) { // check if we are below the paddle
+				else if ((games[id].ballSpeedY > 0
+					&& games[id].ballY <= games[id].paddleRightY) // check if we are above the paddle
+					|| (games[id].ballSpeedY < 0
+						&& games[id].ballY >= games[id].paddleRightY)) { // check if we are below the paddle
 					games[id].ballSpeedY = -games[id].ballSpeedY;
 					if (games[id].ballSpeedX > 0) // chck if we have already hit the paddle
 						games[id].ballSpeedX = -games[id].ballSpeedX;
@@ -139,7 +160,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				console.log("Hits the bottom wall", games[id].ballY);
 			}
 		}
-		return games[id];
+		try {
+			this.server.to(id.toString()).emit('game', games[id]);
+		} catch (error) {
+			console.log("ERROR IN SEND GAME TO ROOM", error);
+		}
 	}
 
 	endpoint(id: number) {

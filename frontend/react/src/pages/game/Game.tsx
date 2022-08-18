@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 const socket = getSocket();
 const GAME_LOOP_TIMEOUT = 100; // time between each game loop
 const PADDLE_GAP = 3; // in %
+const PADDLE_DEP = 3; // in %
 
 class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
@@ -34,8 +35,6 @@ class Paddle extends React.Component<{ x: number, y: number }> {
 interface GameWindowState {
 	ballX: number,
 	ballY: number,
-	ballSpeedX: number,
-	ballSpeedY: number,
 	timeoutId: any,
 	scoreLeft: number,
 	scoreRight: number,
@@ -61,8 +60,6 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 			id: 0,
 			ballY: 46.3,
 			ballX: 48.2,
-			ballSpeedX: 0,
-			ballSpeedY: 0,
 			scoreLeft: 0,
 			scoreRight: 0,
 			timeoutId: 0,
@@ -85,43 +82,25 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 
 
 	gameLoop() {
-		let timeoutId = setTimeout(() => {
-			if (!this.state.isGameOver
-				&& this.props.id !== -1
-				&& this.props.id !== undefined) {
-					this.moveBall();
-					this.setState({loading: true})
-				}
-			if (this.state.matchMaking === true)	
-					this.setState({loading: false})
-			if (this.state.isGameOver) {
-				var winner: boolean;
-				if ((this.state.playerLeft === socket.id && this.state.scoreRight > this.state.scoreLeft)
-					|| (this.state.playerRight === socket.id && this.state.scoreLeft > this.state.scoreRight)) {
-					winner = false;
-				} else {
-					winner = true;
-				}
-				// socket.emit('resetGame', this.props.id, (data: GameWindowState) => {
-				// 	this.setState({
-				// 		ballX: data.ballX,
-				// 		ballY: data.ballY,
-				// 		ballSpeedX: data.ballSpeedX,
-				// 		ballSpeedY: data.ballSpeedY,
-				// 		scoreLeft: data.scoreLeft,
-				// 		scoreRight: data.scoreRight,
-				// 		paddleLeftY: data.paddleLeftY,
-				// 		paddleRightY: data.paddleRightY,
-				// 		isGameOver: data.isGameOver,
-				// 		playerLeft: data.playerLeft,
-				// 		playerRight: data.playerRight,
-				// 		matchMaking: data.matchMaking,
-				// 	});
-				// });
-			}
-			this.gameLoop();
-		}, GAME_LOOP_TIMEOUT);
-		this.setState({ timeoutId });
+	socket.on('game', (data: GameWindowState) => {
+		if (data.matchMaking == false) {
+			this.setState({loading: true});
+		} else {
+			this.setState({loading: false});
+		}
+		this.setState({
+			ballX: data.ballX,
+			ballY: data.ballY,
+			scoreLeft: data.scoreLeft,
+			scoreRight: data.scoreRight,
+			paddleLeftY: data.paddleLeftY,
+			paddleRightY: data.paddleRightY,
+			isGameOver: data.isGameOver,
+			playerLeft: data.playerLeft,
+			playerRight: data.playerRight,
+			matchMaking: data.matchMaking,
+		});
+	})
 	}
 
 	componentWillUnmount() {
@@ -129,34 +108,14 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 		window.removeEventListener("keydown", this.handleKeyDown);
 	}
 
-	moveBall() {
-		this.setState({ id: this.props.id });
-		socket.emit('getGame', this.state, (data: GameWindowState) => {
-			this.setState({
-				ballX: data.ballX,
-				ballY: data.ballY,
-				ballSpeedX: data.ballSpeedX,
-				ballSpeedY: data.ballSpeedY,
-				scoreLeft: data.scoreLeft,
-				scoreRight: data.scoreRight,
-				paddleLeftY: data.paddleLeftY,
-				paddleRightY: data.paddleRightY,
-				isGameOver: data.isGameOver,
-				playerLeft: data.playerLeft,
-				playerRight: data.playerRight,
-				matchMaking: data.matchMaking,
-			});
-		});
-	}
-
 	handleKeyDown(event: KeyboardEvent) {
 		var deltaPaddleY = 0
 		switch (event.key) {
 			case "ArrowUp":
-				deltaPaddleY = -5;
+				deltaPaddleY = -PADDLE_DEP;
 				break;
 			case "ArrowDown":
-				deltaPaddleY = +5;
+				deltaPaddleY = +PADDLE_DEP;
 				break;
 		}
 		if (deltaPaddleY !== 0) {
@@ -193,7 +152,7 @@ function Game() {
 	const uid = localStorage.getItem('uid');
 
 	function matchMaking() {
-		socket.emit('getPlayer', uid,  (id_game: number, launch: boolean) => {
+		socket.emit('getPlayer', uid,  (id_game: number) => {
 			setDisplaying({ display: "none" });
 			setId(id_game);
 		});
