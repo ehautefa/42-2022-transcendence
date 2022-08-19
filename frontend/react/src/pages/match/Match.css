@@ -1,0 +1,35 @@
+.tableMatch {
+    width: 90%;
+    margin:auto;
+    background-color: rgba(0, 0, 0, 0.5);
+	box-shadow: 5px 5px 10px #000;
+	border-radius: 10px;
+}
+
+.tableMatch h3 {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.tableMatch table{
+    width: 100%;
+    margin: auto;
+    text-align: center;
+}
+
+.tableMatch a {
+    color: #fef45b;
+    font-weight: bold;
+}
+
+.tableMatch a:hover {
+    text-decoration: underline;
+
+}
+
+.tableMatch tbody {
+    height: 10px;
+    text-align: center;
+    line-height: 50px;
+    color: #FAE3E3;
+}

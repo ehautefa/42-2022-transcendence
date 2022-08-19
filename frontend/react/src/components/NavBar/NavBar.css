@@ -7,6 +7,7 @@
 	height: 50px;
 	width: 100%;
 	position: relative;
+	margin-bottom: 30px;
 }
 
 .nav div {
@@ -44,7 +45,7 @@
 }
 
 .check {
-	/* display: none; */
+	display: none;
 }
 
 @media (max-width:600px) {

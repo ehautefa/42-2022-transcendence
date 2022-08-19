@@ -5,8 +5,8 @@ function navBar() {
 		<input type="checkbox" className="check" id="nav-ckeck">
 		</input>
 		<div id="nav-header">
-			<a href="https://localhost:3000">
-				Transcendence
+			<a href="http://localhost:3000">
+				TRANSCENDENCE
 			</a>
 		</div>
 		<div className="navButton">
@@ -18,9 +18,10 @@ function navBar() {
 		</div>
 
 		<div className="navLinks">
-			<a href="/Game">Game</a>
-			<a href="/Chat">Chat</a>
-			<a href="/myProfile" >My Profile</a>
+			<a href="/Match">MATCH</a>
+			<a href="/Game">GAME</a>
+			<a href="/Chat">CHAT</a>
+			<a href="/myProfile" >PROFILE</a>
 		</div>
 	</div>)
 }
