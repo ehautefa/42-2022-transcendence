@@ -38,12 +38,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	server: Server;
 	private logger: Logger = new Logger('PongGateway');
 
-	constructor( private readonly MatchService : MatchService ) {}
+	constructor(private readonly MatchService: MatchService) { }
 
 	@Interval(INTERVAL_TIME)
 	GameLoop() {
-		for (let i:number = 0; i < games.length; i++) {
-			if (!games[i].isGameOver && games[i].playerLeft && games[i].playerRight) {
+		for (let i: number = 0; i < games.length; i++) {
+			if (!games[i].isGameOver && games[i].playerLeft) {
 				this.sendGametoRoom(i);
 			}
 		}
@@ -57,12 +57,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		for (var i: number = 0; i < games.length; i++) {
 			if (games[i].playerRight === undefined) {
 				games[i].playerRight = client.id;
+				games[i].playerRightUid = clientUid;
 				client.join(i.toString());
 				games[i].matchMaking = true;
 				this.MatchService.createMatch({
 					user1uid: games[i].playerLeftUid, // user1 is client Left
 					user2uid: clientUid // user2 is client Right
-				}).then(match => console.log(match));
+				}).then(match => {
+					games[i].matchId = match.matchId;
+					this.sendGametoRoom(i);
+				});
 				return i;
 			}
 		}
@@ -97,8 +101,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	sendGametoRoom(id: number) {
-		if (id == undefined || games[id].matchMaking == false)
+		if (id == undefined)
 			return;
+		if (games[id].matchMaking == false) {
+			try {
+				this.server.to(id.toString()).emit('game', games[id]);
+			} catch (error) {
+				console.log("ERROR IN SEND GAME TO ROOM", error);
+			}
+			return ;
+		}
 		games[id].ballX = games[id].ballX + games[id].ballSpeedX;
 		games[id].ballY = games[id].ballY + games[id].ballSpeedY;
 
@@ -169,9 +181,18 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		games[id].ballX = 48.2;
 		if (games[id].scoreLeft == END_SCORE || games[id].scoreRight == END_SCORE) {
 			games[id].ballY = 46.3;
-			games[id].isGameOver = true;
 			games[id].ballSpeedX = 0;
 			games[id].ballSpeedY = 0;
+			if (games[id].isGameOver == false) {
+				this.MatchService.endOfMatch({
+					player1Uuid: games[id].playerLeftUid,
+					player2Uuid: games[id].playerRightUid,
+					score1: games[id].scoreLeft,
+					score2: games[id].scoreRight,
+					matchId: games[id].matchId
+				})
+			}
+			games[id].isGameOver = true;
 		} else {
 			games[id].ballY = Math.random() * 80 + 10;
 			games[id].ballSpeedX = BALL_SPEED * (Math.random() < 0.5 ? 1 : -1);

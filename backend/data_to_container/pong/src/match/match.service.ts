@@ -45,6 +45,14 @@ export class MatchService {
 	}
 
 	async endOfMatch(saveScore: SaveScoreDto): Promise<void> {
+		console.log("END OF MATCH", saveScore);
+		if (saveScore.score1 > saveScore.score2) {
+			await this.userService.endOfMatch(
+				{winnerUuid : saveScore.player1Uuid, loserUuid : saveScore.player2Uuid})
+		} else {
+			await this.userService.endOfMatch(
+				{winnerUuid : saveScore.player2Uuid, loserUuid : saveScore.player1Uuid})
+		}
 		await this.MatchRepository.increment({ matchId: saveScore.matchId }, "score1", saveScore.score1);
 		await this.MatchRepository.increment({ matchId: saveScore.matchId }, "score2", saveScore.score2);
 	}

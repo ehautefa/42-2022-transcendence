@@ -5,10 +5,10 @@ export class SaveScoreDto {
     matchId: string;
 
     @IsNotEmpty({message: "winnerUuid should be declared"})
-    winnerUuid: string;
+    player1Uuid: string;
 
     @IsNotEmpty({message: "loserUuid should be declared"})
-    loserUuid: string;
+    player2Uuid: string;
 
     @IsNotEmpty({message: "score1 should be declared"})
     score1: number;

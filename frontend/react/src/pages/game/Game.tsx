@@ -83,8 +83,10 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 	gameLoop() {
 	socket.on('game', (data: GameWindowState) => {
 		if (data.matchMaking === false) {
+			console.log("matchmaking false");
 			this.setState({loading: true});
 		} else {
+			console.log("matchmaking true");
 			this.setState({loading: false});
 		}
 		this.setState({
