@@ -48,3 +48,19 @@ export function CreateUser() : string {
     const uid = user.userUuid;
     return (uid);
 }
+
+export function GetMatchHistory(uid: string) : void {
+	var myHeaders = new Headers();
+	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+	var url: string = "http://localhost:3011/match/user" + uid;
+	var requestOptions = {
+		method: 'GET',
+		headers: myHeaders,
+	};
+
+	fetch(url, requestOptions)
+		.then(response => response.text())
+		.then(result => console.log(JSON.parse(result)))
+		.catch(error => console.log('error', error));
+}

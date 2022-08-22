@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { FetchUser } from "./request"
+import { FetchUser, GetMatchHistory } from "./request"
 import { User } from "../../type";
 
 
@@ -8,8 +8,11 @@ function myProfile() {
 	const uid = localStorage.getItem('uid');
 	
 	let user: User = {userUuid: ""}; 
-	if (uid)
+	if (uid) {
 		user = FetchUser(uid);
+		GetMatchHistory(uid);
+	}
+
 
 	return (<div>
 		<NavBar />

@@ -2,16 +2,18 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnG
 import { Socket, Server } from 'socket.io';
 import { Inject, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-// import { MatchService } from 'src/match/match.service';
+import { MatchService } from 'src/match/match.service';
+import { PongService } from "./pong.service";
 
 
 const END_SCORE = 5;
 const PADDLE_SIZE = 10; // in %
 const BALL_SPEED = 1; // in %
+const INTERVAL_TIME = 50; // in ms
 
 interface GameWindowState {
 	matchId: string,
-  	ballX: number,
+	ballX: number,
 	ballY: number,
 	ballSpeedX: number,
 	ballSpeedY: number,
@@ -30,31 +32,41 @@ interface GameWindowState {
 
 var games: GameWindowState[] = [];
 
-@WebSocketGateway({ cors: { origin: '*'}, }) // enable CORS everywhere
+@WebSocketGateway({ cors: { origin: '*' }, }) // enable CORS everywhere
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
-	private logger: Logger = new Logger('AppGateway');
+	private logger: Logger = new Logger('PongGateway');
 
-	// @Inject('MatchService')
-	// private readonly matchService : MatchService;
+	constructor( private readonly MatchService : MatchService ) {}
+
+	@Interval(INTERVAL_TIME)
+	GameLoop() {
+		for (let i:number = 0; i < games.length; i++) {
+			if (!games[i].isGameOver && games[i].playerLeft && games[i].playerRight) {
+				this.sendGametoRoom(i);
+			}
+		}
+	}
 
 
 	@SubscribeMessage('getPlayer')
 	getPlayer(client: Socket, clientUid: string): number {
-		for (var i:number = 0; i < games.length; i++) {
+		if (games.length == 0)
+			this.GameLoop(); // start game loop
+		for (var i: number = 0; i < games.length; i++) {
 			if (games[i].playerRight === undefined) {
 				games[i].playerRight = client.id;
 				client.join(i.toString());
 				games[i].matchMaking = true;
-				// this.matchService.createMatch({
-				// 	user1uid: games[i].playerLeftUid, // user1 is client Left
-				// 	user2uid: clientUid // user2 is client Right
-				// }).then(match => console.log(match));
+				this.MatchService.createMatch({
+					user1uid: games[i].playerLeftUid, // user1 is client Left
+					user2uid: clientUid // user2 is client Right
+				}).then(match => console.log(match));
 				return i;
 			}
 		}
-		var game:GameWindowState = {
+		var game: GameWindowState = {
 			matchId: undefined,
 			playerLeftUid: clientUid,
 			playerRightUid: undefined,
@@ -74,7 +86,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			matchMaking: false
 		};
 		games.push(game);
-		console.log("GAMES[",i,"]", games[i]);
+		console.log("GAMES[", i, "]", games[i]);
 		client.join(i.toString());
 		return i;
 	}
@@ -84,60 +96,46 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		return games;
 	}
 
-	@Interval(200)
-	GameLoop() {
-		while (true) {
-			for (let i = 0; i < games.length; i++) {
-				if (games[i].isGameOver == false
-					&& games[i].playerLeft != undefined
-					&& games[i].playerRight != undefined) {
-					console.log("GAME", i, games[i]);
-					this.sendGametoRoom(games[i].id);
-				}
-			}
-		}
-	}
-		
-	sendGametoRoom(id: number)  {
+	sendGametoRoom(id: number) {
 		if (id == undefined || games[id].matchMaking == false)
-			return ;
+			return;
 		games[id].ballX = games[id].ballX + games[id].ballSpeedX;
 		games[id].ballY = games[id].ballY + games[id].ballSpeedY;
 
 		// Check if the ball hits the left paddle
 		if (games[id].ballX <= 5.2
-		&& games[id].ballY  >= games[id].paddleLeftY - PADDLE_SIZE
-		&& games[id].ballY <= games[id].paddleLeftY + PADDLE_SIZE) {
+			&& games[id].ballY >= games[id].paddleLeftY - PADDLE_SIZE
+			&& games[id].ballY <= games[id].paddleLeftY + PADDLE_SIZE) {
 			if (games[id].ballSpeedX < 0
-				&& games[id].ballY >= games[id].paddleLeftY - (PADDLE_SIZE-1)
-				&& games[id].ballY <= games[id].paddleLeftY + (PADDLE_SIZE-1))
+				&& games[id].ballY >= games[id].paddleLeftY - (PADDLE_SIZE - 1)
+				&& games[id].ballY <= games[id].paddleLeftY + (PADDLE_SIZE - 1))
 				// check if we have already hit the paddle
-					games[id].ballSpeedX = -games[id].ballSpeedX;
+				games[id].ballSpeedX = -games[id].ballSpeedX;
 			else if ((games[id].ballSpeedY > 0
 				&& games[id].ballY <= games[id].paddleLeftY) // check if we are above the paddle
 				|| (games[id].ballSpeedY < 0
-				&& games[id].ballY >= games[id].paddleLeftY)) { // check if we are below the paddle
-					games[id].ballSpeedY = -games[id].ballSpeedY;
-					if (games[id].ballSpeedX < 0) // check if we have already hit the paddle
-						games[id].ballSpeedX = -games[id].ballSpeedX;
+					&& games[id].ballY >= games[id].paddleLeftY)) { // check if we are below the paddle
+				games[id].ballSpeedY = -games[id].ballSpeedY;
+				if (games[id].ballSpeedX < 0) // check if we have already hit the paddle
+					games[id].ballSpeedX = -games[id].ballSpeedX;
 			}
 			console.log("Hit left paddle", games[id].ballX, games[id].ballY);
 		} // Check if the ball hits the right paddle
 		else if (games[id].ballX >= 91.8
-			&& games[id].ballY  >= games[id].paddleRightY - PADDLE_SIZE
+			&& games[id].ballY >= games[id].paddleRightY - PADDLE_SIZE
 			&& games[id].ballY <= games[id].paddleRightY + PADDLE_SIZE) {
-				if (games[id].ballSpeedX > 0
-					&& games[id].ballY >= games[id].paddleRightY - (PADDLE_SIZE-1)
-					&& games[id].ballY <= games[id].paddleRightY + (PADDLE_SIZE-1))
-					// check if we have already hit the paddle
+			if (games[id].ballSpeedX > 0
+				&& games[id].ballY >= games[id].paddleRightY - (PADDLE_SIZE - 1)
+				&& games[id].ballY <= games[id].paddleRightY + (PADDLE_SIZE - 1))
+				// check if we have already hit the paddle
+				games[id].ballSpeedX = -games[id].ballSpeedX;
+			else if ((games[id].ballSpeedY > 0
+				&& games[id].ballY <= games[id].paddleRightY) // check if we are above the paddle
+				|| (games[id].ballSpeedY < 0
+					&& games[id].ballY >= games[id].paddleRightY)) { // check if we are below the paddle
+				games[id].ballSpeedY = -games[id].ballSpeedY;
+				if (games[id].ballSpeedX > 0) // chck if we have already hit the paddle
 					games[id].ballSpeedX = -games[id].ballSpeedX;
-				else if ((games[id].ballSpeedY > 0
-					&& games[id].ballY <= games[id].paddleRightY) // check if we are above the paddle
-					|| (games[id].ballSpeedY < 0
-						&& games[id].ballY >= games[id].paddleRightY)) { // check if we are below the paddle
-					games[id].ballSpeedY = -games[id].ballSpeedY;
-					if (games[id].ballSpeedX > 0) // chck if we have already hit the paddle
-						games[id].ballSpeedX = -games[id].ballSpeedX;
 			}
 			console.log("Hit right paddle", games[id].ballX, games[id].ballY);
 			console.log("PADLLE", games[id].paddleRightY - PADDLE_SIZE, games[id].paddleRightY + PADDLE_SIZE);
@@ -183,10 +181,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('handlePaddle')
 	handlePaddle(client: Socket, args: any): void {
-		var id:number  = args[1];
-		var deltaPaddleY:number = args[0];
-		console.log("client", client.id, games[id].playerLeft);
-
+		var id: number = args[1];
+		var deltaPaddleY: number = args[0];
 		if (client.id == games[id].playerLeft) {
 			if (games[id].paddleLeftY + deltaPaddleY >= PADDLE_SIZE && games[id].paddleLeftY + deltaPaddleY <= 85)
 				games[id].paddleLeftY += deltaPaddleY;
@@ -197,7 +193,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
-  @SubscribeMessage('resetGame')
+	@SubscribeMessage('resetGame')
 	resetGame(id: number) {
 		console.log("RESET GAME");
 		games[id].ballX = 48.2;
@@ -211,7 +207,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		games[id].isGameOver = false;
 		games[id].playerLeft = undefined;
 		games[id].playerRight = undefined;
-		return games[id]; 
+		return games[id];
 	}
 
 	afterInit(server: Server) {
@@ -221,7 +217,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
 	}
-	  
+
 	handleConnection(client: Socket, ...args: any[]) {
 		this.logger.log(`Client connected: ${client.id}`);
 	}

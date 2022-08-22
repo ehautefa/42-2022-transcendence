@@ -6,7 +6,6 @@ import { useState } from "react"
 import { useLocation } from "react-router-dom";
 
 const socket = getSocket();
-const GAME_LOOP_TIMEOUT = 100; // time between each game loop
 const PADDLE_GAP = 3; // in %
 const PADDLE_DEP = 3; // in %
 
@@ -83,7 +82,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 
 	gameLoop() {
 	socket.on('game', (data: GameWindowState) => {
-		if (data.matchMaking == false) {
+		if (data.matchMaking === false) {
 			this.setState({loading: true});
 		} else {
 			this.setState({loading: false});
