@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User } from "../../type";
+import { User, Match } from "../../type";
 
 let i: number = 0;
 
@@ -63,4 +63,24 @@ export function GetMatchHistory(uid: string) : void {
 		.then(response => response.text())
 		.then(result => console.log(JSON.parse(result)))
 		.catch(error => console.log('error', error));
+}
+
+
+export function GetAllMatch() : Match[] {
+	let emptyMatch: Match[] = [];
+	const [match, setMatch] = useState(emptyMatch);
+	var myHeaders = new Headers();
+	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+	var url: string = "http://localhost:3011/match/all";
+	var requestOptions = {
+		method: 'GET',
+		headers: myHeaders,
+	};
+
+	fetch(url, requestOptions)
+		.then(response => response.text())
+		.then(result => setMatch(JSON.parse(result)))
+		.catch(error => console.log('error', error));
+	return (match);
 }

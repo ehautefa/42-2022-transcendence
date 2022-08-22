@@ -1,16 +1,17 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { FetchUser, GetMatchHistory } from "./request"
-import { User } from "../../type";
+import { FetchUser, GetAllMatch } from "./request"
+import { User, Match } from "../../type";
 
 
 function myProfile() {
 	const uid = localStorage.getItem('uid');
 	
 	let user: User = {userUuid: ""}; 
+	let matchs: Match[] = [];
 	if (uid) {
 		user = FetchUser(uid);
-		GetMatchHistory(uid);
+		matchs = GetAllMatch();
 	}
 
 
@@ -40,6 +41,26 @@ function myProfile() {
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Other Player</th>
+								<th>My Score</th>
+								<th>Other Score</th>
+							</tr>
+						</thead>
+						<tbody>
+							{matchs.map((match: Match) => {
+								return (<tr key="{match.matchId}">
+									<td>{match.matchId}</td>
+									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
+									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
+									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
+								</tr>);
+							})}
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

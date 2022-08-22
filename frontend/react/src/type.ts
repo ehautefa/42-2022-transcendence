@@ -7,6 +7,14 @@ export type User = {
 	friends?: User[];
 }
 
+export type Match = {
+	matchId?: string;
+	user1?: User;
+	user2?: User;
+	score1?: number;
+	score2?: number;
+}
+
 export interface GameWindowState {
 	ballX: number,
 	ballY: number,
