@@ -85,3 +85,23 @@ export function GetAllMatch() : Match[] {
 		.catch(error => console.log('error', error));
 	return (match);
 }
+
+export function EditUsername(userUuid: string, newName: string) {
+	var myHeaders = new Headers();
+	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+	
+	var urlencoded = new URLSearchParams();
+	urlencoded.append("userUuid", userUuid);
+	urlencoded.append("newName", newName);
+	
+	const requestOptions = {
+		method: 'POST',
+		headers: myHeaders,
+		body: urlencoded
+	};
+	
+	fetch("http://localhost:3011/user/changeUsername", requestOptions)
+		.then(response => response.text())
+		.then(result => JSON.parse(result))
+		.catch(error => console.log('error', error));
+}
