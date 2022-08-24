@@ -26,10 +26,10 @@ export class MatchService {
 
 	async getMatchHistory(userUid: string): Promise<match[]> {
 		var to_find: user = await this.userService.getUser(userUid);
-		return await this.MatchRepository.find({ 
-			where: [
-				{ score1 : 0}
-			]});
+		return await this.MatchRepository.findBy([
+			{user1 : {userUuid: userUid}},
+			{user2 : {userUuid: userUid}}
+		]);
 	}
 
 	async createMatch(matchToCreate: CreateMatchDto): Promise<match> {
