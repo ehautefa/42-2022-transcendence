@@ -1,0 +1,18 @@
+export interface GameWindowState {
+	matchId: string,
+	ballX: number,
+	ballY: number,
+	ballSpeedX: number,
+	ballSpeedY: number,
+	scoreLeft: number,
+	scoreRight: number,
+	paddleLeftY: number,
+	paddleRightY: number,
+	isGameOver: boolean,
+	playerLeftUid: string,
+	playerRightUid: string,
+	playerLeft: string,
+	playerRight: string,
+	id: number,
+	matchMaking: boolean,
+}
