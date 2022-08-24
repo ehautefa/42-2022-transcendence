@@ -57,8 +57,8 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 		this.state = {
 			id: 0,
-			ballY: 46.3,
-			ballX: 48.2,
+			ballY: 47.1,
+			ballX: 48.6,
 			scoreLeft: 0,
 			scoreRight: 0,
 			timeoutId: 0,

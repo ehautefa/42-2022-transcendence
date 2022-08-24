@@ -77,18 +77,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('resetGame')
 	resetGame(id: number) {
-		console.log("RESET GAME");
-		games[id].ballX = 48.2;
-		games[id].ballY = 46;
-		games[id].ballSpeedX = 0;
-		games[id].ballSpeedY = 0;
-		games[id].scoreLeft = 0;
-		games[id].scoreRight = 0;
-		games[id].paddleLeftY = 50;
-		games[id].paddleRightY = 50;
-		games[id].isGameOver = false;
-		games[id].playerLeft = undefined;
-		games[id].playerRight = undefined;
+		games[id] = this.PongService.resetGame(games[id]);	
 		return games[id];
 	}
 

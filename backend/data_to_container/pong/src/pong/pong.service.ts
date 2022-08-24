@@ -7,6 +7,8 @@ import { GameWindowState } from './type';
 const PADDLE_SIZE = 10; // if you change that change also property height of paddle in Game css (x2)
 const BALL_SPEED = 1; // in %
 const END_SCORE = 5;
+const POS_BALL_X = 48.6;
+const POS_BALL_Y = 47.1; // same const in game.tsx
 
 
 @Injectable()
@@ -39,14 +41,30 @@ export class PongService {
         return game;
     }
 
+    resetGame(game: GameWindowState): GameWindowState {
+        game.ballX = POS_BALL_X;
+		game.ballY = POS_BALL_Y;
+		game.ballSpeedX = 0;
+		game.ballSpeedY = 0;
+		game.scoreLeft = 0;
+		game.scoreRight = 0;
+		game.paddleLeftY = 50;
+		game.paddleRightY = 50;
+		game.isGameOver = false;
+		game.playerLeft = undefined;
+		game.playerRight = undefined;
+        return game;
+    }
+
+
     initGame(i: number, clientUid: string, clientID: string) : GameWindowState {
 		var game: GameWindowState = {
 			matchId: undefined,
 			playerLeftUid: clientUid,
 			playerRightUid: undefined,
 			id: i,
-			ballY: 46.3,
-			ballX: 48.2,
+			ballY: POS_BALL_Y,
+			ballX: POS_BALL_X,
 			// randomly choose the direction
 			ballSpeedX: BALL_SPEED * (Math.random() < 0.5 ? 1 : -1),
 			ballSpeedY: BALL_SPEED * (Math.random() < 0.5 ? 1 : -1),
@@ -127,9 +145,9 @@ export class PongService {
     }
 
     endpoint(game: GameWindowState): GameWindowState {
-		game.ballX = 48.2;
+		game.ballX = POS_BALL_X;
 		if (game.scoreLeft == END_SCORE || game.scoreRight == END_SCORE) {
-			game.ballY = 46.3;
+			game.ballY = POS_BALL_Y;
 			game.ballSpeedX = 0;
 			game.ballSpeedY = 0;
 			if (game.isGameOver == false) {
