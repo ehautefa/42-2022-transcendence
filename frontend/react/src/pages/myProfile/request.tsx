@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { convertToObject } from "typescript";
 import { User, Match } from "../../type";
 
 let i: number = 0;

@@ -2,7 +2,7 @@ import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
 import { FetchUser, GetMatchHistory } from "./request"
 import { User } from "../../type";
-import { useState } from "react";
+// import { useState } from "react";
 
 var update = true;
 
@@ -14,7 +14,7 @@ function MyProfile() {
 	if (uid && update === true) {
 		update = false;
 		user = FetchUser(uid);
-		// const [matchs, setMatchs] = useState(GetMatchHistory(uid));
+		GetMatchHistory(uid);
 		// console.log(matchs);
 	}
 
