@@ -25,7 +25,6 @@ export class MatchService {
 	}
 
 	async getMatchHistory(userUid: string): Promise<match[]> {
-		var to_find: user = await this.userService.getUser(userUid);
 		return await this.MatchRepository.findBy([
 			{user1 : {userUuid: userUid}},
 			{user2 : {userUuid: userUid}}

@@ -3,8 +3,6 @@ import "./Chat.css"
 import { useState } from 'react'
 
 function Game() {
-	// Recuperation de la socket initialiser dans index
-	// const socket = getSocket();
 	var message: string;
 	const [messages, setMessages] = useState([]);
 	setMessages([]);

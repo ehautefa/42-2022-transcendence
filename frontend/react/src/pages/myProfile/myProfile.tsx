@@ -1,17 +1,21 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { FetchUser, GetAllMatch } from "./request"
-import { User, Match } from "../../type";
+import { FetchUser, GetMatchHistory } from "./request"
+import { User } from "../../type";
+import { useState } from "react";
 
+var update = true;
 
-function myProfile() {
+function MyProfile() {
 	const uid = localStorage.getItem('uid');
 	
 	let user: User = {userUuid: ""}; 
-	let matchs: Match[] = [];
-	if (uid) {
+	
+	if (uid && update === true) {
+		update = false;
 		user = FetchUser(uid);
-		matchs = GetAllMatch();
+		// const [matchs, setMatchs] = useState(GetMatchHistory(uid));
+		// console.log(matchs);
 	}
 
 
@@ -41,7 +45,7 @@ function myProfile() {
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
-					<table>
+					{/* <table>
 						<thead>
 							<tr>
 								<th>ID</th>
@@ -60,11 +64,11 @@ function myProfile() {
 								</tr>);
 							})}
 						</tbody>
-					</table>
+					</table> */}
 				</div>
 			</div>
 		</div>
 	</div>)
 }
 
-export default myProfile
+export default MyProfile

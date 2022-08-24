@@ -9,8 +9,8 @@ export type User = {
 
 export type Match = {
 	matchId?: string;
-	user1?: User;
-	user2?: User;
+	// user1?: User;
+	// user2?: User;
 	score1?: number;
 	score2?: number;
 }
