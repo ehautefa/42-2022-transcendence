@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MatchService } from 'src/match/match.service';
 import { GameWindowState } from './type';
 
-const PADDLE_SIZE = 10; // in %
+const PADDLE_SIZE = 10; // if you change that change also property height of paddle in Game css (x2)
 const BALL_SPEED = 1; // in %
 const END_SCORE = 5;
 
@@ -16,11 +16,11 @@ export class PongService {
 
     handlePaddle(game: GameWindowState, deltaPaddleY: number, clientID : string) : GameWindowState {
         if (clientID == game.playerLeft) {
-			if (game.paddleLeftY + deltaPaddleY >= PADDLE_SIZE && game.paddleLeftY + deltaPaddleY <= 85)
+			if (game.paddleLeftY + deltaPaddleY >= PADDLE_SIZE && game.paddleLeftY + deltaPaddleY <= 100 - PADDLE_SIZE)
 				game.paddleLeftY += deltaPaddleY;
 		}
 		else if (clientID == game.playerRight) {
-			if (game.paddleRightY + deltaPaddleY >= PADDLE_SIZE && game.paddleRightY + deltaPaddleY <= 85)
+			if (game.paddleRightY + deltaPaddleY >= PADDLE_SIZE && game.paddleRightY + deltaPaddleY <= 100 - PADDLE_SIZE)
 				game.paddleRightY += deltaPaddleY;
 		}
         return game;

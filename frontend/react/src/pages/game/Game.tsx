@@ -6,8 +6,8 @@ import { useState } from "react"
 import { useLocation } from "react-router-dom";
 
 const socket = getSocket();
-const PADDLE_GAP = 3; // in %
-const PADDLE_DEP = 3; // in %
+const PADDLE_GAP = 3; // gap between border and paddle in %
+const PADDLE_DEP = 2; // need to be a divisor of PADDLE_SIZE defined in PongService in %
 
 class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
