@@ -32,7 +32,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (games.length == 0)
 			this.GameLoop(); // start game loop
 		for (var i: number = 0; i < games.length; i++) {
-			if (games[i].playerLeft == undefined && games[i].playerRight == undefined) {
+			if (games[i].playerLeft == "" && games[i].playerRight == "") {
 				// reuse old structure if possible
 				client.join(i.toString());
 				games[i] = this.PongService.initGame(i, clientUid, client.id);

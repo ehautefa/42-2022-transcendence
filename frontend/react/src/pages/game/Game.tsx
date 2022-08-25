@@ -3,7 +3,7 @@ import "./Game.css"
 import React from 'react'
 import { getSocket } from "../../App"
 import { useState } from "react"
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 const socket = getSocket();
 const PADDLE_GAP = 3; // gap between border and paddle in %
@@ -102,7 +102,6 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 		});
 		if (data.isGameOver) {
 			socket.emit('resetGame', this.state.id);
-			// redirect to endGame page'
 		}
 	})
 	}
@@ -129,6 +128,9 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 
 	render() {
 		return <div className="GameWindow" id="GameBoard">
+			{this.state.isGameOver && (
+				<Navigate to="/endGame" replace={true} />
+			)}
 			{this.state.loading ? (
 				<div className="loader-container">
 					<div className="spinner"></div>

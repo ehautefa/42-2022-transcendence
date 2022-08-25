@@ -23,6 +23,8 @@ export interface GameWindowState {
 	gameLoopTimeout: number,
 	timeoutId: any,
 	scoreLeft: number,
+	playerLeft: string,
+	playerRight: string,
 	scoreRight: number,
 	paddleLeftY: number,
 	paddleLeftX: number,

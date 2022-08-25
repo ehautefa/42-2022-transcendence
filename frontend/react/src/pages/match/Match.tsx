@@ -7,8 +7,6 @@ import { getSocket } from "../../App"
 const socket = getSocket();
 
 
-
-
 function Match() {
 	var emptyState: GameWindowState[] = [];
 	const [games, setGames] = useState(emptyState);
@@ -33,7 +31,9 @@ function Match() {
 				</thead>
 				<tbody>
 					{games.map((game: GameWindowState) => {
-						if (!game.isGameOver) {
+						if (!game.isGameOver
+							&& game.playerLeft !== ""
+							&& game.playerRight !== "") {
 							return (<tr key="{game.id}">
 								<td>
 									<a href={"./game?id=" + game.id}>Watch</a>

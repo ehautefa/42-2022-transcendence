@@ -6,7 +6,7 @@ import { GameWindowState } from './type';
 
 const PADDLE_SIZE = 10; // if you change that change also property height of paddle in Game css (x2)
 const BALL_SPEED = 1; // in %
-const END_SCORE = 5;
+const END_SCORE = 1;
 const POS_BALL_X = 48.6;
 const POS_BALL_Y = 47.1; // same const in game.tsx
 
@@ -51,8 +51,8 @@ export class PongService {
 		game.paddleLeftY = 50;
 		game.paddleRightY = 50;
 		game.isGameOver = false;
-		game.playerLeft = undefined;
-		game.playerRight = undefined;
+		game.playerLeft = "";
+		game.playerRight = "";
         return game;
     }
 

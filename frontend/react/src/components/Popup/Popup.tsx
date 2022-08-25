@@ -23,7 +23,9 @@ function PopupEditUsername() {
 
     return (<div className="Popup-mother">
         <button className="Edit" onClick={() => setOpen(true)}>( edit )</button>
-        <Popup open={open} closeOnDocumentClick onClose={() => setOpen(false)}>
+        <Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
+             window.location.reload();
+            }}>
             <div className='editUsername'>
                 <label htmlFor="editUsername">New username :</label>
                 <div className='input-flex'>
