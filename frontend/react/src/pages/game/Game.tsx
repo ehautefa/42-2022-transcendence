@@ -38,8 +38,6 @@ interface GameWindowState {
 	scoreLeft: number,
 	scoreRight: number,
 	paddleLeftY: number,
-	paddleLeftX: number,
-	paddleRightX: number,
 	paddleRightY: number,
 	id: number,
 	isGameOver: boolean,
@@ -47,6 +45,8 @@ interface GameWindowState {
 	playerRight: string,
 	loading: boolean,
 	matchMaking: boolean,
+	playerLeftName: string,
+	playerRightName: string
 }
 
 
@@ -63,14 +63,14 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 			scoreRight: 0,
 			timeoutId: 0,
 			paddleLeftY: 50,
-			paddleLeftX: PADDLE_GAP,
-			paddleRightX: 80 - PADDLE_GAP,
 			paddleRightY: 50,
 			isGameOver: false,
 			playerLeft: "",
 			playerRight: "",
 			loading: false,
 			matchMaking: false,
+			playerLeftName: "",
+			playerRightName: ""
 		};
 	}
 
@@ -82,11 +82,9 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 
 	gameLoop() {
 	socket.on('game', (data: GameWindowState) => {
-		if (data.matchMaking === false) {
-			console.log("matchmaking false");
+		if (data.matchMaking === false && this.state.loading === false) {
 			this.setState({loading: true});
-		} else {
-			console.log("matchmaking true");
+		} else  if (this.state.loading === true) {
 			this.setState({loading: false});
 		}
 		this.setState({
@@ -132,8 +130,8 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				</div>
 			) : (
 				<>
-					<Paddle x={this.state.paddleLeftX} y={this.state.paddleLeftY} />
-					<Paddle x={this.state.paddleRightX} y={this.state.paddleRightY} />
+					<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
+					<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
 					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 					<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 					<Ball x={this.state.ballX} y={this.state.ballY} />

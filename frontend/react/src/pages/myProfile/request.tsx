@@ -86,7 +86,5 @@ export function ChangeUsername(userUuid: string, newName: string) {
 	};
 	
 	fetch("http://localhost:3011/user/changeUsername", requestOptions)
-		.then(response => response.text())
-		.then(result => console.log("ChangUserName", JSON.parse(result)))
 		.catch(error => console.log('error', error));
 }

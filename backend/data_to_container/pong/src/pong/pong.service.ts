@@ -75,7 +75,9 @@ export class PongService {
 			isGameOver: false,
 			playerLeft: clientID,
 			playerRight: undefined,
-			matchMaking: false
+			matchMaking: false,
+            playerLeftName: "",
+            playerRightName: "",
 		};
 		return game;
     }

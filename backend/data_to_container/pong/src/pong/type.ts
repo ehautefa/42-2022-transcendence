@@ -13,6 +13,8 @@ export interface GameWindowState {
 	playerRightUid: string,
 	playerLeft: string,
 	playerRight: string,
+	playerLeftName: string,
+	playerRightName: string,
 	id: number,
 	matchMaking: boolean,
 }
