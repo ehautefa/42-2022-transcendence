@@ -101,6 +101,7 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 			matchMaking: data.matchMaking,
 		});
 		if (data.isGameOver) {
+			socket.emit('resetGame', this.state.id);
 			// redirect to endGame page'
 		}
 	})

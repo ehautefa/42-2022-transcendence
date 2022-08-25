@@ -32,12 +32,19 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (games.length == 0)
 			this.GameLoop(); // start game loop
 		for (var i: number = 0; i < games.length; i++) {
-			if (games[i].playerRight === undefined) {
+			if (games[i].playerLeft == undefined && games[i].playerRight == undefined) {
+				// reuse old structure if possible
+				client.join(i.toString());
+				games[i] = this.PongService.initGame(i, clientUid, client.id);
+				return i;
+			} else if (games[i].playerRight === undefined) {
+				// find a game with only one player
 				client.join(i.toString());
 				games[i] = this.PongService.initSecondPlayer(games[i], clientUid, client.id);
 				return i;
 			}
 		}
+		// create new game
 		games.push(this.PongService.initGame(i, clientUid, client.id));
 		console.log("GAMES[", i, "]", games[i]);
 		client.join(i.toString());
@@ -76,7 +83,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('resetGame')
-	resetGame(id: number) {
+	resetGame(client: Socket, id: number) {
+		client.leave(id.toString());
 		games[id] = this.PongService.resetGame(games[id]);	
 		return games[id];
 	}
