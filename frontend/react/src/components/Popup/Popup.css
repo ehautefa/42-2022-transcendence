@@ -1,11 +1,16 @@
-.Edit {
+.Popup-mother .Edit {
 	background-color: rgba(0, 0, 0, 0);
     color: #fff;
     border: none;
     text-decoration: underline;
     cursor: pointer;
     color: #FA0197;
-    margin-left: 55%
+    width: 100%;
+    margin: 0;
+}
+
+.Popup-mother {
+    min-width: 30%;
 }
 
 .editUsername {
@@ -15,22 +20,57 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 20px;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
     border: 1px solid #fef45b;
-	box-shadow: 3px 3px 5px #000 ;
-	border-radius: 10px;
+	box-shadow: 1px 1px 5px #fef45b;
+	border-radius: 5px;
 }
 
-label{
+.editUsername label{
     padding: 5px;
     font-size: large;
     font-weight: bold;
+    color: #FAE3E3
+}
+
+.editUsername input{
+    padding: 5px;
+    font-size: large;
+    border: 1px solid #FA0197;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    color: #FAE3E3
+}
+
+.editUsername button {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid #fef45b;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: large;
+    font-weight: bold;
+    cursor: pointer;
+	box-shadow: 1px 1px 5px #fef45b;
+    color: #FAE3E3;
+    width: 30%;
+    margin: 0;
 }
 
 .input-flex {
     margin: 10px;
+}
+
+.input-flex input:focus {
+    outline: none;
+}
+
+input+span {
+    color: #FA0197;
+    font-size: larger;
+    font-weight: bold;
 }
 
 input:invalid+span:after {

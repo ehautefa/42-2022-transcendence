@@ -28,7 +28,10 @@ function MyProfile() {
 				<div className="info container">
 					<h3>Profile</h3>
 					<ul>
-						<li className="flex-li">Name : {user.userName} <PopupEditUsername /></li>
+						<li className="flex-li">
+							<div className="Username">Username : {user.userName}</div>
+							<PopupEditUsername />
+						</li>
 						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>

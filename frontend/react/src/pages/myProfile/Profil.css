@@ -22,7 +22,7 @@
 .mainComposantProfile .container {
 	background-color: rgba(0, 0, 0, 0.5);
 	box-shadow: 5px 5px 10px #000;
-	border-radius: 10px;
+	border-radius: 5px;
 	width: 85%;
 	padding: 0 10px;
 	margin: 20px auto;
@@ -30,21 +30,25 @@
 	overflow-y: scroll;
 }
 
+.mainComposantProfile .info .flex-li {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+
 .mainComposantProfile .info ul {
 	list-style: none;
 	line-height: 30px;
 	color: #FAE3E3;
 }
 
-.mainComposantProfile .info ul a {
-	text-align: right;
-	color: #FA0197;
-}
 
 .mainComposantProfile .info .enable {
 	padding: 5px 10px;
 	background-color: rgba(0, 0, 0, 0);
-	border-radius: 10px;
+	border-radius: 5px;
 	color: #FA0197;
 	border: 2px solid #FA0197;
 	box-shadow: 1px 1px 5px #FA0197;
@@ -70,7 +74,7 @@
 	.mainComposantProfile .container {
 		background-color: rgba(0, 0, 0, 0.5);
 		box-shadow: 5px 5px 10px #000;
-		border-radius: 10px;
+		border-radius: 5px;
 		padding: 0 20px;
 		margin: 20px;
 		width: 45%;

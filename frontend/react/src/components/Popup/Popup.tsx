@@ -21,11 +21,11 @@ function PopupEditUsername() {
 
     }
 
-    return (<>
+    return (<div className="Popup-mother">
         <button className="Edit" onClick={() => setOpen(true)}>( edit )</button>
         <Popup open={open} closeOnDocumentClick onClose={() => setOpen(false)}>
             <div className='editUsername'>
-                <label htmlFor="editUsername">UserName (4 to 8 characters):</label>
+                <label htmlFor="editUsername">New username :</label>
                 <div className='input-flex'>
                     <input type="text" id="editUsername" name="username"
                         value={newUsername}
@@ -42,7 +42,7 @@ function PopupEditUsername() {
                 <button type="submit" onClick={SaveUserName}>Save</button>
             </div>
         </Popup>
-        </>);
+        </div>);
 }
 
 export default PopupEditUsername;
