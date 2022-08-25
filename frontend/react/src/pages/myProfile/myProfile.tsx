@@ -2,36 +2,38 @@ import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
 import { FetchUser, GetMatchHistory } from "./request"
 import { User } from "../../type";
-// import { useState } from "react";
+import { useState } from "react";
+import PopupEditUsername from "../../components/Popup/Popup";
 
 var update = true;
 
 function MyProfile() {
 	const uid = localStorage.getItem('uid');
-	
-	let user: User = {userUuid: ""}; 
-	
-	if (uid && update === true) {
-		update = false;
-		user = FetchUser(uid);
-		GetMatchHistory(uid);
-		// console.log(matchs);
+	const emptyUser : User = {userUuid: ""};
+	const [user, setUser] = useState(emptyUser);
+	fetchUser();
+
+	async function fetchUser() {
+		if (uid && update) {
+			const user = await FetchUser(uid);
+			setUser(user);
+			update = false;
+		}
 	}
-
-
-	return (<div>
+	
+	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
 			<div className="flex">
 				<div className="info container">
 					<h3>Profile</h3>
 					<ul>
-						<li>Name : {user.userName} <a href="/myProfile">(edit)</a></li>
+						<li className="flex-li">Name : {user.userName} <PopupEditUsername /></li>
 						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button>Enable two-factor authentication</button>
+					<button className="enable">Enable two-factor authentication</button>
 				</div>
 				<a href="./editProfil">
 					<div className="pp">
@@ -68,7 +70,7 @@ function MyProfile() {
 				</div>
 			</div>
 		</div>
-	</div>)
+	</>)
 }
 
 export default MyProfile

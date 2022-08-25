@@ -22,7 +22,7 @@ export default function App() {
 	console.log ("uid:", uid);
 	if (uid === "") {
 		uid = CreateUser();
-		console.log ("uid:", uid);
+		console.log ("New uid:", uid);
 		localStorage.setItem('uid', uid);
 	}
 	return (

@@ -41,7 +41,7 @@
 	color: #FA0197;
 }
 
-.mainComposantProfile .info button {
+.mainComposantProfile .info .enable {
 	padding: 5px 10px;
 	background-color: rgba(0, 0, 0, 0);
 	border-radius: 10px;
@@ -50,10 +50,13 @@
 	box-shadow: 1px 1px 5px #FA0197;
 	font-size: 15px;
 	width: 100%;
+	align-items: center;
+	justify-content: center;
 	margin: 0 auto 10px;
 }
 
 @media screen and (min-width: 600px) {
+
 	.mainComposantProfile {
 		width: 80%;
 		margin: 5% auto;

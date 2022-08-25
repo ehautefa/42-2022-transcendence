@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { User, Match } from "../../type";
 
-let i: number = 0;
-
-export function FetchUser(uid: string) : User {
-	let emptyUser: User = {userUuid: ""};
-	const [user, setUser] = useState(emptyUser);
+export async function FetchUser(uid: string) {
+	// let emptyUser: User = {userUuid: ""};
+	// const [user, setUser] = useState(emptyUser);
 
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -16,15 +14,11 @@ export function FetchUser(uid: string) : User {
 		headers: myHeaders,
 	};
 
-	fetch(url, requestOptions)
-		.then(response => response.text())
-		.then(result => setUser(JSON.parse(result)))
-		.catch(error => console.log('error', error));
-	return (user);
+	let user =  await fetch(url, requestOptions);
+	return await user.json();
 }
 
 export function CreateUser() : string {
-	console.log("create", i, "users");
 	let emptyUser: User = {userUuid: ""};
 	const [user, setUser] = useState(emptyUser);
 
@@ -45,6 +39,7 @@ export function CreateUser() : string {
 		.then(response => response.text())
 		.then(result => setUser(JSON.parse(result)))
 		.catch(error => console.log('error', error));
+	console.log("New user:", user);
     const uid = user.userUuid;
     return (uid);
 }
@@ -85,7 +80,7 @@ export function GetAllMatch() : Match[] {
 	return (match);
 }
 
-export function EditUsername(userUuid: string, newName: string) {
+export function ChangeUsername(userUuid: string, newName: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 	
@@ -101,6 +96,6 @@ export function EditUsername(userUuid: string, newName: string) {
 	
 	fetch("http://localhost:3011/user/changeUsername", requestOptions)
 		.then(response => response.text())
-		.then(result => JSON.parse(result))
+		.then(result => console.log("ChangUserName", JSON.parse(result)))
 		.catch(error => console.log('error', error));
 }
