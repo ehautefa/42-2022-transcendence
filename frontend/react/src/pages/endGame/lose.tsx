@@ -1,12 +1,12 @@
 import NavBar from "../../components/NavBar/NavBar"
 
-function EndGame() {
+function Lose() {
     return (
         <>
             <NavBar />
-            <h1>End Game</h1>
+            <h1>Lose Game</h1>
         </>
     );
 }
 
-export default EndGame;
+export default Lose;
