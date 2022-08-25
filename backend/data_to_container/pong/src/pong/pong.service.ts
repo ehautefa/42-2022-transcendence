@@ -104,7 +104,7 @@ export class PongService {
                 if (game.ballSpeedX < 0) // check if we have already hit the paddle
                     game.ballSpeedX = -game.ballSpeedX;
             }
-            console.log("Hit left paddle", game.ballX, game.ballY);
+            console.log(game.id, ": Hit left paddle", game.ballX, game.ballY);
         } // Check if the ball hits the right paddle
         else if (game.ballX >= 91.8
             && game.ballY >= game.paddleRightY - PADDLE_SIZE
@@ -122,25 +122,24 @@ export class PongService {
                 if (game.ballSpeedX > 0) // chck if we have already hit the paddle
                     game.ballSpeedX = -game.ballSpeedX;
             }
-            console.log("Hit right paddle", game.ballX, game.ballY);
-            console.log("PADLLE", game.paddleRightY - PADDLE_SIZE, game.paddleRightY + PADDLE_SIZE);
+            console.log(game.id, ": Hit right paddle", game.ballX, game.ballY);
         } else {
             if (game.ballX <= 0.2) { // Check if the ball hits the left wall
                 game.scoreRight++;
                 game = this.endpoint(game);
-                console.log("Hits the left wall", game.ballX);
+                console.log(game.id, ": Hits the left wall", game.ballX);
             } else if (game.ballX >= 95.9) { // Check if the ball hits the right wall
                 game.scoreLeft++;
                 game = this.endpoint(game);
-                console.log("Hits the right wall", game.ballX);
+                console.log(game.id, ": Hits the right wall", game.ballX);
             } else if (game.ballY <= 0.1) { // Check if the ball hits the top wall
                 if (game.ballSpeedY < 0)
                     game.ballSpeedY = -game.ballSpeedY;
-                console.log("Hits the top wall", game.ballY);
+                console.log(game.id, ": Hits the top wall", game.ballY);
             } else if (game.ballY >= 92.5) { // Check if the ball hits the bottom wall
                 if (game.ballSpeedY > 0)
                     game.ballSpeedY = -game.ballSpeedY;
-                console.log("Hits the bottom wall", game.ballY);
+                console.log(game.id, ": Hits the bottom wall", game.ballY);
             }
         }
         return game;

@@ -148,16 +148,13 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 
 function Game() {
 	const index = new URLSearchParams(useLocation().search).get('id');
-	var id_state: number = index === null ? -1 : parseInt(index);
 	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
-	// const [id, setId] = useState(id_state);
 	const uid = localStorage.getItem('uid');
 
 	function matchMaking() {
-		socket.emit('getPlayer', uid,  (id_game: number) => {
+		socket.emit('getPlayer', uid,  () => {
 			setDisplaying({ display: "none" });
-			// setId(id_game);
 		});
 	}
 	return (<div>

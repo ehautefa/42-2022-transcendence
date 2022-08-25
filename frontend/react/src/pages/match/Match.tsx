@@ -12,7 +12,7 @@ const socket = getSocket();
 function Match() {
 	var emptyState: GameWindowState[] = [];
 	const [games, setGames] = useState(emptyState);
-	socket.emit("getGames", (games:GameWindowState[]) => {
+	socket.emit("getGames", (games: GameWindowState[]) => {
 		setGames(games);
 	});
 
@@ -24,7 +24,7 @@ function Match() {
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
+						<th></th>
 						<th>User1</th>
 						<th>User2</th>
 						<th>Score1</th>
@@ -32,22 +32,26 @@ function Match() {
 					</tr>
 				</thead>
 				<tbody>
-					{games.map((game:GameWindowState) => {
-						return (<tr key="{game.id}">
-							<td>
-								<a href={"./game?id=" + game.id}>{game.id}</a>
-							</td>
-							<td>Pika</td>
-							<td>Elise</td>
-							<td>{game.scoreLeft}</td>
-							<td>{game.scoreRight}</td>
-						</tr>);
+					{games.map((game: GameWindowState) => {
+						if (!game.isGameOver) {
+							return (<tr key="{game.id}">
+								<td>
+									<a href={"./game?id=" + game.id}>Watch</a>
+								</td>
+								<td>Pika</td>
+								<td>Elise</td>
+								<td>{game.scoreLeft}</td>
+								<td>{game.scoreRight}</td>
+							</tr>);
+						}
+						else
+							return null;
 					})}
 
 				</tbody>
 			</table>
 		</div>
-		</>)
+	</>)
 }
 
 export default Match
