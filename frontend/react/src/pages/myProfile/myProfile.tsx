@@ -11,16 +11,21 @@ function MyProfile() {
 	const uid = localStorage.getItem('uid');
 	const emptyUser : User = {userUuid: ""};
 	const [user, setUser] = useState(emptyUser);
+	const [matchHistory, setMatchHistory] = useState([]);
 	fetchUser();
 
 	async function fetchUser() {
 		if (uid && update) {
 			const user = await FetchUser(uid);
+			const matchHistory = await GetMatchHistory(uid);
+			setMatchHistory(matchHistory);
 			setUser(user);
 			update = false;
 		}
 	}
 	
+	console.log("MATCH HISTORY", matchHistory);
+
 	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
@@ -50,7 +55,7 @@ function MyProfile() {
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
-					{/* <table>
+					<table>
 						<thead>
 							<tr>
 								<th>ID</th>
@@ -60,7 +65,7 @@ function MyProfile() {
 							</tr>
 						</thead>
 						<tbody>
-							{matchs.map((match: Match) => {
+							{matchHistory.map((match: any) => {
 								return (<tr key="{match.matchId}">
 									<td>{match.matchId}</td>
 									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
@@ -69,7 +74,7 @@ function MyProfile() {
 								</tr>);
 							})}
 						</tbody>
-					</table> */}
+					</table>
 				</div>
 			</div>
 		</div>

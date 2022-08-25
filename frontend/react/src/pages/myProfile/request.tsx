@@ -2,9 +2,6 @@ import { useState } from "react";
 import { User, Match } from "../../type";
 
 export async function FetchUser(uid: string) {
-	// let emptyUser: User = {userUuid: ""};
-	// const [user, setUser] = useState(emptyUser);
-
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -50,14 +47,8 @@ export async function GetMatchHistory(uid: string) {
 		method: 'GET'
 	};
 
-	const match = await fetch(url, requestOptions)
-		.then(response => response.text())
-		.then(result => {
-			return result;
-		})
-		.catch(error => console.log('error', error));
-	console.log("GetMatchHistory", match);
-	return (match);
+	let match = await fetch(url, requestOptions);
+	return await match.json();
 }
 
 
