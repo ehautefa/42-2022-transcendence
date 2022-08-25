@@ -50,7 +50,7 @@ interface GameWindowState {
 }
 
 
-export class GameWindow extends React.Component<{ id: number }, GameWindowState> {
+export class GameWindow extends React.Component<{}, GameWindowState> {
 	constructor(props: any) {
 		super(props);
 
@@ -82,12 +82,13 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 
 	gameLoop() {
 	socket.on('game', (data: GameWindowState) => {
-		if (data.matchMaking === false && this.state.loading === false) {
+		if (data.matchMaking === false) {
 			this.setState({loading: true});
-		} else  if (this.state.loading === true) {
+		} else {
 			this.setState({loading: false});
 		}
 		this.setState({
+			id: data.id,
 			ballX: data.ballX,
 			ballY: data.ballY,
 			scoreLeft: data.scoreLeft,
@@ -99,6 +100,9 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 			playerRight: data.playerRight,
 			matchMaking: data.matchMaking,
 		});
+		if (data.isGameOver) {
+			// redirect to endGame page'
+		}
 	})
 	}
 
@@ -118,7 +122,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				break;
 		}
 		if (deltaPaddleY !== 0) {
-			socket.emit('handlePaddle', deltaPaddleY, this.props.id);
+			socket.emit('handlePaddle', deltaPaddleY, this.state.id);
 		}
 	}
 
@@ -147,19 +151,19 @@ function Game() {
 	var id_state: number = index === null ? -1 : parseInt(index);
 	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
-	const [id, setId] = useState(id_state);
+	// const [id, setId] = useState(id_state);
 	const uid = localStorage.getItem('uid');
 
 	function matchMaking() {
 		socket.emit('getPlayer', uid,  (id_game: number) => {
 			setDisplaying({ display: "none" });
-			setId(id_game);
+			// setId(id_game);
 		});
 	}
 	return (<div>
 		<NavBar />
 		<div className="mainComposantGame">
-			<GameWindow id={id} />
+			<GameWindow />
 			<button style={displaying}
 				className="matchMakingButton"
 				onClick={() => matchMaking()}>
