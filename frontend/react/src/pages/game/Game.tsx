@@ -4,6 +4,7 @@ import React from 'react'
 import { getSocket } from "../../App"
 import { useState } from "react"
 import { Navigate, useLocation } from "react-router-dom";
+import { textChangeRangeIsUnchanged } from "typescript"
 
 const socket = getSocket();
 const PADDLE_GAP = 3; // gap between border and paddle in %
@@ -128,9 +129,11 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 
 	render() {
 		return <div className="GameWindow" id="GameBoard">
-			{this.state.isGameOver && (
-				<Navigate to="/endGame" replace={true} />
-			)}
+			{this.state.isGameOver && (this.state.scoreLeft > this.state.scoreRight
+				&& this.state.playerLeft === socket.id ?
+				(<Navigate to="/endGame/win" replace={true} />) :
+				(<Navigate to="/endGame/lose" replace={true} />))
+			}
 			{this.state.loading ? (
 				<div className="loader-container">
 					<div className="spinner"></div>

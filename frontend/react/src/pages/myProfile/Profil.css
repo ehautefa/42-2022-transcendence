@@ -104,6 +104,10 @@
 		margin: 40px;
 	}
 
+	.mainComposantProfile .nohover:hover {
+		display: none;
+	}
+
 	.mainComposantProfile .pp:hover p {
 		display: block;
 	}
