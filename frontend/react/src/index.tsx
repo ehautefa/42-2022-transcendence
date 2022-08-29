@@ -9,6 +9,9 @@ import Game from "./pages/game/Game";
 import Chat from "./pages/chat/Chat";
 import MyProfile from './pages/myProfile/myProfile';
 import Match from "./pages/match/Match"
+import Win from "./pages/endGame/win";
+import Lose from "./pages/endGame/lose";
+import Profile from './pages/Profile/Profile';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -22,6 +25,9 @@ root.render(
 			<Route path="chat" element={<Chat />} />
 			<Route path="myProfile" element={<MyProfile />} />
 			<Route path="match" element={<Match />} />
+			<Route path="endGame/lose" element={<Lose />} />
+			<Route path="endGame/win" element={<Win />} />
+			<Route path="profile" element={<Profile />} />
 		</Routes>
 	</BrowserRouter>
 );

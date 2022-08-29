@@ -3,9 +3,12 @@ import "./Game.css"
 import React from 'react'
 import { getSocket } from "../../App"
 import { useState } from "react"
-import { useLocation } from "react-router-dom"
+import { Navigate, useLocation } from "react-router-dom";
+import { textChangeRangeIsUnchanged } from "typescript"
 
 const socket = getSocket();
+const PADDLE_GAP = 3; // gap between border and paddle in %
+const PADDLE_DEP = 2; // need to be a divisor of PADDLE_SIZE defined in PongService in %
 
 class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
@@ -32,42 +35,43 @@ class Paddle extends React.Component<{ x: number, y: number }> {
 interface GameWindowState {
 	ballX: number,
 	ballY: number,
-	ballSpeedX: number,
-	ballSpeedY: number,
-	gameLoopTimeout: number,
 	timeoutId: any,
 	scoreLeft: number,
 	scoreRight: number,
 	paddleLeftY: number,
-	paddleLeftX: number,
-	paddleRightX: number,
 	paddleRightY: number,
 	id: number,
-	isGameOver: boolean
+	isGameOver: boolean,
+	playerLeft: string,
+	playerRight: string,
+	loading: boolean,
+	matchMaking: boolean,
+	playerLeftName: string,
+	playerRightName: string
 }
 
 
-export class GameWindow extends React.Component<{id:number}, GameWindowState> {
+export class GameWindow extends React.Component<{}, GameWindowState> {
 	constructor(props: any) {
 		super(props);
 
 		this.handleKeyDown = this.handleKeyDown.bind(this);
-
 		this.state = {
-			id : 0,
-			ballY: 46.3,
-			ballX: 48,
-			ballSpeedX: 0,
-			ballSpeedY: 0,
+			id: 0,
+			ballY: 47.1,
+			ballX: 48.6,
 			scoreLeft: 0,
 			scoreRight: 0,
-			gameLoopTimeout:50, // time between game loops
 			timeoutId: 0,
 			paddleLeftY: 50,
-			paddleLeftX: 3,
-			paddleRightX: 77,
 			paddleRightY: 50,
-			isGameOver: false
+			isGameOver: false,
+			playerLeft: "",
+			playerRight: "",
+			loading: false,
+			matchMaking: false,
+			playerLeftName: "",
+			playerRightName: ""
 		};
 	}
 
@@ -78,15 +82,29 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 
 
 	gameLoop() {
-		let timeoutId = setTimeout(() => {
-			if (!this.state.isGameOver
-				&& this.props.id !== -1
-				&& this.props.id !== undefined) {
-				this.moveBall();
-			}
-			this.gameLoop();
-		}, this.state.gameLoopTimeout);
-		this.setState({ timeoutId });
+	socket.on('game', (data: GameWindowState) => {
+		if (data.matchMaking === false) {
+			this.setState({loading: true});
+		} else {
+			this.setState({loading: false});
+		}
+		this.setState({
+			id: data.id,
+			ballX: data.ballX,
+			ballY: data.ballY,
+			scoreLeft: data.scoreLeft,
+			scoreRight: data.scoreRight,
+			paddleLeftY: data.paddleLeftY,
+			paddleRightY: data.paddleRightY,
+			isGameOver: data.isGameOver,
+			playerLeft: data.playerLeft,
+			playerRight: data.playerRight,
+			matchMaking: data.matchMaking,
+		});
+		if (data.isGameOver) {
+			socket.emit('resetGame', this.state.id);
+		}
+	})
 	}
 
 	componentWillUnmount() {
@@ -94,61 +112,41 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 		window.removeEventListener("keydown", this.handleKeyDown);
 	}
 
-	moveBall() {
-		this.setState({id: this.props.id});
-		socket.emit('getGame', this.state, (data:GameWindowState) => {
-			this.setState({ballX: data.ballX,
-				ballY: data.ballY,
-				ballSpeedX: data.ballSpeedX,
-				ballSpeedY: data.ballSpeedY,
-				scoreLeft: data.scoreLeft,
-				scoreRight: data.scoreRight,
-				paddleLeftY: data.paddleLeftY,
-				paddleRightY: data.paddleRightY,
-				isGameOver: data.isGameOver	
-			});
-		});
-	}
-
 	handleKeyDown(event: KeyboardEvent) {
 		var deltaPaddleY = 0
 		switch (event.key) {
 			case "ArrowUp":
-				deltaPaddleY = -5;
+				deltaPaddleY = -PADDLE_DEP;
 				break;
 			case "ArrowDown":
-				deltaPaddleY = +5;
+				deltaPaddleY = +PADDLE_DEP;
 				break;
 		}
 		if (deltaPaddleY !== 0) {
-			socket.emit('handlePaddle', deltaPaddleY, this.props.id);
+			socket.emit('handlePaddle', deltaPaddleY, this.state.id);
 		}
-	}
-
-	resetGame() {
-	console.log("RESET GAME");
-		this.setState({ballSpeedX: 0, ballSpeedY:0});
-		
-		socket.emit('getGame', this.state, (data:GameWindowState) => {
-			this.setState({ballX: data.ballX,
-				ballY: data.ballY,
-				ballSpeedX: data.ballSpeedX,
-				ballSpeedY: data.ballSpeedY,
-				scoreLeft: data.scoreLeft,
-				scoreRight: data.scoreRight,
-				paddleLeftY: data.paddleLeftY,
-				paddleRightY: data.paddleRightY});
-		});
 	}
 
 	render() {
 		return <div className="GameWindow" id="GameBoard">
-			<button className="ResetButton" onClick={() => this.resetGame()}>Reset</button>
-			<Paddle x={this.state.paddleLeftX} y={this.state.paddleLeftY} />
-			<Paddle x={this.state.paddleRightX} y={this.state.paddleRightY} />
-			<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
-			<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
-			<Ball x={this.state.ballX} y={this.state.ballY} />
+			{this.state.isGameOver && (this.state.scoreLeft > this.state.scoreRight
+				&& this.state.playerLeft === socket.id ?
+				(<Navigate to="/endGame/win" replace={true} />) :
+				(<Navigate to="/endGame/lose" replace={true} />))
+			}
+			{this.state.loading ? (
+				<div className="loader-container">
+					<div className="spinner"></div>
+				</div>
+			) : (
+				<>
+					<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
+					<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
+					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
+					<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
+					<Ball x={this.state.ballX} y={this.state.ballY} />
+				</>
+			)}
 		</div>
 	}
 }
@@ -156,27 +154,23 @@ export class GameWindow extends React.Component<{id:number}, GameWindowState> {
 
 function Game() {
 	const index = new URLSearchParams(useLocation().search).get('id');
-	var id_state : number = index === null ? -1 : parseInt(index);
-	const displaying_state = index === null ? {display: "block"} : {display: "none"};
+	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
-	const [id, setId] = useState(id_state);
+	const uid = localStorage.getItem('uid');
 
 	function matchMaking() {
-		socket.emit('getPlayer', (id_game: number, launch: boolean) => {
-			setDisplaying({display:"none"});
-			setId(id_game);
-			console.log(id, id_game);
-
+		socket.emit('getPlayer', uid,  () => {
+			setDisplaying({ display: "none" });
 		});
 	}
 	return (<div>
 		<NavBar />
 		<div className="mainComposantGame">
-			<GameWindow id={id}/>
+			<GameWindow />
 			<button style={displaying}
-				 className="matchMakingButton"
-				  onClick={() => matchMaking()}>
-					Find another player
+				className="matchMakingButton"
+				onClick={() => matchMaking()}>
+				Find another player
 			</button>
 		</div>
 	</div>)

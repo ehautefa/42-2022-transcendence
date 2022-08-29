@@ -1,15 +1,20 @@
 import NavBar from "../../components/NavBar/NavBar"
-import "./Profil.css"
-import { FetchUser, GetMatchHistory } from "./request"
+import "../myProfile/Profil.css";
+import { FetchUser, GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useState } from "react";
-import PopupEditUsername from "../../components/Popup/Popup";
+import { useLocation } from "react-router-dom";
 
 var update = true;
 
-function MyProfile() {
-	const uid = localStorage.getItem('uid');
-	const emptyUser : User = {userUuid: ""};
+function Profile() {
+
+	// get user uid in url
+	// to do a link to the profile of the user 
+	// use <a href={"./profile?uid=" + useruid}>profile</a>
+
+	const uid = new URLSearchParams(useLocation().search).get('uid');
+	const emptyUser: User = { userUuid: "" };
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
 	fetchUser();
@@ -23,8 +28,6 @@ function MyProfile() {
 			update = false;
 		}
 	}
-	
-	console.log("MATCH HISTORY", matchHistory);
 
 	return (<>
 		<NavBar />
@@ -35,19 +38,15 @@ function MyProfile() {
 					<ul>
 						<li className="flex-li">
 							<div className="Username">Username : {user.userName}</div>
-							<PopupEditUsername />
 						</li>
 						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button className="enable">Enable two-factor authentication</button>
+					<button className="enable">Add in friends</button>
 				</div>
-				<a href="./editProfil">
-					<div className="pp">
-						<p>Edit</p>
-					</div>
-				</a>
+				<div className="pp nohover">
+				</div>
 			</div>
 			<div className="flex">
 				<div className="friends container">
@@ -81,4 +80,4 @@ function MyProfile() {
 	</>)
 }
 
-export default MyProfile
+export default Profile
