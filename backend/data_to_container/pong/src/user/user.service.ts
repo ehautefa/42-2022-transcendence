@@ -5,6 +5,7 @@ import { Repository, UpdateResult } from 'typeorm';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
+import { FlipTwoFactorAuthDto } from './dto/flipTwoFactorAuyh.dto';
 
 @Injectable()
 export class UserService {
@@ -25,7 +26,7 @@ export class UserService {
         return await this.UserRepository.save({
             userName: userToCreate.userName,
             userPassword: userToCreate.userPassword,
-            twoFfactorAuth: false,
+            twoFactorAuth: false,
             wins: 0,
             losses: 0,
         });
@@ -34,6 +35,10 @@ export class UserService {
     async changeUserName(userToChange: ChangeUserNameDto): Promise<void> {
         //need check if userName already exist
         await this.UserRepository.update(userToChange.userUuid, { userName: userToChange.newName });
+    }
+
+    async flipTwoFactorAuth(userToChange: FlipTwoFactorAuthDto): Promise<void> {
+        //await this.UserRepository.update(userToChange.userUuid, [{twoFactorAuth: }]);
     }
 
     async endOfMatch(players: EndOfMatchDto) : Promise<void> {

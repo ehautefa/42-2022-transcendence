@@ -14,7 +14,7 @@ export class user extends BaseEntity {
     userPassword: string;
 
     @Column('boolean')
-    twoFfactorAuth: boolean;
+    twoFactorAuth: boolean;
 
     @Column('smallint')
     wins: number;
