@@ -1,10 +1,14 @@
 import NavBar from "../../components/NavBar/NavBar"
+import "./endGame.css"
 
 function Win() {
     return (
         <>
             <NavBar />
-            <h1>Win Game</h1>
+            <div className="endGame">
+                <h1>You won</h1>
+                <a href="/game">Replay</a>
+            </div>
         </>
     );
 }

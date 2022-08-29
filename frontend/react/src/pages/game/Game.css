@@ -46,7 +46,9 @@
 	border-radius: 5px;
 	background-position: 50% center;
 	width: 100%;
-	border: #fef45b solid 1px;
+	border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+	/* border: #fef45b solid 1px; */
 }
 
 .Paddle {
@@ -88,34 +90,19 @@
 	right: 0;
 }
 
-.ResetButton {
-	display: none;
-	aspect-ratio: 2 / 1;
-	background-color: #10000c;
-	color: #FA0197;
-	font-size: 6vw;
-	width: 40%;
-	border-radius: 5px;
-	border: #FA0197 solid 2px;
-	margin: 18.3% 30%;
-}
-
-.ResetButton:hover {
-	background-color: #FA0197;
-	/* text-shadow: 1px 1px 1px #FA0197; */
-}
-
 .matchMakingButton {
 	position: absolute;
 	top: 0;
-	left: 0;;
+	left: 0;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.7);
 	color: #FA0197;
 	font-size: 5vw;
 	width: 100%;
 	border-radius: 5px;
-	border: #fef45b solid 2px;
+	border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+	border-right: none;
 }
 
 .matchMakingButton:hover {
