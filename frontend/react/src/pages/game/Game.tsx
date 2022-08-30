@@ -4,7 +4,6 @@ import React from 'react'
 import { getSocket } from "../../App"
 import { useState } from "react"
 import { Navigate, useLocation } from "react-router-dom";
-import { textChangeRangeIsUnchanged } from "typescript"
 
 const socket = getSocket();
 const PADDLE_GAP = 3; // gap between border and paddle in %
@@ -70,8 +69,8 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 			playerRight: "",
 			loading: false,
 			matchMaking: false,
-			playerLeftName: "",
-			playerRightName: ""
+			playerLeftName: "Coucou",
+			playerRightName: "Bonjout"
 		};
 	}
 
@@ -143,6 +142,8 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 				</div>
 			) : (
 				<>
+					<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
+					<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
 					<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
 					<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
 					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
