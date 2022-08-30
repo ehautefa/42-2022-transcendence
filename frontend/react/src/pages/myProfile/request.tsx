@@ -41,8 +41,8 @@ export function CreateUser() : string {
     return (uid);
 }
 
-export async function GetMatchHistory(uid: string) {
-	var url: string = "http://localhost:3011/match/user/" + uid;
+export async function GetMatchHistory(userName: string) {
+	var url: string = "http://localhost:3011/match/user/" + userName;
 	var requestOptions = {
 		method: 'GET'
 	};

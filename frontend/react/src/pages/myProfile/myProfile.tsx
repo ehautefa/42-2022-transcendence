@@ -17,7 +17,7 @@ function MyProfile() {
 	async function fetchUser() {
 		if (uid && update) {
 			const user = await FetchUser(uid);
-			const matchHistory = await GetMatchHistory(uid);
+			const matchHistory = await GetMatchHistory(user.userName);
 			setMatchHistory(matchHistory);
 			setUser(user);
 			update = false;
