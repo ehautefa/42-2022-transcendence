@@ -19,10 +19,10 @@ export class MatchController {
 		return await this.MatchService.getMatch(matchUid);
 	}
 
-	@Get('/user/:userUid')
+	@Get('/user/:userName')
 	@UsePipes(ValidationPipe)
-	async getMatchHistory(@Param('userUid') userUid : string) : Promise<match[]> {
-		return await this.MatchService.getMatchHistory(userUid);
+	async getMatchHistory(@Param('userName') userName : string) : Promise<match[]> {
+		return await this.MatchService.getMatchHistory(userName);
 	}
 
 

@@ -69,6 +69,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 		games[id] = this.PongService.sendGametoRoom(games[id]);
 		try {
+			if (games[id].isGameOver)
+            	console.log("game over", games[id].isGameOver, games[id].scoreRight, games[id].scoreLeft, games[id].playerLeft);
 			this.server.to(id.toString()).emit('game', games[id]);
 		} catch (error) {
 			console.log("ERROR IN SEND GAME TO ROOM", error);

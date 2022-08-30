@@ -105,7 +105,7 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 			socket.emit('resetGame', this.state.id);
 		}
 	})
-	}
+}
 
 	componentWillUnmount() {
 		clearTimeout(this.state.timeoutId);
@@ -121,7 +121,7 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 			case "ArrowDown":
 				deltaPaddleY = +PADDLE_DEP;
 				break;
-		}
+			}
 		if (deltaPaddleY !== 0) {
 			socket.emit('handlePaddle', deltaPaddleY, this.state.id);
 		}
@@ -129,10 +129,13 @@ export class GameWindow extends React.Component<{}, GameWindowState> {
 
 	render() {
 		return <div className="GameWindow" id="GameBoard">
-			{this.state.isGameOver && (this.state.scoreLeft > this.state.scoreRight
-				&& this.state.playerLeft === socket.id ?
-				(<Navigate to="/endGame/win" replace={true} />) :
-				(<Navigate to="/endGame/lose" replace={true} />))
+			{this.state.isGameOver &&
+			 	(((this.state.scoreLeft > this.state.scoreRight
+				&& this.state.playerLeft === socket.id)
+				|| (this.state.scoreLeft < this.state.scoreRight
+					&& this.state.playerRight === socket.id)) ?
+					(<Navigate to="/endGame/win" replace={true} />) :
+					(<Navigate to="/endGame/lose" replace={true} />))
 			}
 			{this.state.loading ? (
 				<div className="loader-container">

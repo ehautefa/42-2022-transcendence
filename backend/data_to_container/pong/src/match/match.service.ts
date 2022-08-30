@@ -24,10 +24,10 @@ export class MatchService {
 		return await this.MatchRepository.findOne({ where: { matchId: matchId } });
 	}
 
-	async getMatchHistory(userUid: string): Promise<match[]> {
+	async getMatchHistory(userName: string): Promise<match[]> {
 		return await this.MatchRepository.findBy([
-			{user1 : {userUuid: userUid}},
-			{user2 : {userUuid: userUid}}
+			{user1 : {userName: userName}},
+			{user2 : {userName: userName}}
 		]);
 	}
 

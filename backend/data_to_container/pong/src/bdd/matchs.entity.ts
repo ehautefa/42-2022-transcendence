@@ -8,13 +8,13 @@ export class match extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     matchId: string;
 
-    @ManyToOne(() => user, (usr) => usr.userUuid)
+    @ManyToOne(() => user, (usr) => usr.userName)
     user1: user;
 
     @Column('smallint')
     score1: number;
 
-    @ManyToOne(() => user, (usr) => usr.userUuid)
+    @ManyToOne(() => user, (usr) => usr.userName)
     user2: user;
 
     @Column('smallint')
