@@ -13,6 +13,7 @@ function PopupEditUsername() {
             && newUsername.match(/^[a-zA-Z0-9]+$/)) { // only alphanumeric characters
             setOpen(false);
 	        const uid = localStorage.getItem('uid');
+	        localStorage.setItem('userName', newUsername);
             if (uid) 
                 ChangeUsername(uid, newUsername);
         } else {

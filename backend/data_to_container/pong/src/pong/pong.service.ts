@@ -28,13 +28,14 @@ export class PongService {
         return game;
     }
 
-    initSecondPlayer(game: GameWindowState, clientUid: string, clientID: string) : GameWindowState {
-        game.playerRightUid = clientUid;
+    initSecondPlayer(game: GameWindowState, clientInfo: string, clientID: string) : GameWindowState {
+        game.playerRightUid = clientInfo[0];
         game.playerRight = clientID;
+        game.playerRightName = clientInfo[1];
         game.matchMaking = true;
         this.MatchService.createMatch({
             user1uid: game.playerLeftUid, // user1 is client Left
-            user2uid: clientUid // user2 is client Right
+            user2uid: clientInfo[0] // user2 is client Right
         }).then(match => {
             game.matchId = match.matchId;
         });
@@ -57,10 +58,12 @@ export class PongService {
     }
 
 
-    initGame(i: number, clientUid: string, clientID: string) : GameWindowState {
+    initGame(i: number, clientInfo: string, clientID: string) : GameWindowState {
 		var game: GameWindowState = {
 			matchId: undefined,
-			playerLeftUid: clientUid,
+			playerLeftUid: clientInfo[0],
+            playerLeftName: clientInfo[1],
+            playerRightName: "",
 			playerRightUid: undefined,
 			id: i,
 			ballY: POS_BALL_Y,
@@ -76,8 +79,6 @@ export class PongService {
 			playerLeft: clientID,
 			playerRight: undefined,
 			matchMaking: false,
-            playerLeftName: "",
-            playerRightName: "",
 		};
 		return game;
     }

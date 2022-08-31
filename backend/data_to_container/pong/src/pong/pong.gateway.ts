@@ -28,24 +28,24 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('getPlayer')
-	getPlayer(client: Socket, clientUid: string): number {
+	getPlayer(client: Socket, clientInfo: string): number {
 		if (games.length == 0)
 			this.GameLoop(); // start game loop
 		for (var i: number = 0; i < games.length; i++) {
 			if (games[i].playerLeft == "" && games[i].playerRight == "") {
 				// reuse old structure if possible
 				client.join(i.toString());
-				games[i] = this.PongService.initGame(i, clientUid, client.id);
+				games[i] = this.PongService.initGame(i, clientInfo, client.id);
 				return i;
 			} else if (games[i].playerRight === undefined) {
 				// find a game with only one player
 				client.join(i.toString());
-				games[i] = this.PongService.initSecondPlayer(games[i], clientUid, client.id);
+				games[i] = this.PongService.initSecondPlayer(games[i], clientInfo, client.id);
 				return i;
 			}
 		}
 		// create new game
-		games.push(this.PongService.initGame(i, clientUid, client.id));
+		games.push(this.PongService.initGame(i, clientInfo, client.id));
 		console.log("GAMES[", i, "]", games[i]);
 		client.join(i.toString());
 		return i;

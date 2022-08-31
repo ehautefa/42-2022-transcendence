@@ -9,7 +9,7 @@ var update = true;
 
 function MyProfile() {
 	const uid = localStorage.getItem('uid');
-	const emptyUser : User = {userUuid: ""};
+	const emptyUser : User = {userUuid: "", userName: ""};
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
 	fetchUser();

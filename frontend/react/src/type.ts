@@ -1,6 +1,6 @@
 export type User = {
 	userUuid: string;
-	userName?: string;
+	userName: string;
 	twoFfactorAuth?: boolean;
 	wins?: number;
 	losses?: number;

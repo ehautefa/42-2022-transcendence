@@ -16,7 +16,7 @@ export async function FetchUser(uid: string) {
 }
 
 export function CreateUser() : string {
-	let emptyUser: User = {userUuid: ""};
+	let emptyUser: User = {userUuid: "", userName: ""};
 	const [user, setUser] = useState(emptyUser);
 
 	var myHeaders = new Headers();
@@ -37,6 +37,7 @@ export function CreateUser() : string {
 		.then(result => setUser(JSON.parse(result)))
 		.catch(error => console.log('error', error));
 	console.log("New user:", user);
+	localStorage.setItem('userName', user.userName);
     const uid = user.userUuid;
     return (uid);
 }
