@@ -4,7 +4,6 @@ import React from 'react'
 import { getSocket } from "../../App"
 import { useState } from "react"
 import { Navigate, useLocation } from "react-router-dom";
-import { SocketAddress } from "net"
 
 const socket = getSocket();
 const PADDLE_GAP = 3; // gap between border and paddle in %
@@ -51,7 +50,7 @@ interface GameWindowState {
 }
 
 
-export class GameWindow extends React.Component<{ id: number}, GameWindowState> {
+export class GameWindow extends React.Component<{ id: number }, GameWindowState> {
 	constructor(props: any) {
 		super(props);
 
@@ -82,35 +81,35 @@ export class GameWindow extends React.Component<{ id: number}, GameWindowState> 
 
 
 	gameLoop() {
-	socket.on('game', (data: GameWindowState) => {
-		if (data.matchMaking === false) {
-			this.setState({loading: true});
-		} else {
-			this.setState({loading: false});
-		}
-		this.setState({
-			id: data.id,
-			ballX: data.ballX,
-			ballY: data.ballY,
-			scoreLeft: data.scoreLeft,
-			scoreRight: data.scoreRight,
-			paddleLeftY: data.paddleLeftY,
-			paddleRightY: data.paddleRightY,
-			isGameOver: data.isGameOver,
-			playerLeft: data.playerLeft,
-			playerRight: data.playerRight,
-			matchMaking: data.matchMaking,
-			playerLeftName: data.playerLeftName,
-			playerRightName: data.playerRightName
-		});
-		if (data.isGameOver) {
-			socket.emit('resetGame', this.state.id);
-		}
-	})
-	socket.on('leaveGame', (playerName: string) => {
-		alert(`${playerName} has left the game`);
-	})
-}
+		socket.on('game', (data: GameWindowState) => {
+			if (data.matchMaking === false) {
+				this.setState({ loading: true });
+			} else {
+				this.setState({ loading: false });
+			}
+			this.setState({
+				id: data.id,
+				ballX: data.ballX,
+				ballY: data.ballY,
+				scoreLeft: data.scoreLeft,
+				scoreRight: data.scoreRight,
+				paddleLeftY: data.paddleLeftY,
+				paddleRightY: data.paddleRightY,
+				isGameOver: data.isGameOver,
+				playerLeft: data.playerLeft,
+				playerRight: data.playerRight,
+				matchMaking: data.matchMaking,
+				playerLeftName: data.playerLeftName,
+				playerRightName: data.playerRightName
+			});
+			if (data.isGameOver) {
+				socket.emit('resetGame', this.state.id);
+			}
+		})
+		socket.on('leaveGame', (playerName: string) => {
+			alert(`${playerName} has left the game`);
+		})
+	}
 
 	componentWillUnmount() {
 		clearTimeout(this.state.timeoutId);
@@ -126,10 +125,14 @@ export class GameWindow extends React.Component<{ id: number}, GameWindowState> 
 			case "ArrowDown":
 				deltaPaddleY = +PADDLE_DEP;
 				break;
-			}
+		}
 		if (deltaPaddleY !== 0) {
 			socket.emit('handlePaddle', deltaPaddleY, this.props.id);
 		}
+	}
+
+	ChangeColor() {
+
 	}
 
 	render() {
@@ -141,11 +144,11 @@ export class GameWindow extends React.Component<{ id: number}, GameWindowState> 
 			}
 			{this.state.isGameOver
 				&& (this.state.playerLeft === socket.id
-				|| this.state.playerRight === socket.id)
-			 	&& (((this.state.scoreLeft > this.state.scoreRight
-				&& this.state.playerLeft === socket.id)
-				|| (this.state.scoreLeft < this.state.scoreRight
-					&& this.state.playerRight === socket.id)) ?
+					|| this.state.playerRight === socket.id)
+				&& (((this.state.scoreLeft > this.state.scoreRight
+					&& this.state.playerLeft === socket.id)
+					|| (this.state.scoreLeft < this.state.scoreRight
+						&& this.state.playerRight === socket.id)) ?
 					(<Navigate to="/endGame/win" replace={true} />) :
 					(<Navigate to="/endGame/lose" replace={true} />))
 			}
@@ -183,22 +186,22 @@ function Game() {
 	}
 
 	function matchMaking() {
-		socket.emit('getPlayer', uid, userName,  (id_game : number) => {
+		socket.emit('getPlayer', uid, userName, (id_game: number) => {
 			setDisplaying({ display: "none" });
 			setId(id_game)
 		});
 	}
-	return (<div>
+	return (<>
 		<NavBar />
 		<div className="mainComposantGame">
-			<GameWindow id={id}/>
+			<GameWindow id={id} />
 			<button style={displaying}
 				className="matchMakingButton"
 				onClick={() => matchMaking()}>
 				Find another player
 			</button>
 		</div>
-	</div>)
+	</>)
 }
 
 export default Game;

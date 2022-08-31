@@ -5,7 +5,7 @@ export async function FetchUser(uid: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-	var url: string = "http://localhost:3011/user/" + uid;
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/" + uid;
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
@@ -32,7 +32,8 @@ export function CreateUser() : string {
 		body: urlencoded
 	};
 	
-	fetch("http://localhost:3011/user/create", requestOptions)
+	const url = process.env.REACT_APP_BACK_URL + "/user/create";
+	fetch(url, requestOptions)
 		.then(response => response.text())
 		.then(result => setUser(JSON.parse(result)))
 		.catch(error => console.log('error', error));
@@ -43,7 +44,7 @@ export function CreateUser() : string {
 }
 
 export async function GetMatchHistory(userName: string) {
-	var url: string = "http://localhost:3011/match/user/" + userName;
+	var url: string = process.env.REACT_APP_BACK_URL +  "/match/user/" + userName;
 	var requestOptions = {
 		method: 'GET'
 	};
@@ -59,7 +60,7 @@ export function GetAllMatch() : Match[] {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-	var url: string = "http://localhost:3011/match/all";
+	var url: string = process.env.REACT_APP_BACK_URL + "/match/all";
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
@@ -75,7 +76,7 @@ export function GetAllMatch() : Match[] {
 export function ChangeUsername(userUuid: string, newName: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-	
+
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("userUuid", userUuid);
 	urlencoded.append("newName", newName);
@@ -86,6 +87,8 @@ export function ChangeUsername(userUuid: string, newName: string) {
 		body: urlencoded
 	};
 	
-	fetch("http://localhost:3011/user/changeUsername", requestOptions)
+	const URL = process.env.REACT_APP_BACK_URL + "/user/changeUsername";
+	console.log("URL:", URL);
+	fetch(URL, requestOptions)
 		.catch(error => console.log('error', error));
 }

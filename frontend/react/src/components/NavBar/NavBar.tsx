@@ -5,7 +5,7 @@ function navBar() {
 		<input type="checkbox" className="check" id="nav-ckeck">
 		</input>
 		<div id="nav-header">
-			<a href="http://localhost:3000">
+			<a href="/">
 				TRANSCENDENCE
 			</a>
 		</div>

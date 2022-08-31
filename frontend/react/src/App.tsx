@@ -3,8 +3,10 @@ import './index.css';
 import { io } from 'socket.io-client'
 import { CreateUser } from "./pages/myProfile/request";
 
-// Create my socket 
-const socket = io("http://localhost:3011");
+// Create my socket
+const URL_BACK : string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;; 
+const socket = io(URL_BACK);
+
 
 
 
