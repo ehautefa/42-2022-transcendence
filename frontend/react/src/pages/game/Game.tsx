@@ -130,8 +130,15 @@ export class GameWindow extends React.Component<{ id: number}, GameWindowState> 
 
 	render() {
 		return <div className="GameWindow" id="GameBoard">
-			{this.state.isGameOver &&
-			 	(((this.state.scoreLeft > this.state.scoreRight
+			{this.state.isGameOver
+				&& this.state.playerLeft !== socket.id
+				&& this.state.playerRight !== socket.id
+				&& (<Navigate to="/endGame/GameOver" replace={true} />)
+			}
+			{this.state.isGameOver
+				&& (this.state.playerLeft === socket.id
+				|| this.state.playerRight === socket.id)
+			 	&& (((this.state.scoreLeft > this.state.scoreRight
 				&& this.state.playerLeft === socket.id)
 				|| (this.state.scoreLeft < this.state.scoreRight
 					&& this.state.playerRight === socket.id)) ?
@@ -167,7 +174,7 @@ function Game() {
 	const uid = localStorage.getItem('uid');
 	const userName = localStorage.getItem('userName');
 
-	if (id != -1) {
+	if (id !== -1) {
 		socket.emit('joinGame', id);
 	}
 
