@@ -15,6 +15,7 @@ export class UserService {
     ) { }
 
     async getAllUser(): Promise<user[]> {
+        //need to remove access_token from the tab
         return await this.UserRepository.find({});
     }
 
@@ -23,9 +24,12 @@ export class UserService {
     }
 
     async createUser(userToCreate: CreateUserDto): Promise<user> {
+        console.log(userToCreate);
         return await this.UserRepository.save({
             userName: userToCreate.userName,
+            userName42: userToCreate.userName,
             userPassword: userToCreate.userPassword,
+            accessToken42: userToCreate.accessToken42,
             twoFactorAuth: false,
             wins: 0,
             losses: 0,

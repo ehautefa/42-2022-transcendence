@@ -8,6 +8,9 @@ export class user extends BaseEntity {
     userUuid: string;
 
     @Column('varchar')
+    userName42: string;
+
+    @Column('varchar')
     userName: string;
 
     @Column('varchar')
@@ -22,12 +25,12 @@ export class user extends BaseEntity {
     @Column('smallint')
     losses: number;
 
+    @Column('varchar')
+    accessToken42: string;
+
     @ManyToMany(() => user, usr => usr.userUuid)
     @JoinTable()
     friends: user[];
-
-
-    // @Column()
 
     // match_history
 
