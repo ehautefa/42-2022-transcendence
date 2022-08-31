@@ -27,6 +27,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@SubscribeMessage('joinGame') // For spectator
+	joinGame(client: Socket, id: number) {
+		client.join(id.toString());
+	}
+
 	@SubscribeMessage('getPlayer')
 	getPlayer(client: Socket, clientInfo: string): number {
 		if (games.length == 0)

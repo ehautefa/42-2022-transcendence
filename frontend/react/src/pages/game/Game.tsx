@@ -165,7 +165,11 @@ function Game() {
 	const [displaying, setDisplaying] = useState(displaying_state);
 	const [id, setId] = useState(id_state);
 	const uid = localStorage.getItem('uid');
-	const userName = localStorage.getItem('userName')
+	const userName = localStorage.getItem('userName');
+
+	if (id != -1) {
+		socket.emit('joinGame', id);
+	}
 
 	function matchMaking() {
 		socket.emit('getPlayer', uid, userName,  (id_game : number) => {

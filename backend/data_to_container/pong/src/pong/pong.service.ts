@@ -6,7 +6,7 @@ import { GameWindowState } from './type';
 
 const PADDLE_SIZE = 10; // if you change that change also property height of paddle in Game css (x2)
 const BALL_SPEED = 1; // in %
-const END_SCORE = 2;
+const END_SCORE = 10;
 const POS_BALL_X = 48.6;
 const POS_BALL_Y = 47.1; // same const in game.tsx
 
