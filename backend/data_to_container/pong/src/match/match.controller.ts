@@ -11,9 +11,6 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@ne
 export class MatchController {
 	constructor( private readonly MatchService : MatchService ) {}
 
-	/**
-	 * Get all matchs of the table
-	 */
 	@Get('all')
 	@ApiOperation({ summary: 'Get all match of the table' })
 	@ApiResponse({ status: 200, description: 'Found matchs', type: match })

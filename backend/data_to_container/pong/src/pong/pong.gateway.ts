@@ -110,6 +110,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				} else {
 					this.server.to(i.toString()).emit('leaveGame', games[i].playerRightName);
 				}
+				this.resetGame(client, i);
 			}
 		}
 	}

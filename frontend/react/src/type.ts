@@ -16,20 +16,10 @@ export type Match = {
 }
 
 export interface GameWindowState {
-	ballX: number,
-	ballY: number,
-	ballSpeedX: number,
-	ballSpeedY: number,
-	gameLoopTimeout: number,
-	timeoutId: any,
 	scoreLeft: number,
-	playerLeft: string,
-	playerRight: string,
+	playerLeftName: string,
+	playerRightName: string,
 	scoreRight: number,
-	paddleLeftY: number,
-	paddleLeftX: number,
-	paddleRightX: number,
-	paddleRightY: number,
 	id: number,
 	isGameOver: boolean
 }
