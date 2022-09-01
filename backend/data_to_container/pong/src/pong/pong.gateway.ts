@@ -6,6 +6,8 @@ import { MatchService } from 'src/match/match.service';
 import { PongService } from "./pong.service";
 import { GameWindowState } from "./type";
 import { AuthGuard } from './pong.guards';
+import { InvitePlayerDto } from './dto/invitePlayer.dto';
+import { getPlayerDto } from './dto/getPlayer.dto';
 
 const INTERVAL_TIME = 50; // in ms
 
@@ -34,9 +36,32 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.join(id.toString());
 	}
 
+	// // Invite a specific user to a game
+	// @SubscribeMessage('invitePlayer')
+	// invitePlayer(client: Socket, invitePlayerInfo: InvitePlayerDto) {
+	// 	if (games.length == 0)
+	// 		this.GameLoop(); // start game loop
+	// 	for (var i: number = 0; i < games.length; i++) {
+	// 		if (games[i].playerLeft == "" && games[i].playerRight == "") {
+	// 			// reuse old structure if possible
+	// 			client.join(i.toString());
+	// 			let arg = [invitePlayerInfo.user1uid, invitePlayerInfo.user1name];
+	// 			games[i] = this.PongService.initGame(i, arg, client.id);
+	// 			return i;
+	// 		}
+	// 	}
+	// 	// create new game
+	// 	games.push(this.PongService.initGame(i, clientInfo, client.id));
+	// 	console.log("GAMES[", i, "]", games[i]);
+	// 	client.join(i.toString());
+	// 	return i;
+	// }
+
+	// Launch a game and find a match for the player
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('getPlayer')
-	getPlayer(client: Socket, clientInfo: string): number {
+	// clientInfo : {userUid, username}
+	getPlayer(client: Socket, clientInfo: getPlayerDto): number {
 		let auth_token : string = client.handshake.headers.authorization.split(' ')[1];
 		console.log("Auth token", auth_token);
 		if (games.length == 0)

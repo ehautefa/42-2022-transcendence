@@ -3,6 +3,7 @@ import { Interval, Timeout } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchService } from 'src/match/match.service';
 import { GameWindowState } from './type';
+import { getPlayerDto } from './dto/getPlayer.dto';
 
 const PADDLE_SIZE = 10; // if you change that change also property height of paddle in Game css (x2)
 const BALL_SPEED = 1; // in %
@@ -28,10 +29,10 @@ export class PongService {
         return game;
     }
 
-    initSecondPlayer(game: GameWindowState, clientInfo: string, clientID: string) : GameWindowState {
-        game.playerRightUid = clientInfo[0];
+    initSecondPlayer(game: GameWindowState, clientInfo: getPlayerDto, clientID: string) : GameWindowState {
+        game.playerRightUid = clientInfo.userUuid;
         game.playerRight = clientID;
-        game.playerRightName = clientInfo[1];
+        game.playerRightName = clientInfo.userName;
         game.matchMaking = true;
         this.MatchService.createMatch({
             user1uid: game.playerLeftUid, // user1 is client Left
@@ -58,11 +59,11 @@ export class PongService {
     }
 
 
-    initGame(i: number, clientInfo: string, clientID: string) : GameWindowState {
+    initGame(i: number, clientInfo: getPlayerDto, clientID: string) : GameWindowState {
 		var game: GameWindowState = {
 			matchId: undefined,
-			playerLeftUid: clientInfo[0],
-            playerLeftName: clientInfo[1],
+			playerLeftUid: clientInfo.userUuid,
+            playerLeftName: clientInfo.userName,
             playerRightName: "",
 			playerRightUid: undefined,
 			id: i,
