@@ -6,8 +6,8 @@ import { MatchService } from 'src/match/match.service';
 import { PongService } from "./pong.service";
 import { GameWindowState } from "./type";
 import { AuthGuard } from './pong.guards';
-import { InvitePlayerDto } from './dto/invitePlayer.dto';
 import { getPlayerDto } from './dto/getPlayer.dto';
+import { AcceptInviteDto } from './dto/acceptInvite.dto';
 
 const INTERVAL_TIME = 50; // in ms
 
@@ -36,26 +36,36 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.join(id.toString());
 	}
 
-	// // Invite a specific user to a game
-	// @SubscribeMessage('invitePlayer')
-	// invitePlayer(client: Socket, invitePlayerInfo: InvitePlayerDto) {
-	// 	if (games.length == 0)
-	// 		this.GameLoop(); // start game loop
-	// 	for (var i: number = 0; i < games.length; i++) {
-	// 		if (games[i].playerLeft == "" && games[i].playerRight == "") {
-	// 			// reuse old structure if possible
-	// 			client.join(i.toString());
-	// 			let arg = [invitePlayerInfo.user1uid, invitePlayerInfo.user1name];
-	// 			games[i] = this.PongService.initGame(i, arg, client.id);
-	// 			return i;
-	// 		}
-	// 	}
-	// 	// create new game
-	// 	games.push(this.PongService.initGame(i, clientInfo, client.id));
-	// 	console.log("GAMES[", i, "]", games[i]);
-	// 	client.join(i.toString());
-	// 	return i;
-	// }
+	// Invite a specific user to a game
+	@SubscribeMessage('invitePlayer')
+	invitePlayer(client: Socket, clientInfo: getPlayerDto) {
+		if (games.length == 0)
+			this.GameLoop(); // start game loop
+		for (var i: number = 0; i < games.length; i++) {
+			if (games[i].playerLeft == "" && games[i].playerRight == "") {
+				// reuse old structure if possible
+				client.join(i.toString());
+				games[i] = this.PongService.initGame(i, clientInfo, client.id);
+				games[i].playerRight = "invited"; // mark match reserved to avoid matchmaking 
+				return i;
+			}
+		}
+		// create new game
+		games.push(this.PongService.initGame(i, clientInfo, client.id));
+		console.log("GAMES[", i, "]", games[i]);
+		client.join(i.toString());
+		return i;
+	}
+
+	@SubscribeMessage('acceptInvite') 
+	acceptInvite(client: Socket, acceptInvite: AcceptInviteDto) {
+		let arg : getPlayerDto = {userUuid: acceptInvite.userUuid,
+			 userName: acceptInvite.userName};
+		let id: number = acceptInvite.id; // get id from invitation
+		client.join(id.toString());
+		games[id] = this.PongService.initSecondPlayer(games[id], arg, client.id);
+		return id;
+	}
 
 	// Launch a game and find a match for the player
 	@UseGuards(AuthGuard)
