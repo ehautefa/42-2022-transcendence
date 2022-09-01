@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Match } from "../../type";
+import { User } from "../../type";
 
 export async function FetchUser(uid: string) {
 	var myHeaders = new Headers();
@@ -53,26 +53,6 @@ export async function GetMatchHistory(userName: string) {
 	return await match.json();
 }
 
-
-export function GetAllMatch() : Match[] {
-	let emptyMatch: Match[] = [];
-	const [match, setMatch] = useState(emptyMatch);
-	var myHeaders = new Headers();
-	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-	var url: string = process.env.REACT_APP_BACK_URL + "/match/all";
-	var requestOptions = {
-		method: 'GET',
-		headers: myHeaders,
-	};
-
-	fetch(url, requestOptions)
-		.then(response => response.text())
-		.then(result => setMatch(JSON.parse(result)))
-		.catch(error => console.log('error', error));
-	return (match);
-}
-
 export function ChangeUsername(userUuid: string, newName: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -91,4 +71,14 @@ export function ChangeUsername(userUuid: string, newName: string) {
 	console.log("URL:", URL);
 	fetch(URL, requestOptions)
 		.catch(error => console.log('error', error));
+}
+
+export async function GetAllUsers() {
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/all";
+	var requestOptions = {
+		method: 'GET',
+	};
+
+	let users = await fetch(url, requestOptions);
+	return await users.json();
 }
