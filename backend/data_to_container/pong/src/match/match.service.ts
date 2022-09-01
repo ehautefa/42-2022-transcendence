@@ -17,7 +17,12 @@ export class MatchService {
 	) { }
 
 	async getAllMatch(): Promise<match[]> {
-		return await this.MatchRepository.find({});
+		return await this.MatchRepository.find({
+			relations: { // permet de recuperer les users
+				user1: true,
+				user2: true
+			},
+		});
 	}
 	
 	async getMatch(matchId: string): Promise<match> {
@@ -25,10 +30,16 @@ export class MatchService {
 	}
 
 	async getMatchHistory(userName: string): Promise<match[]> {
-		return await this.MatchRepository.findBy([
-			{user1 : {userName: userName}},
-			{user2 : {userName: userName}}
-		]);
+		return await this.MatchRepository.find({
+			relations: { // permet de recuperer les users
+				user1: true,
+				user2: true
+			},
+			where: [
+				{user1: {userName: userName}},
+				{user2: {userName: userName}}
+			]
+		});
 	}
 
 	async createMatch(matchToCreate: CreateMatchDto): Promise<match> {

@@ -1,10 +1,11 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, Logger, UseGuards } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { MatchService } from 'src/match/match.service';
 import { PongService } from "./pong.service";
 import { GameWindowState } from "./type";
+import { AuthGuard } from './pong.guards';
 
 const INTERVAL_TIME = 50; // in ms
 
@@ -27,13 +28,17 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+
 	@SubscribeMessage('joinGame') // For spectator
 	joinGame(client: Socket, id: number) {
 		client.join(id.toString());
 	}
 
+	@UseGuards(AuthGuard)
 	@SubscribeMessage('getPlayer')
 	getPlayer(client: Socket, clientInfo: string): number {
+		let auth_token : string = client.handshake.headers.authorization.split(' ')[1];
+		console.log("Auth token", auth_token);
 		if (games.length == 0)
 			this.GameLoop(); // start game loop
 		for (var i: number = 0; i < games.length; i++) {

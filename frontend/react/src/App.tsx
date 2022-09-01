@@ -4,8 +4,17 @@ import { io } from 'socket.io-client'
 import { CreateUser } from "./pages/myProfile/request";
 
 // Create my socket
+let socketOptions = {
+	transportOptions: {
+	  polling: {
+		extraHeaders: {
+		  Authorization: 'Bearer 464654564'
+		}
+	  }
+	}
+ };
 const URL_BACK : string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;; 
-const socket = io(URL_BACK);
+const socket = io(URL_BACK, socketOptions);
 
 
 

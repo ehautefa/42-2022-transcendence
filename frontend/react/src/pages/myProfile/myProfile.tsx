@@ -79,7 +79,6 @@ function MyProfile() {
 					<table>
 						<thead>
 							<tr>
-								<th>ID</th>
 								<th>Other Player</th>
 								<th>My Score</th>
 								<th>Other Score</th>
@@ -88,7 +87,6 @@ function MyProfile() {
 						<tbody>
 							{matchHistory.map((match: any) => {
 								return (<tr key="{match.matchId}">
-									<td>{match.matchId}</td>
 									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
