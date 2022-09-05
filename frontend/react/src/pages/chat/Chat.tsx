@@ -1,19 +1,23 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Chat.css"
 import { useState } from 'react'
-
-function Game() {
+import {
+	CSSTransition,
+	TransitionGroup,
+  } from 'react-transition-group';
+function Chat() {
 	var message: string;
-	const [messages, setMessages] = useState([]);
-	setMessages([]);
-	function handleChange(event:any) {
+	const [messages, setMessages] = useState([""]);
+	const handleChange = (event:any) => {
+		console.log("Message 'ecrit' : ", message);
 		message = event.target.value;
 	}
 
-	function sendMessage() {
+	const sendMessage = (event:any) => {
 		if (message) {
 			console.log("Message a envoyer : ", message);
 			// socket.emit("message", socket.id + ": " + message);
+			setMessages(prevValues => [...prevValues, message]);
 			message = "";
 		}
 	}
@@ -31,11 +35,17 @@ function Game() {
 				</div>
 			</div>
 			<div className="chat">
-				<div className="messages">
-					<ul>
-						{messages.map((message: string) => (<li>{message}</li>))}
-					</ul>
-				</div>
+				<TransitionGroup className="messages">
+					{messages.map((message: string) => (
+						<CSSTransition
+						key={message}
+						timeout={500}
+						classNames="fade"
+						>
+						<li>{message}</li>
+						</CSSTransition>
+					))}
+				</TransitionGroup>
 				<form id="form" action="">
 					<input
 						id="input"
@@ -53,4 +63,4 @@ function Game() {
 	</div>)
 }
 
-export default Game
+export default Chat
