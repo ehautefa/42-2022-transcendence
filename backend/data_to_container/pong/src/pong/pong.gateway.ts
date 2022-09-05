@@ -1,8 +1,7 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Inject, Logger, UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-import { MatchService } from 'src/match/match.service';
 import { PongService } from "./pong.service";
 import { GameWindowState } from "./type";
 import { AuthGuard } from './pong.guards';
@@ -21,7 +20,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	server: Server;
 	private logger: Logger = new Logger('PongGateway');
 
-	constructor(private readonly MatchService: MatchService, private readonly PongService: PongService) { }
+	constructor(private readonly PongService: PongService) { }
 
 	@Interval(INTERVAL_TIME)
 	GameLoop() {
@@ -61,6 +60,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.join(i.toString());
 		invitePlayer.id = i;
 		// send invitation to all players
+		console.log("invitePlayer", "send to other players invitation");
 		this.server.emit('invitePlayer', invitePlayer);
 		return i;
 	}
@@ -129,8 +129,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			console.log("ERROR IN SEND GAME TO ROOM", error);
 		}
 	}
-
-	
 
 	@SubscribeMessage('handlePaddle')
 	handlePaddle(client: Socket, args: any): void {

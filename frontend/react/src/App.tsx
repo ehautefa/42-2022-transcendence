@@ -1,4 +1,3 @@
-import React from 'react';
 import './index.css';
 import { io } from 'socket.io-client'
 import { CreateUser } from "./pages/myProfile/request";
@@ -22,7 +21,6 @@ const socket = io(URL_BACK, socketOptions);
 export function getSocket() {
 	return socket;
 }
-
 
 export default function App() {
 	var uid :string = localStorage.getItem('uid') !== null ? localStorage.getItem('uid')! : "";
