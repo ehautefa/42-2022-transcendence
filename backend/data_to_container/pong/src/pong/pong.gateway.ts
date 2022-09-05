@@ -8,6 +8,8 @@ import { GameWindowState } from "./type";
 import { AuthGuard } from './pong.guards';
 import { getPlayerDto } from './dto/getPlayer.dto';
 import { AcceptInviteDto } from './dto/acceptInvite.dto';
+import { invitePlayerDto } from './dto/invitePlayer.dto';
+
 
 const INTERVAL_TIME = 50; // in ms
 
@@ -30,7 +32,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
-
 	@SubscribeMessage('joinGame') // For spectator
 	joinGame(client: Socket, id: number) {
 		client.join(id.toString());
@@ -38,22 +39,28 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	// Invite a specific user to a game
 	@SubscribeMessage('invitePlayer')
-	invitePlayer(client: Socket, clientInfo: getPlayerDto) {
+	invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
+		let arg : getPlayerDto = {userUuid: invitePlayer.userUuid,
+			userName: invitePlayer.userName};
 		if (games.length == 0)
 			this.GameLoop(); // start game loop
 		for (var i: number = 0; i < games.length; i++) {
 			if (games[i].playerLeft == "" && games[i].playerRight == "") {
 				// reuse old structure if possible
 				client.join(i.toString());
-				games[i] = this.PongService.initGame(i, clientInfo, client.id);
-				games[i].playerRight = "invited"; // mark match reserved to avoid matchmaking 
+				games[i] = this.PongService.initGame(i, arg, client.id);
+				games[i].playerRightName = invitePlayer.invitedUserName; // mark match reserved to avoid matchmaking 
 				return i;
 			}
 		}
 		// create new game
-		games.push(this.PongService.initGame(i, clientInfo, client.id));
+		games.push(this.PongService.initGame(i, arg, client.id));
+		games[i].playerRightName = invitePlayer.invitedUserName; // mark match reserved to avoid matchmaking 
 		console.log("GAMES[", i, "]", games[i]);
 		client.join(i.toString());
+		invitePlayer.id = i;
+		// send invitation to all players
+		this.server.emit('invitePlayer', invitePlayer);
 		return i;
 	}
 

@@ -19,6 +19,7 @@ async function bootstrap() {
 		.setVersion('1.0')
 		.addTag('match')
 		.addTag('user')
+		.addTag('pong')
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
