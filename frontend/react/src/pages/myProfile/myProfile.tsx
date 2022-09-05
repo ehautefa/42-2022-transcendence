@@ -4,6 +4,7 @@ import { FetchUser, GetMatchHistory, GetAllUsers } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
 import PopupEditUsername from "../../components/Popup/Popup";
+import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 
 var update = true;
 
@@ -26,6 +27,8 @@ function MyProfile() {
 			update = false;
 		}
 	}
+
+
 	
 	console.log("MATCH HISTORY", matchHistory);
 
@@ -68,7 +71,7 @@ function MyProfile() {
 								return (<tr key="{users.userUid}">
 									<td><a href={"./profile?uid=" + users.userUid}>{users.userName}</a></td>
 									<td>Online</td>
-									<td>Launch a Game</td>
+									<InvitePopUp userUuid={users.userUuid} user={user} />
 								</tr>);
 							})}
 						</tbody>

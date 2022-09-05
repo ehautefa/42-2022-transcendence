@@ -40,6 +40,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// Invite a specific user to a game
 	@SubscribeMessage('invitePlayer')
 	invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
+		console.log("invitePlayerBackend", invitePlayer);
 		let arg : getPlayerDto = {userUuid: invitePlayer.userUuid,
 			userName: invitePlayer.userName};
 		if (games.length == 0)
@@ -49,13 +50,13 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				// reuse old structure if possible
 				client.join(i.toString());
 				games[i] = this.PongService.initGame(i, arg, client.id);
-				games[i].playerRightName = invitePlayer.invitedUserName; // mark match reserved to avoid matchmaking 
+				games[i].playerRightUid = invitePlayer.invitedUid; // mark match reserved to avoid matchmaking 
 				return i;
 			}
 		}
 		// create new game
 		games.push(this.PongService.initGame(i, arg, client.id));
-		games[i].playerRightName = invitePlayer.invitedUserName; // mark match reserved to avoid matchmaking 
+		games[i].playerRightUid = invitePlayer.invitedUid; // mark match reserved to avoid matchmaking 
 		console.log("GAMES[", i, "]", games[i]);
 		client.join(i.toString());
 		invitePlayer.id = i;

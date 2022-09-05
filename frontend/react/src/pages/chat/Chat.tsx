@@ -2,7 +2,7 @@ import NavBar from "../../components/NavBar/NavBar"
 import "./Chat.css"
 import { useState } from 'react'
 
-function Game() {
+function Chat() {
 	var message: string;
 	const [messages, setMessages] = useState([]);
 	setMessages([]);
@@ -53,4 +53,4 @@ function Game() {
 	</div>)
 }
 
-export default Game
+export default Chat

@@ -1,13 +1,21 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import React from 'react'
-import { getSocket } from "../../App"
+import { getSocket } from "../../App" 
 import { useState } from "react"
 import { Navigate, useLocation } from "react-router-dom";
 
 const socket = getSocket();
 const PADDLE_GAP = 3; // gap between border and paddle in %
 const PADDLE_DEP = 2; // need to be a divisor of PADDLE_SIZE defined in PongService in %
+
+socket.on('invitePlayer', (data: any) => {
+	console.log("INVITE PLAYER ON", data);
+	console.log('my uid', localStorage.getItem('uid'));
+	if (data.invitedUid === localStorage.getItem('uid')) {
+		console.log("You are invite by", data.userName);
+	}
+})
 
 class Ball extends React.Component<{ x: number, y: number }> {
 	render() {
@@ -170,6 +178,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 		</div>
 	}
 }
+
 
 
 function Game() {
