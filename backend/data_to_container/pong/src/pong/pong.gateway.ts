@@ -90,7 +90,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				client.join(i.toString());
 				games[i] = this.PongService.initGame(i, clientInfo, client.id);
 				return i;
-			} else if (games[i].playerRight === undefined) {
+			} else if (games[i].playerRight === undefined && // verify if game is not full
+				games[i].playerLeftUid !== clientInfo.userUuid) { // verify if player is not already in game
 				// find a game with only one player
 				client.join(i.toString());
 				games[i] = this.PongService.initSecondPlayer(games[i], clientInfo, client.id);
