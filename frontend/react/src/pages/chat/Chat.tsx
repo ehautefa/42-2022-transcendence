@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { CSSTransition, TransitionGroup} from 'react-transition-group';
 import {Route, NavLink, HashRouter} from 'react-router-dom'
 
-
 function Chat() {
 	var message: string;
 	var who: string;
@@ -20,7 +19,7 @@ function Chat() {
 			console.log("Message a envoyer : ", message);
 			// socket.emit("message", socket.id + ": " + message);
 			setMessages(prevValues => [...prevValues, {msg: message, who_said: "me"}]);
-			if (message.search(/possible/gi) != -1 || message.search(/can /gi) != -1)
+			if (message.search(/possible/gi) !== -1 || message.search(/can /gi) !== -1)
 				setMessages(prevValues => [...prevValues, {msg: "NO WAY!", who_said: "God"}]);
 			message = "";
 		}
