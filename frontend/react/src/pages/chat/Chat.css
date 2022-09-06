@@ -11,7 +11,7 @@
     height: 100%;
     margin: 10px 0;
     border-radius: 5px;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     overflow-y: scroll;
 }
 
@@ -20,10 +20,37 @@
 }
 
 .box {
-    margin: 0 10px;
+    margin-right: 5px;
     display: flex;
     flex-direction: column;
-    width:30%;
+    width: 35%;
+}
+
+.box h2{
+	background-color: #FA0197;
+	color: #fef45b;
+	border: none;
+	padding: 5px;
+    margin: auto;
+	font-size: 1.3rem;
+	font-weight: bolder;
+	border-radius: 10px;
+	width: 80%;
+	text-align: center;
+}
+
+.box button {
+    width: 50%;
+    border-radius: 5px;
+    outline: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 5px;
+    padding: 0.5rem;
+    background-color: #FA0197;
+    color: #fae3fa;
+    border: none;
+    cursor: pointer;
 }
 
 .chat {
@@ -32,15 +59,25 @@
     width: 80%;
     margin: 10px;
     border-radius: 5px;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .chat li {
     list-style: none;
     margin: 10px 0px;
     color: #fae3fa;
+    text-align: left;
     padding: 5px;
 }
+
+.chat ul {
+    list-style: none;
+    margin: 10px 0px;
+    color: #FA0197;
+    text-align: right;
+    padding: 5px;
+}
+
 
 .messages {
     height: 100%;
@@ -48,7 +85,7 @@
 }
 
 .chat form {
-    width:100%;
+    width: 100%;
     display: flex;
     height: 3rem;
     box-sizing: border-box;
@@ -56,28 +93,51 @@
 }
 
 .chat input {
-    width: 90%;
+    width: 85%;
     border-radius: 5px;
     outline: none;
     font-size: 1.2rem;
     padding: 0.5rem;
-	border: 2px solid #FA0197;
-    background-color: rgba(0,0,0,0.5);
+    border: 2px solid #FA0197;
+    background-color: rgba(0, 0, 0, 0.5);
     color: #fae3fa;
 }
 
 .chat button {
-    width: 10%;
+    width: 15%;
     border-radius: 5px;
     outline: none;
     font-size: 1.2rem;
     font-weight: bold;
+    margin-left: 5px;
     padding: 0.5rem;
     background-color: #FA0197;
     color: #fae3fa;
     border: none;
     cursor: pointer;
 }
+
+.fade-appear,
+.fade-enter {
+    opacity: 0;
+    z-index: 1;
+}
+
+.fade-appear-active,
+.fade-enter.fade-enter-active {
+    opacity: 1;
+    transition: opacity 450ms linear 250ms;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit.fade-exit-active {
+    opacity: 0;
+    transition: opacity 150ms linear;
+}
+
 
 @media screen and (max-width: 1024px) and (min-width: 600px) {
     .mainComposant {
@@ -88,7 +148,7 @@
 }
 
 @media screen and (max-width: 600px) {
-    .mainComposant{
+    .mainComposant {
         flex-direction: column-reverse;
         width: 100%;
         margin: 0;
@@ -113,7 +173,7 @@
     .chat button {
         width: 20%;
     }
-    
+
     .chat li {
         margin: 0;
     }

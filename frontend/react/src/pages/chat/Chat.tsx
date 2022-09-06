@@ -1,55 +1,65 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Chat.css"
 import { useState } from 'react'
+import { CSSTransition, TransitionGroup} from 'react-transition-group';
+import {Route, NavLink, HashRouter} from 'react-router-dom'
 
 function Chat() {
 	var message: string;
-	const [messages, setMessages] = useState([]);
-	setMessages([]);
-	function handleChange(event:any) {
-		message = event.target.value;
-	}
+	var who: string;
+	var channel: string;
+	const [messages, setMessages] = useState([{msg: "", who_said: ""}]);
+	const [channels, setChannels] = useState([""]);
+	
+	const handleChange = (event:any) => { message = event.target.value;	}
 
-	function sendMessage() {
+	const sendMessage = (event:any) => {
+		event.preventDefault();
 		if (message) {
 			console.log("Message a envoyer : ", message);
 			// socket.emit("message", socket.id + ": " + message);
+			setMessages(prevValues => [...prevValues, {msg: message, who_said: "me"}]);
+			if (message.search(/possible/gi) !== -1 || message.search(/can /gi) !== -1)
+				setMessages(prevValues => [...prevValues, {msg: "NO WAY!", who_said: "God"}]);
 			message = "";
 		}
+		event.target.reset();
 	}
 
-
-	return (<div>
+	return ( <div>
 		<NavBar />
 		<div className="mainComposant">
 			<div className="box">
+			<button> New Channel </button>
 				<div className="channel">
-					<h3>Channel</h3>
-				</div>
-				<div className="channel">
-					<h3>Members</h3>
+				{channels.map((channel: string) => (
+						<li>{channel}</li>
+					))}
 				</div>
 			</div>
 			<div className="chat">
-				<div className="messages">
-					<ul>
-						{messages.map((message: string) => (<li>{message}</li>))}
-					</ul>
-				</div>
-				<form id="form" action="">
+				<TransitionGroup className="messages">
+					{messages.map(({msg: message, who_said: who}) => (
+						who === "me" ? 
+						(<CSSTransition key={message} timeout={500} classNames="fade">
+						<ul>{who}: {message}</ul>
+						</CSSTransition>) : (<CSSTransition key={message} timeout={500} classNames="fade">
+						<li>{who}: {message}</li>
+						</CSSTransition>) 
+					))}
+				</TransitionGroup>
+				<form onSubmit={sendMessage}>
 					<input
-						id="input"
 						autoComplete="off"
 						type="text"
 						onChange={handleChange}
 						autoFocus
 					/>
-					<button type="reset" onClick={sendMessage}>
-						Send
-					</button>
+					<button type="submit"> Send </button>
 				</form>
 			</div>
 		</div>
+
 	</div>)
 }
 
