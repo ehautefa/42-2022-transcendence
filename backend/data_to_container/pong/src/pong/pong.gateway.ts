@@ -96,6 +96,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				client.join(i.toString());
 				games[i] = this.PongService.initSecondPlayer(games[i], clientInfo, client.id);
 				return i;
+			} else {
+				console.log("Cannot join game", games[i].playerLeftUid, clientInfo.userUuid);
 			}
 		}
 		// create new game

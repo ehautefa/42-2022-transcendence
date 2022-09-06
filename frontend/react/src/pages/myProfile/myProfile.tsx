@@ -68,8 +68,8 @@ function MyProfile() {
 						</thead>
 						<tbody>
 							{allUsers.map((users: any) => {
-								return (<tr key="{users.userUid}">
-									<td><a href={"./profile?uid=" + users.userUid}>{users.userName}</a></td>
+								return (<tr key="{users.userUuid}">
+									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
 									<td>Online</td>
 									<InvitePopUp userUuid={users.userUuid} user={user} />
 								</tr>);

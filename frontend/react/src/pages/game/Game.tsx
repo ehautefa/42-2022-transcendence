@@ -199,7 +199,11 @@ function Game() {
 	}
 
 	function matchMaking() {
-		socket.emit('getPlayer', uid, userName, (id_game: number) => {
+		let arg = {
+			"userUuid": uid,
+			"userName": userName
+		}
+		socket.emit('getPlayer', arg , (id_game: number) => {
 			setDisplaying({ display: "none" });
 			setId(id_game)
 		});
