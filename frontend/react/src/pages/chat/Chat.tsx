@@ -7,58 +7,56 @@ import {Route, NavLink, HashRouter} from 'react-router-dom'
 
 function Chat() {
 	var message: string;
-	const [messages, setMessages] = useState([""]);
-	const handleChange = (event:any) => {
-		console.log("Message 'ecrit' : ", message);
-		message = event.target.value;
-	}
+	var who: string;
+	var channel: string;
+	const [messages, setMessages] = useState([{msg: "", who_said: ""}]);
+	const [channels, setChannels] = useState([""]);
+	
+	const handleChange = (event:any) => { message = event.target.value;	}
 
 	const sendMessage = (event:any) => {
 		event.preventDefault();
 		if (message) {
 			console.log("Message a envoyer : ", message);
 			// socket.emit("message", socket.id + ": " + message);
-			setMessages(prevValues => [...prevValues, message]);
+			setMessages(prevValues => [...prevValues, {msg: message, who_said: "me"}]);
+			if (message.search(/possible/gi) != -1 || message.search(/can /gi) != -1)
+				setMessages(prevValues => [...prevValues, {msg: "NO WAY!", who_said: "God"}]);
 			message = "";
 		}
 		event.target.reset();
 	}
 
-	
 	return ( <div>
 		<NavBar />
 		<div className="mainComposant">
 			<div className="box">
+			<button> New Channel </button>
 				<div className="channel">
-					<h3>Channel</h3>
-				</div>
-				<div className="channel">
-					<h3>Members</h3>
+				{channels.map((channel: string) => (
+						<li>{channel}</li>
+					))}
 				</div>
 			</div>
 			<div className="chat">
 				<TransitionGroup className="messages">
-					{messages.map((message: string) => (
-						<CSSTransition
-						key={message}
-						timeout={500}
-						classNames="fade"
-						>
-						<li>{message}</li>
-						</CSSTransition>
+					{messages.map(({msg: message, who_said: who}) => (
+						who === "me" ? 
+						(<CSSTransition key={message} timeout={500} classNames="fade">
+						<ul>{who}: {message}</ul>
+						</CSSTransition>) : (<CSSTransition key={message} timeout={500} classNames="fade">
+						<li>{who}: {message}</li>
+						</CSSTransition>) 
 					))}
 				</TransitionGroup>
 				<form onSubmit={sendMessage}>
 					<input
-						id="input"
 						autoComplete="off"
 						type="text"
 						onChange={handleChange}
 						autoFocus
 					/>
-					<button type="submit">
-						Send
-					</button>
+					<button type="submit"> Send </button>
 				</form>
 			</div>
 		</div>
@@ -67,33 +65,3 @@ function Chat() {
 }
 
 export default Chat
-
-
-{/*
-
-		<HashRouter>
-			
-
-
-		</HashRouter>
-
-
-
-
-<div>
-<h1>Simple SPA</h1>
-<ul className="header">
-  <li><NavLink to="/">Home</NavLink></li>
-  <li><NavLink to="/stuff">Stuff</NavLink></li>
-  <li><NavLink to="/contact">Contact</NavLink></li>
-</ul>
-<div className="content">
-  <Route path="/" component={Home}/>
-  <Route path="/stuff" component={Stuff}/>
-  <Route path="/contact" component={Contact}/>
-</div>
-</div>
-
-
-
-*/}

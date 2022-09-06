@@ -20,10 +20,37 @@
 }
 
 .box {
-    margin: 0 10px;
+    margin-right: 5px;
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: 35%;
+}
+
+.box h2{
+	background-color: #FA0197;
+	color: #fef45b;
+	border: none;
+	padding: 5px;
+    margin: auto;
+	font-size: 1.3rem;
+	font-weight: bolder;
+	border-radius: 10px;
+	width: 80%;
+	text-align: center;
+}
+
+.box button {
+    width: 50%;
+    border-radius: 5px;
+    outline: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 5px;
+    padding: 0.5rem;
+    background-color: #FA0197;
+    color: #fae3fa;
+    border: none;
+    cursor: pointer;
 }
 
 .chat {
@@ -39,8 +66,18 @@
     list-style: none;
     margin: 10px 0px;
     color: #fae3fa;
+    text-align: left;
     padding: 5px;
 }
+
+.chat ul {
+    list-style: none;
+    margin: 10px 0px;
+    color: #FA0197;
+    text-align: right;
+    padding: 5px;
+}
+
 
 .messages {
     height: 100%;
@@ -56,7 +93,7 @@
 }
 
 .chat input {
-    width: 90%;
+    width: 85%;
     border-radius: 5px;
     outline: none;
     font-size: 1.2rem;
@@ -67,11 +104,12 @@
 }
 
 .chat button {
-    width: 10%;
+    width: 15%;
     border-radius: 5px;
     outline: none;
     font-size: 1.2rem;
     font-weight: bold;
+    margin-left: 5px;
     padding: 0.5rem;
     background-color: #FA0197;
     color: #fae3fa;
