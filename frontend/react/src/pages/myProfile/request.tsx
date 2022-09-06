@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { User } from "../../type";
 
 export async function FetchUser(uid: string) {
 	var myHeaders = new Headers();
@@ -15,10 +13,7 @@ export async function FetchUser(uid: string) {
 	return await user.json();
 }
 
-export function CreateUser() : string {
-	let emptyUser: User = {userUuid: "", userName: ""};
-	const [user, setUser] = useState(emptyUser);
-
+export async function CreateUser() {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 	
@@ -33,14 +28,8 @@ export function CreateUser() : string {
 	};
 	
 	const url = process.env.REACT_APP_BACK_URL + "/user/create";
-	fetch(url, requestOptions)
-		.then(response => response.text())
-		.then(result => setUser(JSON.parse(result)))
-		.catch(error => console.log('error', error));
-	console.log("New user:", user);
-	localStorage.setItem('userName', user.userName);
-    const uid = user.userUuid;
-    return (uid);
+	let user = await (await fetch(url, requestOptions)).json();
+	return user;
 }
 
 export async function GetMatchHistory(userName: string) {
