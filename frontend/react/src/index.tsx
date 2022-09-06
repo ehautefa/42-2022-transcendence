@@ -11,6 +11,7 @@ import MyProfile from './pages/myProfile/myProfile';
 import Match from "./pages/match/Match"
 import Win from "./pages/endGame/win";
 import Lose from "./pages/endGame/lose";
+import GameOver from "./pages/endGame/GameOver";
 import Profile from './pages/Profile/Profile';
 
 const root = ReactDOM.createRoot(
@@ -28,6 +29,7 @@ root.render(
 			<Route path="endGame/lose" element={<Lose />} />
 			<Route path="endGame/win" element={<Win />} />
 			<Route path="profile" element={<Profile />} />
+			<Route path="endGame/gameOver" element={<GameOver />} />
 		</Routes>
 	</BrowserRouter>
 );

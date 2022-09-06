@@ -1,9 +1,9 @@
-import "./Popup.css";
+import "./EditUsernamePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";
 import { ChangeUsername } from "../../pages/myProfile/request";
 
-function PopupEditUsername() {
+function EditUsernamePopUp() {
     const [open, setOpen] = useState(false);
     const [newUsername, setNewUsername] = useState("");
 
@@ -13,6 +13,7 @@ function PopupEditUsername() {
             && newUsername.match(/^[a-zA-Z0-9]+$/)) { // only alphanumeric characters
             setOpen(false);
 	        const uid = localStorage.getItem('uid');
+	        localStorage.setItem('userName', newUsername);
             if (uid) 
                 ChangeUsername(uid, newUsername);
         } else {
@@ -47,4 +48,4 @@ function PopupEditUsername() {
         </div>);
 }
 
-export default PopupEditUsername;
+export default EditUsernamePopUp;

@@ -1,29 +1,40 @@
 import './NavBar.css'
+import { useState } from 'react'
 
-function navBar() {
-	return (<div className="nav">
-		<input type="checkbox" className="check" id="nav-ckeck">
-		</input>
-		<div id="nav-header">
-			<a href="http://localhost:3000">
+function NavBar() {
+	const [isNavExpanded, setIsNavExpanded] = useState(false)
+
+	return (
+		<nav className="nav">
+			<a href="/" className="nav-header">
 				TRANSCENDENCE
 			</a>
-		</div>
-		<div className="navButton">
-			<label htmlFor="nav-check">
-				<span></span>
-				<span></span>
-				<span></span>
-			</label>
-		</div>
-
-		<div className="navLinks">
-			<a href="/Match">MATCH</a>
-			<a href="/Game">GAME</a>
-			<a href="/Chat">CHAT</a>
-			<a href="/myProfile" >PROFILE</a>
-		</div>
-	</div>)
+			<button className="navButton" onClick={() => {
+				console.log("clicked:", isNavExpanded);
+				setIsNavExpanded(!isNavExpanded);
+			}}>
+	 			<span></span>
+	 			<span></span>
+	 			<span></span>
+			</button>
+			<div
+				className={isNavExpanded ? "navLinks expanded" : "navLinks"}>
+				<ul>
+					<li>
+						<a href="/Match">MATCH</a>
+					</li>
+					<li>
+						<a href="/Game">GAME</a>
+					</li>
+					<li>
+						<a href="/Chat">CHAT</a>
+					</li>
+					<li>
+						<a href="/myProfile" >PROFILE</a>
+					</li>
+				</ul>
+			</div>
+		</nav>)
 }
 
-export default navBar;
+export default NavBar;

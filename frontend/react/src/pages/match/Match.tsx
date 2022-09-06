@@ -23,24 +23,24 @@ function Match() {
 				<thead>
 					<tr>
 						<th></th>
-						<th>User1</th>
-						<th>User2</th>
-						<th>Score1</th>
-						<th>Score2</th>
+						<th>First Player</th>
+						<th>Score</th>
+						<th>Second Player</th>
+						<th>Score</th>
 					</tr>
 				</thead>
 				<tbody>
 					{games.map((game: GameWindowState) => {
 						if (!game.isGameOver
-							&& game.playerLeft !== ""
-							&& game.playerRight !== "") {
+							&& game.playerLeftName !== ""
+							&& game.playerRightName !== "") {
 							return (<tr key="{game.id}">
 								<td>
 									<a href={"./game?id=" + game.id}>Watch</a>
 								</td>
-								<td>Pika</td>
-								<td>Elise</td>
+								<td>{game.playerLeftName}</td>
 								<td>{game.scoreLeft}</td>
+								<td>{game.playerRightName}</td>
 								<td>{game.scoreRight}</td>
 							</tr>);
 						}

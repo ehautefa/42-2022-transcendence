@@ -6,7 +6,7 @@
 .mainComposantProfile .pp {
 	width: 80%;
 	aspect-ratio: 1 / 1;
-	border-radius: 200px;
+	border-radius: 400px;
 	box-shadow: 5px 5px 10px #000;
 	padding: 0;
 	margin: auto;
@@ -50,13 +50,59 @@
 	background-color: rgba(0, 0, 0, 0);
 	border-radius: 5px;
 	color: #FA0197;
-	border: 2px solid #FA0197;
-	box-shadow: 1px 1px 5px #FA0197;
+	border: 2px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
 	font-size: 15px;
 	width: 100%;
 	align-items: center;
 	justify-content: center;
 	margin: 0 auto 10px;
+}
+
+
+.mainComposantProfile .container table {
+	table-layout: fixed;
+	width: 100%;
+	/* border-collapse: collapse; */
+	/* border: 3px solid purple; */
+}
+
+.mainComposantProfile .container a {
+    color: #fef45b;
+    font-weight: bold;
+}
+
+.mainComposantProfile .container td {
+	color: #FAE3E3;
+}
+
+.mainComposantProfile .container th {
+	color: #DBACE3;
+	padding: 10px 0;
+	text-align: left;
+	/* text-shadow: 0px 0px 1px #DBACE3; */
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 5px;
+	border-radius: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #DBACE3;
+	border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	box-shadow: 1px 1px 10px #DBACE3;
 }
 
 @media screen and (min-width: 600px) {

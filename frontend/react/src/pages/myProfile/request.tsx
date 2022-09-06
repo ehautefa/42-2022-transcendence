@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { User, Match } from "../../type";
+import { User } from "../../type";
 
 export async function FetchUser(uid: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-	var url: string = "http://localhost:3011/user/" + uid;
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/" + uid;
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
@@ -16,7 +16,7 @@ export async function FetchUser(uid: string) {
 }
 
 export function CreateUser() : string {
-	let emptyUser: User = {userUuid: ""};
+	let emptyUser: User = {userUuid: "", userName: ""};
 	const [user, setUser] = useState(emptyUser);
 
 	var myHeaders = new Headers();
@@ -32,17 +32,19 @@ export function CreateUser() : string {
 		body: urlencoded
 	};
 	
-	fetch("http://localhost:3011/user/create", requestOptions)
+	const url = process.env.REACT_APP_BACK_URL + "/user/create";
+	fetch(url, requestOptions)
 		.then(response => response.text())
 		.then(result => setUser(JSON.parse(result)))
 		.catch(error => console.log('error', error));
 	console.log("New user:", user);
+	localStorage.setItem('userName', user.userName);
     const uid = user.userUuid;
     return (uid);
 }
 
-export async function GetMatchHistory(uid: string) {
-	var url: string = "http://localhost:3011/match/user/" + uid;
+export async function GetMatchHistory(userName: string) {
+	var url: string = process.env.REACT_APP_BACK_URL +  "/match/user/" + userName;
 	var requestOptions = {
 		method: 'GET'
 	};
@@ -51,30 +53,10 @@ export async function GetMatchHistory(uid: string) {
 	return await match.json();
 }
 
-
-export function GetAllMatch() : Match[] {
-	let emptyMatch: Match[] = [];
-	const [match, setMatch] = useState(emptyMatch);
-	var myHeaders = new Headers();
-	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-	var url: string = "http://localhost:3011/match/all";
-	var requestOptions = {
-		method: 'GET',
-		headers: myHeaders,
-	};
-
-	fetch(url, requestOptions)
-		.then(response => response.text())
-		.then(result => setMatch(JSON.parse(result)))
-		.catch(error => console.log('error', error));
-	return (match);
-}
-
 export function ChangeUsername(userUuid: string, newName: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-	
+
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("userUuid", userUuid);
 	urlencoded.append("newName", newName);
@@ -85,6 +67,18 @@ export function ChangeUsername(userUuid: string, newName: string) {
 		body: urlencoded
 	};
 	
-	fetch("http://localhost:3011/user/changeUsername", requestOptions)
+	const URL = process.env.REACT_APP_BACK_URL + "/user/changeUsername";
+	console.log("URL:", URL);
+	fetch(URL, requestOptions)
 		.catch(error => console.log('error', error));
+}
+
+export async function GetAllUsers() {
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/all";
+	var requestOptions = {
+		method: 'GET',
+	};
+
+	let users = await fetch(url, requestOptions);
+	return await users.json();
 }
