@@ -10,7 +10,7 @@ import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 
 
-const INTERVAL_TIME = 50; // in ms
+const INTERVAL_TIME = 30; // in ms
 
 var games: GameWindowState[] = [];
 

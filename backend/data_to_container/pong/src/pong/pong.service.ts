@@ -10,6 +10,13 @@ const BALL_SPEED = 1; // in %
 const END_SCORE = 10;
 const POS_BALL_X = 48.6;
 const POS_BALL_Y = 47.1; // same const in game.tsx
+const BOTTOM_LIM = 94.13;
+const TOP_LIM = 0.44;
+const RIGHT_LIM = 97.15;
+const LEFT_LIM = 0.24;
+const PADDLE_LEFT_X = 4.8;
+const PADDLE_RIGHT_X = 92.26;
+const BALL_DIAM = 6; // en %
 
 
 @Injectable()
@@ -90,11 +97,11 @@ export class PongService {
         game.ballY = game.ballY + game.ballSpeedY;
 
         // Check if the ball hits the left paddle
-        if (game.ballX <= 5.2
-            && game.ballY >= game.paddleLeftY - PADDLE_SIZE
+        if (game.ballX <= PADDLE_LEFT_X
+            && game.ballY >= game.paddleLeftY - PADDLE_SIZE  //- BALL_DIAM
             && game.ballY <= game.paddleLeftY + PADDLE_SIZE) {
             if (game.ballSpeedX < 0
-                && game.ballY >= game.paddleLeftY - (PADDLE_SIZE - 1)
+                && game.ballY >= game.paddleLeftY - (PADDLE_SIZE - 1)  //- BALL_DIAM
                 && game.ballY <= game.paddleLeftY + (PADDLE_SIZE - 1))
                 // check if we have already hit the paddle
                 game.ballSpeedX = -game.ballSpeedX;
@@ -108,11 +115,11 @@ export class PongService {
             }
             console.log(game.id, ": Hit left paddle", game.ballX, game.ballY);
         } // Check if the ball hits the right paddle
-        else if (game.ballX >= 91.8
-            && game.ballY >= game.paddleRightY - PADDLE_SIZE
+        else if (game.ballX >= PADDLE_RIGHT_X
+            && game.ballY >= game.paddleRightY - PADDLE_SIZE  //- BALL_DIAM
             && game.ballY <= game.paddleRightY + PADDLE_SIZE) {
             if (game.ballSpeedX > 0
-                && game.ballY >= game.paddleRightY - (PADDLE_SIZE - 1)
+                && game.ballY >= game.paddleRightY - (PADDLE_SIZE - 1)  //- BALL_DIAM
                 && game.ballY <= game.paddleRightY + (PADDLE_SIZE - 1))
                 // check if we have already hit the paddle
                 game.ballSpeedX = -game.ballSpeedX;
@@ -126,19 +133,19 @@ export class PongService {
             }
             console.log(game.id, ": Hit right paddle", game.ballX, game.ballY);
         } else {
-            if (game.ballX <= 0.2) { // Check if the ball hits the left wall
+            if (game.ballX <= LEFT_LIM) { // Check if the ball hits the left wall
                 game.scoreRight++;
                 game = this.endpoint(game);
                 console.log(game.id, ": Hits the left wall", game.ballX);
-            } else if (game.ballX >= 95.9) { // Check if the ball hits the right wall
+            } else if (game.ballX >= RIGHT_LIM) { // Check if the ball hits the right wall
                 game.scoreLeft++;
                 game = this.endpoint(game);
                 console.log(game.id, ": Hits the right wall", game.ballX);
-            } else if (game.ballY <= 0.1) { // Check if the ball hits the top wall
+            } else if (game.ballY <= TOP_LIM) { // Check if the ball hits the top wall
                 if (game.ballSpeedY < 0)
                     game.ballSpeedY = -game.ballSpeedY;
                 console.log(game.id, ": Hits the top wall", game.ballY);
-            } else if (game.ballY >= 92.5) { // Check if the ball hits the bottom wall
+            } else if (game.ballY >= BOTTOM_LIM) { // Check if the ball hits the bottom wall
                 if (game.ballSpeedY > 0)
                     game.ballSpeedY = -game.ballSpeedY;
                 console.log(game.id, ": Hits the bottom wall", game.ballY);
