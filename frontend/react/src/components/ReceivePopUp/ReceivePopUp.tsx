@@ -1,4 +1,4 @@
-import "../Popup/Popup.css";
+import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";

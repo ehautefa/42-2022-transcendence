@@ -3,7 +3,7 @@ import "./Profil.css"
 import { FetchUser, GetMatchHistory, GetAllUsers } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
-import PopupEditUsername from "../../components/Popup/Popup";
+import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 
 var update = true;
@@ -41,7 +41,7 @@ function MyProfile() {
 					<ul>
 						<li className="flex-li">
 							<div className="Username">Username : {user.userName}</div>
-							<PopupEditUsername />
+							<EditUsernamePopUp />
 						</li>
 						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
