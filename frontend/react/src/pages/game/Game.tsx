@@ -4,6 +4,7 @@ import { getSocket } from "../../App"
 import { useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
+import ReceivePopUp from "../../components/ReceivePopUp/ReceivePopUp";
 
 const socket = getSocket();
 
@@ -44,6 +45,7 @@ function Game() {
 		<NavBar />
 		<div className="mainComposantGame">
 			<GameWindow id={id} />
+			<ReceivePopUp />
 			<button style={displaying}
 				className="matchMakingButton"
 				onClick={() => matchMaking()}>
