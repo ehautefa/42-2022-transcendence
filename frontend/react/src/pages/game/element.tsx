@@ -1,7 +1,4 @@
-import React, { useEffect } from "react"
-
-var ball_color = "#FFF";
-
+import React from "react"
 
 export class Ball extends React.Component<{ x: number, y: number }> {
     render() {
@@ -25,21 +22,20 @@ export class Paddle extends React.Component<{ x: number, y: number }> {
     }
 }
 
-export class ColorSelector extends React.Component {
+export class ColorSelector extends React.Component  {
     constructor(props: any) {
         super(props);
         this.onChangeValue = this.onChangeValue.bind(this);
     }
 
     onChangeValue(event: any) {
-        ball_color = event.target.value;
-        console.log("BALL COLOR",ball_color);
-        document.getElementById("ball")!.style.backgroundColor = ball_color;
+        document.getElementById("ball")!.style.backgroundColor = event.target.value;
     }
 
     render() {
         return (
             <div className= "ColorSelector" onChange={this.onChangeValue}>
+                <p>Ball color :</p>
                 <input type="radio" value="#FA0197" name="color" /> Pink
                 <input type="radio" value="#fef45b" name="color" /> Yellow
                 <input type="radio" value="#DBACE3" name="color" /> Purple
