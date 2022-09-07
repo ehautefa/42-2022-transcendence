@@ -124,3 +124,33 @@
 	background-color: none;
 	text-shadow: 1px 1px 1px #fef45b;
 }
+
+.ColorSelector
+{
+	position: absolute;
+	bottom: 0;
+	display: flex;
+	padding: 0 10px;
+	margin: -60px 0;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	font-size: 1.5rem;
+	color: #DBACE3;
+	text-shadow: 0px 0px 10px #7C4D84;
+}
+
+input[type="radio"] {
+	box-sizing: border-box;
+	width: 1.2rem;
+	height: 1.2rem;
+	margin: 0 10px 10px 50px;
+	border-radius: 1rem;
+	border: 2px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
+}
+
+input[type="radio"]:checked {
+	background-color: #fef45b;
+}

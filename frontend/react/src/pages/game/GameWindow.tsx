@@ -2,7 +2,7 @@ import "./Game.css"
 import React from 'react'
 import { getSocket } from "../../App" 
 import { Navigate } from "react-router-dom";
-import { Ball, Paddle, GameWindowState } from "./element"
+import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
 const socket = getSocket();
 const PADDLE_GAP = 3; // gap between border and paddle in %
@@ -123,6 +123,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 					<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 					<Ball x={this.state.ballX} y={this.state.ballY} />
+                    <ColorSelector />
 				</>
 			)}
 		</div>
