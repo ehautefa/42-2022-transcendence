@@ -1,17 +1,18 @@
 .nav {
+	display: flex;
+	align-items: center;
 	box-sizing: border-box;
-	position: fixed;
-	top: 0;
-	box-shadow: 0px 1px 10px #fef45b;
-	width: 100%;
-	height: 50px;
-	width: 100%;
 	position: relative;
+	height: 60px;
+	width: 100%;
+	padding: 0.5rem 0rem;
 	margin-bottom: 30px;
+	border-bottom: 1px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
 }
 
-.nav div {
-	display: inline;
+.navButton {
+	display: none;
 }
 
 .nav a {
@@ -22,44 +23,45 @@
 	padding: 10px 10px 10px 10px;
 }
 
-.navButton {
-	display: none;
-}
-
 .navLinks {
 	display: inline;
 	float: right;
 	font-size: 18px;
+	margin-left: auto;
+}
+
+.navLinks ul {
+	display: flex;
+	padding: 0;
+}
+
+.navLinks li {
+	list-style: none;
+	margin: 0 1rem;
 }
 
 .navLinks a {
-	display: inline-block;
+	display: block;
+	width: 100%;
 	padding: 13px 10px 13px 10px;
 	text-decoration: none;
 	font-weight: bold;
 	color: #FA0197;
 }
 
-.navLinks a:hover {
-	text-shadow: px 1px 1px #fef45b;
+.nav a:hover {
+	text-shadow: 1px 1px 1px #DBACE3;
 }
 
-.check {
-	display: none;
-}
 
 @media (max-width:600px) {
-	.navButton{
-		display: inline-block;
+	.navButton {
 		position: absolute;
-		right: 0px;
-		top: 0px;
-	}
-
-	.navButton label {
-		display: inline-block;
-		padding: 13px;
-		height: 4vh;
+		right: 25px;
+		top: 25%;
+		cursor: pointer;
+		border: none;
+		background-color: rgba(0, 0, 0, 0);
 	}
 
 	.navButton span {
@@ -69,31 +71,40 @@
 		border-top: 2px solid #FA0197;
 	}
 
-	.navLinks {
+	.navLinks ul {
+		display: none;
 		position: absolute;
-		display: block;
+		top: 60px;
+		left: 0;
+		flex-direction: column;
 		width: 100%;
+		height: calc(100vh - 77px);
 		background-color: #250021;
-		border-top: 1px solid #fef45b;
-		height: 0px;
-		transition: all 0.3s ease-in;
-		overflow-y: hidden;
-		overflow-x: hidden;
-		top: 50px;
-		left: 0px;
+		z-index: 100;
 	}
 
-	.navLinks a {
-		display: block;
+	.navLinks li {
+		text-align: center;
+		margin: 0;
+	}
+
+	.navLinks li a {
+		color: #DBACE3;
+		text-shadow: 0px 0px 20px #7C4D84;
 		width: 100%;
+		padding: 1.5rem 0;
 	}
 
-	.check:not(:checked) ~ .navLinks {
-		height: 0px;
+	.navLinks li a:hover {
+		text-shadow: none;
 	}
 
-	.check:checked ~ .navLinks {
-		height: calc(100vh - 50px);
-		overflow-y: auto;
+	.navLinks li:hover {
+		background-color: rgba(0, 0, 0, 0.5);
 	}
+
+	.navLinks.expanded ul {
+		display: block;
+	}
+
 }

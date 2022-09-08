@@ -1,29 +1,53 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { FetchUser } from "../../request"
+import { FetchUser, GetMatchHistory, GetAllUsers } from "./request"
 import { User } from "../../type";
+import { useState } from "react";
+import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
+import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 
+var update = true;
 
-function myProfile() {
+function MyProfile() {
 	const uid = localStorage.getItem('uid');
-	
-	let user: User = {userId: ""}; 
-	if (uid)
-		user = FetchUser(uid);
+	const emptyUser : User = {userUuid: "", userName: ""};
+	const [user, setUser] = useState(emptyUser);
+	const [matchHistory, setMatchHistory] = useState([]);
+	const [allUsers, setAllUsers] = useState([]);
+	fetchUser();
 
-	return (<div>
+	async function fetchUser() {
+		if (uid && update) {
+			const user = await FetchUser(uid);
+			const matchHistory = await GetMatchHistory(user.userName);
+			const allUsers = await GetAllUsers();
+			setAllUsers(allUsers);
+			setMatchHistory(matchHistory);
+			setUser(user);
+			update = false;
+		}
+	}
+
+
+	
+	console.log("MATCH HISTORY", matchHistory);
+
+	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
 			<div className="flex">
 				<div className="info container">
 					<h3>Profile</h3>
 					<ul>
-						<li>Name : {user.userName} <a>(edit)</a></li>
+						<li className="flex-li">
+							<div className="Username">Username : {user.userName}</div>
+							<EditUsernamePopUp />
+						</li>
 						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button>Enable two-factor authentication</button>
+					<button className="enable">Enable two-factor authentication</button>
 				</div>
 				<a href="./editProfil">
 					<div className="pp">
@@ -34,13 +58,49 @@ function myProfile() {
 			<div className="flex">
 				<div className="friends container">
 					<h3>Friends</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>UserName</th>
+								<th>Status</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{allUsers.map((users: any) => {
+								return (<tr key="{users.userUuid}">
+									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
+									<td>Online</td>
+									<InvitePopUp userUuid={users.userUuid} user={user} />
+								</tr>);
+							})}
+						</tbody>
+					</table>
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Other Player</th>
+								<th>My Score</th>
+								<th>Other Score</th>
+							</tr>
+						</thead>
+						<tbody>
+							{matchHistory.map((match: any) => {
+								return (<tr key="{match.matchId}">
+									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
+									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
+									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
+								</tr>);
+							})}
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
-	</div>)
+	</>)
 }
 
-export default myProfile
+export default MyProfile

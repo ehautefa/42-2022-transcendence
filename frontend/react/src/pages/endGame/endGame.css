@@ -1,0 +1,26 @@
+.endGame {
+    width: 70%;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    margin: 300px auto;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+}
+
+.endGame h1 {
+    font-size: 5em;
+    font-weight: bold;
+    color: #fef45b;
+    text-shadow: 0px 0px 8px #fef45b;
+    text-align: center;
+}
+
+.endGame a {
+    text-decoration: none;
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+}

@@ -3,46 +3,42 @@
 
 version: '3.8'
 services:
-  front_dev:
+  frontend:
     depends_on:
-      - back_dev
-    container_name: front_dev
+      - backend
+    container_name: frontend
     build:
       context: ./frontend
-      target: development
+      target: production
       dockerfile: ./Dockerfile
-    command: npm start
-    # links:
-    #   - back_dev
-    volumes:
-      - ./frontend/react/src:/usr/src/app/src
+    # command: sh /home/node/scripts/dev_entrypoint.sh
     restart: unless-stopped
     env_file:
+    - ./api.env
     - ./frontend/frontend.env
     ports:
        - 3000:3000
     
-  back_dev:
+  backend:
     depends_on:
     - postgres
-    container_name: nestjs_api_dev
-    image: nestjs-api-dev:1.0.0
+    container_name: backend
     build:
       context: ./backend
-      target: development
+      target: production
       dockerfile: ./Dockerfile
-    volumes:
-      - ./backend/data_to_container/pong/:/usr/src/app/
-    command: sh /home/node/dev_entrypoint.sh
+    # command: sh /home/node/dev_entrypoint.sh
     restart: unless-stopped
     env_file:
+    - ./.secret.env
+    - ./api.env
     - ./backend/backend.env
     ports:
       - 3010:3010
       - 3011:3011
 
   postgres:
-    container_name: postgres_dev
+    container_name: postgres
     image: postgres:latest
     volumes:
       - pgVolume:/var/lib/postgresql/data
@@ -51,17 +47,6 @@ services:
     - ./postgres/postgres.env
     ports:
       - "3020:3020"
-
-  pg_admin:
-    depends_on:
-    - postgres
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: always
-    env_file:
-    - pg_admin/pg_admin.env
-    ports:
-      - "3030:80"
 
 volumes:
   pgVolume:

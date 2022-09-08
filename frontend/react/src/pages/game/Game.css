@@ -7,6 +7,35 @@
 	right: 0;
 }
 
+.loader-container {
+    width: 100%;
+	height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	border-radius: 5px;
+    background: rgba(0, 0, 0, 0.834);
+    z-index: 1;
+}
+
+.spinner {
+    width: 64px;
+    height: 64px;
+    border: 8px solid;
+    border-color: #FA0197 transparent #FA0197 transparent;
+    border-radius: 50%;
+    animation: spin-anim 1.2s linear infinite;
+}
+
+@keyframes spin-anim {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 
 #GameBoard {
 	aspect-ratio: 11 / 6;
@@ -14,15 +43,17 @@
 	background-image: linear-gradient(330deg, #FA0197, #fef45b), linear-gradient(330deg, #FA0197, #fef45b);
 	background-size: 2px 100%, 100% 2px;
 	background-repeat: no-repeat;
-	border-radius: 10px;
+	border-radius: 5px;
 	background-position: 50% center;
 	width: 100%;
-	border: #fef45b solid 1px;
+	border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+	/* border: #fef45b solid 1px; */
 }
 
 .Paddle {
 	width: 2%;
-	height: 30%;
+	height: 20%;
 	background-color: #fef45b;
 	border-radius: 5px;
 	position: absolute;
@@ -30,9 +61,22 @@
 
 }
 
+.PlayerName {
+	position: absolute;
+	top: 0;
+	display: flex;
+	padding: 0 10px;
+	margin: -30px 0;
+	flex-direction: column;
+	justify-content: center;
+	font-size: 1.5rem;
+	color: #DBACE3;
+	text-shadow: 0px 0px 10px #7C4D84;
+}
+
 .Ball {
 	aspect-ratio: 1 / 1;
-	width: 4%;
+	width: 3%;
 	height: auto;
 	background-color: #FA0197;
 	border-radius: 100px;
@@ -53,40 +97,27 @@
 
 .Left {
 	left: 0;
+	align-items: flex-start;
 }
 
 .Right {
 	right: 0;
-}
-
-.ResetButton {
-	display: none;
-	aspect-ratio: 2 / 1;
-	background-color: #10000c;
-	color: #FA0197;
-	font-size: 6vw;
-	width: 40%;
-	border-radius: 10px;
-	border: #FA0197 solid 2px;
-	margin: 18.3% 30%;
-}
-
-.ResetButton:hover {
-	background-color: #FA0197;
-	/* text-shadow: 1px 1px 1px #FA0197; */
+	align-items: flex-end;
 }
 
 .matchMakingButton {
 	position: absolute;
 	top: 0;
-	left: 0;;
+	left: 0;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.7);
 	color: #FA0197;
 	font-size: 5vw;
 	width: 100%;
-	border-radius: 10px;
-	border: #fef45b solid 2px;
+	border-radius: 5px;
+	border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+	border-right: none;
 }
 
 .matchMakingButton:hover {
