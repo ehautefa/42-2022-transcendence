@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 import { user } from 'src/bdd/users.entity';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { UserService } from 'src/user/user.service';
@@ -16,23 +17,26 @@ export class AuthService {
     //        "userId": "1fb3ca7d-34c3-4eb8-85e6-56ed45cf5e17"
     // https://www.youtube.com/watch?v=_L225zpUK0M&ab_channel=MariusEspejo
 
-    async validateUser(userUuid: string, userPassword: string): Promise<any> {
-
-        const user: user = await this.userService.getUser(userUuid);
-        if (user && user.userPassword === userPassword) {
-            // const { userUuid, userPassword, ...rest } = user;
-            const { userPassword, ...rest } = user;
-            return rest;
-        }
-        else {
-            console.log('invalid user : ', userUuid);
-        }
-        return null;
-    }
-
-    async login(user: any) {
-        const payload = { userName: user.userName, userUuid: user.userUuid };
-        return { access_token: this.jwtService.sign(payload), };
+    // async validateUser(userUuid: string, userPassword: string): Promise<any> {
+    // 
+    // const user: user = await this.userService.getUser(userUuid);
+    // if (user && user.userPassword === userPassword) {
+    // const { userUuid, userPassword, ...rest } = user;
+    // const { userPassword, ...rest } = user;
+    // return rest;
+    // }
+    // else {
+    // console.log('invalid user : ', userUuid);
+    // }
+    // return null;
+    // }
+    // 
+    async login(user: user, @Res() res: Response) {
+        const access_token = this.jwtService.sign({userUuid: user.userUuid});
+        console.log("access_token =" , access_token);
+        res.cookie('access_token', access_token);
+        res.send();
+        // res.redirect("http://localhost:3000/mainPage");
     }
 
 
@@ -75,9 +79,9 @@ export class AuthService {
                 console.log(error);
                 return;
             });
-        const payload = await this.userService.createUser(userToCreate)
+        // const payload = await this.userService.createUser(userToCreate)
 
-        return { access_token: this.jwtService.sign(payload), };
+        // return { access_token: this.jwtService.sign(payload), };
 
 
 

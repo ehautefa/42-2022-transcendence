@@ -9,16 +9,16 @@ export class user extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     userUuid: string;
 
-    @ApiProperty({ example: 'ehautefa', description: 'The unique username (between 4 and 8 char)'})
     @Column('varchar')
-    userName42: string;
+    user42Id: string;
 
+    @ApiProperty({ example: 'ehautefa', description: 'The unique username (between 4 and 8 char)'})
     @Column('varchar')
     userName: string;
 
-    @ApiProperty({ description: 'The password of the user'})
-    @Column('varchar')
-    userPassword: string;
+    @Column('boolean')
+    online: boolean;
+
 
     @ApiProperty({ example: 'false', description: 'The two factor authentication boolean'})
     @Column('boolean')
@@ -36,7 +36,6 @@ export class user extends BaseEntity {
     @ManyToMany(() => user, usr => usr.userUuid)
     @JoinTable()
     friends: user[];
-
 
     @ApiProperty({ description: 'The acces_token for api 42'})
     @Column('varchar')

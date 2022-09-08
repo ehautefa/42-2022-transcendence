@@ -6,6 +6,7 @@ import { EndOfMatchDto } from './dto/endOfMatch.dto';
 import { FlipTwoFactorAuthDto } from './dto/flipTwoFactorAuyh.dto';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
+import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -33,8 +34,8 @@ export class UserController {
     @ApiParam({ name: 'CreateUserDto', type: CreateUserDto })
     @ApiResponse({ status: 200, description: 'The created user', type: user })
     @UsePipes(ValidationPipe)
-    async createUser(@Body() UserToCreate : CreateUserDto) : Promise<user> {
-        return await this.UserService.createUser(UserToCreate);
+    async createUser(@Body() UserToCreate : FindOrCreateUserDto) : Promise<user> {
+        return await this.UserService.FindOrCreateUser(UserToCreate);
     }
 
     @Post('changeUsername')
