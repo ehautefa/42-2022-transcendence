@@ -4,7 +4,6 @@ import { getSocket } from "../../App"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
-import { usePopup, PopupContextType  } from "../../components/ReceivePopUp/popUpContext";
 
 const socket = getSocket();
 
@@ -28,8 +27,6 @@ function Game() {
 	const [id, setId] = useState(id_state);
 	const uid = localStorage.getItem('uid');
 	const userName = localStorage.getItem('userName');
-	const arg = usePopup()
-	const { triggerPopup, clearPopup} = arg as PopupContextType;
 	
 	if (id !== -1) {
 		socket.emit('joinGame', id);
@@ -44,13 +41,6 @@ function Game() {
 			setDisplaying({ display: "none" });
 			setId(id_game)
 		});
-		triggerPopup(
-			<div className="Popup-mother invitePlayer">
-				<h2>You receive an invitation from </h2>
-				<button onClick={() => clearPopup()}>Close</button>
-				<a href={"./game?id="}>Join Game</a>
-			</div>
-		)
 	}
 	return (<>
 		<NavBar />

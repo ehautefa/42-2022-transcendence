@@ -22,21 +22,23 @@ const root = ReactDOM.createRoot(
 
 const socket = getSocket();
 
+var id = 0;
+
 socket.on('invitePlayer', (data: any) => {
 	console.log("INVITE PLAYER ON", data);
 	console.log('my uid', localStorage.getItem('uid'));
 	if (data.invitedUid === localStorage.getItem('uid')) {
 		console.log("You are invite by", data.userName);
 		// open a popup with a link to the game
-		document.getElementById("ReceivePopup")!.style.display = "block";
+		document.getElementById("ReceivePopupBackground")!.style.display = "block";
+		id = data.id;
 		
 	}
 })
 
 
-
 root.render(<>
-	<ReceivePopUp />
+	<ReceivePopUp arg={id} />
 	<BrowserRouter>
     	<Routes>
 			<Route path="/" element={<App />} />

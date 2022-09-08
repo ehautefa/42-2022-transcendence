@@ -50,6 +50,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				client.join(i.toString());
 				games[i] = this.PongService.initGame(i, arg, client.id);
 				games[i].playerRightUid = invitePlayer.invitedUid; // mark match reserved to avoid matchmaking 
+				invitePlayer.id = i;
+				console.log("invitePlayer", "send to other players invitation");
+				this.server.emit('invitePlayer', invitePlayer);
 				return i;
 			}
 		}

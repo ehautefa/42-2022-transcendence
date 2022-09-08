@@ -3,29 +3,36 @@ import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-// import { usePopup, PopupContextType } from './pop UpContext'
+import {getSocket} from "../../App";
 
-// const ReceivePopUp = () => {
-//     const res = usePopup()
-//     const { value } = res as PopupContextType;
+const socket = getSocket();
 
-//     return value ? <div>{value}</div> : null
-// }
-
-// export default ReceivePopUp
-
-function ReceivePopUp() {
+function ReceivePopUp(arg:any) {
+    console.log("RECEIVE POP UP", arg);
     const [id, setId] = useState(0);
 
     function closePopup() {
-        document.getElementById("ReceivePopup")!.style.display = "none";
+        document.getElementById("ReceivePopupBackground")!.style.display = "none";
+    }
+
+    function joinGame() {
+        let arg = {
+            "userUuid": localStorage.getItem('uid'),
+            "userName": localStorage.getItem('userName'),
+            "id": id
+        }
+        socket.emit("acceptInvite", arg);        
     }
 
     return (<>
-        <div id="ReceivePopup">
-            <h2>You receive an invitation from </h2>
-            <button onClick={closePopup}>Close</button>
-            <a href={"./game?id=" + id}>Join Game</a>
+        <div id="ReceivePopupBackground">
+            <div id="ReceivePopup"> 
+                <h2 id="rcv-h2">You receive an invitation from</h2>
+                <div className="flex-but">
+                    <button id="rcv-but" onClick={joinGame}>Join Game</button>
+                    <button id="rcv-but" onClick={closePopup}>Close</button>
+                </div>
+            </div>
         </div>
     </>
     );

@@ -1,8 +1,6 @@
 import './index.css';
 import { io } from 'socket.io-client'
 import { CreateUser } from "./pages/myProfile/request";
-import { PopupProvider } from './components/ReceivePopUp/popUpContext'
-import ReceivePopUp from './components/ReceivePopUp/ReceivePopUp';
 
 // Create my socket
 let socketOptions = {
