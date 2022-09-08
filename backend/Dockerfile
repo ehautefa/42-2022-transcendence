@@ -59,9 +59,9 @@ COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 # The Nest CLI is a dev dependency,
 # In the previous development stage we ran `npm ci` which installed all dependencies.
 # So we can copy over the node_modules directory from the development image into this build image.
+COPY        --chown=${USER}:${USER} ${SRC_APP_DIR} ${DST_APP_DIR}
 COPY        --chown=${USER}:${USER} --from=development ${DST_APP_DIR}/node_modules ${DST_APP_DIR}/node_modules
 
-COPY        --chown=node:node ${SRC_APP_DIR} ${DST_APP_DIR}
 
 # Run the build command which creates the production bundle
 RUN         npm run build
@@ -72,7 +72,7 @@ ENV         NODE_ENV production
 # Running `npm ci` removes the existing node_modules directory.
 # Passing in --only=production ensures that only the production dependencies are installed.
 # This ensures that the node_modules directory is as optimized as possible.
-RUN         npm ci --only=production && npm cache clean --force
+RUN         npm ci --omit=dev && npm cache clean --force
 
 USER        ${USER}
 
@@ -86,9 +86,11 @@ ARG 		SRC_APP_DIR=./data_to_container/pong
 ARG 		DST_APP_DIR=/usr/src/app
 ARG 		USER=node
 
+WORKDIR     ${DST_APP_DIR}
 # Copy the bundled code from the build stage to the production image
 COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/node_modules ${DST_APP_DIR}/node_modules
 COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/dist ${DST_APP_DIR}/dist
+COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/ssl ${DST_APP_DIR}/ssl
 
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]
