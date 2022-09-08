@@ -1,22 +1,24 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import { getSocket } from "../../App" 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
-import ReceivePopUp from "../../components/ReceivePopUp/ReceivePopUp";
+import { usePopup, PopupContextType  } from "../../components/ReceivePopUp/popUpContext";
 
 const socket = getSocket();
 
-socket.on('invitePlayer', (data: any) => {
-	console.log("INVITE PLAYER ON", data);
-	console.log('my uid', localStorage.getItem('uid'));
-	if (data.invitedUid === localStorage.getItem('uid')) {
-		console.log("You are invite by", data.userName);
-		// open a popup with a link to the game
-		alert("You are invite by " + data.userName);
-	}
-})
+// useEffect(() => {
+// 	socket.on('invitePlayer', (data: any) => {
+// 		console.log("INVITE PLAYER ON", data);
+// 		console.log('my uid', localStorage.getItem('uid'));
+// 		if (data.invitedUid === localStorage.getItem('uid')) {
+// 			console.log("You are invite by", data.userName);
+// 			// open a popup with a link to the game
+			
+// 		}
+// 	})
+// })
 
 function Game() {
 	const index = new URLSearchParams(useLocation().search).get('id');
@@ -26,11 +28,13 @@ function Game() {
 	const [id, setId] = useState(id_state);
 	const uid = localStorage.getItem('uid');
 	const userName = localStorage.getItem('userName');
-
+	const arg = usePopup()
+	const { triggerPopup, clearPopup} = arg as PopupContextType;
+	
 	if (id !== -1) {
 		socket.emit('joinGame', id);
 	}
-
+	
 	function matchMaking() {
 		let arg = {
 			"userUuid": uid,
@@ -40,12 +44,18 @@ function Game() {
 			setDisplaying({ display: "none" });
 			setId(id_game)
 		});
+		triggerPopup(
+			<div className="Popup-mother invitePlayer">
+				<h2>You receive an invitation from </h2>
+				<button onClick={() => clearPopup()}>Close</button>
+				<a href={"./game?id="}>Join Game</a>
+			</div>
+		)
 	}
 	return (<>
 		<NavBar />
 		<div className="mainComposantGame">
 			<GameWindow id={id} />
-			<ReceivePopUp />
 			<button style={displaying}
 				className="matchMakingButton"
 				onClick={() => matchMaking()}>

@@ -13,11 +13,30 @@ import Win from "./pages/endGame/win";
 import Lose from "./pages/endGame/lose";
 import GameOver from "./pages/endGame/GameOver";
 import Profile from './pages/Profile/Profile';
+import ReceivePopUp from './components/ReceivePopUp/ReceivePopUp';
+import { getSocket } from './App';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
-root.render(
+
+const socket = getSocket();
+
+socket.on('invitePlayer', (data: any) => {
+	console.log("INVITE PLAYER ON", data);
+	console.log('my uid', localStorage.getItem('uid'));
+	if (data.invitedUid === localStorage.getItem('uid')) {
+		console.log("You are invite by", data.userName);
+		// open a popup with a link to the game
+		document.getElementById("ReceivePopup")!.style.display = "block";
+		
+	}
+})
+
+
+
+root.render(<>
+	<ReceivePopUp />
 	<BrowserRouter>
     	<Routes>
 			<Route path="/" element={<App />} />
@@ -32,6 +51,7 @@ root.render(
 			<Route path="endGame/gameOver" element={<GameOver />} />
 		</Routes>
 	</BrowserRouter>
+</>
 );
 
 // If you want to start measuring performance in your app, pass a function
