@@ -3,6 +3,7 @@ import { user } from 'src/bdd/users.entity';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
+import { FlipTwoFactorAuthDto } from './dto/flipTwoFactorAuyh.dto';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 
@@ -42,6 +43,12 @@ export class UserController {
     @UsePipes(ValidationPipe)
     async changeUserName(@Body() userToChange : ChangeUserNameDto) {
         return await this.UserService.changeUserName(userToChange);
+    }
+
+    @Post('flipTwoFactorAuth')
+    @UsePipes(ValidationPipe)
+    async flipTwoFactorAuth(@Body() userToChange : FlipTwoFactorAuthDto) {
+        return await this.UserService.flipTwoFactorAuth(userToChange);
     }
 
     @Post('endOfMatch')

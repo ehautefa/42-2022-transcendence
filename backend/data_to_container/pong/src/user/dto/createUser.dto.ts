@@ -10,4 +10,7 @@ export class CreateUserDto {
     @ApiProperty({ description: 'The user password' })
     @IsNotEmpty({message: "userPassword should be declared"})
     userPassword: string;
+
+    @IsNotEmpty({message: "userPassword should be declared"})
+    accessToken42: string;
 }

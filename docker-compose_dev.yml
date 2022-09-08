@@ -9,9 +9,12 @@ services:
     container_name: frontend
     build:
       context: ./frontend
-      target: production
+      target: development
       dockerfile: ./Dockerfile
-    # command: sh /home/node/scripts/dev_entrypoint.sh
+    command: sh /home/node/scripts/dev_entrypoint.sh
+    volumes:
+      - ./frontend/react:/usr/src/app/
+      - ./frontend/scripts/:/home/node/scripts/
     restart: unless-stopped
     env_file:
     - ./api.env
@@ -23,11 +26,14 @@ services:
     depends_on:
     - postgres
     container_name: backend
+    image: nestjs-api-dev:1.0.0
     build:
       context: ./backend
-      target: production
+      target: development
       dockerfile: ./Dockerfile
-    # command: sh /home/node/dev_entrypoint.sh
+    volumes:
+      - ./backend/data_to_container/pong/:/usr/src/app/
+    command: sh /home/node/dev_entrypoint.sh
     restart: unless-stopped
     env_file:
     - ./.secret.env
@@ -47,6 +53,17 @@ services:
     - ./postgres/postgres.env
     ports:
       - "3020:3020"
+
+  pg_admin:
+    depends_on:
+    - postgres
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+    - pg_admin/pg_admin.env
+    ports:
+      - "3030:80"
 
 volumes:
   pgVolume:

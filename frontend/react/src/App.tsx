@@ -36,9 +36,10 @@ export default function App() {
 			localStorage.setItem('userName', user.userName);
 		})
 	}
+
 	return (
 		<div className='login'>
-			<a href="/mainPage">
+			<a href={"https://api.intra.42.fr/oauth/authorize?client_id=" + process.env.REACT_APP_CLIENT_ID + "&redirect_uri=" + process.env.REACT_APP_REDIRECT_URI + "&response_type=code"}>
 				<h1>Try to login</h1>
 			</a>
 		</div>
