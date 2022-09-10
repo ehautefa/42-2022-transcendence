@@ -17,12 +17,15 @@ import ReceivePopUp from './components/ReceivePopUp/ReceivePopUp';
 import { getSocket } from './App';
 import { useState  } from 'react';
 import { ModalProvider } from './context/modal-context';
+import { useModal } from './context/modal-context';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
-);
-
-const socket = getSocket();
+  );
+  
+  const socket = getSocket();
+  
+  
 
 root.render(<>
 	<ModalProvider>

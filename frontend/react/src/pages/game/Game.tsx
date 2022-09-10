@@ -10,16 +10,6 @@ import { useModal } from '../../context/modal-context'
 
 const socket = getSocket();
 
-socket.on('invitePlayer', (data: any) => {
-	console.log("INVITE PLAYER ON", data);
-	const { setModal } = useModal();
-	console.log('my uid', localStorage.getItem('uid'));
-	if (data.invitedUid === localStorage.getItem('uid')) {
-		console.log("You are invite by", data.userName);
-		// open a popup with a link to the game
-		setModal("coucou");
-	}
-})
 function Game() {
 	const index = new URLSearchParams(useLocation().search).get('id');
 	var id_state: number = index === null ? -1 : parseInt(index);
@@ -28,6 +18,7 @@ function Game() {
 	const [id, setId] = useState(id_state);
 	const uid = localStorage.getItem('uid');
 	const userName = localStorage.getItem('userName');
+
 	
 	if (id !== -1) {
 		socket.emit('joinGame', id);
