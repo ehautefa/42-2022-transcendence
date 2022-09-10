@@ -15,6 +15,8 @@ import GameOver from "./pages/endGame/GameOver";
 import Profile from './pages/Profile/Profile';
 import ReceivePopUp from './components/ReceivePopUp/ReceivePopUp';
 import { getSocket } from './App';
+import { useState  } from 'react';
+import { ModalProvider } from './context/modal-context';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -22,37 +24,23 @@ const root = ReactDOM.createRoot(
 
 const socket = getSocket();
 
-var id = 0;
-
-socket.on('invitePlayer', (data: any) => {
-	console.log("INVITE PLAYER ON", data);
-	console.log('my uid', localStorage.getItem('uid'));
-	if (data.invitedUid === localStorage.getItem('uid')) {
-		console.log("You are invite by", data.userName);
-		// open a popup with a link to the game
-		document.getElementById("ReceivePopupBackground")!.style.display = "block";
-		id = data.id;
-		
-	}
-})
-
-
 root.render(<>
-	<ReceivePopUp arg={id} />
-	<BrowserRouter>
-    	<Routes>
-			<Route path="/" element={<App />} />
-			<Route path="mainPage" element={<MainPage />} />
-			<Route path="game" element={<Game />} />
-			<Route path="chat" element={<Chat />} />
-			<Route path="myProfile" element={<MyProfile />} />
-			<Route path="match" element={<Match />} />
-			<Route path="endGame/lose" element={<Lose />} />
-			<Route path="endGame/win" element={<Win />} />
-			<Route path="profile" element={<Profile />} />
-			<Route path="endGame/gameOver" element={<GameOver />} />
-		</Routes>
-	</BrowserRouter>
+	<ModalProvider>
+		<BrowserRouter>
+			<Routes>
+				<Route path="/" element={<App />} />
+				<Route path="mainPage" element={<MainPage />} />
+				<Route path="game" element={<Game />} />
+				<Route path="chat" element={<Chat />} />
+				<Route path="myProfile" element={<MyProfile />} />
+				<Route path="match" element={<Match />} />
+				<Route path="endGame/lose" element={<Lose />} />
+				<Route path="endGame/win" element={<Win />} />
+				<Route path="profile" element={<Profile />} />
+				<Route path="endGame/gameOver" element={<GameOver />} />
+			</Routes>
+		</BrowserRouter>
+	</ModalProvider>
 </>
 );
 

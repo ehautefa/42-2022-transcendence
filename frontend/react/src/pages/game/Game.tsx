@@ -4,21 +4,22 @@ import { getSocket } from "../../App"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
+import { useModal } from '../../context/modal-context'
+
+// create setModal;
 
 const socket = getSocket();
 
-// useEffect(() => {
-// 	socket.on('invitePlayer', (data: any) => {
-// 		console.log("INVITE PLAYER ON", data);
-// 		console.log('my uid', localStorage.getItem('uid'));
-// 		if (data.invitedUid === localStorage.getItem('uid')) {
-// 			console.log("You are invite by", data.userName);
-// 			// open a popup with a link to the game
-			
-// 		}
-// 	})
-// })
-
+socket.on('invitePlayer', (data: any) => {
+	console.log("INVITE PLAYER ON", data);
+	const { setModal } = useModal();
+	console.log('my uid', localStorage.getItem('uid'));
+	if (data.invitedUid === localStorage.getItem('uid')) {
+		console.log("You are invite by", data.userName);
+		// open a popup with a link to the game
+		setModal("coucou");
+	}
+})
 function Game() {
 	const index = new URLSearchParams(useLocation().search).get('id');
 	var id_state: number = index === null ? -1 : parseInt(index);

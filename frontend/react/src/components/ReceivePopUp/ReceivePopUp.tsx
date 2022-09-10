@@ -21,7 +21,9 @@ function ReceivePopUp(arg:any) {
             "userName": localStorage.getItem('userName'),
             "id": id
         }
-        socket.emit("acceptInvite", arg);        
+        socket.emit("acceptInvite", arg);
+        closePopup();
+        
     }
 
     return (<>
