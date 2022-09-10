@@ -1,5 +1,4 @@
 import {
-  BaseEntity,
   Column,
   Entity,
   JoinTable,
@@ -9,35 +8,37 @@ import {
 } from 'typeorm';
 import { user } from './users.entity';
 
-enum RoomType {
-  Public,
-  Private,
-  Protected,
+export enum RoomType {
+  PRIVATE = 'private',
+  PUBLIC = 'public',
+  PROTECTED = 'protected',
 }
 
 @Entity()
-export class Room extends BaseEntity {
+export class Room {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
-  @Column('varchar')
-  name?: string;
+  @Column('varchar', { nullable: true })
+  name: string;
 
-  @Column('varchar')
-  @OneToMany(() => user, (user) => user.userUuid)
-  owner: string;
+  @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
+  owner: user;
 
-  @Column('varchar')
-  password?: string;
+  @Column('varchar', { nullable: true })
+  password: string;
 
-  @Column('smallint')
+  @Column({
+    type: 'enum',
+    enum: RoomType,
+    default: RoomType.PROTECTED,
+  })
   type: RoomType;
 
-  @Column('varchar')
-  @OneToMany(() => user, (user) => user.userUuid)
-  admin: string;
+  @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
+  admin: user;
 
-  @ManyToMany(() => user)
+  @ManyToMany(() => user, (user) => user.userUuid)
   @JoinTable()
-  user_id: number;
+  users: user[];
 }
