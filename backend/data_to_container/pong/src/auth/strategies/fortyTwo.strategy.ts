@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-42";
-import { identity } from "rxjs";
-import { user } from "src/bdd/users.entity";
 import { UserService } from "src/user/user.service";
 
 @Injectable()
+//used when @useGuard(FortyTwoAuthGard)
+//fuction received acces token from 42 api and create or find user in database
 export class FortyTwoStrategy extends PassportStrategy(Strategy) {
   constructor(private userService: UserService) {
     super({
@@ -24,13 +24,3 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     });
   }
 }
-// var FortyTwoStrategy = require('passport-42').Strategy;
-// 
-// passport.use(new FortyTwoStrategy({
-  // },
-  // function(accessToken, rerefreshToken, profile, cb) {
-    // User.findOrCreate({ fortytwoId: profile.id }, function (err, user) {
-      // return cb(err, user);
-    // });
-  // }
-// ))

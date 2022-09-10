@@ -9,6 +9,7 @@ export class user extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     userUuid: string;
 
+    @ApiProperty({ example: '75410', description: '42s user unique ID'})
     @Column('varchar')
     user42Id: string;
 
@@ -16,9 +17,9 @@ export class user extends BaseEntity {
     @Column('varchar')
     userName: string;
 
+    @ApiProperty({ example: 'false', description: 'true if user is online'})
     @Column('boolean')
     online: boolean;
-
 
     @ApiProperty({ example: 'false', description: 'The two factor authentication boolean'})
     @Column('boolean')

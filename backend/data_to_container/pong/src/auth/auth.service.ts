@@ -1,7 +1,6 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable, Req, Res, Headers } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import { user } from 'src/bdd/users.entity';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { UserService } from 'src/user/user.service';
 import { FirstConnectionDto } from './dto/firstConnection.dto';
@@ -31,12 +30,13 @@ export class AuthService {
     // return null;
     // }
     // 
-    async login(user: user, @Res() res: Response) {
-        const access_token = this.jwtService.sign({userUuid: user.userUuid});
-        console.log("access_token =" , access_token);
-        res.cookie('access_token', access_token);
-        res.send();
-        // res.redirect("http://localhost:3000/mainPage");
+    async login(@Req() req, @Res() res) {
+        const access_token = this.jwtService.sign({userUuid: req.user.userUuid});
+        // console.log("access_token =" , access_token);
+        // res.cookie('access_token', access_token);
+        res.setHeader("Authorization", "Bearer " + access_token)
+        // res.redirect(process.env.REACT_APP_REDIRECT_URI);
+        res.redirect("http://localhost:3000/MainPage");
     }
 
 
