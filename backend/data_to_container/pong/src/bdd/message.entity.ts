@@ -3,9 +3,12 @@ import { Room } from './room.entity';
 import { user } from './users.entity';
 
 @Entity()
-export class MessageEntity {
+export class Message {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column('varchar')
+  message: string;
 
   @OneToMany(() => Room, (room) => room.id)
   room: Room;

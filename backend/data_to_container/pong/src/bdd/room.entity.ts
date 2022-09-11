@@ -19,7 +19,10 @@ export class Room {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar', { nullable: true })
+  @Column('varchar', {
+    nullable: true,
+    unique: true,
+  })
   name: string;
 
   @OneToMany(() => user, (user) => user.userUuid, { nullable: true })

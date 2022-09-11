@@ -1,13 +1,13 @@
 import {
-  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { ChatService } from './chat.service';
-import { MessageDto } from './dto/message.dto';
+import { CreateMessageDto } from './dto/createMessage.dto';
+import { createRoomDto } from './dto/createRoom.dto';
 
 @WebSocketGateway({ cors: '*' })
 export class ChatGateway {
@@ -15,23 +15,25 @@ export class ChatGateway {
 
   @WebSocketServer()
   server: Server;
-  
-  @SubscribeMessage('createMessage')
-  sendMessage(@MessageBody() messageDto: MessageDto, @ConnectedSocket() client){
-      // this.chatService.sendMessage(messageDto)
-      this.server.to(client.)
-  }
 
   @SubscribeMessage('createMessage')
-  createMessage(@MessageBody() messageDto: MessageDto) {
-    return this.chatService.createMessage(messageDto);
+  async createMessage(@MessageBody() createMessageDto: CreateMessageDto) {
+    try {
+      const message = await this.chatService.createMessage(createMessageDto);
+      this.server.to(message.room.name).emit('message', message);
+      return message;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @SubscribeMessage('createRoom')
-  createRoom() {}
-
-  joinRoom(roomName: string) {
-    this.server.socketsJoin(roomName);
-    return this.server.
+  createRoom(@MessageBody() createRoomDto: createRoomDto, client: Socket) {
+    this.chatService.createRoom(createRoomDto);
   }
+
+  // joinRoom(roomName: string) {
+  //   this.server.socketsJoin(roomName);
+  //   return this.server.
+  // }
 }
