@@ -6,14 +6,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { FortyTwoStrategy } from './strategies/fortyTwo.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({ // put this in a config file?
     secret: process.env.JWT_SIGN,
     signOptions: { expiresIn: '600s'},
-  })],
-  providers: [AuthService, FortyTwoStrategy, LocalStrategy, JwtStrategy],
+  }),], 
+  providers: [AuthService, FortyTwoStrategy, JwtStrategy, ],
   controllers: [AuthController],
 })
 export class AuthModule {}

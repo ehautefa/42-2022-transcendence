@@ -12,12 +12,13 @@ export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
     @UseGuards(FortyTwoAuthGuard)
+    @ApiOperation({ summary: 'handle redirect to 42 api to authentification (from fortyTwoStrategy)' })
     @Get('login')
     login() {
         console.log("login in controller")
     }
 
-    @ApiOperation({ summary: 'CallBack after acces_token received (from fortyTwoStrategy)' })
+    @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
     @UseGuards(FortyTwoAuthGuard)
     @Get('42/callback')
     cb(@Req() req, @Res() res) {
@@ -30,8 +31,11 @@ export class AuthController {
 
     @UseGuards(JwtAuthGuard)
     @Get('protected')
-    getHello(@Request() req): string {
-        return req.user
+    getHello(@Request() req, @Res() res): string {
+        console.log("protected access")
+        console.log(req.user)
+        res.send("This is protected ressources")
+        return "fsdfsd"
     }
 
     // @UsePipes(ValidationPipe)

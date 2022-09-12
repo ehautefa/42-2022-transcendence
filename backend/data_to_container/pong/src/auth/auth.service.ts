@@ -32,8 +32,9 @@ export class AuthService {
     // 
     async login(@Req() req, @Res() res) {
         const access_token = this.jwtService.sign({userUuid: req.user.userUuid});
+        console.log("verify =",this.jwtService.verify(access_token));
         // console.log("access_token =" , access_token);
-        // res.cookie('access_token', access_token);
+        res.cookie('access_token', access_token);
         res.setHeader("Authorization", "Bearer " + access_token)
         // res.redirect(process.env.REACT_APP_REDIRECT_URI);
         res.redirect("http://localhost:3000/MainPage");
