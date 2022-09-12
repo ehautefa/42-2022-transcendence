@@ -11,7 +11,7 @@ import { user } from './users.entity';
 export enum RoomType {
   PRIVATE = 'private',
   PUBLIC = 'public',
-  PROTECTED = 'protected',
+  DM = 'dm',
 }
 
 @Entity()
@@ -28,13 +28,16 @@ export class Room {
   @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
   owner: user;
 
+  @Column('boolean', { default: false })
+  isProtected: boolean;
+
   @Column('varchar', { nullable: true })
   password: string;
 
   @Column({
     type: 'enum',
     enum: RoomType,
-    default: RoomType.PROTECTED,
+    default: RoomType.PUBLIC,
   })
   type: RoomType;
 

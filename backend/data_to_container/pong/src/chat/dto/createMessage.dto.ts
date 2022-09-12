@@ -2,10 +2,12 @@ import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateMessageDto {
   @IsNotEmpty()
-  name: string;
+  @IsUUID()
+  senderId: string;
 
   message: string;
 
+  @IsNotEmpty()
   @IsUUID()
-  room: string;
+  roomId: string;
 }
