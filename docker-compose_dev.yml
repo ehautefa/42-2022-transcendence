@@ -17,8 +17,10 @@ services:
       - ./frontend/scripts/:/home/node/scripts/
     restart: unless-stopped
     env_file:
-    - ./api.env
-    - ./frontend/frontend.env
+    - env/.env
+    - env/urls.env
+    - env/api.env
+    - env/frontend.env
     ports:
        - 3000:3000
     
@@ -36,9 +38,12 @@ services:
     command: sh /home/node/dev_entrypoint.sh
     restart: unless-stopped
     env_file:
-    - ./.secret.env
-    - ./api.env
-    - ./backend/backend.env
+    - env/.env
+    - env/.secret.env
+    - env/urls.env
+    - env/api.env
+    - env/backend.env
+    - env/postgres.env
     ports:
       - 3010:3010
       - 3011:3011
@@ -50,7 +55,8 @@ services:
       - pgVolume:/var/lib/postgresql/data
     restart: always
     env_file:
-    - ./postgres/postgres.env
+    - env/.env
+    - env/postgres.env
     ports:
       - "3020:3020"
 
@@ -61,7 +67,8 @@ services:
     image: dpage/pgadmin4
     restart: always
     env_file:
-    - pg_admin/pg_admin.env
+    - env/.env
+    - env/pg_admin.env
     ports:
       - "3030:80"
 
