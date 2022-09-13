@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req, Res, Headers } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { user } from 'src/bdd/users.entity';
+import { Response } from 'express';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { UserService } from 'src/user/user.service';
 import { FirstConnectionDto } from './dto/firstConnection.dto';
@@ -16,23 +16,28 @@ export class AuthService {
     //        "userId": "1fb3ca7d-34c3-4eb8-85e6-56ed45cf5e17"
     // https://www.youtube.com/watch?v=_L225zpUK0M&ab_channel=MariusEspejo
 
-    async validateUser(userUuid: string, userPassword: string): Promise<any> {
-
-        const user: user = await this.userService.getUser(userUuid);
-        if (user && user.userPassword === userPassword) {
-            // const { userUuid, userPassword, ...rest } = user;
-            const { userPassword, ...rest } = user;
-            return rest;
-        }
-        else {
-            console.log('invalid user : ', userUuid);
-        }
-        return null;
-    }
-
-    async login(user: any) {
-        const payload = { userName: user.userName, userUuid: user.userUuid };
-        return { access_token: this.jwtService.sign(payload), };
+    // async validateUser(userUuid: string, userPassword: string): Promise<any> {
+    // 
+    // const user: user = await this.userService.getUser(userUuid);
+    // if (user && user.userPassword === userPassword) {
+    // const { userUuid, userPassword, ...rest } = user;
+    // const { userPassword, ...rest } = user;
+    // return rest;
+    // }
+    // else {
+    // console.log('invalid user : ', userUuid);
+    // }
+    // return null;
+    // }
+    // 
+    async login(@Req() req, @Res() res) {
+        const access_token = this.jwtService.sign({userUuid: req.user.userUuid});
+        console.log("verify =",this.jwtService.verify(access_token));
+        // console.log("access_token =" , access_token);
+        res.cookie('access_token', access_token);
+        res.setHeader("Authorization", "Bearer " + access_token)
+        // res.redirect(process.env.REACT_APP_REDIRECT_URI);
+        res.redirect("http://localhost:3000/MainPage");
     }
 
 
@@ -75,9 +80,9 @@ export class AuthService {
                 console.log(error);
                 return;
             });
-        const payload = await this.userService.createUser(userToCreate)
+        // const payload = await this.userService.createUser(userToCreate)
 
-        return { access_token: this.jwtService.sign(payload), };
+        // return { access_token: this.jwtService.sign(payload), };
 
 
 

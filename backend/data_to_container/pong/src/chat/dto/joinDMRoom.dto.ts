@@ -6,7 +6,4 @@ export class JoinDMRoomDto {
 
   @IsNotEmpty()
   recipientId: string;
-
-  @IsNotEmpty()
-  message: string;
 }

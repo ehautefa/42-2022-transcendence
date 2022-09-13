@@ -69,9 +69,9 @@ export class ChatService {
     }
   }
 
-  getDMRoom(senderId: string, recipientId: string): Room | any {
+  async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
     try {
-      const room = this.roomsRepository
+      const room = await this.roomsRepository
         .createQueryBuilder('room')
         .leftJoinAndSelect('room.users', 'user')
         // .where('users[0].id = :roomId', { roomId })
@@ -83,34 +83,55 @@ export class ChatService {
     }
   }
 
-  createRoom(createRoomDto: CreateRoomDto) {
-    // if (createRoomDto.type === 'dm') this.createDMRoom(createRoomDto);
+  async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
+    try {
+      const owner: user = await this.usersRepository.findOneOrFail({
+        where: {
+          userUuid: createRoomDto.ownerId,
+        },
+      });
+      const newRoom: Room = this.roomsRepository.create({
+        name: createRoomDto.name,
+        owner: owner,
+        isProtected: createRoomDto.isProtected,
+        password: createRoomDto.password,
+        type: createRoomDto.type,
+        users: [owner],
+      });
+      this.roomsRepository.save(newRoom);
+      return newRoom;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  createDMRoom(senderId: string, recipientId: string) {
-    // get sender and recipient
-    const room = this.roomsRepository.create({
-      type: RoomType.DM,
-      // users: [createRoomDto.]
-    });
-    return room;
-  }
-  // async findAllMessageInRoom(room: string) {
-  // const messages = await this.messagesRepository.find(room);
-  // return messages;
-  // }
-
-  /*
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
-  }
-
-  update(id: number, updateChatDto: UpdateChatDto) {
-    return `This action updates a #${id} chat`;
+  async createDMRoom(senderId: string, recipientId: string) {
+    try {
+      const sender = await this.usersRepository.findOneOrFail({
+        where: { userUuid: senderId },
+      });
+      const recipient = await this.usersRepository.findOneOrFail({
+        where: { userUuid: recipientId },
+      });
+      const newRoom = this.roomsRepository.create({
+        type: RoomType.DM,
+        users: [sender, recipient],
+      });
+      this.roomsRepository.save(newRoom);
+      return newRoom;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+  async getRoomByName(roomName: string): Promise<Room> {
+    try {
+      const room: Room = await this.roomsRepository.findOneOrFail({
+        where: { name: roomName },
+      });
+      return room;
+    } catch (error) {
+      throw error;
+    }
   }
-  */
 }

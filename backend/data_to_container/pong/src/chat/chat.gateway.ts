@@ -33,29 +33,44 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('joinDMRoom')
-  joinDMRoom(@MessageBody() joinDMRoomDto: JoinDMRoomDto): Room {
+  async joinDMRoom(@MessageBody() joinDMRoomDto: JoinDMRoomDto): Promise<Room> {
     try {
-      const room: Room = this.chatService.getDMRoom(
+      const room: Room = await this.chatService.getDMRoom(
         joinDMRoomDto.senderId,
         joinDMRoomDto.recipientId,
       );
       return room;
     } catch (err) {
-      const room = this.chatService.createDMRoom(
-        joinDMRoomDto.senderId,
-        joinDMRoomDto.recipientId,
-      );
-      return room;
+      try {
+        const room = await this.chatService.createDMRoom(
+          joinDMRoomDto.senderId,
+          joinDMRoomDto.recipientId,
+        );
+        return room;
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
   @SubscribeMessage('createRoom')
-  createRoom(@MessageBody() createRoomDto: CreateRoomDto) {
-    this.chatService.createRoom(createRoomDto);
+  async createRoom(@MessageBody() createRoomDto: CreateRoomDto) {
+    try {
+      const newRoom = await this.chatService.createRoom(createRoomDto);
+      return newRoom;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  // joinRoom(roomName: string) {
-  //   this.server.socketsJoin(roomName);
-  //   return this.server.
-  // }
+  @SubscribeMessage('joinRoom')
+  async joinRoom(roomName: string) {
+    try {
+      const room: Room = await this.chatService.getRoomByName(roomName);
+      this.server.socketsJoin(roomName);
+      return room;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
