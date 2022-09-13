@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user } from 'src/bdd/users.entity';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -7,6 +7,8 @@ import { FlipTwoFactorAuthDto } from './dto/flipTwoFactorAuyh.dto';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
+import { FortyTwoStrategy } from 'src/auth/strategies/fortyTwo.strategy';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -14,6 +16,15 @@ import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 export class UserController {
     constructor( private readonly UserService : UserService ) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Get('me')
+    @ApiOperation({ summary: 'Get me with acces_token' })
+    @ApiResponse({ status: 200, description: 'Found user by uid', type: user })
+    async getMe(@Req() req, @Res() res) {
+        res.send(await this.UserService.getUser(req.user.userUuid));
+    }
+
+    // @UseGuards(JwtAuthGuard)
     @Get('all')
     @ApiOperation({ summary: 'Get all user of the table' })
     @ApiResponse({ status: 200, description: 'Found users', type: user })

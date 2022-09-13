@@ -14,5 +14,6 @@ import { FortyTwoStrategy } from './strategies/fortyTwo.strategy';
   }),], 
   providers: [AuthService, FortyTwoStrategy, JwtStrategy, ],
   controllers: [AuthController],
+  exports: [JwtStrategy, FortyTwoStrategy]
 })
 export class AuthModule {}
