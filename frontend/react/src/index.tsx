@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -13,19 +12,11 @@ import Win from "./pages/endGame/win";
 import Lose from "./pages/endGame/lose";
 import GameOver from "./pages/endGame/GameOver";
 import Profile from './pages/Profile/Profile';
-import ReceivePopUp from './components/ReceivePopUp/ReceivePopUp';
-import { getSocket } from './App';
-import { useState  } from 'react';
 import { ModalProvider } from './context/modal-context';
-import { useModal } from './context/modal-context';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-  );
-  
-  const socket = getSocket();
-  
-  
+	document.getElementById('root') as HTMLElement
+);
 
 root.render(<>
 	<ModalProvider>

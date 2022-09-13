@@ -1,10 +1,9 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import { getSocket } from "../../App" 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
-import { useModal } from '../../context/modal-context'
 
 // create setModal;
 

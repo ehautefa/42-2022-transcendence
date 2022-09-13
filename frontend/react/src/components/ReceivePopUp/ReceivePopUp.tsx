@@ -1,15 +1,12 @@
 import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
-import Popup from 'reactjs-popup';
-import { useState } from "react";
 import {getSocket} from "../../App";
 
 const socket = getSocket();
 
-function ReceivePopUp(arg:any) {
-    console.log("RECEIVE POP UP", arg);
-    const [id, setId] = useState(0);
+function ReceivePopUp(modal: any) {
+    console.log("RECEIVE POP UP", modal);
 
     function closePopup() {
         document.getElementById("ReceivePopupBackground")!.style.display = "none";
@@ -19,17 +16,18 @@ function ReceivePopUp(arg:any) {
         let arg = {
             "userUuid": localStorage.getItem('uid'),
             "userName": localStorage.getItem('userName'),
-            "id": id
+            "id": modal.id
         }
         socket.emit("acceptInvite", arg);
         closePopup();
+		// navigate to game with good id
         
     }
-
+	
     return (<>
         <div id="ReceivePopupBackground">
             <div id="ReceivePopup"> 
-                <h2 id="rcv-h2">You receive an invitation from</h2>
+                <h2 id="rcv-h2">You receive an invitation from {modal.username}</h2>
                 <div className="flex-but">
                     <button id="rcv-but" onClick={joinGame}>Join Game</button>
                     <button id="rcv-but" onClick={closePopup}>Close</button>

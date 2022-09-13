@@ -1,7 +1,6 @@
 import './index.css';
 import { io } from 'socket.io-client'
 import { CreateUser } from "./pages/myProfile/request";
-import { useModal } from './context/modal-context';
 
 // Create my socket
 let socketOptions = {
@@ -22,16 +21,6 @@ export function getSocket() {
 }
 
 export default function App() {
-	const { setModal } = useModal();
-  socket.on('invitePlayer', (data: any) => {
-	  console.log("INVITE PLAYER ON", data);
-	  console.log('my uid', localStorage.getItem('uid'));
-	  if (data.invitedUid === localStorage.getItem('uid')) {
-		  console.log("You are invite by", data.userName);
-		  // open a popup with a link to the game
-		  setModal(data.id);
-	  }
-  })
 	var uid: string = localStorage.getItem('uid') !== null ? localStorage.getItem('uid')! : "";
 	// Connect my socket to server
 	socket.on("connect", () => {
