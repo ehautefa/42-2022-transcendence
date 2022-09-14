@@ -42,9 +42,9 @@ function Chat() {
 					{messages.map(({msg: message, who_said: who}) => (
 						who === "me" ? 
 						(<CSSTransition key={message} timeout={500} classNames="fade">
-						<ul>{who}: {message}</ul>
+						<div className="message_mine">{who}: {message}</div>
 						</CSSTransition>) : (<CSSTransition key={message} timeout={500} classNames="fade">
-						<li>{who}: {message}</li>
+						<div className="message_other">{who}: {message}</div>
 						</CSSTransition>) 
 					))}
 				</TransitionGroup>
