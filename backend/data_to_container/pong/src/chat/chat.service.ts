@@ -134,4 +134,13 @@ export class ChatService {
       throw error;
     }
   }
+
+  async findAllPublicRooms(): Promise<Room[]> {
+    const rooms: Room[] = await this.roomsRepository.find({
+      where: {
+        type: RoomType.PUBLIC,
+      },
+    });
+    return rooms;
+  }
 }

@@ -73,4 +73,10 @@ export class ChatGateway {
       console.error(error);
     }
   }
+
+  @SubscribeMessage('findPublicRooms')
+  async findAllPublicRooms(): Promise<Room[]> {
+    const rooms: Room[] = await this.chatService.findAllPublicRooms();
+    return rooms;
+  }
 }
