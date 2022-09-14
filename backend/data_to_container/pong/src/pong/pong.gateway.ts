@@ -72,6 +72,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	acceptInvite(client: Socket, acceptInvite: AcceptInviteDto) {
 		let arg : getPlayerDto = {userUuid: acceptInvite.userUuid,
 			 userName: acceptInvite.userName};
+		console.log("acceptInvite", acceptInvite);
 		let id: number = acceptInvite.id; // get id from invitation
 		client.join(id.toString());
 		games[id] = this.PongService.initSecondPlayer(games[id], arg, client.id);

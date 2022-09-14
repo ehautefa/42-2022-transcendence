@@ -6,22 +6,20 @@ import {getSocket} from "../../App";
 const socket = getSocket();
 
 function ReceivePopUp(modal: any) {
-    console.log("RECEIVE POP UP", modal);
-
-    function closePopup() {
-        document.getElementById("ReceivePopupBackground")!.style.display = "none";
+	
+	function closePopup() {
+		document.getElementById("ReceivePopupBackground")!.style.display = "none";
     }
-
+	
     function joinGame() {
-        let arg = {
+		let arg = {
             "userUuid": localStorage.getItem('uid'),
             "userName": localStorage.getItem('userName'),
-            "id": modal.id
+            "id": modal.modal.id
         }
         socket.emit("acceptInvite", arg);
         closePopup();
 		// navigate to game with good id
-        
     }
 	
     return (<>
