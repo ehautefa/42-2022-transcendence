@@ -36,7 +36,7 @@ export default function App() {
 	}
 	return (<>
 		<div className='login'>
-			<a href="/mainPage">
+			<a href={"http://localhost:3011/auth/login"}>
 				<h1>Try to login</h1>
 			</a>
 		</div>

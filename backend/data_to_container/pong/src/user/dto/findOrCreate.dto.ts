@@ -1,15 +1,15 @@
 import { IsNotEmpty, Length } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class CreateUserDto {
+export class FindOrCreateUserDto {
+
+    @ApiProperty({ description: 'The user id from 42' })
+    @IsNotEmpty({message: "user42Id should be declared"})
+    user42Id: string;
 
     @ApiProperty({ description: 'The user name' })
     @IsNotEmpty({message: "userName should be declared"})
     userName: string;
-
-    @ApiProperty({ description: 'The user password' })
-    @IsNotEmpty({message: "userPassword should be declared"})
-    userPassword: string;
 
     @IsNotEmpty({message: "userPassword should be declared"})
     accessToken42: string;
