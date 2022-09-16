@@ -9,7 +9,6 @@ import { getPlayerDto } from './dto/getPlayer.dto';
 import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 
-
 const INTERVAL_TIME = 30; // in ms
 
 var games: GameWindowState[] = [];
@@ -25,21 +24,32 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@Interval(INTERVAL_TIME)
 	GameLoop() {
 		for (let i: number = 0; i < games.length; i++) {
-			if (!games[i].isGameOver && games[i].playerLeft) {
+			if (!games[i].isGameOver && games[i].begin) {
 				this.sendGametoRoom(i);
 			}
 		}
 	}
 
 	@SubscribeMessage('joinGame') // For spectator
-	joinGame(client: Socket, id: number) {
+	joinGame(client: Socket, arg:any) {
+		var id:number = arg[0];
+		var username:string = arg[1];
+		console.log("joinGame", id, username, client.id);
 		client.join(id.toString());
-	}
+		if (games[id].playerLeftName === username)
+			games[id].playerLeft = client.id;
+		else if (games[id].playerRightName === username)
+			games[id].playerRight = client.id;
+
+		if (games[id].playerLeft !== "" && games[id].playerRight !== "") {
+			games[id].begin = true;
+		}
+}
 
 	// Invite a specific user to a game
 	@SubscribeMessage('invitePlayer')
 	invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
-		console.log("invitePlayerBackend", invitePlayer);
+		console.log("invitePlayer", invitePlayer);
 		let arg : getPlayerDto = {userUuid: invitePlayer.userUuid,
 			userName: invitePlayer.userName};
 		if (games.length == 0)
@@ -47,23 +57,20 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		for (var i: number = 0; i < games.length; i++) {
 			if (games[i].playerLeft == "" && games[i].playerRight == "") {
 				// reuse old structure if possible
-				client.join(i.toString());
-				games[i] = this.PongService.initGame(i, arg, client.id);
+				games[i] = this.PongService.initGame(i, arg, "");
 				games[i].playerRightUid = invitePlayer.invitedUid; // mark match reserved to avoid matchmaking 
 				invitePlayer.id = i;
-				console.log("invitePlayer", "send to other players invitation");
+				console.log("GAMES[", i, "]", games[i]);
 				this.server.emit('invitePlayer', invitePlayer);
 				return i;
 			}
 		}
 		// create new game
-		games.push(this.PongService.initGame(i, arg, client.id));
+		games.push(this.PongService.initGame(i, arg, ""));
 		games[i].playerRightUid = invitePlayer.invitedUid; // mark match reserved to avoid matchmaking 
-		console.log("GAMES[", i, "]", games[i]);
-		client.join(i.toString());
 		invitePlayer.id = i;
 		// send invitation to all players
-		console.log("invitePlayer", "send to other players invitation");
+		console.log("GAMES[", i, "]", games[i]);
 		this.server.emit('invitePlayer', invitePlayer);
 		return i;
 	}
@@ -72,10 +79,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	acceptInvite(client: Socket, acceptInvite: AcceptInviteDto) {
 		let arg : getPlayerDto = {userUuid: acceptInvite.userUuid,
 			 userName: acceptInvite.userName};
-		console.log("acceptInvite", acceptInvite);
+		console.log("acceptInvite", arg);
 		let id: number = acceptInvite.id; // get id from invitation
 		client.join(id.toString());
 		games[id] = this.PongService.initSecondPlayer(games[id], arg, client.id);
+		console.log("GAMES[", id, "]", games[id]);
 		return id;
 	}
 
@@ -84,8 +92,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('getPlayer')
 	// clientInfo : {userUid, username}
 	getPlayer(client: Socket, clientInfo: getPlayerDto): number {
-		let auth_token : string = client.handshake.headers.authorization.split(' ')[1];
-		console.log("Auth token", auth_token);
+		// let auth_token : string = client.handshake.headers.authorization.split(' ')[1];
 		if (games.length == 0)
 			this.GameLoop(); // start game loop
 		for (var i: number = 0; i < games.length; i++) {
@@ -155,17 +162,17 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
-		for (let i: number = 0; i < games.length; i++) {
-			if (games[i].playerLeft === client.id || games[i].playerRight === client.id) {
-				games[i] = this.PongService.resetGame(games[i]);
-				if (games[i].playerLeft === client.id) {
-					this.server.to(i.toString()).emit('leaveGame', games[i].playerLeftName);
-				} else {
-					this.server.to(i.toString()).emit('leaveGame', games[i].playerRightName);
-				}
-				this.resetGame(client, i);
-			}
-		}
+		// for (let i: number = 0; i < games.length; i++) {
+		// 	if (games[i].playerLeft === client.id || games[i].playerRight === client.id) {
+		// 		games[i] = this.PongService.resetGame(games[i]);
+		// 		if (games[i].playerLeft === client.id) {
+		// 			this.server.to(i.toString()).emit('leaveGame', games[i].playerLeftName);
+		// 		} else {
+		// 			this.server.to(i.toString()).emit('leaveGame', games[i].playerRightName);
+		// 		}
+		// 		this.resetGame(client, i);
+		// 	}
+		// }
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {

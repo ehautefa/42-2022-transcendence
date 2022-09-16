@@ -17,4 +17,5 @@ export interface GameWindowState {
 	playerRightName: string,
 	id: number,
 	matchMaking: boolean,
+	begin: boolean,
 }

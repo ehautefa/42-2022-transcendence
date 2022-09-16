@@ -20,7 +20,7 @@ function Game() {
 
 	
 	if (id !== -1) {
-		socket.emit('joinGame', id);
+		socket.emit('joinGame', id, userName);
 	}
 	
 	function matchMaking() {

@@ -2,6 +2,7 @@ import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
 import {getSocket} from "../../App";
+import { useContext } from "react";
 
 const socket = getSocket();
 
@@ -20,6 +21,8 @@ function ReceivePopUp(modal: any) {
         socket.emit("acceptInvite", arg);
         closePopup();
 		// navigate to game with good id
+        window.history.pushState({}, "", "/game?id=" + modal.modal.id);
+        window.location.reload();
     }
 	
     return (<>

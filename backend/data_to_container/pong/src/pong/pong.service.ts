@@ -43,7 +43,7 @@ export class PongService {
         game.matchMaking = true;
         this.MatchService.createMatch({
             user1uid: game.playerLeftUid, // user1 is client Left
-            user2uid: clientInfo[0] // user2 is client Right
+            user2uid: clientInfo.userUuid // user2 is client Right
         }).then(match => {
             game.matchId = match.matchId;
         });
@@ -87,12 +87,12 @@ export class PongService {
 			playerLeft: clientID,
 			playerRight: undefined,
 			matchMaking: false,
+            begin: false,
 		};
 		return game;
     }
 
     sendGametoRoom(game: GameWindowState): GameWindowState {
-
         game.ballX = game.ballX + game.ballSpeedX;
         game.ballY = game.ballY + game.ballSpeedY;
 
