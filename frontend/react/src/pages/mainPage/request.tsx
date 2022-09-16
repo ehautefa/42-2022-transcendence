@@ -9,11 +9,12 @@ export async function getMe() {
 		method: 'GET',
 		headers: myHeaders,
         credentials: credentials,
-        // withcredenbotials: true,
 	};
 
-	let user =  await fetch(url, requestOptions);
-    console.log(user);
-
-    // TO DO, put username and uid in localstorage
+	await (await fetch(url, requestOptions)).json().then(
+		(result) => {
+			localStorage.setItem('uid', result.userUuid);
+			localStorage.setItem('userName', result.userName);
+		}
+	)
 }

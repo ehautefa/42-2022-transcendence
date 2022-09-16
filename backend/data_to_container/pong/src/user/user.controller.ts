@@ -20,7 +20,7 @@ export class UserController {
     @Get('me')
     @ApiOperation({ summary: 'Get me with acces_token' })
     @ApiResponse({ status: 200, description: 'Found user by uid', type: user })
-    async getMe(@Req() req, @Res() res) {
+    async getMe(@Req() req, @Res() res){
         res.send(await this.UserService.getUser(req.user.userUuid));
     }
 
