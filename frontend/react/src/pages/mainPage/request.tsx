@@ -9,7 +9,7 @@ export async function getMe() {
 		method: 'GET',
 		headers: myHeaders,
         credentials: credentials,
-        // withcredentials: true,
+        // withcredenbotials: true,
 	};
 
 	let user =  await fetch(url, requestOptions);
