@@ -1,16 +1,47 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Chat.css"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CSSTransition, TransitionGroup} from 'react-transition-group';
-import {Route, NavLink, HashRouter} from 'react-router-dom'
+import { getSocket } from "../../App" 
+//import {Route, NavLink, HashRouter} from 'react-router-dom'
+//import { User } from "../../type";
 
 function Chat() {
+	const socket = getSocket();
 	var message: string;
-	var who: string;
-	var channel: string;
 	const [messages, setMessages] = useState([{msg: "", who_said: ""}]);
-	const [channels, setChannels] = useState([""]);
 	
+	const [channels, setChannels] = useState({});
+	const userName = localStorage.getItem('userName');
+	const [newChannel, setNewChannel] = useState("blablae");
+
+
+  	useEffect(() => {
+		socket.connect();
+
+		const channelListener = (channel:any) => {
+			setChannels((prevChannels:any) => {
+				const newChannels = {...prevChannels};
+				newChannels[channel.id] = message;
+				return newChannels;
+			});
+		};
+	});
+	setNewChannel("blablamore");
+
+	function makeRoom() {
+		socket.emit('createRoom', {
+			name: newChannel, 
+			ownerId: userName, 
+			isProtected:false, 
+			password: "", 
+			type: 'public', 
+			userIs:userName 
+		});
+	}
+	
+	socket.emit('findPublicRooms', (rooms:any) => {setChannels(rooms)});
+
 	const handleChange = (event:any) => { message = event.target.value;	}
 
 	const sendMessage = (event:any) => {
@@ -30,10 +61,10 @@ function Chat() {
 		<NavBar />
 		<div className="mainComposant">
 			<div className="box">
-			<button> New Channel </button>
+			<button type="submit" onClick={makeRoom}> New Channel </button>
 				<div className="channel">
-				{channels.map((channel: string) => (
-						<li>{channel}</li>
+				{[...Object.values(channels)].map((channel:any) => (
+						<li>{channel.name}</li>
 					))}
 				</div>
 			</div>
