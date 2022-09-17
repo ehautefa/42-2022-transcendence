@@ -12,7 +12,7 @@ let socketOptions = {
 	}
 };
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
-const socket = io(URL_BACK, socketOptions);
+const socket = io(URL_BACK + "/pong", socketOptions);
 
 
 export function getSocket() {

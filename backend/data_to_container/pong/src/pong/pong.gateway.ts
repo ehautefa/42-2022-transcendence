@@ -11,7 +11,7 @@ import { invitePlayerDto } from './dto/invitePlayer.dto';
 
 var games: GameWindowState[] = [];
 
-@WebSocketGateway({ cors: { origin: '*' }, }) // enable CORS everywhere
+@WebSocketGateway({	cors: { origin: '*' }, namespace: 'pong'}) // enable CORS everywhere
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
@@ -160,17 +160,17 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
-		// for (let i: number = 0; i < games.length; i++) {
-		// 	if (games[i].playerLeft === client.id || games[i].playerRight === client.id) {
-		// 		games[i] = this.PongService.resetGame(games[i]);
-		// 		if (games[i].playerLeft === client.id) {
-		// 			this.server.to(i.toString()).emit('leaveGame', games[i].playerLeftName);
-		// 		} else {
-		// 			this.server.to(i.toString()).emit('leaveGame', games[i].playerRightName);
-		// 		}
-		// 		this.resetGame(client, i);
-		// 	}
-		// }
+		for (let i: number = 0; i < games.length; i++) {
+			if (games[i].playerLeft === client.id || games[i].playerRight === client.id) {
+				games[i] = this.PongService.resetGame(games[i]);
+				if (games[i].playerLeft === client.id) {
+					this.server.to(i.toString()).emit('leaveGame', games[i].playerLeftName);
+				} else {
+					this.server.to(i.toString()).emit('leaveGame', games[i].playerRightName);
+				}
+				this.resetGame(client, i);
+			}
+		}
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {

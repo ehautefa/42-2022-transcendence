@@ -2,7 +2,6 @@ import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
 import {getSocket} from "../../App";
-import { useContext } from "react";
 
 const socket = getSocket();
 

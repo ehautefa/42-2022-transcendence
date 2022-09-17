@@ -6,6 +6,10 @@ import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
 const socket = getSocket();
 
+const PADDLE_GAP = process.env.REACT_APP_PADDLE_GAP === undefined ? 3 : parseInt(process.env.REACT_APP_PADDLE_GAP);
+const PADDLE_DEP = process.env.REACT_APP_PADDLE_DEP === undefined ? 2 : parseInt(process.env.REACT_APP_PADDLE_DEP);
+// TO DO : understand why env variable is not working
+
 export class GameWindow extends React.Component<{ id: number }, GameWindowState> {
 	constructor(props: any) {
 		super(props);
@@ -76,10 +80,10 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 		var deltaPaddleY = 0
 		switch (event.key) {
 			case "ArrowUp":
-				deltaPaddleY = -parseInt(process.env.REACT_PONG_PADDLE_DEP);
+				deltaPaddleY = -PADDLE_DEP;
 				break;
 			case "ArrowDown":
-				deltaPaddleY = +parseInt(process.env.REACT_PONG_PADDLE_DEP);
+				deltaPaddleY = +PADDLE_DEP;
 				break;
 		}
 		if (deltaPaddleY !== 0) {
@@ -116,8 +120,8 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				<>
 					<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
 					<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
-					<Paddle x={parseInt(process.env.REACT_PONG_PADDLE_GAP)} y={this.state.paddleLeftY} />
-					<Paddle x={80 - parseInt(process.env.REACT_PONG_PADDLE_GAP)} y={this.state.paddleRightY} />
+					<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
+					<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
 					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 					<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 					<Ball x={this.state.ballX} y={this.state.ballY} />
