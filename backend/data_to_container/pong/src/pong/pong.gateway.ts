@@ -9,8 +9,6 @@ import { getPlayerDto } from './dto/getPlayer.dto';
 import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 
-const INTERVAL_TIME = 30; // in ms
-
 var games: GameWindowState[] = [];
 
 @WebSocketGateway({ cors: { origin: '*' }, }) // enable CORS everywhere
@@ -21,7 +19,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	constructor(private readonly PongService: PongService) { }
 
-	@Interval(INTERVAL_TIME)
+	@Interval(parseInt(process.env.PONG_INTERVAL_TIME))
 	GameLoop() {
 		for (let i: number = 0; i < games.length; i++) {
 			if (!games[i].isGameOver && games[i].begin) {

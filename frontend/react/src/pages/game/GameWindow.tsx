@@ -5,8 +5,6 @@ import { Navigate } from "react-router-dom";
 import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
 const socket = getSocket();
-const PADDLE_GAP = 3; // gap between border and paddle in %
-const PADDLE_DEP = 2; // need to be a divisor of PADDLE_SIZE defined in PongService in %
 
 export class GameWindow extends React.Component<{ id: number }, GameWindowState> {
 	constructor(props: any) {
@@ -78,10 +76,10 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 		var deltaPaddleY = 0
 		switch (event.key) {
 			case "ArrowUp":
-				deltaPaddleY = -PADDLE_DEP;
+				deltaPaddleY = -parseInt(process.env.REACT_PONG_PADDLE_DEP);
 				break;
 			case "ArrowDown":
-				deltaPaddleY = +PADDLE_DEP;
+				deltaPaddleY = +parseInt(process.env.REACT_PONG_PADDLE_DEP);
 				break;
 		}
 		if (deltaPaddleY !== 0) {
@@ -118,8 +116,8 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				<>
 					<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
 					<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
-					<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
-					<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
+					<Paddle x={parseInt(process.env.REACT_PONG_PADDLE_GAP)} y={this.state.paddleLeftY} />
+					<Paddle x={80 - parseInt(process.env.REACT_PONG_PADDLE_GAP)} y={this.state.paddleRightY} />
 					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 					<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 					<Ball x={this.state.ballX} y={this.state.ballY} />
