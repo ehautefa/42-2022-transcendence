@@ -43,7 +43,6 @@ export class MatchService {
 	}
 
 	async createMatch(matchToCreate: CreateMatchDto): Promise<match> {
-		console.log("Try to create match", matchToCreate);
 		var user1: user = await this.userService.getUser(matchToCreate.user1uid);
 		var user2: user = await this.userService.getUser(matchToCreate.user2uid);
 		return await this.MatchRepository.save({

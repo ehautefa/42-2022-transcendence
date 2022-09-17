@@ -8,14 +8,15 @@ export interface GameWindowState {
 	scoreRight: number,
 	paddleLeftY: number,
 	paddleRightY: number,
-	isGameOver: boolean,
+	
 	playerLeftUid: string,
 	playerRightUid: string,
 	playerLeft: string,
 	playerRight: string,
 	playerLeftName: string,
 	playerRightName: string,
-	id: number,
+	
 	matchMaking: boolean,
 	begin: boolean,
+	isGameOver: boolean,
 }

@@ -15,6 +15,7 @@ function Game() {
 	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
 	const [id, setId] = useState(id_state);
+	const [loading, setLoading] = useState(false);
 	const uid = localStorage.getItem('uid');
 	const userName = localStorage.getItem('userName');
 
@@ -28,9 +29,12 @@ function Game() {
 			"userUuid": uid,
 			"userName": userName
 		}
-		socket.emit('getPlayer', arg , (id_game: number) => {
+		socket.emit('getPlayer', arg , (matchId: string) => {
 			setDisplaying({ display: "none" });
-			setId(id_game)
+			if (matchId === "")
+				setLoading(true);
+			else
+				setLoading(false);
 		});
 	}
 	return (<>

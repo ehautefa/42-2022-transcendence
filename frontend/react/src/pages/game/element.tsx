@@ -48,6 +48,7 @@ export class ColorSelector extends React.Component  {
 
 
 export interface GameWindowState {
+	matchId: string,
     ballX: number,
     ballY: number,
     timeoutId: any,
@@ -55,7 +56,6 @@ export interface GameWindowState {
     scoreRight: number,
     paddleLeftY: number,
     paddleRightY: number,
-    id: number,
     isGameOver: boolean,
     playerLeft: string,
     playerRight: string,

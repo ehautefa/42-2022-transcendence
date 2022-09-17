@@ -16,7 +16,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 		this.state = {
-			id: 0,
+			matchId: "",
 			ballY: 47.1,
 			ballX: 48.6,
 			scoreLeft: 0,
@@ -48,7 +48,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				this.setState({ loading: false });
 			}
 			this.setState({
-				id: data.id,
+				matchId: data.matchId,
 				ballX: data.ballX,
 				ballY: data.ballY,
 				scoreLeft: data.scoreLeft,
@@ -63,7 +63,7 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				playerRightName: data.playerRightName
 			});
 			if (data.isGameOver) {
-				socket.emit('resetGame', this.state.id);
+				socket.emit('resetGame', this.state.matchId);
 			}
 		})
 		socket.on('leaveGame', (playerName: string) => {
@@ -87,12 +87,8 @@ export class GameWindow extends React.Component<{ id: number }, GameWindowState>
 				break;
 		}
 		if (deltaPaddleY !== 0) {
-			socket.emit('handlePaddle', deltaPaddleY, this.props.id);
+			socket.emit('handlePaddle', deltaPaddleY, this.state.matchId);
 		}
-	}
-
-	ChangeColor() {
-
 	}
 
 	render() {
