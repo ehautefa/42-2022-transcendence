@@ -10,18 +10,18 @@ import { GameWindow } from "./GameWindow"
 const socket = getSocket();
 
 function Game() {
-	const index = new URLSearchParams(useLocation().search).get('id');
-	var id_state: number = index === null ? -1 : parseInt(index);
+	var index = new URLSearchParams(useLocation().search).get('id');
 	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
-	const [id, setId] = useState(id_state);
+	index = index === null ? "" : index;
+	const [id, setId] = useState(index);
 	const [loading, setLoading] = useState(false);
 	const uid = localStorage.getItem('uid');
 	const userName = localStorage.getItem('userName');
 
 	
-	if (id !== -1) {
-		socket.emit('joinGame', id, userName);
+	if (id !== "") {
+		socket.emit('joinGame', index, userName);
 	}
 	
 	function matchMaking() {

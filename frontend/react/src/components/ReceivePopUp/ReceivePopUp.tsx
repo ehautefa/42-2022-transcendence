@@ -15,12 +15,12 @@ function ReceivePopUp(modal: any) {
 		let arg = {
             "userUuid": localStorage.getItem('uid'),
             "userName": localStorage.getItem('userName'),
-            "id": modal.modal.id
+            "matchId": modal.modal.matchId
         }
         socket.emit("acceptInvite", arg);
         closePopup();
 		// navigate to game with good id
-        window.history.pushState({}, "", "/game?id=" + modal.modal.id);
+        window.history.pushState({}, "", "/game?id=" + modal.modal.matchId);
         window.location.reload();
     }
 	

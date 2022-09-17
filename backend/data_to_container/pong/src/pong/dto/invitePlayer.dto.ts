@@ -11,10 +11,7 @@ export class invitePlayerDto {
 	@IsNotEmpty({message: "userName should be declared"})
     userName: string;
 
-    @ApiProperty({ description: 'The invited player uid'})
-    @IsNotEmpty({message: "invitedPlayerUid should be declared"})
-    invitedUid: string;
-
-    @ApiProperty({ description: 'The game id'})
-    id: number;
+    @ApiProperty({ description: 'The invited player username'})
+    @IsNotEmpty({message: "invitedUserName should be declared"})
+    invitedUserName: string;
 }

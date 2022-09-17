@@ -10,7 +10,7 @@ const PADDLE_GAP = process.env.REACT_APP_PADDLE_GAP === undefined ? 3 : parseInt
 const PADDLE_DEP = process.env.REACT_APP_PADDLE_DEP === undefined ? 2 : parseInt(process.env.REACT_APP_PADDLE_DEP);
 // TO DO : understand why env variable is not working
 
-export class GameWindow extends React.Component<{ id: number }, GameWindowState> {
+export class GameWindow extends React.Component<{ id: string }, GameWindowState> {
 	constructor(props: any) {
 		super(props);
 

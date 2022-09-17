@@ -11,7 +11,7 @@ export class AcceptInviteDto {
 	@IsNotEmpty({message: "userName should be declared"})
     userName: string;
 
-    @ApiProperty({ description: 'The game id' })
-    @IsNotEmpty({message: "id should be declared"})
-    id: number;
+    @ApiProperty({ description: 'The match id' })
+    @IsNotEmpty({message: "matchId should be declared"})
+    matchId: string;
 }

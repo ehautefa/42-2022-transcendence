@@ -36,6 +36,7 @@ export class PongService {
     }
 
     async initGame(client1: playerDto, client2: playerDto) : Promise<GameWindowState> {
+		var client2_socket:string = client2.socket === undefined ? "" : client2.socket.id;
 		var game: GameWindowState = {
 			matchId: undefined,
 			playerLeftUid: client1.userUuid,
@@ -43,7 +44,7 @@ export class PongService {
 			playerLeft: client1.socket.id,
 			playerRightUid: client2.userUuid,
             playerRightName: client2.userName,
-			playerRight: client2.socket.id,
+			playerRight: client2_socket,
 			ballY: parseInt(process.env.PONG_POS_BALL_Y),
 			ballX: parseInt(process.env.PONG_POS_BALL_X),
 			// randomly choose the direction
@@ -55,7 +56,7 @@ export class PongService {
 			paddleRightY: 50,
 			isGameOver: false,
 			matchMaking: true,
-            begin: true,
+            begin: false,
 		};
 		await this.MatchService.createMatch({
 			user1uid: client1.userUuid, // user1 is client Left
@@ -63,8 +64,10 @@ export class PongService {
 		}).then(match => {
 			console.log("match created", match);
 			game.matchId = match.matchId;
-			client1.socket.join(match.matchId);
-			client2.socket.join(match.matchId);
+			if (client1 !== undefined)
+				client1.socket.join(match.matchId);
+			if (client2.socket !== undefined)
+				client2.socket.join(match.matchId);
 		});
 		return game;
     }

@@ -71,7 +71,7 @@ function MyProfile() {
 								return (<tr key="{users.userUuid}">
 									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
 									<td>Online</td>
-									<InvitePopUp userUuid={users.userUuid} user={user} />
+									<InvitePopUp userName={users.userName} user={user} />
 								</tr>);
 							})}
 						</tbody>
