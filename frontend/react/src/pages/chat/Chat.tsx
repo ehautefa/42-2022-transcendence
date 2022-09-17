@@ -27,7 +27,6 @@ function Chat() {
 			});
 		};
 	});
-	setNewChannel("blablamore");
 
 	function makeRoom() {
 		socket.emit('createRoom', {
