@@ -3,8 +3,16 @@ import "./Profil.css"
 import { FetchUser, GetMatchHistory, GetAllUsers } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
+import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
+
+const socketStatus = getSocketStatus();
+
+socketStatus.on('getUserUuid', () => {
+	console.log("GET USER UUID", localStorage.getItem('uid'));
+	socketStatus.emit('getUserUuid', localStorage.getItem('uid'));
+})
 
 var update = true;
 
@@ -22,6 +30,9 @@ function MyProfile() {
 			const matchHistory = await GetMatchHistory(user.userName);
 			const allUsers = await GetAllUsers();
 			setAllUsers(allUsers);
+			socketStatus.emit('getFriendsStatus', allUsers, (data: any) => {
+				setAllUsers(data);
+			});
 			setMatchHistory(matchHistory);
 			setUser(user);
 			update = false;
@@ -70,7 +81,7 @@ function MyProfile() {
 							{allUsers.map((users: any) => {
 								return (<tr key="{users.userUuid}">
 									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
-									<td>Online</td>
+									{users.status ? <td>Online</td> : <td>Offline</td>}
 									<InvitePopUp userName={users.userName} user={user} />
 								</tr>);
 							})}

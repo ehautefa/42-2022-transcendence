@@ -20,9 +20,7 @@ export async function getMe() {
 		(result) => {
 			localStorage.setItem('uid', result.userUuid);
 			localStorage.setItem('userName', result.userName);
-			socket.on('init', (data: any) => {
-				console.log("INIT", data);
-			});
+			socket.emit('init', result.userUuid);
 		}
 	)
 }
