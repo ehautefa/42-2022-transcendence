@@ -39,10 +39,6 @@ function MyProfile() {
 		}
 	}
 
-
-	
-	console.log("MATCH HISTORY", matchHistory);
-
 	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
@@ -54,7 +50,6 @@ function MyProfile() {
 							<div className="Username">Username : {user.userName}</div>
 							<EditUsernamePopUp />
 						</li>
-						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
@@ -79,10 +74,10 @@ function MyProfile() {
 						</thead>
 						<tbody>
 							{allUsers.map((users: any) => {
-								return (<tr key="{users.userUuid}">
+								return (<tr key={users.userUuid}>
 									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
 									{users.status ? <td>Online</td> : <td>Offline</td>}
-									<InvitePopUp userName={users.userName} user={user} />
+									<td><InvitePopUp userName={users.userName} user={user} /></td>
 								</tr>);
 							})}
 						</tbody>
@@ -100,7 +95,7 @@ function MyProfile() {
 						</thead>
 						<tbody>
 							{matchHistory.map((match: any) => {
-								return (<tr key="{match.matchId}">
+								return (<tr key={match.matchId}>
 									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
