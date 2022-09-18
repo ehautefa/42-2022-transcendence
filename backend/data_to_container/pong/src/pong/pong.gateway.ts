@@ -35,7 +35,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	joinGame(client: Socket, arg:any) {
 		var matchId:string = arg[0];
 		var username:string = arg[1];
-		console.log("joinGame", matchId, username, client.id, games.get(matchId));
 		client.join(matchId);
 		if (games.get(matchId).playerLeftName === username)
 			games.get(matchId).playerLeft = client.id;
@@ -162,16 +161,18 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
-		// for (let game of games.values()) {
-		// 	if (game.playerLeft === client.id || game.playerRight === client.id) {
-		// 		if (game.playerLeft === client.id) {
-		// 			this.server.to(game.matchId).emit('leaveGame', game.playerLeftName);
-		// 		} else {
-		// 			this.server.to(game.matchId).emit('leaveGame', game.playerRightName);
-		// 		}
-		// 		games.delete(game.matchId);
-		// 	}
-		// }
+		for (let game of games.values()) {
+			if (game.playerLeft === client.id || game.playerRight === client.id) {
+				if (game.playerLeft === client.id) {
+					this.server.to(game.matchId).emit('leaveGame', game.playerLeftName);
+				} else {
+					this.server.to(game.matchId).emit('leaveGame', game.playerRightName);
+				}
+
+				// TO DO : define how we known if it's a deconnexion or just change page
+				// games.delete(game.matchId);
+			}
+		}
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {

@@ -1,9 +1,9 @@
 import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
-import {getSocket} from "../../App";
+import { getSocketPong } from "../../App";
 
-const socket = getSocket();
+const socket = getSocketPong();
 
 function ReceivePopUp(modal: any) {
 	

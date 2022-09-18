@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Context } from 'vm';
 import ReceivePopUp from '../components/ReceivePopUp/ReceivePopUp';
-import { getSocket } from "../App" 
+import { getSocketPong } from "../App" 
 
 const ModalContext = React.createContext({});
-const socket = getSocket();
+const socket = getSocketPong();
 
 const Modal = (({ modal, unSetModal }: any) => {
 	console.log("MODAL", modal);

@@ -1,3 +1,8 @@
+import { getSocketStatus } from "../../App"
+import { Socket } from "socket.io-client";
+
+const socket: Socket = getSocketStatus();
+
 export async function getMe() {
 
     var myHeaders = new Headers();
@@ -15,6 +20,9 @@ export async function getMe() {
 		(result) => {
 			localStorage.setItem('uid', result.userUuid);
 			localStorage.setItem('userName', result.userName);
+			socket.on('init', (data: any) => {
+				console.log("INIT", data);
+			});
 		}
 	)
 }

@@ -2,9 +2,9 @@ import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "./InvitePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocket } from "../../App"
+import { getSocketPong } from "../../App"
 
-const socket = getSocket();
+const socket = getSocketPong();
 
 function InvitePopUp(arg: any) {
     const [open, setOpen] = useState(false);

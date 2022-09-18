@@ -1,10 +1,10 @@
 import "./Game.css"
 import React from 'react'
-import { getSocket } from "../../App" 
+import { getSocketPong } from "../../App" 
 import { Navigate } from "react-router-dom";
 import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
-const socket = getSocket();
+const socket = getSocketPong();
 
 const PADDLE_GAP = process.env.REACT_APP_PADDLE_GAP === undefined ? 3 : parseInt(process.env.REACT_APP_PADDLE_GAP);
 const PADDLE_DEP = process.env.REACT_APP_PADDLE_DEP === undefined ? 2 : parseInt(process.env.REACT_APP_PADDLE_DEP);
