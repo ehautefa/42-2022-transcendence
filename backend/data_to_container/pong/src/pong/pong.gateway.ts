@@ -3,24 +3,27 @@ import { Socket, Server } from 'socket.io';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
+import { StatusGateway  } from "src/status/status.gateway";
 import { GameWindowState } from "./type";
 import { AuthGuard } from './pong.guards';
 import { getPlayerDto } from './dto/getPlayer.dto';
 import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 import { playerDto } from './dto/player.dto';
+import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 
 var games = new Map<string, GameWindowState>();
 var players = new Array<playerDto>();
 var launch_game = true;
 
-@WebSocketGateway({	cors: { origin: '*' }, namespace: 'pong'}) // enable CORS everywhere
+@WebSocketGateway({ cors: { origin: '*' }, namespace: 'pong' }) // enable CORS everywhere
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 	private logger: Logger = new Logger('PongGateway');
 
-	constructor(private readonly PongService: PongService) { }
+	// import PongService and StatusGateway
+	constructor(private readonly PongService: PongService, private readonly StatusGateway: StatusGateway) {}
 
 	@Interval(parseInt(process.env.PONG_INTERVAL_TIME))
 	GameLoop() {
@@ -32,9 +35,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('joinGame') // For spectator
-	joinGame(client: Socket, arg:any) {
-		var matchId:string = arg[0];
-		var username:string = arg[1];
+	joinGame(client: Socket, arg: any) {
+		var matchId: string = arg[0];
+		var username: string = arg[1];
 		client.join(matchId);
 		if (games.get(matchId).playerLeftName === username)
 			games.get(matchId).playerLeft = client.id;
@@ -44,32 +47,36 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		if (games.get(matchId).playerLeft !== "" && games.get(matchId).playerRight !== "") {
 			games.get(matchId).begin = true;
 		}
-}
+	}
 
 	// Invite a specific user to a game
 	@SubscribeMessage('invitePlayer')
 	async invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
 		console.log("invitePlayer", invitePlayer);
-		let player1: playerDto = { 
+		let player1: playerDto = {
 			userUuid: invitePlayer.userUuid,
 			userName: invitePlayer.userName,
 			socket: client
 		};
 		let player2: playerDto = {
-			userUuid: "",
+			userUuid: invitePlayer.invitedUserUuid,
 			userName: invitePlayer.invitedUserName,
 			socket: undefined
 		};
 		let game: GameWindowState;
 		game = await this.PongService.initGame(player1, player2);
 		games.set(game.matchId, game);
-		let response: any = {matchId: game.matchId, userName: invitePlayer.invitedUserName};
-		this.server.emit('invitePlayer', response);
-		console.log("GAME: ", game.matchId,"/n", game);
+		let response: SendInviteDto = { matchId: game.matchId,
+			invitedUserName: invitePlayer.invitedUserName,
+			invitedUserUuid: invitePlayer.invitedUserUuid };
+
+		// this.server.emit('invitePlayer', response);
+		this.StatusGateway.sendInvitation(response);
+		console.log("GAME: ", game.matchId, "/n", game);
 		return game.matchId;
 	}
 
-	@SubscribeMessage('acceptInvite') 
+	@SubscribeMessage('acceptInvite')
 	acceptInvite(client: Socket, acceptInvite: AcceptInviteDto) {
 		if (launch_game == true) {
 			launch_game = false;
@@ -109,7 +116,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 			game = await this.PongService.initGame(player, players.shift());
 			games.set(game.matchId, game);
-			console.log("GAME: ", game.matchId,"/n", game);
+			console.log("GAME: ", game.matchId, "/n", game);
 		}
 		game.begin = true; // start game
 		return game.matchId;
@@ -123,7 +130,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	sendGametoRoom(matchId: string) {
 		console.log("sendGametoRoom", matchId);
 		if (matchId == undefined)
-        	return;
+			return;
 		let game: GameWindowState = games.get(matchId);
 		if (game.matchMaking == false) {
 			try {
@@ -131,12 +138,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			} catch (error) {
 				console.log("ERROR IN SEND GAME TO ROOM", error);
 			}
-			return ;
+			return;
 		}
 		game = this.PongService.sendGametoRoom(game);
 		try {
 			if (game.isGameOver)
-            	console.log("game over", game.isGameOver, game.scoreRight, game.scoreLeft, game.playerLeft);
+				console.log("game over", game.isGameOver, game.scoreRight, game.scoreLeft, game.playerLeft);
 			this.server.to(matchId).emit('game', game);
 		} catch (error) {
 			console.log("ERROR IN SEND GAME TO ROOM", error);

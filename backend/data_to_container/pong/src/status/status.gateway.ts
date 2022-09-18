@@ -1,7 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
-import { Interval } from '@nestjs/schedule';
 import { Socket, Server } from 'socket.io';
+import { SendInviteDto } from './dto/sendInvite.dto';
 
 export type User = {
 	userUuid: string;
@@ -29,6 +28,16 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		inline.set(userUuid, client.id);
 	}
 
+	sendInvitation(sendInvite : SendInviteDto) {
+		let socket = inline.get(sendInvite.invitedUserUuid);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return ;
+		}
+		let response: any = {matchId: sendInvite.matchId, userName: sendInvite.invitedUserName};
+		this.server.to(socket).emit('sendInvite', response);
+	}
+
 	@SubscribeMessage('getFriendsStatus')
 	getFriendsStatus(client: Socket, users: User[] ): User[] {
 		for (let i = 0; i < users.length; i++) {
@@ -39,14 +48,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		}
 		return users;
-	}
-
-	// Get True if the user is connected False else
-	@SubscribeMessage('getStatus')
-	getStatus(client: Socket, userUuid: string): boolean {
-		if (inline.get(userUuid))
-			return true;
-		return false;
 	}
 
 	handleConnection(client: any, ...args: any[]) {

@@ -14,7 +14,7 @@ function Game() {
 	const displaying_state = index === null ? { display: "block" } : { display: "none" };
 	const [displaying, setDisplaying] = useState(displaying_state);
 	index = index === null ? "" : index;
-	const [id, setId] = useState(index);
+	const id = index;
 	const [loading, setLoading] = useState(false);
 	const uid = localStorage.getItem('uid');
 	const userName = localStorage.getItem('userName');
