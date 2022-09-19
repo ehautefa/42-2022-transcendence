@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user } from 'src/bdd/users.entity';
+import { User } from 'src/status/status.gateway';
 import { Repository, UpdateResult } from 'typeorm';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -39,7 +40,6 @@ export class UserService {
                     numberToAdd++;
                 else
                     break
-
                 uniqueUserName = userToFindOrCreate.userName + numberToAdd;
             }
 
@@ -65,8 +65,12 @@ export class UserService {
         await this.UserRepository.update(userToChange.userUuid, { userName: userToChange.newName });
     }
 
-    async flipTwoFactorAuth(userToChange: FlipTwoFactorAuthDto): Promise<void> {
-        //await this.UserRepository.update(userToChange.userUuid, [{twoFactorAuth: }]);
+    async disableTwoFactorAuth(user: User): Promise<void> {
+        await this.UserRepository.update(user.userUuid, { twoFactorAuth: false });
+    }
+
+    async enableTwoFactorAuth(user: User): Promise<void> {
+        await this.UserRepository.update(user.userUuid, { twoFactorAuth: true });
     }
 
     async endOfMatch(players: EndOfMatchDto): Promise<void> {
