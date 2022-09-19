@@ -8,16 +8,18 @@ import { getSocket } from "../../App"
 
 function Chat() {
 	const socket = getSocket();
+
+	console.log(socket);
+
 	var message: string;
 	const [messages, setMessages] = useState([{msg: "", who_said: ""}]);
 	
-	const [channels, setChannels] = useState({});
+	const [channels, setChannels] = useState([]);
 	const userName = localStorage.getItem('userName');
 	const [newChannel, setNewChannel] = useState("blablae");
 
 
   	useEffect(() => {
-		socket.connect();
 
 		const channelListener = (channel:any) => {
 			setChannels((prevChannels:any) => {
@@ -29,6 +31,7 @@ function Chat() {
 	});
 
 	function makeRoom() {
+		console.log('creating room ', newChannel);
 		socket.emit('createRoom', {
 			name: newChannel, 
 			ownerId: userName, 
@@ -37,9 +40,12 @@ function Chat() {
 			type: 'public', 
 			userIs:userName 
 		});
+		socket.emit('findPublicRooms', (rooms:any) => {setChannels(rooms)});
+		console.log(channels);
 	}
 	
-	socket.emit('findPublicRooms', (rooms:any) => {setChannels(rooms)});
+
+	console.log(channels);
 
 	const handleChange = (event:any) => { message = event.target.value;	}
 
@@ -62,7 +68,7 @@ function Chat() {
 			<div className="box">
 			<button type="submit" onClick={makeRoom}> New Channel </button>
 				<div className="channel">
-				{[...Object.values(channels)].map((channel:any) => (
+				{channels.map((channel:any) => (
 						<li>{channel.name}</li>
 					))}
 				</div>
