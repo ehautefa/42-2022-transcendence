@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { SendInviteDto } from './dto/sendInvite.dto';
@@ -12,11 +13,11 @@ export type User = {
 	friends?: User[];
 }
 
-const STATUS_INTERVAL_TIME = 1000; // 1 seconde
 var inline = new Map<string, string>();
 			// Map<userUid, socketId>
 // Map of all users connected and their socketId
 
+@Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'status' }) // enable CORS everywhere
 export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
@@ -24,8 +25,9 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getUserUuid')
 	getUserUid(client: Socket, userUuid: string): void {
-		console.log('init', client.id, userUuid);
 		inline.set(userUuid, client.id);
+		console.log('init', client.id, userUuid);
+		console.log("inline", inline);
 	}
 
 	sendInvitation(sendInvite : SendInviteDto) {
@@ -36,6 +38,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		let response: any = {matchId: sendInvite.matchId, userName: sendInvite.invitedUserName};
 		this.server.to(socket).emit('sendInvite', response);
+		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
 	@SubscribeMessage('getFriendsStatus')
@@ -52,7 +55,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleConnection(client: any, ...args: any[]) {
 		console.log('client connected', inline);
-		client.emit('getUserUuid');
+		// client.emit('getUserUuid');
 	}
 
 	handleDisconnect(client: any) {

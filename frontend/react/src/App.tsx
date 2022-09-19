@@ -11,13 +11,14 @@ let socketOptions = {
 		}
 	}
 };
+
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
-const socket = io(URL_BACK + "/pong", socketOptions);
+const socketPong = io(URL_BACK + "/pong", socketOptions);
 const socketStatus = io(URL_BACK + "/status", socketOptions);
 
 
 export function getSocketPong() {
-	return socket;
+	return socketPong;
 }
 
 export function getSocketStatus() {
@@ -26,12 +27,12 @@ export function getSocketStatus() {
 
 export default function App() {
 	// Connect my socket to server
-	socket.on("connect", () => {
-		console.log("SOCKET PONG:", socket.id, " : ", socket.connected);
+	socketPong.on("connect", () => {
+		console.log("SOCKET PONG:", socketPong.id, " : ", socketPong.connected);
 	});
-	socketStatus.on("connect", () => {
-		console.log("SOCKET STATUS:", socketStatus.id, " : ", socketStatus.connected);
-	});
+	// socketStatus.on("connect", () => {
+	// 	console.log("SOCKET STATUS:", socketStatus.id, " : ", socketStatus.connected);
+	// });
 	return (<>
 		<div className='login'>
 			<a href={"http://localhost:3011/auth/login"}>

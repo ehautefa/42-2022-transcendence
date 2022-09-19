@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger, UseGuards, Inject } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
 import { StatusGateway  } from "src/status/status.gateway";
@@ -23,7 +23,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private logger: Logger = new Logger('PongGateway');
 
 	// import PongService and StatusGateway
-	constructor(private readonly PongService: PongService, private readonly StatusGateway: StatusGateway) {}
+	@Inject(StatusGateway)
+	private readonly StatusGateway : StatusGateway;
+	constructor(private readonly PongService: PongService) {}
 
 	@Interval(parseInt(process.env.PONG_INTERVAL_TIME))
 	GameLoop() {

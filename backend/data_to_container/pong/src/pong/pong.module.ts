@@ -8,8 +8,8 @@ import { AuthGuard } from './pong.guards';
 import { StatusGateway } from 'src/status/status.gateway';
 
 @Module({
-  imports: [MatchModule, StatusGateway, ScheduleModule.forRoot()],
+  imports: [MatchModule, ScheduleModule.forRoot()],
   exports: [PongService],
-  providers: [PongGateway, PongService, { provide: APP_GUARD, useClass: AuthGuard }],
+  providers: [PongGateway, PongService, StatusGateway, { provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class PongModule {}
