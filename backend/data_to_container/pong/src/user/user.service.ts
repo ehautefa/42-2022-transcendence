@@ -21,21 +21,12 @@ export class UserService {
     }
 
     async getUser(userUuid: string): Promise<user> {
-        return await this.UserRepository.findOne({ where: { userUuid: userUuid } });
+        if (!userUuid)
+            return null;
+        const user = await this.UserRepository.findOne({ where: { userUuid: userUuid } });
+        return user;
     }
 
-    // async createUser(userToCreate: CreateUserDto): Promise<user> {
-        // console.log(userToCreate);
-        // return await this.UserRepository.save({
-            // userName: "todel",
-            // user42Id: "todel",
-            // accessToken42: "todel",
-            // twoFactorAuth: false,
-            // wins: 0,
-            // losses: 0,
-        // });
-    // }
-// 
     async FindOrCreateUser(userToFindOrCreate: FindOrCreateUserDto): Promise<user> {
         const user = await this.UserRepository.findOne({ where: { user42Id: userToFindOrCreate.user42Id } })
         if (user)
@@ -61,7 +52,10 @@ export class UserService {
         //need check if userName already exist
 
         if (await this.UserRepository.findOne({ where: { userName: userToChange.newName } }))
-            return console.log("Error username already exist");
+        {
+            console.log("Error username already exist");
+            return null;
+        }
         await this.UserRepository.update(userToChange.userUuid, { userName: userToChange.newName });
     }
 

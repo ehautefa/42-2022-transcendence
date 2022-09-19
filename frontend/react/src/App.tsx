@@ -1,6 +1,5 @@
 import './index.css';
 import { io } from 'socket.io-client'
-import { CreateUser } from "./pages/myProfile/request";
 
 // Create my socket
 let socketOptions = {
@@ -12,40 +11,35 @@ let socketOptions = {
 		}
 	}
 };
+
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
-const socket = io(URL_BACK, socketOptions);
+const socketPong = io(URL_BACK + "/pong", socketOptions);
+const socketStatus = io(URL_BACK + "/status", socketOptions);
 
 
+export function getSocketPong() {
+	return socketPong;
+}
 
-
-export function getSocket() {
-	return socket;
+export function getSocketStatus() {
+	return socketStatus;
 }
 
 export default function App() {
-
-
-
-	var uid: string = localStorage.getItem('uid') !== null ? localStorage.getItem('uid')! : "";
 	// Connect my socket to server
-	socket.on("connect", () => {
-		console.log("SOCKET FRONT:", socket.id, " : ", socket.connected);
+	socketPong.on("connect", () => {
+		console.log("SOCKET PONG:", socketPong.id, " : ", socketPong.connected);
 	});
-	if (uid === "") {
-		let user = CreateUser();
-		user.then((user) => {
-			localStorage.setItem('uid', user.userUuid);
-			console.log("userUuid:", user.userUuid);
-			localStorage.setItem('userName', user.userName);
-		})
-	}
-
-	return (
+	// socketStatus.on("connect", () => {
+	// 	console.log("SOCKET STATUS:", socketStatus.id, " : ", socketStatus.connected);
+	// });
+	return (<>
 		<div className='login'>
 			<a href={"http://localhost:3011/auth/login"}>
 				<h1>Try to login</h1>
 			</a>
 		</div>
+	</>
 	);
 }
 

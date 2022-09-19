@@ -1,148 +1,167 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger, UseGuards, Inject } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
+import { StatusGateway  } from "src/status/status.gateway";
 import { GameWindowState } from "./type";
 import { AuthGuard } from './pong.guards';
 import { getPlayerDto } from './dto/getPlayer.dto';
 import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
+import { playerDto } from './dto/player.dto';
+import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 
+var games = new Map<string, GameWindowState>();
+var players = new Array<playerDto>();
+var launch_game = true;
 
-const INTERVAL_TIME = 30; // in ms
-
-var games: GameWindowState[] = [];
-
-@WebSocketGateway({ cors: { origin: '*' }, }) // enable CORS everywhere
+@WebSocketGateway({ cors: { origin: '*' }, namespace: 'pong' }) // enable CORS everywhere
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 	private logger: Logger = new Logger('PongGateway');
 
-	constructor(private readonly PongService: PongService) { }
+	// import PongService and StatusGateway
+	@Inject(StatusGateway)
+	private readonly StatusGateway : StatusGateway;
+	constructor(private readonly PongService: PongService) {}
 
-	@Interval(INTERVAL_TIME)
+	@Interval(parseInt(process.env.PONG_INTERVAL_TIME))
 	GameLoop() {
-		for (let i: number = 0; i < games.length; i++) {
-			if (!games[i].isGameOver && games[i].playerLeft) {
-				this.sendGametoRoom(i);
+		for (let [key, value] of games) {
+			if (!value.isGameOver && value.begin) {
+				this.sendGametoRoom(key);
 			}
 		}
 	}
 
 	@SubscribeMessage('joinGame') // For spectator
-	joinGame(client: Socket, id: number) {
-		client.join(id.toString());
+	joinGame(client: Socket, arg: any) {
+		var matchId: string = arg[0];
+		var username: string = arg[1];
+		client.join(matchId);
+		if (games.get(matchId).playerLeftName === username)
+			games.get(matchId).playerLeft = client.id;
+		else if (games.get(matchId).playerRightName === username)
+			games.get(matchId).playerRight = client.id;
+
+		if (games.get(matchId).playerLeft !== "" && games.get(matchId).playerRight !== "") {
+			games.get(matchId).begin = true;
+		}
 	}
 
 	// Invite a specific user to a game
 	@SubscribeMessage('invitePlayer')
-	invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
-		console.log("invitePlayerBackend", invitePlayer);
-		let arg : getPlayerDto = {userUuid: invitePlayer.userUuid,
-			userName: invitePlayer.userName};
-		if (games.length == 0)
-			this.GameLoop(); // start game loop
-		for (var i: number = 0; i < games.length; i++) {
-			if (games[i].playerLeft == "" && games[i].playerRight == "") {
-				// reuse old structure if possible
-				client.join(i.toString());
-				games[i] = this.PongService.initGame(i, arg, client.id);
-				games[i].playerRightUid = invitePlayer.invitedUid; // mark match reserved to avoid matchmaking 
-				return i;
-			}
-		}
-		// create new game
-		games.push(this.PongService.initGame(i, arg, client.id));
-		games[i].playerRightUid = invitePlayer.invitedUid; // mark match reserved to avoid matchmaking 
-		console.log("GAMES[", i, "]", games[i]);
-		client.join(i.toString());
-		invitePlayer.id = i;
-		// send invitation to all players
-		console.log("invitePlayer", "send to other players invitation");
-		this.server.emit('invitePlayer', invitePlayer);
-		return i;
+	async invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
+		console.log("invitePlayer", invitePlayer);
+		let player1: playerDto = {
+			userUuid: invitePlayer.userUuid,
+			userName: invitePlayer.userName,
+			socket: client
+		};
+		let player2: playerDto = {
+			userUuid: invitePlayer.invitedUserUuid,
+			userName: invitePlayer.invitedUserName,
+			socket: undefined
+		};
+		let game: GameWindowState;
+		game = await this.PongService.initGame(player1, player2);
+		games.set(game.matchId, game);
+		let response: SendInviteDto = { matchId: game.matchId,
+			invitedUserName: invitePlayer.invitedUserName,
+			invitedUserUuid: invitePlayer.invitedUserUuid };
+
+		// this.server.emit('invitePlayer', response);
+		this.StatusGateway.sendInvitation(response);
+		console.log("GAME: ", game.matchId, "/n", game);
+		return game.matchId;
 	}
 
-	@SubscribeMessage('acceptInvite') 
+	@SubscribeMessage('acceptInvite')
 	acceptInvite(client: Socket, acceptInvite: AcceptInviteDto) {
-		let arg : getPlayerDto = {userUuid: acceptInvite.userUuid,
-			 userName: acceptInvite.userName};
-		let id: number = acceptInvite.id; // get id from invitation
-		client.join(id.toString());
-		games[id] = this.PongService.initSecondPlayer(games[id], arg, client.id);
-		return id;
+		if (launch_game == true) {
+			launch_game = false;
+			this.GameLoop(); // start game loop
+		}
+		console.log("acceptInvite", acceptInvite);
+		let matchId: string = acceptInvite.matchId; // get id from invitation
+		games[matchId].playerRightUid = acceptInvite.userUuid; // set player 2 name
+		games[matchId].begin = true; // start game
 	}
 
 	// Launch a game and find a match for the player
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('getPlayer')
-	// clientInfo : {userUid, username}
-	getPlayer(client: Socket, clientInfo: getPlayerDto): number {
-		let auth_token : string = client.handshake.headers.authorization.split(' ')[1];
-		console.log("Auth token", auth_token);
-		if (games.length == 0)
+	async getPlayer(client: Socket, clientInfo: getPlayerDto): Promise<string> {
+		// let auth_token : string = client.handshake.headers.authorization.split(' ')[1];
+		let player: playerDto = { // create a player entity
+			userUuid: clientInfo.userUuid,
+			userName: clientInfo.userName,
+			socket: client
+		};
+		let game: GameWindowState;
+		if (launch_game == true) {
+			launch_game = false;
 			this.GameLoop(); // start game loop
-		for (var i: number = 0; i < games.length; i++) {
-			if (games[i].playerLeft == "" && games[i].playerRight == "") {
-				// reuse old structure if possible
-				client.join(i.toString());
-				games[i] = this.PongService.initGame(i, clientInfo, client.id);
-				return i;
-			} else if (games[i].playerRight === undefined && // verify if game is not full
-				games[i].playerLeftUid !== clientInfo.userUuid) { // verify if player is not already in game
-				// find a game with only one player
-				client.join(i.toString());
-				games[i] = this.PongService.initSecondPlayer(games[i], clientInfo, client.id);
-				return i;
-			} else {
-				console.log("Cannot join game", games[i].playerLeftUid, clientInfo.userUuid);
-			}
 		}
-		// create new game
-		games.push(this.PongService.initGame(i, clientInfo, client.id));
-		console.log("GAMES[", i, "]", games[i]);
-		client.join(i.toString());
-		return i;
+		if (players.length == 0) { // no player in the queue
+			players.push(player);
+			console.log("Player added to queue", players);
+			return "";
+		} else {
+			for (var i: number = 0; i < players.length; i++) {
+				if (players[i].userUuid == player.userUuid) { // player already in the queue
+					console.log("Player already in queue");
+					return "";
+				}
+			}
+			game = await this.PongService.initGame(player, players.shift());
+			games.set(game.matchId, game);
+			console.log("GAME: ", game.matchId, "/n", game);
+		}
+		game.begin = true; // start game
+		return game.matchId;
 	}
 
 	@SubscribeMessage('getGames')
-	getGames(client: Socket): GameWindowState[] {
+	getGames(client: Socket): Map<string, GameWindowState> {
 		return games;
 	}
 
-	sendGametoRoom(id: number) {
-		if (id == undefined)
-        	return;
-		if (games[id].matchMaking == false) {
+	sendGametoRoom(matchId: string) {
+		console.log("sendGametoRoom", matchId);
+		if (matchId == undefined)
+			return;
+		let game: GameWindowState = games.get(matchId);
+		if (game.matchMaking == false) {
 			try {
-				this.server.to(id.toString()).emit('game', games[id]);
+				this.server.to(matchId).emit('game', game);
 			} catch (error) {
 				console.log("ERROR IN SEND GAME TO ROOM", error);
 			}
-			return ;
+			return;
 		}
-		games[id] = this.PongService.sendGametoRoom(games[id]);
+		game = this.PongService.sendGametoRoom(game);
 		try {
-			if (games[id].isGameOver)
-            	console.log("game over", games[id].isGameOver, games[id].scoreRight, games[id].scoreLeft, games[id].playerLeft);
-			this.server.to(id.toString()).emit('game', games[id]);
+			if (game.isGameOver)
+				console.log("game over", game.isGameOver, game.scoreRight, game.scoreLeft, game.playerLeft);
+			this.server.to(matchId).emit('game', game);
 		} catch (error) {
 			console.log("ERROR IN SEND GAME TO ROOM", error);
 		}
 	}
 
 	@SubscribeMessage('handlePaddle')
+	// args = [deltaPaddle, matchId]
 	handlePaddle(client: Socket, args: any): void {
 		games[args[1]] = this.PongService.handlePaddle(games[args[1]], args[0], client.id);
 	}
 
 	@SubscribeMessage('resetGame')
-	resetGame(client: Socket, id: number) {
-		client.leave(id.toString());
-		games[id] = this.PongService.resetGame(games[id]);	
-		return games[id];
+	resetGame(client: Socket, matchId: string): void {
+		client.leave(matchId);
+		games.delete(matchId);
 	}
 
 	afterInit(server: Server) {
@@ -151,15 +170,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
-		for (let i: number = 0; i < games.length; i++) {
-			if (games[i].playerLeft === client.id || games[i].playerRight === client.id) {
-				games[i] = this.PongService.resetGame(games[i]);
-				if (games[i].playerLeft === client.id) {
-					this.server.to(i.toString()).emit('leaveGame', games[i].playerLeftName);
+		for (let game of games.values()) {
+			if (game.playerLeft === client.id || game.playerRight === client.id) {
+				if (game.playerLeft === client.id) {
+					this.server.to(game.matchId).emit('leaveGame', game.playerLeftName);
 				} else {
-					this.server.to(i.toString()).emit('leaveGame', games[i].playerRightName);
+					this.server.to(game.matchId).emit('leaveGame', game.playerRightName);
 				}
-				this.resetGame(client, i);
+
+				// TO DO : define how we known if it's a deconnexion or just change page
+				// games.delete(game.matchId);
 			}
 		}
 	}

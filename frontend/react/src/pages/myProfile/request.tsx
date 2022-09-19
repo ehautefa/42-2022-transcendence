@@ -13,25 +13,6 @@ export async function FetchUser(uid: string) {
 	return await user.json();
 }
 
-export async function CreateUser() {
-	var myHeaders = new Headers();
-	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-	
-	var urlencoded = new URLSearchParams();
-	urlencoded.append("userName", "Elise");
-	urlencoded.append("userPassword", "bidule");
-	
-	const requestOptions = {
-		method: 'POST',
-		headers: myHeaders,
-		body: urlencoded
-	};
-	
-	const url = process.env.REACT_APP_BACK_URL + "/user/create";
-	let user = await (await fetch(url, requestOptions)).json();
-	return user;
-}
-
 export async function GetMatchHistory(userName: string) {
 	var url: string = process.env.REACT_APP_BACK_URL +  "/match/user/" + userName;
 	var requestOptions = {
@@ -57,7 +38,6 @@ export function ChangeUsername(userUuid: string, newName: string) {
 	};
 	
 	const URL = process.env.REACT_APP_BACK_URL + "/user/changeUsername";
-	console.log("URL:", URL);
 	fetch(URL, requestOptions)
 		.catch(error => console.log('error', error));
 }

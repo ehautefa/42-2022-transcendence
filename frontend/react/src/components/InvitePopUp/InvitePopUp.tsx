@@ -2,25 +2,25 @@ import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "./InvitePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocket } from "../../App"
+import { getSocketPong } from "../../App"
 
-const socket = getSocket();
+const socket = getSocketPong();
 
 function InvitePopUp(arg: any) {
     const [open, setOpen] = useState(false);
-    const [id, setId] = useState(0);
+    const [id, setId] = useState("");
 
     function invitePlayer() {
         setOpen(true);
-        console.log("invitePlayer", arg.userUuid);
+        console.log("invitePlayer", arg.userName);
         socket.emit("invitePlayer", {
             userName: arg.user.userName,
             userUuid: arg.user.userUuid,
-            invitedUid: arg.userUuid,
-            id: 0
-        }, (id: number) => {
-            console.log("ID", id);
-            setId(id);
+            invitedUserName: arg.userName,
+			invitedUserUuid: arg.userUuid
+        }, (matchId: string) => {
+            console.log("MATCH ID", matchId);
+            setId(matchId);
         });
     }
 

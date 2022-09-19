@@ -2,9 +2,9 @@ import NavBar from "../../components/NavBar/NavBar"
 import "./Match.css"
 import { useState } from "react"
 import { GameWindowState } from "../../type";
-import { getSocket } from "../../App"
+import { getSocketPong } from "../../App"
 
-const socket = getSocket();
+const socket = getSocketPong();
 
 
 function Match() {

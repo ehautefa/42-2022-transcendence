@@ -1,23 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { Interval, Timeout } from '@nestjs/schedule';
-import { InjectRepository } from '@nestjs/typeorm';
 import { MatchService } from 'src/match/match.service';
 import { GameWindowState } from './type';
 import { getPlayerDto } from './dto/getPlayer.dto';
-
-const PADDLE_SIZE = 10; // if you change that change also property height of paddle in Game css (x2)
-const BALL_SPEED = 1; // in %
-const END_SCORE = 10;
-const POS_BALL_X = 48.6;
-const POS_BALL_Y = 47.1; // same const in game.tsx
-const BOTTOM_LIM = 94.13;
-const TOP_LIM = 0.44;
-const RIGHT_LIM = 97.15;
-const LEFT_LIM = 0.24;
-const PADDLE_LEFT_X = 4.8;
-const PADDLE_RIGHT_X = 92.26;
-const BALL_DIAM = 6; // en %
-
+import { playerDto } from './dto/player.dto';
 
 @Injectable()
 export class PongService {
@@ -25,12 +10,12 @@ export class PongService {
     private readonly MatchService: MatchService;
 
     handlePaddle(game: GameWindowState, deltaPaddleY: number, clientID : string) : GameWindowState {
-        if (clientID == game.playerLeft) {
-			if (game.paddleLeftY + deltaPaddleY >= PADDLE_SIZE && game.paddleLeftY + deltaPaddleY <= 100 - PADDLE_SIZE)
+		if (clientID == game.playerLeft) {
+			if (game.paddleLeftY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleLeftY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
 				game.paddleLeftY += deltaPaddleY;
 		}
 		else if (clientID == game.playerRight) {
-			if (game.paddleRightY + deltaPaddleY >= PADDLE_SIZE && game.paddleRightY + deltaPaddleY <= 100 - PADDLE_SIZE)
+			if (game.paddleRightY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleRightY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
 				game.paddleRightY += deltaPaddleY;
 		}
         return game;
@@ -43,66 +28,61 @@ export class PongService {
         game.matchMaking = true;
         this.MatchService.createMatch({
             user1uid: game.playerLeftUid, // user1 is client Left
-            user2uid: clientInfo[0] // user2 is client Right
+            user2uid: clientInfo.userUuid // user2 is client Right
         }).then(match => {
             game.matchId = match.matchId;
         });
         return game;
     }
 
-    resetGame(game: GameWindowState): GameWindowState {
-        game.ballX = POS_BALL_X;
-		game.ballY = POS_BALL_Y;
-		game.ballSpeedX = 0;
-		game.ballSpeedY = 0;
-		game.scoreLeft = 0;
-		game.scoreRight = 0;
-		game.paddleLeftY = 50;
-		game.paddleRightY = 50;
-		game.isGameOver = false;
-		game.playerLeft = "";
-		game.playerRight = "";
-        return game;
-    }
-
-
-    initGame(i: number, clientInfo: getPlayerDto, clientID: string) : GameWindowState {
+    async initGame(client1: playerDto, client2: playerDto) : Promise<GameWindowState> {
+		var client2_socket:string = client2.socket === undefined ? "" : client2.socket.id;
 		var game: GameWindowState = {
 			matchId: undefined,
-			playerLeftUid: clientInfo.userUuid,
-            playerLeftName: clientInfo.userName,
-            playerRightName: "",
-			playerRightUid: undefined,
-			id: i,
-			ballY: POS_BALL_Y,
-			ballX: POS_BALL_X,
+			playerLeftUid: client1.userUuid,
+            playerLeftName: client1.userName,
+			playerLeft: client1.socket.id,
+			playerRightUid: client2.userUuid,
+            playerRightName: client2.userName,
+			playerRight: client2_socket,
+			ballY: parseInt(process.env.PONG_POS_BALL_Y),
+			ballX: parseInt(process.env.PONG_POS_BALL_X),
 			// randomly choose the direction
-			ballSpeedX: BALL_SPEED * (Math.random() < 0.5 ? 1 : -1),
-			ballSpeedY: BALL_SPEED * (Math.random() < 0.5 ? 1 : -1),
+			ballSpeedX: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
+			ballSpeedY: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
 			scoreLeft: 0,
 			scoreRight: 0,
 			paddleLeftY: 50,
 			paddleRightY: 50,
 			isGameOver: false,
-			playerLeft: clientID,
-			playerRight: undefined,
-			matchMaking: false,
+			matchMaking: true,
+            begin: false,
 		};
+		await this.MatchService.createMatch({
+			user1uid: client1.userUuid, // user1 is client Left
+			user2uid: client2.userUuid // user2 is client Right
+		}).then(match => {
+			console.log("match created", match);
+			game.matchId = match.matchId;
+			if (client1 !== undefined)
+				client1.socket.join(match.matchId);
+			if (client2.socket !== undefined)
+				client2.socket.join(match.matchId);
+		});
 		return game;
     }
 
     sendGametoRoom(game: GameWindowState): GameWindowState {
-
         game.ballX = game.ballX + game.ballSpeedX;
         game.ballY = game.ballY + game.ballSpeedY;
 
         // Check if the ball hits the left paddle
-        if (game.ballX <= PADDLE_LEFT_X
-            && game.ballY >= game.paddleLeftY - PADDLE_SIZE  //- BALL_DIAM
-            && game.ballY <= game.paddleLeftY + PADDLE_SIZE) {
+        if (game.ballX <= parseInt(process.env.PONG_PADDLE_LEFT_X)
+            && game.ballY >= game.paddleLeftY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
+            && game.ballY <= game.paddleLeftY + parseInt(process.env.PONG_PADDLE_SIZE)) {
             if (game.ballSpeedX < 0
-                && game.ballY >= game.paddleLeftY - (PADDLE_SIZE - 1)  //- BALL_DIAM
-                && game.ballY <= game.paddleLeftY + (PADDLE_SIZE - 1))
+                && game.ballY >= game.paddleLeftY - (parseInt(process.env.PONG_PADDLE_SIZE) - 1)  //- BALL_DIAM
+                && game.ballY <= game.paddleLeftY + (parseInt(process.env.PONG_PADDLE_SIZE) - 1))
                 // check if we have already hit the paddle
                 game.ballSpeedX = -game.ballSpeedX;
             else if ((game.ballSpeedY > 0
@@ -113,14 +93,14 @@ export class PongService {
                 if (game.ballSpeedX < 0) // check if we have already hit the paddle
                     game.ballSpeedX = -game.ballSpeedX;
             }
-            console.log(game.id, ": Hit left paddle", game.ballX, game.ballY);
+            console.log(game.matchId, ": Hit left paddle", game.ballX, game.ballY);
         } // Check if the ball hits the right paddle
-        else if (game.ballX >= PADDLE_RIGHT_X
-            && game.ballY >= game.paddleRightY - PADDLE_SIZE  //- BALL_DIAM
-            && game.ballY <= game.paddleRightY + PADDLE_SIZE) {
+        else if (game.ballX >= parseInt(process.env.PONG_PADDLE_RIGHT_X)
+            && game.ballY >= game.paddleRightY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
+            && game.ballY <= game.paddleRightY + parseInt(process.env.PONG_PADDLE_SIZE)) {
             if (game.ballSpeedX > 0
-                && game.ballY >= game.paddleRightY - (PADDLE_SIZE - 1)  //- BALL_DIAM
-                && game.ballY <= game.paddleRightY + (PADDLE_SIZE - 1))
+                && game.ballY >= game.paddleRightY - (parseInt(process.env.PONG_PADDLE_SIZE) - 1)  //- BALL_DIAM
+                && game.ballY <= game.paddleRightY + (parseInt(process.env.PONG_PADDLE_SIZE) - 1))
                 // check if we have already hit the paddle
                 game.ballSpeedX = -game.ballSpeedX;
             else if ((game.ballSpeedY > 0
@@ -131,33 +111,33 @@ export class PongService {
                 if (game.ballSpeedX > 0) // chck if we have already hit the paddle
                     game.ballSpeedX = -game.ballSpeedX;
             }
-            console.log(game.id, ": Hit right paddle", game.ballX, game.ballY);
+            console.log(game.matchId, ": Hit right paddle", game.ballX, game.ballY);
         } else {
-            if (game.ballX <= LEFT_LIM) { // Check if the ball hits the left wall
+            if (game.ballX <= parseInt(process.env.PONG_LEFT_LIM)) { // Check if the ball hits the left wall
                 game.scoreRight++;
                 game = this.endpoint(game);
-                console.log(game.id, ": Hits the left wall", game.ballX);
-            } else if (game.ballX >= RIGHT_LIM) { // Check if the ball hits the right wall
+                console.log(game.matchId, ": Hits the left wall", game.ballX);
+            } else if (game.ballX >= parseInt(process.env.PONG_RIGHT_LIM)) { // Check if the ball hits the right wall
                 game.scoreLeft++;
                 game = this.endpoint(game);
-                console.log(game.id, ": Hits the right wall", game.ballX);
-            } else if (game.ballY <= TOP_LIM) { // Check if the ball hits the top wall
+                console.log(game.matchId, ": Hits the right wall", game.ballX);
+            } else if (game.ballY <= parseInt(process.env.PONG_TOP_LIM)) { // Check if the ball hits the top wall
                 if (game.ballSpeedY < 0)
                     game.ballSpeedY = -game.ballSpeedY;
-                console.log(game.id, ": Hits the top wall", game.ballY);
-            } else if (game.ballY >= BOTTOM_LIM) { // Check if the ball hits the bottom wall
+                console.log(game.matchId, ": Hits the top wall", game.ballY);
+            } else if (game.ballY >= parseInt(process.env.PONG_BOTTOM_LIM)) { // Check if the ball hits the bottom wall
                 if (game.ballSpeedY > 0)
                     game.ballSpeedY = -game.ballSpeedY;
-                console.log(game.id, ": Hits the bottom wall", game.ballY);
+                console.log(game.matchId, ": Hits the bottom wall", game.ballY);
             }
         }
         return game;
     }
 
     endpoint(game: GameWindowState): GameWindowState {
-		game.ballX = POS_BALL_X;
-		if (game.scoreLeft == END_SCORE || game.scoreRight == END_SCORE) {
-			game.ballY = POS_BALL_Y;
+		game.ballX = parseInt(process.env.PONG_POS_BALL_X);
+		if (game.scoreLeft == parseInt(process.env.PONG_END_SCORE) || game.scoreRight == parseInt(process.env.PONG_END_SCORE)) {
+			game.ballY = parseInt(process.env.PONG_POS_BALL_Y);
 			game.ballSpeedX = 0;
 			game.ballSpeedY = 0;
 			if (game.isGameOver == false) {
@@ -173,8 +153,8 @@ export class PongService {
 			game.isGameOver = true;
 		} else {
 			game.ballY = Math.random() * 80 + 10;
-			game.ballSpeedX = BALL_SPEED * (Math.random() < 0.5 ? 1 : -1);
-			game.ballSpeedY = BALL_SPEED * (Math.random() < 0.5 ? 1 : -1);
+			game.ballSpeedX = parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1);
+			game.ballSpeedY = parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1);
 		}
         return game;
 	}

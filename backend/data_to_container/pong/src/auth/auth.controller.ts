@@ -11,22 +11,18 @@ import { JwtAuthGuard } from './guards/jwt-auth.guards';
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
-    @UseGuards(FortyTwoAuthGuard)
-    @ApiOperation({ summary: 'handle redirect to 42 api to authentification (from fortyTwoStrategy)' })
-    @Get('login')
-    login() {
-        console.log("login in controller")
-    }
-
+    // @UseGuards(FortyTwoAuthGuard)
+    // @ApiOperation({ summary: 'handle redirect to 42 api to authentification (from fortyTwoStrategy)' })
+    // @Get('login')
+    // login() {
+        // console.log("login in controller")
+    // }
+// 
     @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
     @UseGuards(FortyTwoAuthGuard)
-    @Get('42/callback')
-    cb(@Req() req, @Res() res) {
-        if (req.user) {
-            console.log("username connected with", req.user);
+    @Get('login')
+    login(@Req() req, @Res() res) {
             return this.authService.login(req, res);
-        }
-        res.redirect('/auth/login');
     }
 
     @UseGuards(JwtAuthGuard)

@@ -10,6 +10,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         private readonly userService: UserService
     ) {
         super({
+            failureRedirect: '/auth/login',
             jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
                 console.log("constructor jwt");
                 let data = request?.cookies['access_token']
@@ -23,17 +24,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             ignoreExpiration: false,
             secretOrKey: process.env.JWT_SIGN //Protect in env file
         }, async (jwt_paylod, done) => {
+            console.log("verify jwt strat")
             const user = await userService.getUser(jwt_paylod.userUuid);
             console.log(user)
             return done(null, user);
         });
     }
 
-    validate(payload: any) {
-        console.log('vali');
-        return {
-            id: payload.userUuid,
-            // name: payload.userName,
-        };
-    }
+    // validate(payload: any) {
+        // console.log('vali');
+        // return {
+            // userUuid: payload.userUuid,
+        // };
+    // }
 }

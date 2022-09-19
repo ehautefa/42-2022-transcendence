@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -13,25 +12,30 @@ import Win from "./pages/endGame/win";
 import Lose from "./pages/endGame/lose";
 import GameOver from "./pages/endGame/GameOver";
 import Profile from './pages/Profile/Profile';
+import { ModalProvider } from './context/modal-context';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+	document.getElementById('root') as HTMLElement
 );
-root.render(
-	<BrowserRouter>
-    	<Routes>
-			<Route path="/" element={<App />} />
-			<Route path="mainPage" element={<MainPage />} />
-			<Route path="game" element={<Game />} />
-			<Route path="chat" element={<Chat />} />
-			<Route path="myProfile" element={<MyProfile />} />
-			<Route path="match" element={<Match />} />
-			<Route path="endGame/lose" element={<Lose />} />
-			<Route path="endGame/win" element={<Win />} />
-			<Route path="profile" element={<Profile />} />
-			<Route path="endGame/gameOver" element={<GameOver />} />
-		</Routes>
-	</BrowserRouter>
+
+root.render(<>
+	<ModalProvider>
+		<BrowserRouter>
+			<Routes>
+				<Route path="/" element={<App />} />
+				<Route path="mainPage" element={<MainPage />} />
+				<Route path="game" element={<Game />} />
+				<Route path="chat" element={<Chat />} />
+				<Route path="myProfile" element={<MyProfile />} />
+				<Route path="match" element={<Match />} />
+				<Route path="endGame/lose" element={<Lose />} />
+				<Route path="endGame/win" element={<Win />} />
+				<Route path="profile" element={<Profile />} />
+				<Route path="endGame/gameOver" element={<GameOver />} />
+			</Routes>
+		</BrowserRouter>
+	</ModalProvider>
+</>
 );
 
 // If you want to start measuring performance in your app, pass a function

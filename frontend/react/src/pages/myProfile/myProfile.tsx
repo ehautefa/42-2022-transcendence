@@ -3,8 +3,16 @@ import "./Profil.css"
 import { FetchUser, GetMatchHistory, GetAllUsers } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
+import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
+
+const socketStatus = getSocketStatus();
+
+socketStatus.on('getUserUuid', () => {
+	console.log("GET USER UUID", localStorage.getItem('uid'));
+	socketStatus.emit('getUserUuid', localStorage.getItem('uid'));
+})
 
 var update = true;
 
@@ -22,15 +30,14 @@ function MyProfile() {
 			const matchHistory = await GetMatchHistory(user.userName);
 			const allUsers = await GetAllUsers();
 			setAllUsers(allUsers);
+			socketStatus.emit('getFriendsStatus', allUsers, (data: any) => {
+				setAllUsers(data);
+			});
 			setMatchHistory(matchHistory);
 			setUser(user);
 			update = false;
 		}
 	}
-
-
-	
-	console.log("MATCH HISTORY", matchHistory);
 
 	return (<>
 		<NavBar />
@@ -43,7 +50,6 @@ function MyProfile() {
 							<div className="Username">Username : {user.userName}</div>
 							<EditUsernamePopUp />
 						</li>
-						<li>Current Status: Online</li>
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
@@ -68,10 +74,10 @@ function MyProfile() {
 						</thead>
 						<tbody>
 							{allUsers.map((users: any) => {
-								return (<tr key="{users.userUuid}">
+								return (<tr key={users.userUuid}>
 									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
-									<td>Online</td>
-									<InvitePopUp userUuid={users.userUuid} user={user} />
+									{users.status ? <td>Online</td> : <td>Offline</td>}
+									<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
 								</tr>);
 							})}
 						</tbody>
@@ -89,7 +95,7 @@ function MyProfile() {
 						</thead>
 						<tbody>
 							{matchHistory.map((match: any) => {
-								return (<tr key="{match.matchId}">
+								return (<tr key={match.matchId}>
 									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>

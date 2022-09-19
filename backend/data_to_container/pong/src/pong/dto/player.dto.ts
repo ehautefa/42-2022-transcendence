@@ -1,7 +1,9 @@
 import { IsNotEmpty } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Socket } from 'socket.io';
 
-export class invitePlayerDto {
+
+export class playerDto {
 
     @ApiProperty({ description: 'The player uid' })
     @IsNotEmpty({message: "userUid should be declared"})
@@ -11,11 +13,6 @@ export class invitePlayerDto {
 	@IsNotEmpty({message: "userName should be declared"})
     userName: string;
 
-    @ApiProperty({ description: 'The invited player username'})
-    @IsNotEmpty({message: "invitedUserName should be declared"})
-    invitedUserName: string;
-
-	@ApiProperty({ description: 'The invited player userUuid'})
-    @IsNotEmpty({message: "invitedUserUuid should be declared"})
-    invitedUserUuid: string;
+	@ApiProperty({ description: 'The player socket id' })
+	socket: Socket;
 }
