@@ -1,6 +1,6 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Logger, UseGuards, Inject } from '@nestjs/common';
+import { Logger, UseGuards, Inject, Req } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
 import { StatusGateway  } from "src/status/status.gateway";
@@ -11,13 +11,17 @@ import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
+import { request } from "http";
 
 var games = new Map<string, GameWindowState>();
 var players = new Array<playerDto>();
 var launch_game = true;
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'pong' }) // enable CORS everywhere
-export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+@WebSocketGateway({ cors: 
+	{ origin: "http://localhost:3000", credentials: true }, 
+	namespace: '/pong' }) // enable CORS everywhere
+export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 	private logger: Logger = new Logger('PongGateway');
@@ -91,13 +95,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	// Launch a game and find a match for the player
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@SubscribeMessage('getPlayer')
-	async getPlayer(client: Socket, clientInfo: getPlayerDto): Promise<string> {
-		// let auth_token : string = client.handshake.headers.authorization.split(' ')[1];
+	async getPlayer(client: Socket, @Req() req): Promise<string> {
 		let player: playerDto = { // create a player entity
-			userUuid: clientInfo.userUuid,
-			userName: clientInfo.userName,
+			userUuid: req.user.userUuid,
+			userName: req.user.userName,
 			socket: client
 		};
 		let game: GameWindowState;
@@ -162,10 +165,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	resetGame(client: Socket, matchId: string): void {
 		client.leave(matchId);
 		games.delete(matchId);
-	}
-
-	afterInit(server: Server) {
-		this.logger.log('Init');
 	}
 
 	handleDisconnect(client: Socket) {

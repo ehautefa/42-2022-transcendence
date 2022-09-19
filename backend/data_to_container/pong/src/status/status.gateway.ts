@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Logger, Injectable } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { SendInviteDto } from './dto/sendInvite.dto';
@@ -18,17 +18,19 @@ var inline = new Map<string, string>();
 // Map of all users connected and their socketId
 
 @Injectable()
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'status' }) // enable CORS everywhere
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/status' }) // enable CORS everywhere
 export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
-	@SubscribeMessage('getUserUuid')
-	getUserUid(client: Socket, userUuid: string): void {
-		inline.set(userUuid, client.id);
-		console.log('init', client.id, userUuid);
-		console.log("inline", inline);
-	}
+	private logger: Logger = new Logger('PongGateway')
+
+	// @SubscribeMessage('getUserUuid')
+	// getUserUid(client: Socket, userUuid: string): void {
+	// 	inline.set(userUuid, client.id);
+	// 	console.log('init', client.id, userUuid);
+	// 	console.log("inline", inline);
+	// }
 
 	sendInvitation(sendInvite : SendInviteDto) {
 		let socket = inline.get(sendInvite.invitedUserUuid);
@@ -41,25 +43,25 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
-	@SubscribeMessage('getFriendsStatus')
-	getFriendsStatus(client: Socket, users: User[] ): User[] {
-		for (let i = 0; i < users.length; i++) {
-			if (inline.has(users[i].userUuid)) {
-				users[i].status = true;
-			} else {
-				users[i].status = false;
-			}
-		}
-		return users;
-	}
+	// @SubscribeMessage('getFriendsStatus')
+	// getFriendsStatus(client: Socket, users: User[] ): User[] {
+	// 	for (let i = 0; i < users.length; i++) {
+	// 		if (inline.has(users[i].userUuid)) {
+	// 			users[i].status = true;
+	// 		} else {
+	// 			users[i].status = false;
+	// 		}
+	// 	}
+	// 	return users;
+	// }
 
-	handleConnection(client: any, ...args: any[]) {
-		console.log('client connected', inline);
+	handleConnection(client: any) {
+		this.logger.log(`Client status connected: ${client.id}`);
 		// client.emit('getUserUuid');
 	}
 
 	handleDisconnect(client: any) {
-		console.log('client disconnected', client.id);
+		this.logger.log(`Client status disconnected: ${client.id}`);
 		for (const [key, value] of inline.entries()) {
 			if (value === client.id) {
 				inline.delete(key);
