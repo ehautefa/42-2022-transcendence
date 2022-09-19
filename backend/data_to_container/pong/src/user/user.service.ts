@@ -32,12 +32,19 @@ export class UserService {
         if (user)
             return user;
         else {
-            let extraName: string = '';
-            if (await this.UserRepository.findOne({ where: { userName: userToFindOrCreate.userName } }))
-                extraName = userToFindOrCreate.user42Id;
+            let numberToAdd: number = 1;
+            let uniqueUserName: string = userToFindOrCreate.userName;
+            while (numberToAdd < 60) {
+                if (await this.UserRepository.findOne({ where: { userName: uniqueUserName } }))
+                    numberToAdd++;
+                else
+                    break
+
+                uniqueUserName = userToFindOrCreate.userName + numberToAdd;
+            }
 
             return await this.UserRepository.save({
-                userName: userToFindOrCreate.userName + extraName,
+                userName: uniqueUserName,
                 user42Id: userToFindOrCreate.user42Id,
                 accessToken42: userToFindOrCreate.accessToken42,
                 online: false,
@@ -51,8 +58,7 @@ export class UserService {
     async changeUserName(userToChange: ChangeUserNameDto): Promise<void> {
         //need check if userName already exist
 
-        if (await this.UserRepository.findOne({ where: { userName: userToChange.newName } }))
-        {
+        if (await this.UserRepository.findOne({ where: { userName: userToChange.newName } })) {
             console.log("Error username already exist");
             return null;
         }
