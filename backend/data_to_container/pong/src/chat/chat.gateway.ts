@@ -1,22 +1,29 @@
 import {
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Logger, UseGuards } from '@nestjs/common';
+import { Socket, Server } from 'socket.io';
 import { Room } from 'src/bdd/room.entity';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { JoinDMRoomDto } from './dto/joinDMRoom.dto';
 
-@WebSocketGateway({ cors: '*' })
-export class ChatGateway {
+const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
+
+@WebSocketGateway({ cors: { origin: "*"}, namespace: 'chat' })
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
   @WebSocketServer()
   server: Server;
+  private logger: Logger = new Logger('PongGateway');
 
   @SubscribeMessage('createMessage')
   async createMessage(
@@ -78,5 +85,17 @@ export class ChatGateway {
   async findAllPublicRooms(): Promise<Room[]> {
     const rooms: Room[] = await this.chatService.findAllPublicRooms();
     return rooms;
+  }
+
+	afterInit(server: Server) {
+		this.logger.log('Init');
+	}
+
+  handleDisconnect(client: Socket) {
+    this.logger.log(`Client disconnected: ${client.id}`);
+  }
+
+  handleConnection(client: Socket, ...args: any[]) {
+    this.logger.log(`Client connected: ${client.id}`);
   }
 }

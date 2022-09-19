@@ -2,12 +2,12 @@ import NavBar from "../../components/NavBar/NavBar"
 import "./Chat.css"
 import { useState, useEffect } from 'react'
 import { CSSTransition, TransitionGroup} from 'react-transition-group';
-import { getSocket } from "../../App" 
+import { getSocketChat } from "../../App" 
 //import {Route, NavLink, HashRouter} from 'react-router-dom'
 //import { User } from "../../type";
 
 function Chat() {
-	const socket = getSocket();
+	const socket = getSocketChat();
 
 	console.log(socket);
 
@@ -21,13 +21,7 @@ function Chat() {
 
   	useEffect(() => {
 
-		const channelListener = (channel:any) => {
-			setChannels((prevChannels:any) => {
-				const newChannels = {...prevChannels};
-				newChannels[channel.id] = message;
-				return newChannels;
-			});
-		};
+
 	});
 
 	function makeRoom() {
