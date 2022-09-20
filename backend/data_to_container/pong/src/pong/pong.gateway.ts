@@ -19,8 +19,11 @@ var players = new Array<playerDto>();
 var launch_game = true;
 
 @WebSocketGateway({ cors: 
-	{ origin: "http://localhost:3000", credentials: true }, 
-	namespace: '/pong' }) // enable CORS everywhere
+					{
+						origin: 'http://localhost:3000',
+					}, 
+					namespace: '/pong',
+				 }) // enable CORS everywhere
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;

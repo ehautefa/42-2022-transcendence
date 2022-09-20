@@ -3,17 +3,11 @@ import { io } from 'socket.io-client'
 
 // Create my socket
 let socketOptions = {
-	transportOptions: {
-		polling: {
-			extraHeaders: {
-				Authorization: 'Bearer 464654564'
-			}
-		}
-	}
+	withCredentials: true,
 };
 
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
-const socketPong = io(URL_BACK + "/pong", {withCredentials: true});
+const socketPong = io(URL_BACK + "/pong", socketOptions);
 
 // const socketStatus = io(URL_BACK + "/status", socketOptions);
 
