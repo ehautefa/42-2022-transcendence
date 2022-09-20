@@ -12,7 +12,7 @@ import { UserService } from './user.service';
 @Module({
   imports: [BddModule,PassportModule, JwtModule.register({ // put this in a config file?
     secret: process.env.JWT_SIGN,
-    signOptions: { expiresIn: '600s'},
+    signOptions: { expiresIn: process.env.JWT_EXPIRE},
   }),],
   controllers: [UserController],
   providers: [UserService, FortyTwoStrategy],

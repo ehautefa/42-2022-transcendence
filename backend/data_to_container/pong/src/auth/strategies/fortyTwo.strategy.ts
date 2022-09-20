@@ -16,7 +16,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
       //fuction received acces token from 42 api and create or find user in database
 
       console.log("[FortyTwoStrategy] - Find or create user :", profile.id)
-      const user = await userService.FindOrCreateUser({ 'userName': profile.username, 'user42Id': profile.id, 'accessToken42': access_token });
+      const user = await userService.FindOrCreateUser({ 'userName': profile.username, 'user42Id': profile.id});
       if (!user) {
         //needToThrow
         console.log("[FortyTwoStrategy] - Error during creation / finding");

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user } from 'src/bdd/users.entity';
-import { User } from 'src/status/status.gateway';
 import { Repository, UpdateResult } from 'typeorm';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -18,13 +17,42 @@ export class UserService {
 
     async getAllUser(): Promise<user[]> {
         //need to remove access_token from the tab
-        return await this.UserRepository.find({});
+        return await this.UserRepository.find({ relations: { friends: true, blocked: true } });
+    }
+
+    async addFriend(user: user, userUuidToAdd: string): Promise<user[]> {
+        const tofind = await this.getCompleteUser(userUuidToAdd);
+        if (!tofind)
+            return null;
+        user.friends.push(tofind);
+        await this.UserRepository.save(user);
+        return user.friends;
+    }
+
+    async removeFriend(user: user, userUuidToRemove: string) {
+        const tofind = await this.getUser(userUuidToRemove);
+        const idx = user.friends.findIndex((object) => {
+            return object.userUuid === tofind.userUuid;
+        })
+        if (idx > -1) {
+            user.friends.splice(idx);
+            await this.UserRepository.save(user);
+            return user.friends;
+        }
+        return
     }
 
     async getUser(userUuid: string): Promise<user> {
         if (!userUuid)
             return null;
         const user = await this.UserRepository.findOne({ where: { userUuid: userUuid } });
+        return user;
+    }
+
+    async getCompleteUser(userUuid: string): Promise<user> {
+        if (!userUuid)
+            return null;
+        const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, }, where: { userUuid: userUuid } });
         return user;
     }
 
@@ -46,7 +74,6 @@ export class UserService {
             return await this.UserRepository.save({
                 userName: uniqueUserName,
                 user42Id: userToFindOrCreate.user42Id,
-                accessToken42: userToFindOrCreate.accessToken42,
                 online: false,
                 twoFactorAuth: false,
                 wins: 0,
@@ -65,11 +92,11 @@ export class UserService {
         await this.UserRepository.update(userToChange.userUuid, { userName: userToChange.newName });
     }
 
-    async disableTwoFactorAuth(user: User): Promise<void> {
+    async disableTwoFactorAuth(user: user): Promise<void> {
         await this.UserRepository.update(user.userUuid, { twoFactorAuth: false });
     }
 
-    async enableTwoFactorAuth(user: User): Promise<void> {
+    async enableTwoFactorAuth(user: user): Promise<void> {
         await this.UserRepository.update(user.userUuid, { twoFactorAuth: true });
     }
 

@@ -25,8 +25,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             secretOrKey: process.env.JWT_SIGN //Protect in env file
         }, async (jwt_paylod, done) => {
             console.log("verify jwt strat")
-            const user = await userService.getUser(jwt_paylod.userUuid);
-            console.log(user)
+            const user = await userService.getCompleteUser(jwt_paylod.userUuid);
+            // console.log(user)
             return done(null, user);
         });
     }

@@ -10,7 +10,4 @@ export class FindOrCreateUserDto {
     @ApiProperty({ description: 'The user name' })
     @IsNotEmpty({message: "userName should be declared"})
     userName: string;
-
-    @IsNotEmpty({message: "userPassword should be declared"})
-    accessToken42: string;
 }
