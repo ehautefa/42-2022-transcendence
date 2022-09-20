@@ -10,7 +10,7 @@ import { FortyTwoStrategy } from './strategies/fortyTwo.strategy';
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({ // put this in a config file?
     secret: process.env.JWT_SIGN,
-    signOptions: { expiresIn: '600s'},
+    signOptions: { expiresIn: process.env.JWT_EXPIRE},
   }),], 
   providers: [AuthService, FortyTwoStrategy, JwtStrategy, ],
   controllers: [AuthController],

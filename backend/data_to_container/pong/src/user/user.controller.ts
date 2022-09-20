@@ -9,66 +9,133 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@ne
 import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { FortyTwoStrategy } from 'src/auth/strategies/fortyTwo.strategy';
+import { HandleFriendDto } from './dto/handleFriend.dto';
 
 @ApiBearerAuth()
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-    constructor( private readonly UserService : UserService ) {}
+    constructor(private readonly UserService: UserService) { }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('me')
-    @ApiOperation({ summary: 'Get me with acces_token' })
-    @ApiResponse({ status: 200, description: 'Found user by uid', type: user })
-    async getMe(@Req() req, @Res() res){
-        res.send(await this.UserService.getUser(req.user.userUuid));
-    }
-
-    // @UseGuards(JwtAuthGuard)
     @Get('all')
     @ApiOperation({ summary: 'Get all user of the table' })
     @ApiResponse({ status: 200, description: 'Found users', type: user })
-    async getAllUser() : Promise<user[]>{
+    @UseGuards(JwtAuthGuard)
+    async getAllUser(): Promise<user[]> {
         return await this.UserService.getAllUser();
+    }
+
+    @Get('allUuidWithUserName')
+    @ApiOperation({ summary: 'Get all user Uuid of the table' })
+    @UseGuards(JwtAuthGuard)
+    async getAllUserUuidWithUserName() {
+        return await this.UserService.getAllUserUuidWithUserName();
     }
 
     @Get('/:userUid')
     @ApiOperation({ summary: 'Get user by userUid' })
     @ApiResponse({ status: 200, description: 'Found user by uid', type: user })
+    @UseGuards(JwtAuthGuard)
     @UsePipes(ValidationPipe)
-    async getUser(@Param('userUid') userUid : string) : Promise<user> {
-        return await this.UserService.getUser(userUid);
+    async getCompleteUser(@Param('userUid') userUid: string): Promise<user> {
+        return await this.UserService.getCompleteUser(userUid);
     }
 
-    @Post('create')
-    @ApiOperation({ summary: 'Create a new user' })
-    @ApiParam({ name: 'CreateUserDto', type: CreateUserDto })
-    @ApiResponse({ status: 200, description: 'The created user', type: user })
+    @Get('me')
+    @ApiOperation({ summary: 'Get me (from cookie)' })
+    @ApiResponse({ status: 200, description: 'Found user by uid', type: user })
+    @UseGuards(JwtAuthGuard)
+    async getMe(@Req() req, @Res() res) {
+        res.send(req.user);
+    }
+
+    @Get('myFriends')
+    @ApiOperation({ summary: 'Get myFriends (from cookie)' })
+    @UseGuards(JwtAuthGuard)
+    async getMyFriends(@Req() req, @Res() res) {
+        res.send(req.friends);
+    }
+
+    @Get('myBlocked')
+    @ApiOperation({ summary: 'Get myblocked (from cookie)' })
+    @UseGuards(JwtAuthGuard)
+    async getMyblocked(@Req() req, @Res() res) {
+        res.send(req.blocked);
+    }
+
+    @Post('addFriend')
+    @ApiOperation({ summary: 'Add Friend(with uUid) to me (from cookie)' })
+    @UseGuards(JwtAuthGuard)
     @UsePipes(ValidationPipe)
-    async createUser(@Body() UserToCreate : FindOrCreateUserDto) : Promise<user> {
-        return await this.UserService.FindOrCreateUser(UserToCreate);
+    async addFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+        res.send(this.UserService.addFriend(req.user, userToHandle.userUuidToHandle));
+    }
+
+    @Post('addBlocked')
+    @ApiOperation({ summary: 'Add Blocked(with uUid) to me (from cookie)' })
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
+    async addBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+        res.send(this.UserService.addBlocked(req.user, userToHandle.userUuidToHandle));
+    }
+
+    @Post('removeFriend')
+    @ApiOperation({ summary: 'remove Friend(with uUid) to me (from cookie)' })
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
+    async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+        res.send(this.UserService.removeFriend(req.user, userToHandle.userUuidToHandle));
+    }
+
+    @Post('removeBlocked')
+    @ApiOperation({ summary: 'remove Blocked(with uUid) to me (from cookie)' })
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
+    async removeBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+        res.send(this.UserService.removeBlocked(req.user, userToHandle.userUuidToHandle));
+    }
+
+    @Post('enableTwoFactorAuth')
+    @ApiOperation({ summary: 'Enable two factor auth to me (from cookie)' })
+    @UseGuards(JwtAuthGuard)
+    async enableTwoFactorAuth(@Req() req) {
+        return await this.UserService.enableTwoFactorAuth(req.user);
+    }
+
+    @Post('disableTwoFactorAuth')
+    @ApiOperation({ summary: 'Disable two factor auth to me (from cookie)' })
+    @UseGuards(JwtAuthGuard)
+    async disableTwoFactorAuth(@Req() req) {
+        return await this.UserService.disableTwoFactorAuth(req.user);
     }
 
     @Post('changeUsername')
-    @ApiOperation({ summary: 'Change the username of the user' })
+    @ApiOperation({ summary: 'Change my username (from cookie)' })
     @ApiParam({ name: 'ChangeUserNameDto', type: ChangeUserNameDto })
+    @UseGuards(JwtAuthGuard)
     @UsePipes(ValidationPipe)
-    async changeUserName(@Body() userToChange : ChangeUserNameDto) {
-        return await this.UserService.changeUserName(userToChange);
-    }
-
-    @Post('flipTwoFactorAuth')
-    @UsePipes(ValidationPipe)
-    async flipTwoFactorAuth(@Body() userToChange : FlipTwoFactorAuthDto) {
-        return await this.UserService.flipTwoFactorAuth(userToChange);
+    async changeUserName(@Req() req, @Body() userToChange: ChangeUserNameDto) {
+        return await this.UserService.changeUserName(req.user, userToChange.newName);
     }
 
     @Post('endOfMatch')
     @ApiOperation({ summary: 'Save score at the end of the match' })
     @ApiParam({ name: 'EndOfMatchDto', type: EndOfMatchDto })
+    @UseGuards(JwtAuthGuard)
     @UsePipes(ValidationPipe)
-    async endOfMatch(@Body() players : EndOfMatchDto) : Promise<void> {
+    async endOfMatch(@Body() players: EndOfMatchDto): Promise<void> {
         return await this.UserService.endOfMatch(players);
+    }
+
+    //TO_DELL IN PROD
+    //Check NODE_ENV = PRODUCTION?
+    @Post('create')
+    @ApiOperation({ summary: 'Create a new user ONLY in DEV?' })
+    @ApiResponse({ status: 200, description: 'The created user', type: user })
+    @UsePipes(ValidationPipe)
+    async createUser(@Body() UserToCreate: FindOrCreateUserDto): Promise<user> {
+        // console.log(process.env.NODE_ENV)
+        return await this.UserService.FindOrCreateUser(UserToCreate);
     }
 
 }

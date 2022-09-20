@@ -38,12 +38,11 @@ export class user extends BaseEntity {
     @JoinTable()
     friends: user[];
 
-    @ApiProperty({ description: 'The acces_token for api 42'})
-    @Column('varchar')
-    accessToken42: string;
-
+    @ApiProperty({ description: 'The list of user who are blocked by the user'})
+    @ManyToMany(() => user, usr => usr.userUuid)
+    @JoinTable()
+    blocked: user[];
 
     // match_history
-
 
 }
