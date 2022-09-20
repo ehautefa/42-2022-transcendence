@@ -5,14 +5,12 @@ import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
 import { StatusGateway  } from "src/status/status.gateway";
 import { GameWindowState } from "./type";
-import { AuthGuard } from './pong.guards';
 import { getPlayerDto } from './dto/getPlayer.dto';
 import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
-import { request } from "http";
 
 var games = new Map<string, GameWindowState>();
 var players = new Array<playerDto>();

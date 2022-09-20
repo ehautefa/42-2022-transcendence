@@ -3,7 +3,7 @@ import { io } from 'socket.io-client'
 
 // Create my socket
 let socketOptions = {
-	withCredentials: true,
+	// withCredentials: true,
 };
 
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;

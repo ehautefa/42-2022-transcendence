@@ -3,7 +3,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnectio
 import { Socket, Server } from 'socket.io';
 import { SendInviteDto } from './dto/sendInvite.dto';
 
-export type User = {
+type User = {
 	userUuid: string;
 	userName: string;
 	status?: boolean;
