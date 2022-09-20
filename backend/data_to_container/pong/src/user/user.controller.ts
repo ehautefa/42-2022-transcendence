@@ -25,11 +25,11 @@ export class UserController {
         return await this.UserService.getAllUser();
     }
 
-    @Get('allUuid')
+    @Get('allUuidWithUserName')
     @ApiOperation({ summary: 'Get all user Uuid of the table' })
     @UseGuards(JwtAuthGuard)
-    async getAllUserUuid() {
-        return await this.UserService.getAllUserUuid();
+    async getAllUserUuidWithUserName() {
+        return await this.UserService.getAllUserUuidWithUserName();
     }
 
     @Get('/:userUid')
@@ -134,7 +134,7 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'The created user', type: user })
     @UsePipes(ValidationPipe)
     async createUser(@Body() UserToCreate: FindOrCreateUserDto): Promise<user> {
-        console.log(process.env.NODE_ENV)
+        // console.log(process.env.NODE_ENV)
         return await this.UserService.FindOrCreateUser(UserToCreate);
     }
 

@@ -19,8 +19,8 @@ export class UserService {
         return await this.UserRepository.find({ relations: { friends: true, blocked: true } });
     }
 
-    async getAllUserUuid() {
-        return await this.UserRepository.find({ select:{userUuid : true}});
+    async getAllUserUuidWithUserName() {
+        return await this.UserRepository.find({ select:{userUuid: true, userName: true}});
     }
 
     //need to remove from blocked?
