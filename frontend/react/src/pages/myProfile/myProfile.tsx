@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { GetMatchHistory, GetAllUsers, getMe } from "./request"
+import { GetMatchHistory, GetAllUsers, getMe, disableTwoFactorAuth, enableTwoFactorAuth } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
 import { getSocketStatus } from "../../App";
@@ -38,6 +38,15 @@ function MyProfile() {
 		}
 	}
 
+	function switch2FA() {
+		if (user.twoFactorAuth) {
+			disableTwoFactorAuth();
+		} else {
+			enableTwoFactorAuth();
+		}
+		window.location.reload();
+	}
+
 	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
@@ -52,7 +61,10 @@ function MyProfile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button className="enable">Enable two-factor authentication</button>
+					{user.twoFactorAuth === false ?
+						<button className="enable" onClick={switch2FA}>Enable two-factor authentication</button> :
+						<button className="enable" onClick={switch2FA}>Disable two-factor authentication</button>
+					}
 				</div>
 				<a href="./editProfil">
 					<div className="pp">

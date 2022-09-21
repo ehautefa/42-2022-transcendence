@@ -2,7 +2,7 @@ export type User = {
 	userUuid: string;
 	userName: string;
 	status?: boolean;
-	twoFfactorAuth?: boolean;
+	twoFactorAuth?: boolean;
 	wins?: number;
 	losses?: number;
 	friends?: User[];
