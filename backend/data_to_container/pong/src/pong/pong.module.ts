@@ -9,7 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [MatchModule, StatusModule, ScheduleModule.forRoot(), JwtModule.register({ // put this in a config file?
     secret: process.env.JWT_SIGN,
-    signOptions: { expiresIn: '600s'},
+    signOptions: { expiresIn: '60000s'},
   })],
   exports: [PongService],
   providers: [PongGateway, PongService],

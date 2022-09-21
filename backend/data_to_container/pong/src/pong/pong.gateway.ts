@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Logger, UseGuards, Inject, Req } from '@nestjs/common';
+import { Logger, UseGuards, Inject, Req, Body } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
 import { StatusGateway  } from "src/status/status.gateway";
@@ -11,6 +11,7 @@ import { invitePlayerDto } from './dto/invitePlayer.dto';
 import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
+import { handlePaddleDto } from "./dto/handlePaddle.dto";
 
 var games = new Map<string, GameWindowState>();
 var players = new Array<playerDto>();
@@ -43,6 +44,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('joinGame') // For spectator
+	@UseGuards(JwtAuthGuard)
 	joinGame(client: Socket, arg: any) {
 		var matchId: string = arg[0];
 		var username: string = arg[1];
@@ -59,7 +61,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// Invite a specific user to a game
 	@SubscribeMessage('invitePlayer')
-	// @UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
 		console.log("invitePlayer", invitePlayer);
 		let player1: playerDto = {
@@ -86,6 +88,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('acceptInvite')
+	@UseGuards(JwtAuthGuard)
 	acceptInvite(client: Socket, acceptInvite: AcceptInviteDto) {
 		if (launch_game == true) {
 			launch_game = false;
@@ -98,8 +101,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	// Launch a game and find a match for the player
-	@UseGuards(JwtAuthGuard)
 	@SubscribeMessage('getPlayer')
+	@UseGuards(JwtAuthGuard)
 	async getPlayer(@Req() req): Promise<string> {
 		let player: playerDto = { // create a player entity
 			userUuid: req.user.userUuid,
@@ -131,12 +134,12 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('getGames')
+	@UseGuards(JwtAuthGuard)
 	getGames(client: Socket): Map<string, GameWindowState> {
 		return games;
 	}
 
 	sendGametoRoom(matchId: string) {
-		console.log("sendGametoRoom", matchId);
 		if (matchId == undefined)
 			return;
 		let game: GameWindowState = games.get(matchId);
@@ -159,12 +162,15 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('handlePaddle')
-	// args = [deltaPaddle, matchId]
-	handlePaddle(client: Socket, args: any): void {
-		games[args[1]] = this.PongService.handlePaddle(games[args[1]], args[0], client.id);
+	@UseGuards(JwtAuthGuard)
+	handlePaddle(@Req() req, @Body() handlePaddle: handlePaddleDto): void {
+		games[handlePaddle.matchId] = this.PongService.handlePaddle(games.get(handlePaddle.matchId),
+																	handlePaddle.deltaPaddle,
+																	req.user.userUuid);
 	}
 
 	@SubscribeMessage('resetGame')
+	@UseGuards(JwtAuthGuard)
 	resetGame(client: Socket, matchId: string): void {
 		client.leave(matchId);
 		games.delete(matchId);

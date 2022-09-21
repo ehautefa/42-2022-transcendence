@@ -87,7 +87,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 				break;
 		}
 		if (deltaPaddleY !== 0) {
-			socket.emit('handlePaddle', deltaPaddleY, this.state.matchId);
+			socket.emit('handlePaddle', {deltaPaddle: deltaPaddleY, matchId: this.state.matchId});
 		}
 	}
 

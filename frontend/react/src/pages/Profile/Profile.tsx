@@ -4,6 +4,7 @@ import { FetchUser, GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { addFriend, removeFriend } from "./request";
 
 var update = true;
 
@@ -29,6 +30,14 @@ function Profile() {
 		}
 	}
 
+	function addInFriend() {
+		addFriend(user.userUuid);
+	}
+
+	function removeFromFriend() {
+		removeFriend(user.userUuid);
+	}
+
 	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
@@ -43,7 +52,8 @@ function Profile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button className="enable">Add in friends</button>
+					<button className="enable" onClick={addInFriend}>Add in friends</button>
+					<button className="enable" onClick={removeFromFriend}>Remove from friends</button>
 				</div>
 				<div className="pp nohover">
 				</div>

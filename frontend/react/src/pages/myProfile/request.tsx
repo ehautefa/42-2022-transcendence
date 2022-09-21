@@ -112,42 +112,6 @@ export async function disableTwoFactorAuth() {
 	}
 }
 
-export async function addFriend(friendUuid: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/addFriend";
-
-	var urlencoded = new URLSearchParams();
-	urlencoded.append("userUuidToHandle", friendUuid);
-
-	var requestOptions = {
-		method: 'POST',
-		body: urlencoded,
-		credentials: credentials
-	};
-
-	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-}
-
-export async function removeFriend(friendUuid: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/removeFriend";
-
-	var urlencoded = new URLSearchParams();
-	urlencoded.append("userUuidToHandle", friendUuid);
-
-	var requestOptions = {
-		method: 'POST',
-		body: urlencoded,
-		credentials: credentials
-	};
-
-	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-}
-
 export async function getMyFriends() {
 	var url: string = process.env.REACT_APP_BACK_URL + "/user/myFriends";
 	var requestOptions = {
@@ -155,9 +119,10 @@ export async function getMyFriends() {
 		credentials: credentials
 	};
 
-	let friends = await (await fetch(url, requestOptions)).json();
-	if (friends.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-	return await friends;
+	let friends = await fetch(url, requestOptions);
+	console.log("FRIENDS", friends);
+	// if (friends.statusCode === 401) {
+	// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	// }
+	return await friends.json();
 }

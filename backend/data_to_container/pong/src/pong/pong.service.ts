@@ -9,12 +9,12 @@ export class PongService {
     @Inject(MatchService)
     private readonly MatchService: MatchService;
 
-    handlePaddle(game: GameWindowState, deltaPaddleY: number, clientID : string) : GameWindowState {
-		if (clientID == game.playerLeft) {
+    handlePaddle(game: GameWindowState, deltaPaddleY: number, userUuid : string) : GameWindowState {
+		if (userUuid == game.playerLeftUid) {
 			if (game.paddleLeftY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleLeftY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
 				game.paddleLeftY += deltaPaddleY;
 		}
-		else if (clientID == game.playerRight) {
+		else if (userUuid == game.playerRightUid) {
 			if (game.paddleRightY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleRightY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
 				game.paddleRightY += deltaPaddleY;
 		}
