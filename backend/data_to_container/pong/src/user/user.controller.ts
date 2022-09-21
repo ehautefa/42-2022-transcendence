@@ -126,13 +126,13 @@ export class UserController {
         return await this.UserService.FindOrCreateUser(UserToCreate);
     }
 	
-	@Get('/:userUid')
-	@ApiOperation({ summary: 'Get user by userUid' })
-	@ApiResponse({ status: 200, description: 'Found user by uid', type: user })
-	@UseGuards(JwtAuthGuard)
-	@UsePipes(ValidationPipe)
-	async getCompleteUser(@Param('userUid') userUid: string): Promise<user> {
-		console.log("getCompleteUser conrtoller", userUid)
-	    return await this.UserService.getCompleteUser(userUid);
-	}
+    @Get('/:userUid')
+    @ApiOperation({ summary: 'Get user by userUid' })
+    @ApiResponse({ status: 200, description: 'Found user by uid', type: user })
+    @UseGuards(JwtAuthGuard)
+    @UsePipes(ValidationPipe)
+    async getCompleteUser(@Param('userUid') userUid: string): Promise<user> {
+      console.log("getCompleteUser conrtoller", userUid)
+        return await this.UserService.getCompleteUser(userUid);
+    }
 }
