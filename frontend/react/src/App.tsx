@@ -1,15 +1,22 @@
 import './index.css';
 import { io } from 'socket.io-client'
+import Cookies from 'js-cookie' 
 
 // Create my socket
 let socketOptions = {
-	// withCredentials: true,
+	transportOptions: {
+		polling: {
+			extraHeaders: {
+				'access_token': Cookies.get('access_token')
+			}
+		}
+	}
 };
 
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
 const socketPong = io(URL_BACK + "/pong", socketOptions);
 
-// const socketStatus = io(URL_BACK + "/status", socketOptions);
+// const socketStatus = io(URL_BACK + "/status", socketOptions); // {forceNew: true}
 
 
 export function getSocketPong() {

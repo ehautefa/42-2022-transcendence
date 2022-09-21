@@ -18,7 +18,9 @@ var launch_game = true;
 
 @WebSocketGateway({ cors: 
 					{
-						origin: 'http://localhost:3000',
+						origin: "http://localhost:3000",
+						methods: ["GET", "POST"],
+						credentials: true,
 					}, 
 					namespace: '/pong',
 				 }) // enable CORS everywhere
@@ -58,6 +60,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// Invite a specific user to a game
 	@SubscribeMessage('invitePlayer')
+	// @UseGuards(JwtAuthGuard)
 	async invitePlayer(client: Socket, invitePlayer: invitePlayerDto) {
 		console.log("invitePlayer", invitePlayer);
 		let player1: playerDto = {
@@ -98,10 +101,10 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// Launch a game and find a match for the player
 	@UseGuards(JwtAuthGuard)
 	@SubscribeMessage('getPlayer')
-	async getPlayer(client: Socket, @Req() req): Promise<string> {
+	async getPlayer(client: Socket, clientInfo: getPlayerDto): Promise<string> {
 		let player: playerDto = { // create a player entity
-			userUuid: req.user.userUuid,
-			userName: req.user.userName,
+			userUuid: clientInfo.userUuid,
+			userName: clientInfo.userName,
 			socket: client
 		};
 		let game: GameWindowState;

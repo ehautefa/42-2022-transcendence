@@ -77,6 +77,7 @@ export class UserService {
     }
 
     async getCompleteUser(userUuid: string): Promise<user> {
+		console.log("getCompleteUser", userUuid);
         if (!userUuid)
             return null;
         const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, }, where: { userUuid: userUuid } });

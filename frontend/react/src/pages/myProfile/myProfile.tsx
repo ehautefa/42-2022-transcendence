@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { FetchUser, GetMatchHistory, GetAllUsers } from "./request"
+import { GetMatchHistory, GetAllUsers, getMe } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
 // import { getSocketStatus } from "../../App";
@@ -17,7 +17,6 @@ import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 var update = true;
 
 function MyProfile() {
-	const uid = localStorage.getItem('uid');
 	const emptyUser : User = {userUuid: "", userName: ""};
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
@@ -25,8 +24,8 @@ function MyProfile() {
 	fetchUser();
 
 	async function fetchUser() {
-		if (uid && update) {
-			const user = await FetchUser(uid);
+		if (update) {
+			const user = await getMe();
 			const matchHistory = await GetMatchHistory(user.userName);
 			const allUsers = await GetAllUsers();
 			setAllUsers(allUsers);
@@ -96,9 +95,9 @@ function MyProfile() {
 						<tbody>
 							{matchHistory.map((match: any) => {
 								return (<tr key={match.matchId}>
-									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
 								</tr>);
 							})}
 						</tbody>

@@ -12,10 +12,7 @@ function EditUsernamePopUp() {
             && newUsername.length < 8 // max length of username is 8
             && newUsername.match(/^[a-zA-Z0-9]+$/)) { // only alphanumeric characters
             setOpen(false);
-	        const uid = localStorage.getItem('uid');
-	        localStorage.setItem('userName', newUsername);
-            if (uid) 
-                ChangeUsername(uid, newUsername);
+            ChangeUsername(newUsername);
         } else {
             alert("Username must be between 4 and 8 characters and alphanumeric");
         }

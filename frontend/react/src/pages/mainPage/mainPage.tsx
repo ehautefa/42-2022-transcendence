@@ -1,11 +1,7 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "../../index.css"
-import { getMe } from "./request"
 
 function MainPage() {
-	getMe();
-	
-
 	return (<>
 		<NavBar />
 			<div className="login" >

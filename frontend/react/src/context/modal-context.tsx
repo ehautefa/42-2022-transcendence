@@ -36,10 +36,10 @@ const ModalProvider = (props: any) => {
 	
 	socket.on('invitePlayer', (data: any) => {
 		console.log("INVITE PLAYER ON", data);
-		if (data.userName === localStorage.getItem('userName')) {
-			console.log("You are invite by", data.userName);
-			setModal(data);
-		}
+		// if (data.userName === localStorage.getItem('userName')) {
+		// 	console.log("You are invite by", data.userName);
+		// 	setModal(data);
+		// }
 	})
 	const unSetModal = useCallback(() => {
 		setModal(undefined);

@@ -1,3 +1,20 @@
+var credentials: RequestCredentials = "include";
+
+export async function getMe() {
+
+    var myHeaders = new Headers();
+	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/me";
+	console.log("GETME URL", url);
+	var requestOptions = {
+		method: 'GET',
+		headers: myHeaders,
+        credentials: credentials,
+	};
+
+	return await (await fetch(url, requestOptions)).json()
+}
 
 export async function FetchUser(uid: string) {
 	var myHeaders = new Headers();
@@ -7,6 +24,7 @@ export async function FetchUser(uid: string) {
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
+        credentials: credentials
 	};
 
 	let user =  await fetch(url, requestOptions);
@@ -23,18 +41,18 @@ export async function GetMatchHistory(userName: string) {
 	return await match.json();
 }
 
-export function ChangeUsername(userUuid: string, newName: string) {
+export function ChangeUsername(newName: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
 	var urlencoded = new URLSearchParams();
-	urlencoded.append("userUuid", userUuid);
 	urlencoded.append("newName", newName);
 	
 	const requestOptions = {
 		method: 'POST',
 		headers: myHeaders,
-		body: urlencoded
+		body: urlencoded,
+        credentials: credentials
 	};
 	
 	const URL = process.env.REACT_APP_BACK_URL + "/user/changeUsername";
@@ -43,9 +61,10 @@ export function ChangeUsername(userUuid: string, newName: string) {
 }
 
 export async function GetAllUsers() {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/all";
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/allUuidWithUserName";
 	var requestOptions = {
 		method: 'GET',
+        credentials: credentials
 	};
 
 	let users = await fetch(url, requestOptions);

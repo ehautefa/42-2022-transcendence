@@ -13,11 +13,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             failureRedirect: '/auth/login',
             jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
                 console.log("constructor jwt");
-                let data = request?.cookies['access_token']
-                if (!data) {
-                    return null;
+				let data : string = null;
+				if (request?.cookies['access_token']) { 
+					// check if access_token is in cookies
+					data = request.cookies['access_token'];
+				} else if (request['handshake']['headers']['access_token']){
+					// if access_token is not in cookie check if it is in headers
+					data = request['handshake']['headers']['access_token'];
                 }
-                console.log("token = ", request.cookies['access_token']);
+                console.log("token = ", data);
                 return data
             }]),
             // passReqToCallback: true,
