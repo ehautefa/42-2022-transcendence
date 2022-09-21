@@ -62,9 +62,6 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 				playerLeftName: data.playerLeftName,
 				playerRightName: data.playerRightName
 			});
-			if (data.isGameOver) {
-				socket.emit('resetGame', this.state.matchId);
-			}
 		})
 		socket.on('leaveGame', (playerName: string) => {
 			alert(`${playerName} has left the game`);

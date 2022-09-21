@@ -21,7 +21,7 @@ function Game() {
 
 	
 	if (id !== "") {
-		socket.emit('joinGame', index, userName);
+		socket.emit('joinGame', {matchId: index});
 	}
 	
 	function matchMaking() {
