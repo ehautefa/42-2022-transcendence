@@ -3,7 +3,7 @@ import { Socket, Server } from 'socket.io';
 import { Logger, UseGuards, Inject, Req } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
-import { StatusGateway  } from "src/status/status.gateway";
+// import { StatusGateway  } from "src/status/status.gateway";
 import { GameWindowState } from "./type";
 import { getPlayerDto } from './dto/getPlayer.dto';
 import { AcceptInviteDto } from './dto/acceptInvite.dto';
@@ -30,8 +30,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger('PongGateway');
 
 	// import PongService and StatusGateway
-	@Inject(StatusGateway)
-	private readonly StatusGateway : StatusGateway;
+	// @Inject(StatusGateway)
+	// private readonly StatusGateway : StatusGateway;
 	constructor(private readonly PongService: PongService) {}
 
 	@Interval(parseInt(process.env.PONG_INTERVAL_TIME))
@@ -81,7 +81,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			invitedUserUuid: invitePlayer.invitedUserUuid };
 
 		// this.server.emit('invitePlayer', response);
-		this.StatusGateway.sendInvitation(response);
+		// this.StatusGateway.sendInvitation(response);
 		console.log("GAME: ", game.matchId, "/n", game);
 		return game.matchId;
 	}
@@ -101,11 +101,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// Launch a game and find a match for the player
 	@UseGuards(JwtAuthGuard)
 	@SubscribeMessage('getPlayer')
-	async getPlayer(client: Socket, clientInfo: getPlayerDto): Promise<string> {
+	async getPlayer(client: Socket, @Req() req): Promise<string> {
 		let player: playerDto = { // create a player entity
-			userUuid: clientInfo.userUuid,
-			userName: clientInfo.userName,
-			socket: client
+			userUuid: req.user.userUuid,
+			userName: req.user.userName,
+			socket: req
 		};
 		let game: GameWindowState;
 		if (launch_game == true) {

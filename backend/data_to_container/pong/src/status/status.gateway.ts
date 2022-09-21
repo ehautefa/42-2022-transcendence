@@ -25,12 +25,12 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	private logger: Logger = new Logger('PongGateway')
 
-	// @SubscribeMessage('getUserUuid')
-	// getUserUid(client: Socket, userUuid: string): void {
-	// 	inline.set(userUuid, client.id);
-	// 	console.log('init', client.id, userUuid);
-	// 	console.log("inline", inline);
-	// }
+	@SubscribeMessage('getUserUuid')
+	getUserUid(client: Socket, userUuid: string): void {
+		inline.set(userUuid, client.id);
+		console.log('init', client.id, userUuid);
+		console.log("inline", inline);
+	}
 
 	sendInvitation(sendInvite : SendInviteDto) {
 		let socket = inline.get(sendInvite.invitedUserUuid);
@@ -43,21 +43,21 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
-	// @SubscribeMessage('getFriendsStatus')
-	// getFriendsStatus(client: Socket, users: User[] ): User[] {
-	// 	for (let i = 0; i < users.length; i++) {
-	// 		if (inline.has(users[i].userUuid)) {
-	// 			users[i].status = true;
-	// 		} else {
-	// 			users[i].status = false;
-	// 		}
-	// 	}
-	// 	return users;
-	// }
+	@SubscribeMessage('getFriendsStatus')
+	getFriendsStatus(client: Socket, users: User[] ): User[] {
+		for (let i = 0; i < users.length; i++) {
+			if (inline.has(users[i].userUuid)) {
+				users[i].status = true;
+			} else {
+				users[i].status = false;
+			}
+		}
+		return users;
+	}
 
 	handleConnection(client: any) {
 		this.logger.log(`Client status connected: ${client.id}`);
-		// client.emit('getUserUuid');
+		client.emit('getUserUuid');
 	}
 
 	handleDisconnect(client: any) {

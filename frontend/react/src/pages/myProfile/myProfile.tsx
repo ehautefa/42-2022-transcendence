@@ -3,16 +3,16 @@ import "./Profil.css"
 import { GetMatchHistory, GetAllUsers, getMe } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
-// import { getSocketStatus } from "../../App";
+import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 
-// const socketStatus = getSocketStatus();
+const socketStatus = getSocketStatus();
 
-// socketStatus.on('getUserUuid', () => {
-// 	console.log("GET USER UUID", localStorage.getItem('uid'));
-// 	socketStatus.emit('getUserUuid', localStorage.getItem('uid'));
-// })
+socketStatus.on('getUserUuid', () => {
+	console.log("GET USER UUID", localStorage.getItem('uid'));
+	socketStatus.emit('getUserUuid', localStorage.getItem('uid'));
+})
 
 var update = true;
 
@@ -29,9 +29,9 @@ function MyProfile() {
 			const matchHistory = await GetMatchHistory(user.userName);
 			const allUsers = await GetAllUsers();
 			setAllUsers(allUsers);
-			// socketStatus.emit('getFriendsStatus', allUsers, (data: any) => {
-			// 	setAllUsers(data);
-			// });
+			socketStatus.emit('getFriendsStatus', allUsers, (data: any) => {
+				setAllUsers(data);
+			});
 			setMatchHistory(matchHistory);
 			setUser(user);
 			update = false;
