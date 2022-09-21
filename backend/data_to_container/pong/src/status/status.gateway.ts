@@ -1,6 +1,8 @@
-import { Logger, Injectable } from '@nestjs/common';
+import { Logger, Injectable, UseGuards, Req } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
+
 import { SendInviteDto } from './dto/sendInvite.dto';
 
 type User = {
@@ -26,9 +28,10 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger('PongGateway')
 
 	@SubscribeMessage('getUserUuid')
-	getUserUid(client: Socket, userUuid: string): void {
-		inline.set(userUuid, client.id);
-		console.log('init', client.id, userUuid);
+	@UseGuards(JwtAuthGuard)
+	getUserUid(@Req() req): void {
+		inline.set(req.user.userUid, req.id);
+		console.log('init', req.id, req.user.userUuid);
 		console.log("inline", inline);
 	}
 
@@ -44,6 +47,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('getFriendsStatus')
+	@UseGuards(JwtAuthGuard)
 	getFriendsStatus(client: Socket, users: User[] ): User[] {
 		for (let i = 0; i < users.length; i++) {
 			if (inline.has(users[i].userUuid)) {

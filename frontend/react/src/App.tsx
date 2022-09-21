@@ -10,14 +10,13 @@ let socketOptions = {
 				'access_token': Cookies.get('access_token')
 			}
 		}
-	}
+	},
+	forceNew: true
 };
 
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
 const socketPong = io(URL_BACK + "/pong", socketOptions);
-
-console.log("URL_BACK", URL_BACK);
-const socketStatus = io(URL_BACK + "/status"); // {forceNew: true}
+const socketStatus = io(URL_BACK + "/status", socketOptions);
 
 
 export function getSocketPong() {
