@@ -13,7 +13,11 @@ export async function getMe() {
         credentials: credentials,
 	};
 
-	return await (await fetch(url, requestOptions)).json()
+	let user =  await (await fetch(url, requestOptions)).json()
+	if (user.statusCode === 401) {
+		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	}
+	return await user;
 }
 
 export async function FetchUser(uid: string) {
@@ -27,8 +31,11 @@ export async function FetchUser(uid: string) {
         credentials: credentials
 	};
 
-	let user =  await fetch(url, requestOptions);
-	return await user.json();
+	let user = await (await fetch(url, requestOptions)).json();
+	if (user.statusCode === 401) {
+		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	}
+	return await user;
 }
 
 export async function GetMatchHistory(userName: string) {
@@ -37,11 +44,14 @@ export async function GetMatchHistory(userName: string) {
 		method: 'GET'
 	};
 
-	let match = await fetch(url, requestOptions);
-	return await match.json();
+	let match = await (await fetch(url, requestOptions)).json();
+	if (match.statusCode === 401) {
+		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	}
+	return await match;
 }
 
-export function ChangeUsername(newName: string) {
+export async  function ChangeUsername(newName: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -56,8 +66,10 @@ export function ChangeUsername(newName: string) {
 	};
 	
 	const URL = process.env.REACT_APP_BACK_URL + "/user/changeUsername";
-	fetch(URL, requestOptions)
-		.catch(error => console.log('error', error));
+	let result = await fetch(URL, requestOptions);
+	if (result.status === 401) {
+		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	}
 }
 
 export async function GetAllUsers() {
@@ -67,6 +79,9 @@ export async function GetAllUsers() {
         credentials: credentials
 	};
 
-	let users = await fetch(url, requestOptions);
-	return await users.json();
+	let users = await (await fetch(url, requestOptions)).json();
+	if (users.statusCode === 401) {
+		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	}
+	return await users;
 }
