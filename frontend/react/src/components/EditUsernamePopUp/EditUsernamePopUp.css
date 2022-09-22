@@ -3,11 +3,13 @@
     color: #fff;
     border: none;
     text-decoration: underline;
+	box-shadow: none;
     cursor: pointer;
     color: #FA0197;
     width: 100%;
     margin: 0;
 }
+
 
 .Popup-mother {
     min-width: 30%;

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Context } from 'vm';
 import ReceivePopUp from '../components/ReceivePopUp/ReceivePopUp';
-import { getSocketPong } from "../App" 
+import { getSocketStatus } from "../App" 
 
 const ModalContext = React.createContext({});
-const socket = getSocketPong();
+const socket = getSocketStatus();
 
 const Modal = (({ modal, unSetModal }: any) => {
 	console.log("MODAL", modal);
@@ -34,12 +34,9 @@ const useModal = (): Context => {
 const ModalProvider = (props: any) => {
 	const [modal, setModal] = useState();
 	
-	socket.on('invitePlayer', (data: any) => {
+	socket.on('sendInvite', (data: any) => {
 		console.log("INVITE PLAYER ON", data);
-		// if (data.userName === localStorage.getItem('userName')) {
-		// 	console.log("You are invite by", data.userName);
-		// 	setModal(data);
-		// }
+		setModal(data);
 	})
 	const unSetModal = useCallback(() => {
 		setModal(undefined);

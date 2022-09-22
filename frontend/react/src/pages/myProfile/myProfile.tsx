@@ -10,8 +10,7 @@ import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 const socketStatus = getSocketStatus();
 
 socketStatus.on('getUserUuid', () => {
-	console.log("GET USER UUID", localStorage.getItem('uid'));
-	socketStatus.emit('getUserUuid', localStorage.getItem('uid'));
+	socketStatus.emit('getUserUuid');
 })
 
 var update = true;

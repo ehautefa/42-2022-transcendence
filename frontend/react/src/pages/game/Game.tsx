@@ -16,20 +16,13 @@ function Game() {
 	index = index === null ? "" : index;
 	const id = index;
 	const [loading, setLoading] = useState(false);
-	const uid = localStorage.getItem('uid');
-	const userName = localStorage.getItem('userName');
-
 	
 	if (id !== "") {
 		socket.emit('joinGame', {matchId: index});
 	}
 	
 	function matchMaking() {
-		let arg = {
-			"userUuid": uid,
-			"userName": userName
-		}
-		socket.emit('getPlayer', arg , (matchId: string) => {
+		socket.emit('getPlayer', (matchId: string) => {
 			setDisplaying({ display: "none" });
 			if (matchId === "")
 				setLoading(true);

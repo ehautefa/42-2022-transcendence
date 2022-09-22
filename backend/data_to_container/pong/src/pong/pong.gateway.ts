@@ -47,6 +47,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@UseGuards(JwtAuthGuard)
 	joinGame(@Req() req, @Body() matchId: string): void {
 		req.join(matchId);
+		console.log("MAtchid ", games.get(matchId));
 		if (games.get(matchId).playerLeftUid === req.user.userUuid)
 			games.get(matchId).playerLeft = req.id;
 		else if (games.get(matchId).playerRightUid === req.user.userUuid)
@@ -149,8 +150,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		game = this.PongService.sendGametoRoom(game);
 		try {
-			if (game.isGameOver)
-				console.log("game over", game.isGameOver, game.scoreRight, game.scoreLeft, game.playerLeft);
 			this.server.to(matchId).emit('game', game);
 		} catch (error) {
 			console.log("ERROR IN SEND GAME TO ROOM", error);
@@ -174,8 +173,10 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				} else {
 					this.server.to(game.matchId).emit('leaveGame', game.playerRightName);
 				}
-				if (game.begin === true)
+				if (game.begin === true) {
+					console.log("DELETING GAME", game.matchId);
 					games.delete(game.matchId);
+				}
 			}
 		}
 	}
