@@ -18,7 +18,7 @@ function Game() {
 	const [loading, setLoading] = useState(false);
 	
 	if (id !== "") {
-		socket.emit('joinGame', {matchId: index});
+		socket.emit('joinGame', index);
 	}
 	
 	function matchMaking() {

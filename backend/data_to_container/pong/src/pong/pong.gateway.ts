@@ -47,7 +47,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@UseGuards(JwtAuthGuard)
 	joinGame(@Req() req, @Body() matchId: string): void {
 		req.join(matchId);
-		console.log("MAtchid ", games.get(matchId));
+		console.log("MAtchid ", matchId, games[matchId]);
 		if (games.get(matchId).playerLeftUid === req.user.userUuid)
 			games.get(matchId).playerLeft = req.id;
 		else if (games.get(matchId).playerRightUid === req.user.userUuid)

@@ -12,7 +12,7 @@ function ReceivePopUp(modal: any) {
     }
 	
     function joinGame() {
-        socket.emit("acceptInvite", {matchId: modal.modal.matchId});
+        socket.emit("acceptInvite", modal.modal.matchId);
         closePopup();
 		// navigate to game with good id
         window.history.pushState({}, "", "/game?id=" + modal.modal.matchId);
