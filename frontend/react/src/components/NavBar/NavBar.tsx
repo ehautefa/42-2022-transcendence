@@ -16,10 +16,14 @@ function NavBar() {
 	 			<span></span>
 	 			<span></span>
 	 			<span></span>
+	 			<span></span>
 			</button>
 			<div
 				className={isNavExpanded ? "navLinks expanded" : "navLinks"}>
 				<ul>
+					<li>
+						<a href="/allPlayers" >PLAYERS</a>
+					</li>
 					<li>
 						<a href="/Match">MATCH</a>
 					</li>

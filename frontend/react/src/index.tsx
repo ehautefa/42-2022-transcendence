@@ -12,6 +12,7 @@ import Win from "./pages/endGame/win";
 import Lose from "./pages/endGame/lose";
 import GameOver from "./pages/endGame/GameOver";
 import Profile from './pages/Profile/Profile';
+import AllPlayers from './pages/allPlayers/allPlayers';
 import { ModalProvider } from './context/modal-context';
 
 const root = ReactDOM.createRoot(
@@ -31,6 +32,7 @@ root.render(<>
 				<Route path="endGame/lose" element={<Lose />} />
 				<Route path="endGame/win" element={<Win />} />
 				<Route path="profile" element={<Profile />} />
+				<Route path="allPlayers" element={<AllPlayers />} />
 				<Route path="endGame/gameOver" element={<GameOver />} />
 			</Routes>
 		</BrowserRouter>

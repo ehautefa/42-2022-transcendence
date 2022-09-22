@@ -1,5 +1,13 @@
 var credentials: RequestCredentials = "include";
 
+export function addInFriend(userUuid: string) {
+	addFriend(userUuid);
+}
+
+export function removeFromFriend(userUuid: string) {
+	removeFriend(userUuid);
+}
+
 export async function addFriend(friendUuid: string) {
 	var url: string = process.env.REACT_APP_BACK_URL + "/user/addFriend";
 
