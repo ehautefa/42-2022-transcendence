@@ -5,8 +5,6 @@ import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
 import { StatusGateway  } from "src/status/status.gateway";
 import { GameWindowState } from "./type";
-import { getPlayerDto } from './dto/getPlayer.dto';
-import { AcceptInviteDto } from './dto/acceptInvite.dto';
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
@@ -132,8 +130,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getGames')
 	@UseGuards(JwtAuthGuard)
-	getGames(): Map<string, GameWindowState> {
-		return games;
+	getGames(): GameWindowState[] {
+		console.log("GET GAMEs", games);
+		return Object.values(games);
 	}
 
 	sendGametoRoom(matchId: string) {

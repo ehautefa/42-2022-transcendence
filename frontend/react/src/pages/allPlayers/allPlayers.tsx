@@ -6,6 +6,7 @@ import NavBar from "../../components/NavBar/NavBar";
 import {getSocketStatus} from "../../App";
 
 const socketStatus = getSocketStatus();
+var update = true;
 
 type players = {
 	userUuid: string;
@@ -15,7 +16,10 @@ type players = {
 
 function AllPlayers() {
 	const [users, setUsers] = useState([]);
-	fetchPlayers();
+	if (update) {
+		update = false;
+		fetchPlayers();
+	}
 
 	
 	async function fetchPlayers() {
