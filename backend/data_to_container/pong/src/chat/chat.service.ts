@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
@@ -14,22 +15,20 @@ export class ChatService {
     private messagesRepository: Repository<Message>,
     @InjectRepository(Room)
     private roomsRepository: Repository<Room>,
-    @InjectRepository(user)
-    private usersRepository: Repository<user>,
   ) {}
+
+  private readonly userService: UserService;
+
+  /*
+   ** service functions called by the gateway
+   */
 
   async createMessage(createMessageDto: CreateMessageDto) {
     try {
       const room = await this.roomsRepository.findOneOrFail({
-        where: {
-          id: createMessageDto.roomId,
-        },
+        where: { id: createMessageDto.roomId },
       });
-      const sender = await this.usersRepository.findOneOrFail({
-        where: {
-          userUuid: createMessageDto.senderId,
-        },
-      });
+      const sender = await this.userService.getUser(createMessageDto.senderId);
       const newMessage = this.messagesRepository.create({
         message: createMessageDto.message,
         room: room,
@@ -39,11 +38,29 @@ export class ChatService {
       this.messagesRepository.save(newMessage);
       return newMessage;
     } catch (error) {
-      throw error;
+      console.error(error);
     }
   }
 
-  async findAllMessagesInRoom(roomId: string): Promise<Message[]> {
+  async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
+    const owner: user = await this.userService.getUser(createRoomDto.ownerId);
+    if (!owner) {
+      console.error('User not found');
+      return null;
+    }
+    const newRoom: Room = this.roomsRepository.create({
+      name: createRoomDto.name,
+      owner: owner,
+      isProtected: createRoomDto.isProtected,
+      password: createRoomDto.password,
+      type: createRoomDto.type,
+      users: [owner],
+    });
+    this.roomsRepository.save(newRoom);
+    return newRoom;
+  }
+
+  async getAllMessagesInRoom(roomId: string): Promise<Message[]> {
     try {
       const messages: Message[] = await this.messagesRepository
         .createQueryBuilder('msg')
@@ -59,9 +76,7 @@ export class ChatService {
   async getRoomById(roomId: string) {
     try {
       const room: Room = await this.roomsRepository.findOneOrFail({
-        where: {
-          id: roomId,
-        },
+        where: { id: roomId },
       });
       return room;
     } catch (error) {
@@ -71,11 +86,22 @@ export class ChatService {
 
   async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
     try {
-      const room = await this.roomsRepository
+      // SELECT * from rooms
+      // LEFT JOIN room_users_user ON rooms.id = room_users_user.room_id
+      // LEFT JOIN users ON room_users_user.user_id = users.id
+      // WHERE rooms.type = 'dm' AND users.id IN (2, 4)
+      // GROUP BY rooms.id
+      // HAVING COUNT(users.id) = 2;
+      const room: Room = await this.roomsRepository
         .createQueryBuilder('room')
-        .leftJoinAndSelect('room.users', 'user')
-        // .where('users[0].id = :roomId', { roomId })
-        .andWhere({ type: RoomType.DM })
+        .leftJoinAndSelect('room.users', 'users')
+        // .select('room.id', 'roomId')
+        .where('room.type = :type', { type: 'dm' })
+        .andWhere('users.id in (:...userId)', {
+          userId: [senderId, recipientId],
+        })
+        .groupBy('room.id')
+        .having('count(users.id) = 2')
         .getOneOrFail();
       return room;
     } catch (error) {
@@ -83,45 +109,33 @@ export class ChatService {
     }
   }
 
-  async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
+  async joinDmRoom(senderId: string, recipientId: string) {
     try {
-      const owner: user = await this.usersRepository.findOneOrFail({
-        where: {
-          userUuid: createRoomDto.ownerId,
-        },
-      });
-      const newRoom: Room = this.roomsRepository.create({
-        name: createRoomDto.name,
-        owner: owner,
-        isProtected: createRoomDto.isProtected,
-        password: createRoomDto.password,
-        type: createRoomDto.type,
-        users: [owner],
-      });
-      this.roomsRepository.save(newRoom);
-      return newRoom;
-    } catch (error) {
-      throw error;
+      const room: Room = await this.getDMRoom(senderId, recipientId);
+      return room;
+    } catch (err) {
+      try {
+        const room = await this.createDMRoom(senderId, recipientId);
+        return room;
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
-  async createDMRoom(senderId: string, recipientId: string) {
-    try {
-      const sender = await this.usersRepository.findOneOrFail({
-        where: { userUuid: senderId },
-      });
-      const recipient = await this.usersRepository.findOneOrFail({
-        where: { userUuid: recipientId },
-      });
-      const newRoom = this.roomsRepository.create({
-        type: RoomType.DM,
-        users: [sender, recipient],
-      });
-      this.roomsRepository.save(newRoom);
-      return newRoom;
-    } catch (error) {
-      throw error;
+  async createDMRoom(senderId: string, recipientId: string): Promise<Room> {
+    const sender = await this.userService.getUser(senderId);
+    const recipient = await this.userService.getUser(recipientId);
+    if (!sender || !recipient) {
+      console.error('User not found');
+      return null;
     }
+    const newRoom: Room = this.roomsRepository.create({
+      type: RoomType.DM,
+      users: [sender, recipient],
+    });
+    this.roomsRepository.save(newRoom);
+    return newRoom;
   }
 
   async getRoomByName(roomName: string): Promise<Room> {

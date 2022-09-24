@@ -15,5 +15,5 @@ export class CreateRoomDto {
   type: RoomType;
 
   @IsNotEmpty()
-  userIs: string;
+  userId: string;
 }

@@ -1,8 +1,8 @@
-import NavBar from "../../components/NavBar/NavBar"
-import "./Chat.css"
-import { useState, useEffect } from 'react'
-import { CSSTransition, TransitionGroup} from 'react-transition-group';
-import { getSocketChat } from "../../App" 
+import { useEffect, useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { getSocketChat } from "../../App";
+import NavBar from "../../components/NavBar/NavBar";
+import "./Chat.css";
 //import {Route, NavLink, HashRouter} from 'react-router-dom'
 //import { User } from "../../type";
 
@@ -32,7 +32,7 @@ function Chat() {
 			isProtected:false, 
 			password: "", 
 			type: 'public', 
-			userIs:userName 
+			userId:userName 
 		});
 		socket.emit('findPublicRooms', (rooms:any) => {setChannels(rooms)});
 		console.log(channels);
