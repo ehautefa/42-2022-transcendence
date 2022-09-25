@@ -2,6 +2,8 @@ import { Logger, Injectable, UseGuards, Req } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
+import { HandleFriendDto } from 'src/user/dto/handleFriend.dto';
+import { User } from 'src/bdd/users.entity';
 
 import { SendInviteDto } from './dto/sendInvite.dto';
 
@@ -32,6 +34,16 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	getUserUid(@Req() req): void {
 		inline.set(req.user.userUuid, req.id);
 		console.log("inline", inline);
+	}
+
+	addFriend(inviter : User, invited: HandleFriendDto) {
+		let socket = inline.get(invited.userUuidToHandle);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return ;
+		}
+		this.server.to(socket).emit('addFriend', inviter.userName);
+		console.log("Invitation sent to " + inviter.userName);
 	}
 
 	sendInvitation(sendInvite : SendInviteDto) {

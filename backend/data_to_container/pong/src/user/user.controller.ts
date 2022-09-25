@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user } from 'src/bdd/users.entity';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
@@ -7,12 +7,16 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@ne
 import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
+import { StatusGateway } from 'src/status/status.gateway';
 
 @ApiBearerAuth()
 @ApiTags('user')
 @Controller('user')
 export class UserController {
     constructor(private readonly UserService: UserService) { }
+
+	@Inject(StatusGateway)
+	private readonly StatusGateway : StatusGateway;
 
     @Get('all')
     @ApiOperation({ summary: 'Get all user of the table' })
@@ -56,6 +60,7 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @UsePipes(ValidationPipe)
     async addFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+		this.StatusGateway.addFriend(req.user, userToHandle);
 		res.send(this.UserService.addFriend(req.user, userToHandle.userUuidToHandle));
     }
 	
