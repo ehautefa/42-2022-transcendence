@@ -11,13 +11,15 @@ const socket = getSocketPong();
 
 function Game() {
 	var index = new URLSearchParams(useLocation().search).get('id');
-	const displaying_state = index === null ? { display: "block" } : { display: "none" };
-	const [displaying, setDisplaying] = useState(displaying_state);
-	index = index === null ? "" : index;
-	const id = index;
-	const [loading, setLoading] = useState(false);
+	const [displaying, setDisplaying] = useState({ display: "none"});
+	const [loading, setLoading] = useState(true);
+	if (index == null) {
+		setDisplaying({ display: "block" });
+		setLoading(false);
+		index = "";
+	}
 
-	if (id !== "") {
+	if (index !== "") {
 		socket.emit('joinGame', index);
 	}
 
@@ -31,16 +33,15 @@ function Game() {
 		});
 	}
 
-	socket.on('beginGame', (socketId: string) => {
+	socket.on('beginGame', () => {
 		console.log("beginGame");
-		if (socketId === socket.id)
-			setLoading(false);
+		setLoading(false);
 	});
 
 	return (<>
 				<NavBar />
 				<div className="mainComposantGame">
-					<GameWindow id={id} />
+					<GameWindow id={index} />
 					<button style={displaying}
 						className="matchMakingButton"
 						onClick={() => matchMaking()}>

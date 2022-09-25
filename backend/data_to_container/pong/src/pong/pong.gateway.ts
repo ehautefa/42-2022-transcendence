@@ -53,6 +53,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		if (games.get(matchId).playerLeft !== "" && games.get(matchId).playerRight !== "") {
 			games.get(matchId).begin = true;
+			this.server.to(matchId).emit('beginGame');
 		}
 	}
 
@@ -93,7 +94,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log("ERROR: USER IS NOT THE INVITED ONE");
 			return;
 		}
-		games[matchId].begin = true; // start game
 	}
 
 	// Launch a game and find a match for the player
@@ -123,7 +123,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			game = await this.PongService.initGame(player, players.shift());
 			games.set(game.matchId, game);
-			this.server.to(game.playerRight).emit('beginGame', game.playerRight);
+			this.server.to(game.matchId).emit('beginGame');
 			console.log("GAME: ", game.matchId, "/n", game);
 		}
 		game.begin = true; // start game
