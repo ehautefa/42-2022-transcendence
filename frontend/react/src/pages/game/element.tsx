@@ -59,7 +59,6 @@ export interface GameWindowState {
     isGameOver: boolean,
     playerLeft: string,
     playerRight: string,
-    loading: boolean,
     matchMaking: boolean,
     playerLeftName: string,
     playerRightName: string

@@ -123,6 +123,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			game = await this.PongService.initGame(player, players.shift());
 			games.set(game.matchId, game);
+			this.server.to(game.playerRight).emit('beginGame', game.playerRight);
 			console.log("GAME: ", game.matchId, "/n", game);
 		}
 		game.begin = true; // start game
