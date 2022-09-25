@@ -39,22 +39,22 @@ export class MatchController {
 	}
 
 
-	@Post('create')
-	@UseGuards(JwtAuthGuard)
-	@ApiOperation({ summary: 'Create a match with score 0' })
-	@ApiParam({ name: 'CreateMatchDto', type: CreateMatchDto })
-	@ApiResponse({ status: 200, description: 'The created match', type: match})
-	@UsePipes(ValidationPipe)
-	async createMatch(@Body() matchToCreate : CreateMatchDto) : Promise<match> {
-		return await this.MatchService.createMatch(matchToCreate);
-	}
+	// @Post('create')
+	// @UseGuards(JwtAuthGuard)
+	// @ApiOperation({ summary: 'Create a match with score 0' })
+	// @ApiParam({ name: 'CreateMatchDto', type: CreateMatchDto })
+	// @ApiResponse({ status: 200, description: 'The created match', type: match})
+	// @UsePipes(ValidationPipe)
+	// async createMatch(@Body() matchToCreate : CreateMatchDto) : Promise<match> {
+	// 	return await this.MatchService.createMatch(matchToCreate);
+	// }
 
-	@Post('saveScore')
-	@UseGuards(JwtAuthGuard)
-	@ApiOperation({ summary: 'Save score at the end of the match' })
-	@ApiParam({ name: 'SaveScoreDto', type: SaveScoreDto })	
-	@UsePipes(ValidationPipe)
-	async saveScore(@Body() saveScore : SaveScoreDto) : Promise<void> {
-		return await this.MatchService.endOfMatch(saveScore);
-	}
+	// @Post('saveScore')
+	// @UseGuards(JwtAuthGuard)
+	// @ApiOperation({ summary: 'Save score at the end of the match' })
+	// @ApiParam({ name: 'SaveScoreDto', type: SaveScoreDto })	
+	// @UsePipes(ValidationPipe)
+	// async saveScore(@Body() saveScore : SaveScoreDto) : Promise<void> {
+	// 	return await this.MatchService.endOfMatch(saveScore);
+	// }
 }

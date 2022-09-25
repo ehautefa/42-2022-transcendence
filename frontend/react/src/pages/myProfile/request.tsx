@@ -41,7 +41,8 @@ export async function FetchUser(uid: string) {
 export async function GetMatchHistory(userName: string) {
 	var url: string = process.env.REACT_APP_BACK_URL +  "/match/user/" + userName;
 	var requestOptions = {
-		method: 'GET'
+		method: 'GET',
+		credentials: credentials
 	};
 
 	let match = await (await fetch(url, requestOptions)).json();
