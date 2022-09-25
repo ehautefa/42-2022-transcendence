@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MatchService } from './match.service';
 import { match } from 'src/bdd/matchs.entity';
 import { CreateMatchDto } from './dto/createMatch.dto';
 import { SaveScoreDto } from './dto/saveScore.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 
 @ApiBearerAuth()
 @ApiTags('match')
@@ -12,6 +13,7 @@ export class MatchController {
 	constructor( private readonly MatchService : MatchService ) {}
 
 	@Get('all')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get all match of the table' })
 	@ApiResponse({ status: 200, description: 'Found matchs', type: match })
     async getAllMatch() : Promise<match[]>{
@@ -19,6 +21,7 @@ export class MatchController {
     }
 
 	@Get('/:matchUid')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get match by matchUid' })
 	@ApiResponse({ status: 200, description: 'The found match', type: match})
 	@UsePipes(ValidationPipe)
@@ -27,6 +30,7 @@ export class MatchController {
 	}
 
 	@Get('/user/:userName')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get match history of the user' })
 	@ApiResponse({ status: 200, description: 'Match History of the user', type: match})
 	@UsePipes(ValidationPipe)
@@ -36,6 +40,7 @@ export class MatchController {
 
 
 	@Post('create')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Create a match with score 0' })
 	@ApiParam({ name: 'CreateMatchDto', type: CreateMatchDto })
 	@ApiResponse({ status: 200, description: 'The created match', type: match})
@@ -45,6 +50,7 @@ export class MatchController {
 	}
 
 	@Post('saveScore')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Save score at the end of the match' })
 	@ApiParam({ name: 'SaveScoreDto', type: SaveScoreDto })	
 	@UsePipes(ValidationPipe)
