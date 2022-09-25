@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MatchService } from 'src/match/match.service';
 import { GameWindowState } from './type';
-import { getPlayerDto } from './dto/getPlayer.dto';
 import { playerDto } from './dto/player.dto';
 
 @Injectable()
@@ -18,20 +17,6 @@ export class PongService {
 			if (game.paddleRightY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleRightY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
 				game.paddleRightY += deltaPaddleY;
 		}
-        return game;
-    }
-
-    initSecondPlayer(game: GameWindowState, clientInfo: getPlayerDto, clientID: string) : GameWindowState {
-        game.playerRightUid = clientInfo.userUuid;
-        game.playerRight = clientID;
-        game.playerRightName = clientInfo.userName;
-        game.matchMaking = true;
-        this.MatchService.createMatch({
-            user1uid: game.playerLeftUid, // user1 is client Left
-            user2uid: clientInfo.userUuid // user2 is client Right
-        }).then(match => {
-            game.matchId = match.matchId;
-        });
         return game;
     }
 

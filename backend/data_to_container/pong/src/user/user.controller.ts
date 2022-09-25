@@ -132,7 +132,7 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @UsePipes(ValidationPipe)
     async getCompleteUser(@Param('userUid') userUid: string): Promise<user> {
-      console.log("getCompleteUser conrtoller", userUid)
+    //   console.log("getCompleteUser conrtoller", userUid)
         return await this.UserService.getCompleteUser(userUid);
     }
 }

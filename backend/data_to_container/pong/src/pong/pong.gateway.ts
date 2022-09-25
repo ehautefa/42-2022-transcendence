@@ -73,6 +73,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let game: GameWindowState;
 		game = await this.PongService.initGame(player1, player2);
 		games.set(game.matchId, game);
+		console.log("GAMES VALUES : ", games, games.values());
 		let response: SendInviteDto = { matchId: game.matchId,
 			invitedUserName: invitePlayer.invitedUserName,
 			invitedUserUuid: invitePlayer.invitedUserUuid };
@@ -130,9 +131,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getGames')
 	@UseGuards(JwtAuthGuard)
-	getGames(): GameWindowState[] {
-		console.log("GET GAMEs", games);
-		return Object.values(games);
+	getGames() : GameWindowState[] {
+		return Array.from(games.values());
 	}
 
 	sendGametoRoom(matchId: string) {
