@@ -11,6 +11,7 @@ function Match() {
 	const emptyGames : GameWindowState[] = [];
 	const [games, setGames] = useState(emptyGames);
 	socket.emit("getGames", (games: GameWindowState[]) => {
+		console.log("Socket getGames", games);
 		setGames(games);
 	});
 

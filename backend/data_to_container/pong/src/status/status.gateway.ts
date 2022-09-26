@@ -36,7 +36,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@UseGuards(JwtAuthGuard)
 	getUserUid(@Req() req): void {
 		inline.set(req.user.userUuid, req.id);
-		console.log("inline", inline);
 	}
 
 	@SubscribeMessage('addFriend')

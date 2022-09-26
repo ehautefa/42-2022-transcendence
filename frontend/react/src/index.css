@@ -76,5 +76,5 @@ button {
 }
 
 .button:hover {
-    font-weight: bolder;
+    border-color: #fef45b;
 }

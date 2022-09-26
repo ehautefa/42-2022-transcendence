@@ -130,10 +130,6 @@
 		width: 60%;
 	}
 
-	.mainComposantProfile .info ul {
-		margin-left: 40px;
-	}
-
 	.mainComposantProfile .info button {
 		margin-left: 50%;
 		width: 50%;
@@ -150,10 +146,6 @@
 		margin: 40px;
 	}
 
-	.mainComposantProfile .nohover:hover {
-		display: none;
-	}
-
 	.mainComposantProfile .pp:hover p {
 		display: block;
 	}
@@ -164,7 +156,7 @@
 	}
 
 	.mainComposantProfile .pp p {
-		line-height: 150px;
+		line-height: 130px;
 		display: none;
 		text-decoration: underline;
 		font-size: 1.5em;
