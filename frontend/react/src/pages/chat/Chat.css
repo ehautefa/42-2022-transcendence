@@ -40,17 +40,19 @@
 }
 
 .box button {
+
     width: 50%;
     border-radius: 5px;
     outline: none;
     font-size: 1.2rem;
-    font-weight: bold;
     margin-left: 5px;
-    padding: 0.5rem;
-    background-color: #FA0197;
-    color: #fae3fa;
-    border: none;
-    cursor: pointer;
+    padding: 5px 10px;
+    align-items: center;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0);
+	color: #FA0197;
+	border: 2px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .chat {
@@ -127,11 +129,15 @@
     font-size: 1.2rem;
     font-weight: bold;
     margin-left: 5px;
-    padding: 0.5rem;
-    background-color: #FA0197;
-    color: #fae3fa;
-    border: none;
-    cursor: pointer;
+    padding: 5px 10px;
+    align-items: center;
+	justify-content: center;
+
+    
+	background-color: rgba(0, 0, 0, 0);
+	color: #FA0197;
+	border: 2px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .fade-appear,

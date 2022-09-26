@@ -15,32 +15,31 @@ function Chat() {
 	const [messages, setMessages] = useState([{msg: "", who_said: ""}]);
 	
 	const [channels, setChannels] = useState([]);
-	const userName = localStorage.getItem('userName');
+	const userUuid = localStorage.getItem('uid');
 	const [newChannel, setNewChannel] = useState("blablae");
 
 
   	useEffect(() => {
-
-
+		socket.on('room', (rooms:any) => {
+			console.log('getting information');
+			setChannels(rooms);
+		});
 	});
 
 	function makeRoom() {
 		console.log('creating room ', newChannel);
 		socket.emit('createRoom', {
 			name: newChannel, 
-			ownerId: userName, 
+			ownerId: userUuid, 
 			isProtected:false, 
 			password: "", 
 			type: 'public', 
-			userId:userName 
+			userId:userUuid 
 		});
-		socket.emit('findPublicRooms', (rooms:any) => {setChannels(rooms)});
+		socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
 		console.log(channels);
 	}
 	
-
-	console.log(channels);
-
 	const handleChange = (event:any) => { message = event.target.value;	}
 
 	const sendMessage = (event:any) => {
@@ -62,8 +61,8 @@ function Chat() {
 			<div className="box">
 			<button type="submit" onClick={makeRoom}> New Channel </button>
 				<div className="channel">
-				{channels.map((channel:any) => (
-						<li>{channel.name}</li>
+				{channels.map((room:any) => (
+						<li>{room.name}</li>
 					))}
 				</div>
 			</div>
