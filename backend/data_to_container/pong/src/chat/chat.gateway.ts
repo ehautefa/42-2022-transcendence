@@ -1,14 +1,11 @@
 import { Logger, Req, UseGuards } from '@nestjs/common';
 import {
   MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { Message } from 'src/bdd/message.entity';
 import { Room } from 'src/bdd/room.entity';
@@ -26,9 +23,8 @@ const URL_BACK: string =
 */
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
-export class ChatGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+// implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+export class ChatGateway {
   constructor(private readonly chatService: ChatService) {}
 
   // The socket.io server responsible for handling (receiviing and emitting) events
@@ -47,6 +43,25 @@ export class ChatGateway
     return message;
   }
 
+  // Create a room in the room table
+  @SubscribeMessage('createRoom')
+  async createRoom(@MessageBody() createRoomDto: CreateRoomDto): Promise<Room> {
+    this.logger.log('Here creating a room');
+    console.log(createRoomDto);
+    const newRoom = await this.chatService.createRoom(createRoomDto);
+    this.server.emit('room');
+    return newRoom;
+  }
+
+  // Join a room previously created and return it
+  @SubscribeMessage('joinRoom')
+  async joinRoom(roomName: string) {
+    const room: Room = await this.chatService.getRoomByName(roomName);
+    this.server.socketsJoin(roomName);
+    return room;
+  }
+
+  // Join a DM room (create it if the room does not exist yet)
   @SubscribeMessage('joinDMRoom')
   @UseGuards(JwtAuthGuard)
   async joinDMRoom(
@@ -54,34 +69,12 @@ export class ChatGateway
     @Req() req,
   ): Promise<Room> {
     this.logger.log(req);
-    const room: Room = await this.chatService.joinDmRoom(
+    console.log(req);
+    const room: Room = await this.chatService.joinDMRoom(
       req.user.userUuid,
       joinDMRoomDto.recipientId,
     );
     return room;
-  }
-
-  @SubscribeMessage('createRoom')
-  async createRoom(@MessageBody() createRoomDto: CreateRoomDto) {
-    this.logger.log('Here creating a room');
-    console.log(createRoomDto);
-    try {
-      const newRoom = await this.chatService.createRoom(createRoomDto);
-      return newRoom;
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  @SubscribeMessage('joinRoom')
-  async joinRoom(roomName: string) {
-    try {
-      const room: Room = await this.chatService.getRoomByName(roomName);
-      this.server.socketsJoin(roomName);
-      return room;
-    } catch (error) {
-      console.error(error);
-    }
   }
 
   @SubscribeMessage('getAllMessagesInRoom')
@@ -92,12 +85,14 @@ export class ChatGateway
     );
     return messages;
   }
-  @SubscribeMessage('findPublicRooms')
+
+  @SubscribeMessage('findAllPublicRooms')
   async findAllPublicRooms(): Promise<Room[]> {
     const rooms: Room[] = await this.chatService.findAllPublicRooms();
     return rooms;
   }
 
+  /*
   afterInit(server: Server) {
     this.logger.log('Init');
   }
@@ -109,4 +104,5 @@ export class ChatGateway
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
+  */
 }
