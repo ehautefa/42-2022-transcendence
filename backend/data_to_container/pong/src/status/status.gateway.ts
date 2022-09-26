@@ -1,11 +1,13 @@
-import { Logger, Injectable, UseGuards, Req } from '@nestjs/common';
+import { Logger, Injectable, UseGuards, Req, Body } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { HandleFriendDto } from 'src/user/dto/handleFriend.dto';
-import { User } from 'src/bdd/users.entity';
-
+import { user } from 'src/bdd/users.entity';
+import { UserService } from 'src/user/user.service';
 import { SendInviteDto } from './dto/sendInvite.dto';
+import { Subscriber } from 'rxjs';
+import { addFriendResponseDto } from './dto/addFriendResponse.dto';
 
 type User = {
 	userUuid: string;
@@ -28,6 +30,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 
 	private logger: Logger = new Logger('PongGateway')
+	constructor(private readonly UserService: UserService) {}
 
 	@SubscribeMessage('getUserUuid')
 	@UseGuards(JwtAuthGuard)
@@ -36,14 +39,27 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("inline", inline);
 	}
 
-	addFriend(inviter : User, invited: HandleFriendDto) {
-		let socket = inline.get(invited.userUuidToHandle);
+	@SubscribeMessage('addFriend')
+	@UseGuards(JwtAuthGuard)
+	addFriend(@Req() req, @Body() userUuid : string) {
+		let socket = inline.get(userUuid);
 		if (!socket) {
 			console.log('Error player disconnected');
 			return ;
 		}
-		this.server.to(socket).emit('addFriend', inviter.userName);
-		console.log("Invitation sent to " + inviter.userName);
+		let response: any = {type: 'addFriend', inviter: req.user};
+		this.server.to(socket).emit('addFriend', response);
+		console.log("Invitation sent to " + userUuid);
+	}
+
+	@SubscribeMessage('addFriendResponse')
+	@UseGuards(JwtAuthGuard)
+	addFriendResponse(@Req() req, @Body() body : addFriendResponseDto) {
+		if (body.accept) {
+			this.UserService.addFriend(req.user, body.inviter)
+		} else {
+			console.log("Friend request rejected");
+		}
 	}
 
 	sendInvitation(sendInvite : SendInviteDto) {
@@ -52,7 +68,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log('Error player disconnected');
 			return ;
 		}
-		let response: any = {matchId: sendInvite.matchId, userName: sendInvite.invitedUserName};
+		let response: any = {type: 'receive', matchId: sendInvite.matchId, userName: sendInvite.invitedUserName};
 		this.server.to(socket).emit('sendInvite', response);
 		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}

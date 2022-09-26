@@ -55,14 +55,14 @@ export class UserController {
 		res.send(req.blocked);
     }
 	
-    @Post('addFriend')
-    @ApiOperation({ summary: 'Add Friend(with uUid) to me (from cookie)' })
-    @UseGuards(JwtAuthGuard)
-    @UsePipes(ValidationPipe)
-    async addFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-		this.StatusGateway.addFriend(req.user, userToHandle);
-		res.send(this.UserService.addFriend(req.user, userToHandle.userUuidToHandle));
-    }
+    // @Post('addFriend')
+    // @ApiOperation({ summary: 'Add Friend(with uUid) to me (from cookie)' })
+    // @UseGuards(JwtAuthGuard)
+    // @UsePipes(ValidationPipe)
+    // async addFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    //   console.log("User COntroller addFriend", req.user, userToHandle)
+		// res.send(this.UserService.addFriend(req.user, userToHandle.userUuidToHandle));
+    // }
 	
     @Post('addBlocked')
     @ApiOperation({ summary: 'Add Blocked(with uUid) to me (from cookie)' })

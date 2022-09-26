@@ -1,7 +1,11 @@
+import { getSocketStatus } from "../../App";
+
+const socketStatus = getSocketStatus();
+
 var credentials: RequestCredentials = "include";
 
 export function addInFriend(userUuid: string) {
-	addFriend(userUuid);
+	socketStatus.emit('addFriend', userUuid);
 }
 
 export function removeFromFriend(userUuid: string) {

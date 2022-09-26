@@ -24,11 +24,11 @@ export class UserService {
     }
 
     //need to remove from blocked?
-    async addFriend(user: user, userUuidToAdd: string): Promise<user[]> {
-        const tofind = await this.getCompleteUser(userUuidToAdd);
-        if (!tofind)
+    async addFriend(user: user, inviter: user): Promise<user[]> {
+        if (user == undefined || inviter == undefined)
             return null;
-        user.friends.push(tofind);
+        user.friends.push(inviter);
+        inviter.friends.push(user);
         await this.UserRepository.save(user);
         return user.friends;
     }
