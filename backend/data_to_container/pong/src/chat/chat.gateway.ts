@@ -49,7 +49,6 @@ export class ChatGateway {
     this.logger.log('Here creating a room');
     console.log(createRoomDto);
     const newRoom = await this.chatService.createRoom(createRoomDto);
-    this.server.emit('room');
     return newRoom;
   }
 

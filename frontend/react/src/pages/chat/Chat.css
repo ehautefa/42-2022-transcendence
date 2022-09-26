@@ -1,3 +1,9 @@
+body {
+	background-color: #250021;
+	background-image: url("../../../public/synthwave-wallpaper.jpg");
+	background-repeat: no-repeat;
+}
+
 .mainComposant {
     width: 80%;
     height: 80vh;
@@ -7,12 +13,32 @@
 }
 
 .channel {
-    width: 100%;
+    width: 94%;
     height: 100%;
-    margin: 10px 0;
+    border-radius: 10px;
+    outline: none;
+    padding: 0.5rem;
+    color: #fae3fa;
+}
+
+.channel li{
+    font-size: 0.8rem;
+    width: 93%;
+    padding: 10px 10px;
+    outline:rgb(80, 80, 80);
+    margin-top: 10px;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.5);
-    overflow-y: scroll;
+    box-shadow: 5px 5px 10px #000;
+    color: #fef45b;
+    font-weight: bold;
+
+}
+
+.channel li:hover {
+	text-shadow: 1px 1px 1px #FA0197;
+    box-shadow: 5px 5px 10px rgb(41, 38, 38);
+
 }
 
 .channel h3 {
@@ -26,33 +52,25 @@
     width: 35%;
 }
 
-.box h2{
-	background-color: #FA0197;
-	color: #fef45b;
-	border: none;
-	padding: 5px;
-    margin: auto;
-	font-size: 1.3rem;
-	font-weight: bolder;
-	border-radius: 10px;
-	width: 80%;
-	text-align: center;
-}
-
 .box button {
 
-    width: 50%;
+    width: 30%;
     border-radius: 5px;
     outline: none;
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin-left: 5px;
-    padding: 5px 10px;
+    padding: 10px 10px;
     align-items: center;
 	justify-content: center;
 	background-color: rgba(0, 0, 0, 0);
 	color: #FA0197;
 	border: 2px solid #DBACE3;
 	box-shadow: 0px 0px 20px #7C4D84;
+}
+
+.box button:hover {
+    border-color: #fef45b;
+
 }
 
 .chat {
@@ -140,6 +158,10 @@
 	box-shadow: 0px 0px 20px #7C4D84;
 }
 
+.chat button:hover{
+    border-color: #fef45b;
+}
+
 .fade-appear,
 .fade-enter {
     opacity: 0;
@@ -166,30 +188,25 @@
     .mainComposant {
         width: 98%;
         margin-top: 10px;
-        height: 92vh;
+        height: 82vh;
     }
 }
 
 @media screen and (max-width: 600px) {
     .mainComposant {
-        flex-direction: column-reverse;
         width: 100%;
         margin: 0;
-        height: 110vh;
+        height: 90vh;
         padding: 0;
     }
 
     .box {
-        width: 100%;
-        margin: 0;
-        padding: 0;
+        width: 35%;
+
     }
 
     .chat {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        height: 100vh;
+
         overflow-y: scroll;
     }
 
