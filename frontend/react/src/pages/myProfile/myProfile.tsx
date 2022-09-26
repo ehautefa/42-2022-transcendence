@@ -21,12 +21,12 @@ function MyProfile() {
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
 	fetchUser();
-
+	
 	async function fetchUser() {
 		if (update) {
 			const user = await getMe();
 			const matchHistory = await GetMatchHistory(user.userName);
-			const friends = await GetAllUsers();
+			const friends = await getMyFriends();
 			setFriends(friends);
 			socketStatus.emit('getFriendsStatus', friends, (data: any) => {
 				setFriends(data);

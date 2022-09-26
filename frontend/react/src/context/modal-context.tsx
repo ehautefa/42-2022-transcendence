@@ -9,7 +9,6 @@ const socket = getSocketStatus();
 
 const Modal = (({ modal, unSetModal }: any) => {
 	console.log("MODAL", modal);
-	const selector = modal.type === 'addFriend' ? 'AddFriendPopUp' : 'ReceivePopUp';
 	useEffect(() => {
 		const bind = (event: any) => {
 			console.log(event.keyCode);
