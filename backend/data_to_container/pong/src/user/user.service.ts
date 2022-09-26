@@ -23,6 +23,13 @@ export class UserService {
         return await this.UserRepository.find({ select:{userUuid: true, userName: true}});
     }
 
+    async getFriends(userUuid: string) {
+        const user = await this.getCompleteUser(userUuid);
+        if (!user)
+            return null;
+        return user.friends;
+    }
+
     //need to remove from blocked?
     async addFriend(user: user, inviter: user): Promise<user[]> {
         if (user == undefined || inviter == undefined)

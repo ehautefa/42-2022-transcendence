@@ -48,6 +48,14 @@ export class UserController {
     res.send(req.user.friends);
   }
 
+  @Get('friends/:userUuid')
+  @ApiOperation({ summary: 'Get friends of a user' })
+  @ApiParam({ name: 'userUuid', type: String })
+  @UseGuards(JwtAuthGuard)
+  async getFriends(@Req() req, @Param('userUuid') userUuid: string) {
+    return await this.UserService.getFriends(userUuid);
+  }
+
   @Get('myBlocked')
   @ApiOperation({ summary: 'Get myblocked (from cookie)' })
   @UseGuards(JwtAuthGuard)

@@ -4,7 +4,7 @@ import { FetchUser, GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { addInFriend, removeFromFriend } from "./request";
+import { addInFriend, removeFromFriend, getFriends } from "./request";
 
 var update = true;
 
@@ -18,14 +18,17 @@ function Profile() {
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
+	const [friends, setFriends] = useState([]);
 	fetchUser();
 
 	async function fetchUser() {
 		if (uid && update) {
 			const user = await FetchUser(uid);
 			const matchHistory = await GetMatchHistory(uid);
+			const friends = await getFriends(user.userUuid);
 			setMatchHistory(matchHistory);
 			setUser(user);
+			setFriends(friends);
 			update = false;
 		}
 	}
@@ -53,6 +56,22 @@ function Profile() {
 			<div className="flex">
 				<div className="friends container">
 					<h3>Friends</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>UserName</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							{friends.map((users: any) => {
+								return (<tr key={users.userUuid}>
+									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
+									{users.status ? <td>Online</td> : <td>Offline</td>}
+								</tr>);
+							})}
+						</tbody>
+					</table>
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
