@@ -8,11 +8,8 @@ import "./Chat.css";
 
 function Chat() {
 	const socket = getSocketChat();
-	var selectedRoom = "";
+	const [selectedRoom, setSelectedRoom] = useState("");
 	const [messages, setMessages] = useState();
-	socket.emit('getAllMessagesInRoom', selectedRoom, (msgs:any) => {
-		setMessages(msgs);
-	});
 	
 	const [channels, setChannels] = useState([]);
 	const userUuid = localStorage.getItem('uid');
@@ -25,6 +22,9 @@ function Chat() {
 		socket.on('room', (rooms:any) => {
 			console.log('getting information');
 			setChannels(rooms);
+		});
+		socket.emit('getAllMessagesInRoom', selectedRoom, (msgs:any) => {
+			setMessages(msgs);
 		});
 	});
 
@@ -43,10 +43,7 @@ function Chat() {
 
 	function selectRoom(name: string) {
 		console.log('Selected room ', name);
-		selectedRoom = name;
-		socket.emit('getAllMessagesInRoom', name, (msgs:any) => {
-			setMessages(msgs);
-		});
+		setSelectedRoom(name);
 	}
 	
 /* 	const handleChange = (event:any) => { message = event.target.value;	}
