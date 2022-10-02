@@ -9,12 +9,12 @@ function EditUsernamePopUp() {
 
     function SaveUserName() {
         if (newUsername.length > 3 // min length of username is 4
-            && newUsername.length < 8 // max length of username is 8
+            && newUsername.length < 12 // max length of username is 12
             && newUsername.match(/^[a-zA-Z0-9]+$/)) { // only alphanumeric characters
             setOpen(false);
             ChangeUsername(newUsername);
         } else {
-            alert("Username must be between 4 and 8 characters and alphanumeric");
+            alert("Username must be between 4 and 12 characters and alphanumeric");
         }
 
     }
@@ -35,8 +35,8 @@ function EditUsernamePopUp() {
                         autoCorrect="off"
                         placeholder="Username"
                         minLength={4}
-                        maxLength={8}
-                        size={10} />
+                        maxLength={12}
+                        size={12} />
                     <span></span>
                 </div>
                 <button type="submit" onClick={SaveUserName}>Save</button>
