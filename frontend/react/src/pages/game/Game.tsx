@@ -9,43 +9,40 @@ const socket = getSocketPong();
 
 function Game() {
 	var index = new URLSearchParams(useLocation().search).get('id');
-	// const [displaying, setDisplaying] = useState({ display: "none"});
-	const [loading, setLoading] = useState(true);
-	if (index == null) {
-		// setDisplaying({ display: "block" });
-		// setLoading(false);
-		index = "";
-	}
+	const [layer, setLayer] = useState(1); // 0 - matchMaking button, 1 - waiting for opponent, 2 - game 
 
-	if (index !== "") {
+	if (index !== null) {
 		socket.emit('joinGame', index);
+	} else {
+		setLayer(0);
+		index = "";
 	}
 
 	function matchMaking() {
 		socket.emit('getPlayer', (matchId: string) => {
-			// setDisplaying({ display: "none" });
-			// if (matchId === "")
-				// setLoading(true);
-			// else
-				// setLoading(false)
+			if (matchId === "")
+				setLayer(1);
+			else
+				setLayer(2)
 		});
 	}
 
 	socket.on('beginGame', () => {
-		console.log("beginGame");
-		// setLoading(false);
+		setLayer(2);
 	});
 
 	return (<>
 		<NavBar />
 		<div className="mainComposantGame">
 			<GameWindow id={index} />
-			{ !loading ?
+			{ layer === 0 &&
 				<button
 					className="matchMakingButton"
 					onClick={() => matchMaking()}>
 					Find another player
-				</button> :
+				</button>
+			}
+			{ layer === 1 &&
 				<div className="loader-container">
 					<div className="spinner"></div>
 				</div>
