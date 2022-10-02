@@ -25,7 +25,8 @@ function AllPlayers() {
 	async function fetchPlayers() {
 		const response = await getAllUuidWithUserName();
 		setUsers(response);
-		socketStatus.emit('getFriendsStatus', users, (data: any) => {
+		
+		socketStatus.emit('getFriendsStatus', response, (data: any) => {
 			setUsers(data);
 		});
 	}
@@ -34,7 +35,7 @@ function AllPlayers() {
 		<NavBar />
 		<div className="allPlayers">
 			{users.map((user:players) => (
-				<div className="onePlayer">
+				<div className="onePlayer" key={user.userUuid}>
 					<div className="pp"></div>
 					<a href={"./profile?uid=" + user.userUuid}>{user.userName}</a>
 					{user.status ? <p>Online</p> : <p>Offline</p>}

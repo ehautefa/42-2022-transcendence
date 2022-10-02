@@ -11,5 +11,6 @@ export async function getAllUuidWithUserName() {
 	if (users.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
+	console.log("USERS", users);
 	return await users;
 }

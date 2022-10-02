@@ -86,7 +86,7 @@ function Profile() {
 						</thead>
 						<tbody>
 							{matchHistory.map((match: any) => {
-								return (<tr key="{match.matchId}">
+								return (<tr key={match.matchId}>
 									<td>{match.matchId}</td>
 									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
