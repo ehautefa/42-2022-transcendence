@@ -9,12 +9,13 @@ const socket = getSocketPong();
 
 function Game() {
 	var index = new URLSearchParams(useLocation().search).get('id');
-	const [layer, setLayer] = useState(1); // 0 - matchMaking button, 1 - waiting for opponent, 2 - game 
+	const initialLayer = index === null ? 0 : 1;
+	console.log(initialLayer);
+	const [layer, setLayer] = useState(initialLayer); // 0 - matchMaking button, 1 - waiting for opponent, 2 - game 
 
 	if (index !== null) {
 		socket.emit('joinGame', index);
 	} else {
-		setLayer(0);
 		index = "";
 	}
 
