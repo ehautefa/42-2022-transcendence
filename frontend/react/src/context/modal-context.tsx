@@ -50,6 +50,9 @@ const ModalProvider = (props: any) => {
 		console.log("ADD FRIEND ON", inviter);
 		setModal(inviter);
 	})
+	socket.on('sendAlert', (message: string) => {
+		alert(message);
+	})
 	const unSetModal = useCallback(() => {
 		setModal(undefined);
 	}, [setModal])

@@ -50,8 +50,8 @@ export class UserService {
         return user.blocked;
     }
 
-    async removeFriend(user: user, userUuidToRemove: string) {
-        const tofind = await this.getUser(userUuidToRemove);
+    async removeFriend(user: user, tofind: user) {
+        // const tofind = await this.getUser(userUuidToRemove);
         const idx = user.friends.findIndex((object) => {
             return object.userUuid === tofind.userUuid;
         })

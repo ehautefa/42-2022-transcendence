@@ -8,6 +8,7 @@ import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
 import { StatusGateway } from 'src/status/status.gateway';
+import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -85,7 +86,16 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    res.send(this.UserService.removeFriend(req.user, userToHandle.userUuidToHandle));
+    const tofind = await this.UserService.getUser(userToHandle.userUuidToHandle);
+	if (!tofind)
+		return res.status(404).send("User not found");
+    res.send(this.UserService.removeFriend(req.user, tofind));
+    res.send(this.UserService.removeFriend(tofind, req.user));
+	const sendAlert : SendAlertDto = {
+		userUuid: userToHandle.userUuidToHandle,
+		message: `${req.user.userName} removed you from his friend list`,
+	}
+	this.StatusGateway.sendAlert(sendAlert);
   }
 
   @Post('removeBlocked')

@@ -6,6 +6,7 @@ import { HandleFriendDto } from 'src/user/dto/handleFriend.dto';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
 import { SendInviteDto } from './dto/sendInvite.dto';
+import { SendAlertDto } from './dto/sendAlert.dto';
 import { Subscriber } from 'rxjs';
 import { addFriendResponseDto } from './dto/addFriendResponse.dto';
 
@@ -59,6 +60,16 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		} else {
 			console.log("Friend request rejected");
 		}
+	}
+
+	sendAlert(sendAlert : SendAlertDto) {
+		let socket = inline.get(sendAlert.userUuid);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return ;
+		}
+		this.server.to(socket).emit('sendAlert', sendAlert.message);
+		console.log("Alert sent to " + sendAlert.userUuid);
 	}
 
 	sendInvitation(sendInvite : SendInviteDto) {
