@@ -1,17 +1,52 @@
-import NavBar from "../../components/NavBar/NavBar"
-import "./Chat.css"
-import { useState } from 'react'
-import { CSSTransition, TransitionGroup} from 'react-transition-group';
-import {Route, NavLink, HashRouter} from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { getSocketChat } from "../../App";
+import NavBar from "../../components/NavBar/NavBar";
+import "./Chat.css";
+//import {Route, NavLink, HashRouter} from 'react-router-dom'
+//import { User } from "../../type";
 
 function Chat() {
-	var message: string;
-	var who: string;
-	var channel: string;
-	const [messages, setMessages] = useState([{msg: "", who_said: ""}]);
-	const [channels, setChannels] = useState([""]);
+	const socket = getSocketChat();
+	const [selectedRoom, setSelectedRoom] = useState("");
+	const [messages, setMessages] = useState();
 	
-	const handleChange = (event:any) => { message = event.target.value;	}
+	const [channels, setChannels] = useState([]);
+	const userUuid = localStorage.getItem('uid');
+	const [newChannel, setNewChannel] = useState("blaaaa");
+
+
+  	useEffect(() => {
+		socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
+
+		socket.on('room', (rooms:any) => {
+			console.log('getting information');
+			setChannels(rooms);
+		});
+		socket.emit('getAllMessagesInRoom', selectedRoom, (msgs:any) => {
+			setMessages(msgs);
+		});
+	});
+
+	function makeRoom() {
+		console.log('creating room ', newChannel);
+		socket.emit('createRoom', {
+			name: newChannel,
+			ownerId: userUuid, 
+			isProtected:false, 
+			password: "", 
+			type: 'public', 
+			userId:userUuid 
+		});
+		console.log(channels);
+	}
+
+	function selectRoom(name: string) {
+		console.log('Selected room ', name);
+		setSelectedRoom(name);
+	}
+	
+/* 	const handleChange = (event:any) => { message = event.target.value;	}
 
 	const sendMessage = (event:any) => {
 		event.preventDefault();
@@ -24,35 +59,36 @@ function Chat() {
 			message = "";
 		}
 		event.target.reset();
-	}
-
+	} */
+	
 	return ( <div>
 		<NavBar />
 		<div className="mainComposant">
 			<div className="box">
-			<button> New Channel </button>
+			<button type="submit" onClick={makeRoom}> New </button>
 				<div className="channel">
-				{channels.map((channel: string) => (
-						<li>{channel}</li>
+				{channels.map((room:any) => (
+						<li key = {room.name} onClick={() => selectRoom(room.name)}>{room.name}</li>
 					))}
 				</div>
 			</div>
 			<div className="chat">
 				<TransitionGroup className="messages">
-					{messages.map(({msg: message, who_said: who}) => (
-						who === "me" ? 
+					{messages ? (messages as any).map((message:any) => (
+						message.sender.userUuid === userUuid ? 
 						(<CSSTransition key={message} timeout={500} classNames="fade">
-						<ul>{who}: {message}</ul>
+						<div className="message_mine">me: {message}</div>
 						</CSSTransition>) : (<CSSTransition key={message} timeout={500} classNames="fade">
-						<li>{who}: {message}</li>
-						</CSSTransition>) 
-					))}
+						<div className="message_mine">{message.sender.userName}: {message}</div>
+						</CSSTransition>))
+					) : null
+					}
 				</TransitionGroup>
-				<form onSubmit={sendMessage}>
+				<form onSubmit={makeRoom}>
 					<input
 						autoComplete="off"
 						type="text"
-						onChange={handleChange}
+						onChange={makeRoom}
 						autoFocus
 					/>
 					<button type="submit"> Send </button>

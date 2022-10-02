@@ -10,10 +10,11 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MatchModule } from './match/match.module';
 import { PongModule } from './pong/pong.module';
+import { ChatModule } from './chat/chat.module';
 import { StatusModule } from './status/status.module';
 
 @Module({
-  imports: [TestModule, ApiModule, BddModule, UserModule, AuthModule, MatchModule, PongModule, StatusModule],
+  imports: [TestModule, ApiModule, ChatModule, BddModule, UserModule, AuthModule, MatchModule, PongModule, StatusModule],
   controllers: [AppController],
   providers: [AppService],
 })

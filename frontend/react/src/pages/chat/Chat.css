@@ -1,3 +1,9 @@
+body {
+	background-color: #250021;
+	background-image: url("../../../public/synthwave-wallpaper.jpg");
+	background-repeat: no-repeat;
+}
+
 .mainComposant {
     width: 80%;
     height: 80vh;
@@ -7,12 +13,32 @@
 }
 
 .channel {
-    width: 100%;
+    width: 94%;
     height: 100%;
-    margin: 10px 0;
+    border-radius: 10px;
+    outline: none;
+    padding: 0.5rem;
+    color: #fae3fa;
+}
+
+.channel li{
+    font-size: 0.8rem;
+    width: 93%;
+    padding: 10px 10px;
+    outline:rgb(80, 80, 80);
+    margin-top: 10px;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.5);
-    overflow-y: scroll;
+    box-shadow: 5px 5px 10px #000;
+    color: #fef45b;
+    font-weight: bold;
+
+}
+
+.channel li:hover {
+	text-shadow: 1px 1px 1px #FA0197;
+    box-shadow: 5px 5px 10px rgb(41, 38, 38);
+
 }
 
 .channel h3 {
@@ -26,31 +52,25 @@
     width: 35%;
 }
 
-.box h2{
-	background-color: #FA0197;
-	color: #fef45b;
-	border: none;
-	padding: 5px;
-    margin: auto;
-	font-size: 1.3rem;
-	font-weight: bolder;
-	border-radius: 10px;
-	width: 80%;
-	text-align: center;
-}
-
 .box button {
-    width: 50%;
+
+    width: 30%;
     border-radius: 5px;
     outline: none;
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1rem;
     margin-left: 5px;
-    padding: 0.5rem;
-    background-color: #FA0197;
-    color: #fae3fa;
-    border: none;
-    cursor: pointer;
+    padding: 10px 10px;
+    align-items: center;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0);
+	color: #FA0197;
+	border: 2px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
+}
+
+.box button:hover {
+    border-color: #fef45b;
+
 }
 
 .chat {
@@ -62,22 +82,39 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.chat li {
-    list-style: none;
-    margin: 10px 0px;
+.message_mine {
+    font-family: Monaco, Arial, sans-serif;
+    text-align:right;
+    width: max-content;
+    word-break: break-all;
+    word-wrap: normal;
+    max-width: 50%;
+    margin-left: auto;
+    margin-top: 15px;
+    margin-right: 5px;
+    border-radius: 5px;
     color: #fae3fa;
-    text-align: left;
+    padding: 0.5rem;
+    background-color: #FA0197;
+    box-shadow: -2px 2px 3px rgb(80, 80, 80), inset 0px 0px 3px 1px  #6d0041;
     padding: 5px;
 }
 
-.chat ul {
+.message_other {
+    font-family: Monaco, Arial, sans-serif;
+
+    width: max-content;
+    max-width: 50%;
     list-style: none;
-    margin: 10px 0px;
+    border-radius: 5px;
+    margin-top: 15px;
+    margin-left: 5px;
     color: #FA0197;
-    text-align: right;
+    padding: 0.5rem;
+    background-color:  #fae3fa;
+    box-shadow: -2px 2px 3px gray, inset 0px 0px 3px 1px   gray;
     padding: 5px;
 }
-
 
 .messages {
     height: 100%;
@@ -110,11 +147,19 @@
     font-size: 1.2rem;
     font-weight: bold;
     margin-left: 5px;
-    padding: 0.5rem;
-    background-color: #FA0197;
-    color: #fae3fa;
-    border: none;
-    cursor: pointer;
+    padding: 5px 10px;
+    align-items: center;
+	justify-content: center;
+
+    
+	background-color: rgba(0, 0, 0, 0);
+	color: #FA0197;
+	border: 2px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
+}
+
+.chat button:hover{
+    border-color: #fef45b;
 }
 
 .fade-appear,
@@ -143,30 +188,25 @@
     .mainComposant {
         width: 98%;
         margin-top: 10px;
-        height: 92vh;
+        height: 82vh;
     }
 }
 
 @media screen and (max-width: 600px) {
     .mainComposant {
-        flex-direction: column-reverse;
         width: 100%;
         margin: 0;
-        height: 110vh;
+        height: 90vh;
         padding: 0;
     }
 
     .box {
-        width: 100%;
-        margin: 0;
-        padding: 0;
+        width: 35%;
+
     }
 
     .chat {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        height: 100vh;
+
         overflow-y: scroll;
     }
 
