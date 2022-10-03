@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { getSocketChat } from "../../App";
+import Popup from 'reactjs-popup';
 import NavBar from "../../components/NavBar/NavBar";
 import "./Chat.css";
 //import {Route, NavLink, HashRouter} from 'react-router-dom'
@@ -8,67 +9,71 @@ import "./Chat.css";
 
 function Chat() {
 	const socket = getSocketChat();
+	const [open, setOpen] = useState(false);
 	const [selectedRoom, setSelectedRoom] = useState("");
 	const [messages, setMessages] = useState();
-	
 	const [channels, setChannels] = useState([]);
-	const userUuid = localStorage.getItem('uid');
-	const [newChannel, setNewChannel] = useState("blaaaa");
+
+	var userUuid = localStorage.getItem('uid');
+	if (userUuid === 'undefined' || userUuid === null)
+		userUuid = 'a433d950-3f11-11ed-b878-0242ac120002';
+	const [newChannel, setNewChannel] = useState("blaaa");
 
 
   	useEffect(() => {
 		socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
-
+		
 		socket.on('room', (rooms:any) => {
 			console.log('getting information');
 			setChannels(rooms);
 		});
-		socket.emit('getAllMessagesInRoom', selectedRoom, (msgs:any) => {
-			setMessages(msgs);
-		});
 	});
+
+	useEffect(() => {
+		socket.emit('getAllMessagesInRoom', selectedRoom, (msgs:any) => {
+			setMessages(msgs)});
+	}, [selectedRoom, socket]);
 
 	function makeRoom() {
 		console.log('creating room ', newChannel);
-		socket.emit('createRoom', {
-			name: newChannel,
-			ownerId: userUuid, 
-			isProtected:false, 
-			password: "", 
-			type: 'public', 
+		socket.emit('createRoom', { name: newChannel, ownerId: userUuid, 
+			isProtected:false, password: "", type: 'public', 
 			userId:userUuid 
 		});
 		console.log(channels);
-	}
-
-	function selectRoom(name: string) {
-		console.log('Selected room ', name);
-		setSelectedRoom(name);
+		setOpen(false);
 	}
 	
-/* 	const handleChange = (event:any) => { message = event.target.value;	}
-
-	const sendMessage = (event:any) => {
-		event.preventDefault();
-		if (message) {
-			console.log("Message a envoyer : ", message);
-			// socket.emit("message", socket.id + ": " + message);
-			setMessages(prevValues => [...prevValues, {msg: message, who_said: "me"}]);
-			if (message.search(/possible/gi) !== -1 || message.search(/can /gi) !== -1)
-				setMessages(prevValues => [...prevValues, {msg: "NO WAY!", who_said: "God"}]);
-			message = "";
-		}
-		event.target.reset();
-	} */
 	
 	return ( <div>
 		<NavBar />
 		<div className="mainComposant">
 			<div className="box">
-			<button type="submit" onClick={makeRoom}> New </button>
+			<button type="submit" onClick={() => setOpen(true)}> New </button>
+			<Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
+             window.location.reload();
+            }}>
+            <div className='messagePopup'>
+                <label htmlFor="messagePopup">Message to :</label>
+                <div className='input-flex'>
+                    <input type="text" id="messagePopup" name="username"
+                        value={newChannel}
+                        onChange={(e) => setNewChannel(e.target.value)}
+                        autoFocus
+                        autoCorrect="off"
+                        placeholder="..."
+                        minLength={1}
+                        maxLength={30}
+                        size={30} />
+                    <span></span>
+                </div>
+                <button type="submit" onClick={makeRoom}>Save</button>
+            </div>
+        	</Popup>
+
 				<div className="channel">
 				{channels.map((room:any) => (
-						<li key = {room.name} onClick={() => selectRoom(room.name)}>{room.name}</li>
+						<li key = {room.name} onClick={() => setSelectedRoom(room.name)}>{room.name}</li>
 					))}
 				</div>
 			</div>
