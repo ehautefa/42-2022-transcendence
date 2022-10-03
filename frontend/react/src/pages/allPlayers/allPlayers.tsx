@@ -1,9 +1,10 @@
 import { getAllUuidWithUserName } from "./request";
 import { useState } from "react";
 import "./allPlayers.css";
-import { addInFriend, removeFromFriend } from "../Profile/request";
+import { addFriend, removeFriend } from "./request";
 import NavBar from "../../components/NavBar/NavBar";
 import {getSocketStatus} from "../../App";
+import { getMyFriends } from "../myProfile/request";
 
 const socketStatus = getSocketStatus();
 var update = true;
@@ -15,7 +16,9 @@ type players = {
 }
 
 function AllPlayers() {
+	const emptyFriends = new Array<players>();
 	const [users, setUsers] = useState([]);
+	const [friends, setFriends] = useState(emptyFriends);
 	if (update) {
 		update = false;
 		fetchPlayers();
@@ -27,6 +30,8 @@ function AllPlayers() {
 		socketStatus.emit('getFriendsStatus', response, (data: any) => {
 			setUsers(data);
 		});
+		const myFriends = await getMyFriends();
+		setFriends(myFriends);
 	}
 
 	return (<>
@@ -37,8 +42,11 @@ function AllPlayers() {
 					<div className="pp"></div>
 					<a href={"./profile?uid=" + user.userUuid}>{user.userName}</a>
 					{user.status ? <p>Online</p> : <p>Offline</p>}
-					<button className="enable" onClick={() => addInFriend(user.userUuid)}>Add in friends</button>
-					<button className="enable" onClick={() => removeFromFriend(user.userUuid)}>Remove from friends</button>
+					{
+						friends.includes(user) ?
+						<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
+						: <button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
+					}
 				</div>
 			))}
 		</div>
