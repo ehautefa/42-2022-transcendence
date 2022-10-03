@@ -20,24 +20,6 @@ export async function getMe() {
 	return await user;
 }
 
-export async function FetchUser(uid: string) {
-	var myHeaders = new Headers();
-	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/" + uid;
-	var requestOptions = {
-		method: 'GET',
-		headers: myHeaders,
-        credentials: credentials
-	};
-
-	let user = await (await fetch(url, requestOptions)).json();
-	if (user.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-	return await user;
-}
-
 export async function GetMatchHistory(userName: string) {
 	var url: string = process.env.REACT_APP_BACK_URL +  "/match/user/" + userName;
 	var requestOptions = {
@@ -71,20 +53,6 @@ export async  function ChangeUsername(newName: string) {
 	if (result.status === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
-}
-
-export async function GetAllUsers() {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/allUuidWithUserName";
-	var requestOptions = {
-		method: 'GET',
-        credentials: credentials
-	};
-
-	let users = await (await fetch(url, requestOptions)).json();
-	if (users.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-	return await users;
 }
 
 export async function enableTwoFactorAuth() {

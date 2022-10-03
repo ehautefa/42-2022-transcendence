@@ -2,23 +2,10 @@ import { Logger, Injectable, UseGuards, Req, Body } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
-import { HandleFriendDto } from 'src/user/dto/handleFriend.dto';
-import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
 import { SendInviteDto } from './dto/sendInvite.dto';
 import { SendAlertDto } from './dto/sendAlert.dto';
-import { Subscriber } from 'rxjs';
-import { addFriendResponseDto } from './dto/addFriendResponse.dto';
-
-type User = {
-	userUuid: string;
-	userName: string;
-	status?: boolean;
-	twoFfactorAuth?: boolean;
-	wins?: number;
-	losses?: number;
-	friends?: User[];
-}
+import { user } from 'src/bdd/users.entity';
 
 var inline = new Map<string, string>();
 			// Map<userUid, socketId>
@@ -37,29 +24,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@UseGuards(JwtAuthGuard)
 	getUserUid(@Req() req): void {
 		inline.set(req.user.userUuid, req.id);
-	}
-
-	@SubscribeMessage('addFriend')
-	@UseGuards(JwtAuthGuard)
-	addFriend(@Req() req, @Body() userUuid : string) {
-		let socket = inline.get(userUuid);
-		if (!socket) {
-			console.log('Error player disconnected');
-			return ;
-		}
-		let response: any = {type: 'addFriend', inviter: req.user};
-		this.server.to(socket).emit('addFriend', response);
-		console.log("Invitation sent to " + userUuid);
-	}
-
-	@SubscribeMessage('addFriendResponse')
-	@UseGuards(JwtAuthGuard)
-	addFriendResponse(@Req() req, @Body() body : addFriendResponseDto) {
-		if (body.accept) {
-			this.UserService.addFriend(req.user, body.inviter)
-		} else {
-			console.log("Friend request rejected");
-		}
 	}
 
 	sendAlert(sendAlert : SendAlertDto) {
@@ -85,12 +49,12 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getFriendsStatus')
 	@UseGuards(JwtAuthGuard)
-	getFriendsStatus(client: Socket, users: User[] ): User[] {
+	getFriendsStatus(client: Socket, users: user[] ): user[] {
 		for (let i = 0; i < users.length; i++) {
 			if (inline.has(users[i].userUuid)) {
-				users[i].status = true;
+				users[i].online = true;
 			} else {
-				users[i].status = false;
+				users[i].online = false;
 			}
 		}
 		return users;

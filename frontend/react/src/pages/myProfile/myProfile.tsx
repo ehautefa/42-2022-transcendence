@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, enableTwoFactorAuth, GetAllUsers } from "./request"
+import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, enableTwoFactorAuth } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
 import { getSocketStatus } from "../../App";
@@ -89,7 +89,7 @@ function MyProfile() {
 							{friends.map((users: any) => {
 								return (<tr key={users.userUuid}>
 									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
-									{users.status ? <td>Online</td> : <td>Offline</td>}
+									{users.online ? <td>Online</td> : <td>Offline</td>}
 									<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
 								</tr>);
 							})}
