@@ -137,49 +137,47 @@ export class UserService {
     }
 
     async FindOrCreateUserLocal(userToFindOrCreate: string): Promise<user> {
-        const user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate } })
-        if (user) {
-            //need to throw if user is not local
-            if (user.user42Id !== 'none')
-                return null;
-            return user;
-        }
+        const user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'none'} })
+        //need to throw
+        if (!user) {
+            console.log('This username is used by an accout created with 42Api - cannot login with a 42 profile')
+        return user;
+    }
         return await this.UserRepository.save({
-            userName: userToFindOrCreate,
-            user42Id: 'none',
-            isLocal: true,
-            online: false,
-            twoFactorAuth: false,
-            wins: 0,
-            losses: 0,
-        });
+        userName: userToFindOrCreate,
+        user42Id: 'none',
+        online: false,
+        twoFactorAuth: false,
+        wins: 0,
+        losses: 0,
+    });
     }
 
-    async changeUserName(user: user, newName: string): Promise<void> {
-        //need check if userName already exist
+    async changeUserName(user: user, newName: string): Promise < void> {
+    //need check if userName already exist
 
-        if (await this.UserRepository.findOne({ where: { userName: newName } })) {
-            console.log("Error username already exist");
-            return null;
-            //need to throw
-        }
-        await this.UserRepository.update(user.userUuid, { userName: newName });
+    if(await this.UserRepository.findOne({ where: { userName: newName } })) {
+    console.log("Error username already exist");
+    return null;
+    //need to throw
+}
+await this.UserRepository.update(user.userUuid, { userName: newName });
     }
 
-    async disableTwoFactorAuth(user: user): Promise<user> {
-        user.twoFactorAuth = false;
-        await this.UserRepository.save(user);
-        return user;
-    }
+    async disableTwoFactorAuth(user: user): Promise < user > {
+    user.twoFactorAuth = false;
+    await this.UserRepository.save(user);
+    return user;
+}
 
-    async enableTwoFactorAuth(user: user): Promise<user> {
-        user.twoFactorAuth = true;
-        await this.UserRepository.save(user);
-        return user;
-    }
+    async enableTwoFactorAuth(user: user): Promise < user > {
+    user.twoFactorAuth = true;
+    await this.UserRepository.save(user);
+    return user;
+}
 
-    async endOfMatch(players: EndOfMatchDto): Promise<void> {
-        await this.UserRepository.increment({ userUuid: players.loserUuid }, "losses", 1)
+    async endOfMatch(players: EndOfMatchDto): Promise < void> {
+    await this.UserRepository.increment({ userUuid: players.loserUuid }, "losses", 1)
         await this.UserRepository.increment({ userUuid: players.winnerUuid }, "wins", 1)
-    }
+}
 }
