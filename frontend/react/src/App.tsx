@@ -33,12 +33,12 @@ async function createUser(username: string) {
 		body: urlencoded,
 	};
 
-	let result = await (await fetch(url, requestOptions)).json();
+	let result = (await fetch(url, requestOptions));
 	console.log("createUser result:", result);
-	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
+	// if (result.statusCode === 401) {
+	// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	// }
+	// window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
 }
 
 

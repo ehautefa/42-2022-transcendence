@@ -6,6 +6,7 @@ import { useState } from "react";
 import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
+import Cookies from "js-cookie";
 
 const socketStatus = getSocketStatus();
 
@@ -44,9 +45,12 @@ function MyProfile() {
 		} else {
 			new_user = await enableTwoFactorAuth();
 		}
-		// window.location.reload();
 		setUser(new_user);
+	}
 
+	function logOut() {
+		Cookies.remove('access_token', { path: "/"});
+		window.location.replace(process.env.REACT_APP_FRONT_URL + "/");
 	}
 
 	return (<>
@@ -54,7 +58,10 @@ function MyProfile() {
 		<div className="mainComposantProfile">
 			<div className="flex">
 				<div className="info container">
-					<h3>Profile</h3>
+					<div className="firstLine">
+						<h3>Profile</h3>
+						<button onClick={logOut}>Log out</button>
+					</div>
 					<ul>
 						<li className="flex-li">
 							<div className="Username">Username : {user.userName}</div>

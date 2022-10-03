@@ -30,6 +30,22 @@
 	overflow-y: scroll;
 }
 
+.mainComposantProfile .info .firstLine {
+	display: flex;
+	justify-content: space-between;
+}
+
+.mainComposantProfile .info .firstLine button {
+	margin: 0;
+	width: 20%;
+	padding: 0;
+	border: none;
+	text-decoration: underline;
+	color: #FA0197;
+	box-shadow: none;
+}
+
+
 .mainComposantProfile .info .flex-li {
 	display: flex;
 	flex-direction: row;
