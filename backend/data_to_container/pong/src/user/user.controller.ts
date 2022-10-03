@@ -59,6 +59,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get myFriends (from cookie)' })
   @UseGuards(JwtAuthGuard)
   async getMyRequests(@Req() req, @Res() res) {
+    console.log("getMyRequests", req.user.requestPending);
     res.send(req.user.requestPending);
   }
 
@@ -91,6 +92,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async makeFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    console.log("makeFriendRequest");
     await this.UserService.makeFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
   }
 
@@ -99,6 +101,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async acceptFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    console.log("acceptFriendRequest", userToHandle);
     await this.UserService.acceptFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
   }
 // 

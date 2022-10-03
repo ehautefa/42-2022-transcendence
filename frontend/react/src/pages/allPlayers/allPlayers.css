@@ -17,7 +17,13 @@
 }
 
 .allPlayers table thead {
-	
+	border-bottom: 1px solid #DBACE3;
+	box-shadow: 1px 0px 5px #7C4D84;
+}
+
+.allPlayers table thead th {
+	padding: 10px;
+	font-size: large;
 }
 
 .allPlayers tbody tr {
@@ -48,7 +54,7 @@
 .allPlayers tbody .pp {
 	width: 40px;
 	height: 40px;
-	margin: 0px;
+	margin: 20px;
 	border-radius: 50%;
 	background-image: url(../../../public/default_avatar.png);
 	background-size: cover;

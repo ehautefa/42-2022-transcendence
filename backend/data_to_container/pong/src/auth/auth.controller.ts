@@ -17,11 +17,11 @@ export class AuthController {
         private readonly userService: UserService
     ) { }
 
-    @Post('localLogin')
+    @Get('localLogin/:userName')
     @ApiOperation({ summary: 'Create a new user' })
     @UsePipes(ValidationPipe)
-    async localLogin(@Req() req, @Res() res, @Body() UserToCreate: FindOrCreateUserLocalDto) {
-        const user = await this.userService.FindOrCreateUserLocal(UserToCreate.userName);
+    async localLogin(@Req() req, @Res() res, @Param ('userName') userName: string) {
+        const user = await this.userService.FindOrCreateUserLocal(userName);
         res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid }))
         console.log("Local username connected with Uuid", user);
         if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)

@@ -23,14 +23,10 @@ const socketChat = io(URL_BACK + "/chat", socketOptions);
 
 
 async function createUser(username: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin";
-
-	var urlencoded = new URLSearchParams();
-	urlencoded.append("userName", username);
+	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
 
 	var requestOptions = {
-		method: 'POST',
-		body: urlencoded,
+		method: 'GET',
 	};
 
 	let result = (await fetch(url, requestOptions));

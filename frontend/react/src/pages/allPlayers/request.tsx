@@ -16,10 +16,10 @@ export async function getAllUuidWithUserName() {
 }
 
 export async function addFriend(friendUuid: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/addFriend";
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/makeFriendRequest";
 
 	var urlencoded = new URLSearchParams();
-	urlencoded.append("userUuidToHandle", friendUuid);
+	urlencoded.append("userUuid", friendUuid);
 
 	var requestOptions = {
 		method: 'POST',
@@ -37,7 +37,7 @@ export async function removeFriend(friendUuid: string) {
 	var url: string = process.env.REACT_APP_BACK_URL + "/user/removeFriend";
 
 	var urlencoded = new URLSearchParams();
-	urlencoded.append("userUuidToHandle", friendUuid);
+	urlencoded.append("userUuid", friendUuid);
 
 	var requestOptions = {
 		method: 'POST',

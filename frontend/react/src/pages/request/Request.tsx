@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Request.css";
+import { acceptFriendRequest, getMyRequests } from "./requests";
 import NavBar from "../../components/NavBar/NavBar";
 
 var update = true;
@@ -17,14 +18,11 @@ function Request() {
 		fetchRequest();
 	}
 
-	
-	async function fetchRequest() {
-		// const response = await getMyRequest();
-		// setRequests(response);
-	}
 
-	function accept(userUuid: string) {
-		// acceptRequest(userUuid);
+	async function fetchRequest() {
+		const response = await getMyRequests();
+		setRequests(response);
+		console.log("REquest", response);
 	}
 
 	function refuse(userUuid: string) {
@@ -34,14 +32,30 @@ function Request() {
 	return (<>
 		<NavBar />
 		<div className="allPlayers">
-			{requests.map((request:players) => (
-				<div className="onePlayer" key={request.userUuid}>
-					<div className="pp"></div>
-					<a href={"./profile?uid=" + request.userUuid}>{request.userName}</a>
-					<button className="enable" onClick={() => accept(request.userUuid)}>Accept</button>
-					<button className="enable" onClick={() => refuse(request.userUuid)}>Refuse</button>
-				</div>
-			))}
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th>UserName</th>
+						<th>Status</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{requests.map((request: any) => {
+						return (<tr key={request}>
+							<td className="pp">
+							</td>
+							<td><a href={"./profile?uid=" + request}>elise</a></td>
+							<td><button className="enable" onClick={() => acceptFriendRequest(request)}>Accept</button></td>
+							<td><button className="enable" onClick={() => refuse(request)}>Refuse</button></td>
+						</tr>
+						)
+					})}
+				</tbody>
+			</table>
+
 		</div>
 	</>
 	);

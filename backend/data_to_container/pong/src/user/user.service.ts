@@ -46,7 +46,7 @@ export class UserService {
 
     async acceptFriendRequest(CompleteMe: user, CompleteUser2: user) {
         // cant find user
-        if (!CompleteMe || CompleteUser2)
+        if (!CompleteMe || !CompleteUser2)
             return false
 
         let idx1: number = CompleteMe.requestPending.indexOf(CompleteUser2.userUuid)
@@ -59,7 +59,7 @@ export class UserService {
 
     async makeFriendRequest(completeMe: user, completeUser2: user) {
         // cant find user
-        if (completeMe ||!completeUser2)
+        if (!completeMe ||!completeUser2)
             return false
 
         // allready friends need to throw
