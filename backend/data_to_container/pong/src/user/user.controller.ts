@@ -55,6 +55,13 @@ export class UserController {
     res.send(req.user.friends);
   }
 
+  @Get('getMyRequests')
+  @ApiOperation({ summary: 'Get myFriends (from cookie)' })
+  @UseGuards(JwtAuthGuard)
+  async getMyRequests(@Req() req, @Res() res) {
+    res.send(req.user.requestPending);
+  }
+
   @Get('isMyFriends')
   @ApiOperation({ summary: 'check if we are friends' })
   @UseGuards(JwtAuthGuard)
