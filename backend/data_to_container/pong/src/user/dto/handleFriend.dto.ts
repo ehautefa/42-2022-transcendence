@@ -5,5 +5,5 @@ export class HandleFriendDto {
 
     @ApiProperty({ description: 'The user uUid' })
     @IsNotEmpty({message: "userUuid should be declared"})
-    userUuidToHandle: string;
+    userUuid: string;
 }

@@ -9,7 +9,12 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
 import { StatusGateway } from 'src/status/status.gateway';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
-import { FindOrCreateUserLocalDto } from './dto/findOrCreateLocal';
+
+//accept
+//refused
+//getRequest
+//addFriend
+//removeFriend
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -55,7 +60,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async isMyFriends(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    return await this.UserService.isMyFriend(req.user, userToHandle.userUuidToHandle);
+    return await this.UserService.isMyFriend(req.user, await this.UserService.getUser(userToHandle.userUuid));
   }
 
 
@@ -74,6 +79,22 @@ export class UserController {
     res.send(req.blocked);
   }
 
+  @Post('makeFriendRequest')
+  @ApiOperation({ summary: 'Make Friend Request' })
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  async makeFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    await this.UserService.makeFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
+  }
+
+  @Post('acceptFriendRequest')
+  @ApiOperation({ summary: 'Make Friend Request' })
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  async acceptFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    await this.UserService.acceptFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
+  }
+// 
   // @Post('addFriend')
   // @ApiOperation({ summary: 'Add Friend(with uUid) to me (from cookie)' })
   // @UseGuards(JwtAuthGuard)
@@ -88,7 +109,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async addBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    res.send(this.UserService.addBlocked(req.user, userToHandle.userUuidToHandle));
+    res.send(this.UserService.addBlocked(req.user, userToHandle.userUuid));
   }
 
   @Post('removeFriend')
@@ -96,16 +117,16 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    const tofind = await this.UserService.getUser(userToHandle.userUuidToHandle);
-    if (!tofind)
-      return res.status(404).send("User not found");
-    await this.UserService.removeFriend(req.user, tofind);
-    await this.UserService.removeFriend(tofind, req.user);
-    const sendAlert: SendAlertDto = {
-      userUuid: userToHandle.userUuidToHandle,
-      message: `${req.user.userName} removed you from his friend list`,
-    }
-    this.StatusGateway.sendAlert(sendAlert);
+    const tofind = await this.UserService.getUser(userToHandle.userUuid);
+	if (!tofind)
+		return res.status(404).send("User not found");
+    res.send(this.UserService.removeFriend(req.user, tofind));
+    res.send(this.UserService.removeFriend(tofind, req.user));
+	const sendAlert : SendAlertDto = {
+		userUuid: userToHandle.userUuid,
+		message: `${req.user.userName} removed you from his friend list`,
+	}
+	this.StatusGateway.sendAlert(sendAlert);
   }
 
   @Post('removeBlocked')
@@ -113,7 +134,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async removeBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    res.send(this.UserService.removeBlocked(req.user, userToHandle.userUuidToHandle));
+    res.send(this.UserService.removeBlocked(req.user, userToHandle.userUuid));
   }
 
   @Post('enableTwoFactorAuth')
@@ -148,16 +169,6 @@ export class UserController {
     return await this.UserService.endOfMatch(players);
   }
 
-  //TO_DELL IN PROD
-  //Check NODE_ENV = PRODUCTION?
-  @Post('create')
-  @ApiOperation({ summary: 'Create a new user ONLY in DEV?' })
-  @ApiResponse({ status: 200, description: 'The created user', type: user })
-  @UsePipes(ValidationPipe)
-  async createUser(@Body() UserToCreate: FindOrCreateUserLocalDto) {
-    // console.log(process.env.NODE_ENV)
-    const user = await this.UserService.FindOrCreateUserLocal(UserToCreate.userName);
-  }
 
   @Get('/:userUid')
   @ApiOperation({ summary: 'Get user by userUid' })
