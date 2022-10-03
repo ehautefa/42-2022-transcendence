@@ -38,6 +38,7 @@ async function createUser(username: string) {
 	if (result.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
+	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
 }
 
 

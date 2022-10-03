@@ -1,11 +1,11 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "../myProfile/Profil.css";
-import { FetchUser, GetMatchHistory } from "../myProfile/request"
+import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { addFriend, removeFriend } from "../allPlayers/request";
-import { getFriends } from "./request";
+import { getFriends, FetchUser } from "./request";
 
 var update = true;
 

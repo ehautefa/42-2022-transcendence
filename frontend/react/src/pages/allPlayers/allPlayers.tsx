@@ -12,7 +12,7 @@ var update = true;
 type players = {
 	userUuid: string;
 	userName: string;
-	status: boolean;
+	online: boolean;
 }
 
 function AllPlayers() {
@@ -41,7 +41,7 @@ function AllPlayers() {
 				<div className="onePlayer" key={user.userUuid}>
 					<div className="pp"></div>
 					<a href={"./profile?uid=" + user.userUuid}>{user.userName}</a>
-					{user.status ? <p>Online</p> : <p>Offline</p>}
+					{user.online ? <p>Online</p> : <p>Offline</p>}
 					{
 						friends.includes(user) ?
 						<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>

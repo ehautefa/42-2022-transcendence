@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Context } from 'vm';
 import ReceivePopUp from '../components/ReceivePopUp/ReceivePopUp';
-import AddFriendPopUp from '../components/AddFriendPopUp/AddFriendPopUp';
 import { getSocketStatus } from "../App"
 
 const ModalContext = React.createContext({});
@@ -20,10 +19,6 @@ const Modal = (({ modal, unSetModal }: any) => {
 	}, [modal, unSetModal])
 
 	return (<>
-		{
-			modal.type === 'addFriend'
-			&& <AddFriendPopUp modal={modal} />
-		}
 		{
 			modal.type === 'receive'
 			&& <ReceivePopUp modal={modal} />
