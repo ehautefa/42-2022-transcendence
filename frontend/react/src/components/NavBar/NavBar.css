@@ -54,6 +54,19 @@
 }
 
 
+.request a {
+	margin: 0;
+	padding: 0;
+}
+
+.request img {
+	width: 30px;
+	padding: 0;
+	margin-top: 10px;
+}
+
+
+
 @media (max-width:600px) {
 	.navButton {
 		position: absolute;
