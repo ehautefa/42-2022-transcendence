@@ -23,7 +23,7 @@ const socketChat = io(URL_BACK + "/chat", socketOptions);
 
 
 async function createUser(username: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/auth/create";
+	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin";
 
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("userName", username);
