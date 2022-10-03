@@ -31,38 +31,61 @@ export class UserService {
         return user.friends;
     }
 
-    async isMyFriend(me: user, userUuidToHandle: string): Promise<boolean> {
-        const tofind = await this.getCompleteUser(userUuidToHandle);
-        if (!tofind)
-            return false
+    async isMyFriend(me: user, user2: user): Promise<boolean | null> {
+        if (!me || !user2)
+            return null
         //need to throw
-        const idx = me.friends.findIndex((object) => {
-            return object.userUuid === tofind.userUuid;
+        const idx1 = me.friends.findIndex((object) => {
+            return object.userUuid === user2.userUuid;
         })
-        if (idx > -1)
+        if (idx1 > -1)
             return true;
         else
             return false;
     }
 
-    async makeFriendRequest(me: user, userUuidToHandle: string) {
-        const tofind = await this.getCompleteUser(userUuidToHandle);
-        if (!tofind)
+    async acceptFriendRequest(CompleteMe: user, CompleteUser2: user) {
+        // cant find user
+        if (!CompleteMe || CompleteUser2)
             return false
-        //need to throw
-        tofind.requestPending.push(me.userUuid);
 
+        let idx1: number = CompleteMe.requestPending.indexOf(CompleteUser2.userUuid)
+        CompleteMe.requestPending.splice(idx1);
+        let idx2 = CompleteUser2.requestPending.indexOf(CompleteMe.userUuid)
+        CompleteUser2.requestPending.splice(idx2);
+        await this.becomeFriend(CompleteMe, CompleteUser2);
+    
+    }
+
+    async makeFriendRequest(completeMe: user, completeUser2: user) {
+        // cant find user
+        if (completeMe ||!completeUser2)
+            return false
+
+        // allready friends need to throw
+        if (completeMe.friends.indexOf(completeUser2) > -1)
+            return false
+
+       const idx = completeUser2.requestPending.indexOf(completeMe.userUuid)
+        //symeetrical request
+        if (completeMe.requestPending.indexOf(completeUser2.userUuid) > -1) {
+            if (idx > -1)
+                completeUser2.requestPending.splice(idx);
+            await this.becomeFriend(completeMe, completeUser2);
+        }
+        // already in pending?
+        else if (idx < 0)
+        {
+            completeUser2.requestPending.push(completeMe.userUuid);
+            this.UserRepository.save(completeUser2);
+        }
     }
 
     //need to remove from blocked?
-    async addFriend(user: user, inviter: user): Promise<user[]> {
-        if (user == undefined || inviter == undefined)
-            return null;
-        //need to throw
-        user.friends.push(inviter);
-        inviter.friends.push(user);
-        await this.UserRepository.save(user);
-        return user.friends;
+    async becomeFriend(completeUser1: user, completeUser2: user): Promise<void> {
+        completeUser1.friends.push(completeUser2);
+        completeUser2.friends.push(completeUser1);
+        await this.UserRepository.save([completeUser1, completeUser2]);
     }
 
     //need to remove from friends?
@@ -147,11 +170,11 @@ export class UserService {
     }
 
     async FindOrCreateUserLocal(userToFindOrCreate: string): Promise<user> {
-        let user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'none' } })
+        let user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'local' } })
         if (!user) {
             user = await this.UserRepository.save({
                 userName: userToFindOrCreate,
-                user42Id: 'none',
+                user42Id: 'local',
                 requestPending: [],
                 online: false,
                 twoFactorAuth: false,
