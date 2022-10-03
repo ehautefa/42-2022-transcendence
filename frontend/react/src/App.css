@@ -1,0 +1,17 @@
+.createUser {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.createUser button {
+    margin-top: 10px;
+}
+
+.createUser button:hover {
+    border: 2px solid #fef45b;
+}
