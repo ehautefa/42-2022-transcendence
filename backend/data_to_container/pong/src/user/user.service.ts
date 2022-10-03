@@ -45,6 +45,15 @@ export class UserService {
             return false;
     }
 
+    async makeFriendRequest(me: user, userUuidToHandle: string) {
+        const tofind = await this.getCompleteUser(userUuidToHandle);
+        if (!tofind)
+            return false
+        //need to throw
+        tofind.requestPending.push(me.userUuid);
+
+    }
+
     //need to remove from blocked?
     async addFriend(user: user, inviter: user): Promise<user[]> {
         if (user == undefined || inviter == undefined)
@@ -129,6 +138,7 @@ export class UserService {
                 userName: uniqueUserName,
                 user42Id: userToFindOrCreate.user42Id,
                 online: false,
+                requestPending: [],
                 twoFactorAuth: false,
                 wins: 0,
                 losses: 0,
@@ -137,20 +147,19 @@ export class UserService {
     }
 
     async FindOrCreateUserLocal(userToFindOrCreate: string): Promise<user> {
-        const user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'none' } })
-        //need to throw
+        let user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'none' } })
         if (!user) {
-            console.log('This username is used by an accout created with 42Api - cannot login with a 42 profile')
-            return user;
+            user = await this.UserRepository.save({
+                userName: userToFindOrCreate,
+                user42Id: 'none',
+                requestPending: [],
+                online: false,
+                twoFactorAuth: false,
+                wins: 0,
+                losses: 0,
+            });
         }
-        return await this.UserRepository.save({
-            userName: userToFindOrCreate,
-            user42Id: 'none',
-            online: false,
-            twoFactorAuth: false,
-            wins: 0,
-            losses: 0,
-        });
+        return user;
     }
 
     async changeUserName(user: user, newName: string): Promise<void> {
