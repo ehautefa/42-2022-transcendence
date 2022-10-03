@@ -9,6 +9,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
 import { StatusGateway } from 'src/status/status.gateway';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
+import { FindOrCreateUserLocalDto } from './dto/findOrCreateLocal';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -48,6 +49,15 @@ export class UserController {
   async getMyFriends(@Req() req, @Res() res) {
     res.send(req.user.friends);
   }
+
+  @Get('isMyFriends')
+  @ApiOperation({ summary: 'check if we are friends' })
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  async isMyFriends(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    return await this.UserService.isMyFriend(req.user, userToHandle.userUuidToHandle);
+  }
+
 
   @Get('friends/:userUuid')
   @ApiOperation({ summary: 'Get friends of a user' })
@@ -144,9 +154,9 @@ export class UserController {
   @ApiOperation({ summary: 'Create a new user ONLY in DEV?' })
   @ApiResponse({ status: 200, description: 'The created user', type: user })
   @UsePipes(ValidationPipe)
-  async createUser(@Body() UserToCreate: FindOrCreateUserDto): Promise<user> {
+  async createUser(@Body() UserToCreate: FindOrCreateUserLocalDto) {
     // console.log(process.env.NODE_ENV)
-    return await this.UserService.FindOrCreateUser(UserToCreate);
+    const user = await this.UserService.FindOrCreateUserLocal(UserToCreate.userName);
   }
 
   @Get('/:userUid')

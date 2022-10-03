@@ -20,20 +20,36 @@ export class UserService {
     }
 
     async getAllUserUuidWithUserName() {
-        return await this.UserRepository.find({ select:{userUuid: true, userName: true}});
+        return await this.UserRepository.find({ select: { userUuid: true, userName: true } });
     }
 
     async getFriends(userUuid: string) {
         const user = await this.getCompleteUser(userUuid);
         if (!user)
             return null;
+        //need to throw
         return user.friends;
+    }
+
+    async isMyFriend(me: user, userUuidToHandle: string): Promise<boolean> {
+        const tofind = await this.getCompleteUser(userUuidToHandle);
+        if (!tofind)
+            return false
+        //need to throw
+        const idx = me.friends.findIndex((object) => {
+            return object.userUuid === tofind.userUuid;
+        })
+        if (idx > -1)
+            return true;
+        else
+            return false;
     }
 
     //need to remove from blocked?
     async addFriend(user: user, inviter: user): Promise<user[]> {
         if (user == undefined || inviter == undefined)
             return null;
+        //need to throw
         user.friends.push(inviter);
         inviter.friends.push(user);
         await this.UserRepository.save(user);
@@ -45,6 +61,7 @@ export class UserService {
         const tofind = await this.getCompleteUser(userUuidToAdd);
         if (!tofind)
             return null;
+        //need to throw
         user.blocked.push(tofind);
         await this.UserRepository.save(user);
         return user.blocked;
@@ -79,14 +96,16 @@ export class UserService {
     async getUser(userUuid: string): Promise<user> {
         if (!userUuid)
             return null;
+        //need to throw
         const user = await this.UserRepository.findOne({ where: { userUuid: userUuid } });
         return user;
     }
 
     async getCompleteUser(userUuid: string): Promise<user> {
-		// console.log("getCompleteUser", userUuid);
+        // console.log("getCompleteUser", userUuid);
         if (!userUuid)
             return null;
+        //need to throw
         const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, }, where: { userUuid: userUuid } });
         return user;
     }
@@ -117,12 +136,32 @@ export class UserService {
         }
     }
 
+    async FindOrCreateUserLocal(userToFindOrCreate: string): Promise<user> {
+        const user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate } })
+        if (user) {
+            //need to throw if user is not local
+            if (user.user42Id !== 'none')
+                return null;
+            return user;
+        }
+        return await this.UserRepository.save({
+            userName: userToFindOrCreate,
+            user42Id: 'none',
+            isLocal: true,
+            online: false,
+            twoFactorAuth: false,
+            wins: 0,
+            losses: 0,
+        });
+    }
+
     async changeUserName(user: user, newName: string): Promise<void> {
         //need check if userName already exist
 
         if (await this.UserRepository.findOne({ where: { userName: newName } })) {
             console.log("Error username already exist");
             return null;
+            //need to throw
         }
         await this.UserRepository.update(user.userUuid, { userName: newName });
     }
