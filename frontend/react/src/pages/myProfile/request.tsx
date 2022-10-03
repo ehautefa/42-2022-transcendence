@@ -98,6 +98,7 @@ export async function enableTwoFactorAuth() {
 	if (result.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
+	return await result;
 }
 
 export async function disableTwoFactorAuth() {
@@ -111,6 +112,7 @@ export async function disableTwoFactorAuth() {
 	if (result.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
+	return await result;
 }
 
 export async function getMyFriends() {
