@@ -87,15 +87,15 @@ export class UserController {
   @UsePipes(ValidationPipe)
   async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     const tofind = await this.UserService.getUser(userToHandle.userUuidToHandle);
-	if (!tofind)
-		return res.status(404).send("User not found");
-    res.send(this.UserService.removeFriend(req.user, tofind));
-    res.send(this.UserService.removeFriend(tofind, req.user));
-	const sendAlert : SendAlertDto = {
-		userUuid: userToHandle.userUuidToHandle,
-		message: `${req.user.userName} removed you from his friend list`,
-	}
-	this.StatusGateway.sendAlert(sendAlert);
+    if (!tofind)
+      return res.status(404).send("User not found");
+    await this.UserService.removeFriend(req.user, tofind);
+    await this.UserService.removeFriend(tofind, req.user);
+    const sendAlert: SendAlertDto = {
+      userUuid: userToHandle.userUuidToHandle,
+      message: `${req.user.userName} removed you from his friend list`,
+    }
+    this.StatusGateway.sendAlert(sendAlert);
   }
 
   @Post('removeBlocked')
