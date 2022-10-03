@@ -38,6 +38,11 @@ export class user extends BaseEntity {
     @JoinTable()
     friends: user[];
 
+    @ApiProperty({ example: 'ehautefa', description: 'Uuidfriend request pending '})
+    @Column('varchar')
+    requestPending: string[];
+
+
     @ApiProperty({ description: 'The list of user who are blocked by the user'})
     @ManyToMany(() => user, usr => usr.userUuid)
     @JoinTable()

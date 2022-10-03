@@ -45,6 +45,15 @@ export class UserService {
             return false;
     }
 
+    async makeFriendRequest(me: user, userUuidToHandle: string) {
+        const tofind = await this.getCompleteUser(userUuidToHandle);
+        if (!tofind)
+            return false
+        //need to throw
+        tofind.requestPending.push(me.userUuid);
+
+    }
+
     //need to remove from blocked?
     async addFriend(user: user, inviter: user): Promise<user[]> {
         if (user == undefined || inviter == undefined)
@@ -129,6 +138,7 @@ export class UserService {
                 userName: uniqueUserName,
                 user42Id: userToFindOrCreate.user42Id,
                 online: false,
+                requestPending: [],
                 twoFactorAuth: false,
                 wins: 0,
                 losses: 0,
@@ -137,47 +147,46 @@ export class UserService {
     }
 
     async FindOrCreateUserLocal(userToFindOrCreate: string): Promise<user> {
-        const user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'none'} })
-        //need to throw
+        let user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'none' } })
         if (!user) {
-            console.log('This username is used by an accout created with 42Api - cannot login with a 42 profile')
+            user = await this.UserRepository.save({
+                userName: userToFindOrCreate,
+                user42Id: 'none',
+                requestPending: [],
+                online: false,
+                twoFactorAuth: false,
+                wins: 0,
+                losses: 0,
+            });
+        }
         return user;
     }
-        return await this.UserRepository.save({
-        userName: userToFindOrCreate,
-        user42Id: 'none',
-        online: false,
-        twoFactorAuth: false,
-        wins: 0,
-        losses: 0,
-    });
+
+    async changeUserName(user: user, newName: string): Promise<void> {
+        //need check if userName already exist
+
+        if (await this.UserRepository.findOne({ where: { userName: newName } })) {
+            console.log("Error username already exist");
+            return null;
+            //need to throw
+        }
+        await this.UserRepository.update(user.userUuid, { userName: newName });
     }
 
-    async changeUserName(user: user, newName: string): Promise < void> {
-    //need check if userName already exist
-
-    if(await this.UserRepository.findOne({ where: { userName: newName } })) {
-    console.log("Error username already exist");
-    return null;
-    //need to throw
-}
-await this.UserRepository.update(user.userUuid, { userName: newName });
+    async disableTwoFactorAuth(user: user): Promise<user> {
+        user.twoFactorAuth = false;
+        await this.UserRepository.save(user);
+        return user;
     }
 
-    async disableTwoFactorAuth(user: user): Promise < user > {
-    user.twoFactorAuth = false;
-    await this.UserRepository.save(user);
-    return user;
-}
+    async enableTwoFactorAuth(user: user): Promise<user> {
+        user.twoFactorAuth = true;
+        await this.UserRepository.save(user);
+        return user;
+    }
 
-    async enableTwoFactorAuth(user: user): Promise < user > {
-    user.twoFactorAuth = true;
-    await this.UserRepository.save(user);
-    return user;
-}
-
-    async endOfMatch(players: EndOfMatchDto): Promise < void> {
-    await this.UserRepository.increment({ userUuid: players.loserUuid }, "losses", 1)
+    async endOfMatch(players: EndOfMatchDto): Promise<void> {
+        await this.UserRepository.increment({ userUuid: players.loserUuid }, "losses", 1)
         await this.UserRepository.increment({ userUuid: players.winnerUuid }, "wins", 1)
-}
+    }
 }
