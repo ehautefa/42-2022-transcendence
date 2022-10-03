@@ -8,7 +8,6 @@ export class AuthService {
     ) { }
 
     async login(@Req() req, @Res() res) {
-        if (req.user) {
             console.log("username connected with Uuid", req.user);
             const access_token = this.jwtService.sign({ userUuid: req.user.userUuid });
             res.cookie('access_token', access_token);
@@ -17,10 +16,5 @@ export class AuthService {
                 res.redirect(process.env.REACT_APP_HOME_PAGE);
             else
                 res.redirect(req.headers.referer);
-        }
-        else {
-            res.redirect('/auth/login');
-
-        }
     }
 }

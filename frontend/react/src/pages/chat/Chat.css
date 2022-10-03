@@ -1,7 +1,7 @@
 body {
-	background-color: #250021;
-	background-image: url("../../../public/synthwave-wallpaper.jpg");
-	background-repeat: no-repeat;
+    background-color: #250021;
+    background-image: url("../../../public/synthwave-wallpaper.jpg");
+    background-repeat: no-repeat;
 }
 
 .mainComposant {
@@ -29,16 +29,15 @@ body {
     margin-top: 10px;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.5);
-    box-shadow: 5px 5px 10px #000;
+    box-shadow: 3px 3px 6px #000;
     color: #fef45b;
     font-weight: bold;
 
 }
 
 .channel li:hover {
-	text-shadow: 1px 1px 1px #FA0197;
+    text-shadow: 1px 1px 1px #FA0197;
     box-shadow: 5px 5px 10px rgb(41, 38, 38);
-
 }
 
 .channel h3 {
@@ -61,15 +60,16 @@ body {
     margin-left: 5px;
     padding: 10px 10px;
     align-items: center;
-	justify-content: center;
-	background-color: rgba(0, 0, 0, 0);
-	color: #FA0197;
-	border: 2px solid #DBACE3;
-	box-shadow: 0px 0px 20px #7C4D84;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+    color: #FA0197;
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .box button:hover {
     border-color: #fef45b;
+    text-shadow: 1px 1px 1px #DBACE3;
 
 }
 
@@ -149,17 +149,18 @@ body {
     margin-left: 5px;
     padding: 5px 10px;
     align-items: center;
-	justify-content: center;
+    justify-content: center;
 
     
-	background-color: rgba(0, 0, 0, 0);
-	color: #FA0197;
-	border: 2px solid #DBACE3;
-	box-shadow: 0px 0px 20px #7C4D84;
+    background-color: rgba(0, 0, 0, 0);
+    color: #FA0197;
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .chat button:hover{
     border-color: #fef45b;
+    text-shadow: 1px 1px 1px #DBACE3;
 }
 
 .fade-appear,
@@ -222,4 +223,54 @@ body {
         margin: 0;
         padding: 2px;
     }
+}
+
+
+
+
+
+.messagePopup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1px solid #fef45b;
+    box-shadow: 1px 1px 5px #fef45b;
+    border-radius: 5px;
+}
+
+.messagePopup label{
+    padding: 5px;
+    font-size: large;
+    font-weight: bold;
+    color: #FAE3E3;
+}
+
+.messagePopup input{
+    padding: 5px;
+    font-size: large;
+    border: 1px solid #FA0197;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    color: #FAE3E3
+}
+
+.messagePopup button {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid #FAE3E3;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: large;
+    font-weight: bold;
+    cursor: pointer;
+    /* box-shadow: 1px 1px 5px #fef45b; */
+    color: #FAE3E3;
+    width: 30%;
+    margin: 20px 0 0;
 }

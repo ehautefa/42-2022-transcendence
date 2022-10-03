@@ -17,18 +17,17 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
 
       console.log("[FortyTwoStrategy] - Find or create user :", profile.id)
       const user = await userService.FindOrCreateUser({ 'userName': profile.username, 'user42Id': profile.id});
-      if (!user) {
-        //needToThrow
-        console.log("[FortyTwoStrategy] - Error during creation / finding");
-        return done("[FortyTwoStrategy] - Error during creation / finding");
-      }
-      else {
-
+      // if (!user) {
+        // needToThrow
+        // console.log("[FortyTwoStrategy] - Error during creation / finding");
+        // return done("[FortyTwoStrategy] - Error during creation / finding");
+      // }
+      // else {
         console.log("[FortyTwoStrategy] - ", user.userName, "created/found")
         if (user.twoFactorAuth)
           console.log("WARNING - TwoFactorAuth ENABLE")
         return done(null, user);
-      }
+      // }
     });
   }
 }
