@@ -3,7 +3,7 @@ import { useState } from "react";
 import "./allPlayers.css";
 import { addFriend, removeFriend } from "./request";
 import NavBar from "../../components/NavBar/NavBar";
-import {getSocketStatus} from "../../App";
+import { getSocketStatus } from "../../App";
 import { getMyFriends } from "../myProfile/request";
 
 const socketStatus = getSocketStatus();
@@ -24,9 +24,9 @@ function AllPlayers() {
 		fetchPlayers();
 	}
 
-	
+
 	async function fetchPlayers() {
-		const response = await getAllUuidWithUserName();		
+		const response = await getAllUuidWithUserName();
 		socketStatus.emit('getFriendsStatus', response, (data: any) => {
 			setUsers(data);
 		});
@@ -37,18 +37,31 @@ function AllPlayers() {
 	return (<>
 		<NavBar />
 		<div className="allPlayers">
-			{users.map((user:players) => (
-				<div className="onePlayer" key={user.userUuid}>
-					<div className="pp"></div>
-					<a href={"./profile?uid=" + user.userUuid}>{user.userName}</a>
-					{user.online ? <p>Online</p> : <p>Offline</p>}
-					{
-						friends.includes(user) ?
-						<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
-						: <button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
-					}
-				</div>
-			))}
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th>UserName</th>
+						<th>Status</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{users.map((user: players) => {
+						return(<tr key={user.userUuid}>
+							<td className="pp">
+							</td>
+							<td><a href={"./profile?uid=" + user.userUuid}>{user.userName}</a></td>
+							<td>{user.online ? <p>Online</p> : <p>Offline</p>}</td>
+							<td>{
+								friends.includes(user) ?
+									<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
+									: <button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
+							}</td>
+						</tr>
+					)})}
+				</tbody>
+			</table>
 		</div>
 	</>
 	);

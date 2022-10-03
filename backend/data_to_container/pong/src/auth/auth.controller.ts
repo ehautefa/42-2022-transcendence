@@ -21,6 +21,7 @@ export class AuthController {
     @ApiOperation({ summary: 'Create a new user' })
     @UsePipes(ValidationPipe)
     async localLogin(@Req() req, @Res() res, @Body() UserToCreate: FindOrCreateUserLocalDto) {
+        console.log("USER TO CREATE", UserToCreate)
         const user = await this.userService.FindOrCreateUserLocal(UserToCreate.userName);
         console.log("Local username connected with Uuid", user);
         res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid }))
