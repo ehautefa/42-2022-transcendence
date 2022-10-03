@@ -1,5 +1,6 @@
 import './NavBar.css'
 import { useState } from 'react'
+import bell from "../../assets/bell.png"
 
 function NavBar() {
 	const [isNavExpanded, setIsNavExpanded] = useState(false)
@@ -22,8 +23,10 @@ function NavBar() {
 			<div
 				className={isNavExpanded ? "navLinks expanded" : "navLinks"}>
 				<ul>
-					<li>
-						<a href="/request">REQUEST</a>
+					<li className='request'>
+						<a href="/request">
+							<img src={bell} alt="request" />
+						</a>
 					</li>
 					<li>
 						<a href="/allPlayers" >PLAYERS</a>
