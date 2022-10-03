@@ -23,9 +23,7 @@ function AllPlayers() {
 
 	
 	async function fetchPlayers() {
-		const response = await getAllUuidWithUserName();
-		setUsers(response);
-		
+		const response = await getAllUuidWithUserName();		
 		socketStatus.emit('getFriendsStatus', response, (data: any) => {
 			setUsers(data);
 		});

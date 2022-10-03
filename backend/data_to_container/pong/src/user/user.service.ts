@@ -127,12 +127,16 @@ export class UserService {
         await this.UserRepository.update(user.userUuid, { userName: newName });
     }
 
-    async disableTwoFactorAuth(user: user): Promise<void> {
-        await this.UserRepository.update(user.userUuid, { twoFactorAuth: false });
+    async disableTwoFactorAuth(user: user): Promise<user> {
+        user.twoFactorAuth = false;
+        await this.UserRepository.save(user);
+        return user;
     }
 
-    async enableTwoFactorAuth(user: user): Promise<void> {
-        await this.UserRepository.update(user.userUuid, { twoFactorAuth: true });
+    async enableTwoFactorAuth(user: user): Promise<user> {
+        user.twoFactorAuth = true;
+        await this.UserRepository.save(user);
+        return user;
     }
 
     async endOfMatch(players: EndOfMatchDto): Promise<void> {

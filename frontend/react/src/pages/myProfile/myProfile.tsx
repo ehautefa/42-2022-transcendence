@@ -37,13 +37,16 @@ function MyProfile() {
 		}
 	}
 
-	function switch2FA() {
+	async function switch2FA() {
+		let new_user;
 		if (user.twoFactorAuth) {
-			disableTwoFactorAuth();
+			new_user = await disableTwoFactorAuth();
 		} else {
-			enableTwoFactorAuth();
+			new_user = await enableTwoFactorAuth();
 		}
-		window.location.reload();
+		// window.location.reload();
+		setUser(new_user);
+
 	}
 
 	return (<>
