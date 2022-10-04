@@ -38,9 +38,10 @@ export class user extends BaseEntity {
     @JoinTable()
     friends: user[];
 
-    @ApiProperty({ example: 'ehautefa', description: 'Uuidfriend request pending '})
-    @Column('varchar', {array: true})
-    requestPending: string[];
+    @ApiProperty({ description: 'The list of user who are in pending request'})
+    @ManyToMany(() => user, usr => usr.userUuid)
+    @JoinTable()
+    requestPending: user[];
 
     @ApiProperty({ description: 'The list of user who are blocked by the user'})
     @ManyToMany(() => user, usr => usr.userUuid)

@@ -49,7 +49,9 @@ export class UserService {
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return false
 
-        const idx1: number = completeMe.requestPending.indexOf(completeUser2.userUuid)
+        const idx1 = completeMe.requestPending.findIndex((object) => {
+            return object.userUuid === completeUser2.userUuid;
+        })
         if (idx1 > -1)
             completeMe.requestPending.splice(idx1);
         // cant find request
@@ -63,9 +65,14 @@ export class UserService {
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return false
 
-        let idx1: number = completeMe.requestPending.indexOf(completeUser2.userUuid)
+        const idx1 = completeMe.requestPending.findIndex((object) => {
+            return object.userUuid === completeUser2.userUuid;
+        })
         if (idx1 >= 0)
+        {
             completeMe.requestPending.splice(idx1);
+            this.UserRepository.save(completeMe);
+        }
         //no request pending
         else
             return
@@ -82,8 +89,12 @@ export class UserService {
         if (completeMe.friends.indexOf(completeUser2) >= 0)
             return false
 
-        const idx1: number = completeMe.requestPending.indexOf(completeUser2.userUuid)
-        const idx2: number = completeUser2.requestPending.indexOf(completeMe.userUuid)
+        const idx1 = completeMe.requestPending.findIndex((object) => {
+            return object.userUuid === completeUser2.userUuid;
+        })
+        const idx2 = completeUser2.requestPending.findIndex((object) => {
+            return object.userUuid === completeMe.userUuid;
+        })
         //symeetrical request
         if (idx1 >= 0) {
                 completeMe.requestPending.splice(idx1);
@@ -93,7 +104,7 @@ export class UserService {
         }
         // not pending?
         else if (idx2 < 0) {
-            completeUser2.requestPending.push(completeMe.userUuid);
+            completeUser2.requestPending.push(completeMe);
             this.UserRepository.save(completeUser2);
         }
         //already in pending
@@ -187,7 +198,7 @@ export class UserService {
         if (!userUuid)
             return null;
         //need to throw
-        const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, }, where: { userUuid: userUuid } });
+        const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true}, where: { userUuid: userUuid } });
         return user;
     }
 
