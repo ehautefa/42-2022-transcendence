@@ -10,10 +10,6 @@ import { HandleFriendDto } from './dto/handleFriend.dto';
 import { StatusGateway } from 'src/status/status.gateway';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 
-//accept
-//refused
-//getRequest
-//addFriend
 //removeFriend
 
 @ApiBearerAuth()
@@ -97,12 +93,21 @@ export class UserController {
   }
 
   @Post('acceptFriendRequest')
-  @ApiOperation({ summary: 'Make Friend Request' })
+  @ApiOperation({ summary: 'accept Friend Request' })
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async acceptFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     console.log("acceptFriendRequest", userToHandle);
     await this.UserService.acceptFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
+  }
+
+  @Post('refuseFriendRequest')
+  @ApiOperation({ summary: 'Refuse Friend Request' })
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  async refuseFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    console.log("refuseFriendRequest", userToHandle);
+    await this.UserService.refuseFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
   }
 // 
   // @Post('addFriend')

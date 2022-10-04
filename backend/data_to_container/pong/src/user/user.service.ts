@@ -49,40 +49,69 @@ export class UserService {
         if (!CompleteMe || !CompleteUser2)
             return false
 
-        let idx1: number = CompleteMe.requestPending.indexOf(CompleteUser2.userUuid)
-        CompleteMe.requestPending.splice(idx1);
-        let idx2 = CompleteUser2.requestPending.indexOf(CompleteMe.userUuid)
-        CompleteUser2.requestPending.splice(idx2);
+        const idx1: number = CompleteMe.requestPending.indexOf(CompleteUser2.userUuid)
+        if (idx1 > -1)
+            CompleteMe.requestPending.splice(idx1);
+        // cant find request
+        else
+            return false
         await this.becomeFriend(CompleteMe, CompleteUser2);
-    
+    }
+
+    async refuseFriendRequest(CompleteMe: user, CompleteUser2: user) {
+        // cant find user
+        if (!CompleteMe || !CompleteUser2)
+            return false
+
+        let idx1: number = CompleteMe.requestPending.indexOf(CompleteUser2.userUuid)
+        if (idx1 >= 0)
+            CompleteMe.requestPending.splice(idx1);
+        //no request pending
+        else
+            return
     }
 
     async makeFriendRequest(completeMe: user, completeUser2: user) {
+        //check same user?
+
         // cant find user
-        if (!completeMe ||!completeUser2)
+        if (!completeMe || !completeUser2)
             return false
 
         // allready friends need to throw
         if (completeMe.friends.indexOf(completeUser2) > -1)
             return false
 
-       const idx = completeUser2.requestPending.indexOf(completeMe.userUuid)
+        const idx2: number = completeUser2.requestPending.indexOf(completeMe.userUuid)
         //symeetrical request
         if (completeMe.requestPending.indexOf(completeUser2.userUuid) > -1) {
-            if (idx > -1)
-                completeUser2.requestPending.splice(idx);
+            if (idx2 > -1)
+                completeUser2.requestPending.splice(idx2);
             await this.becomeFriend(completeMe, completeUser2);
         }
-        // already in pending?
-        else if (idx < 0)
-        {
+        // not pending?
+        else if (idx2 < 0) {
             completeUser2.requestPending.push(completeMe.userUuid);
             this.UserRepository.save(completeUser2);
         }
+        //already in pending
+        else
+            return false
     }
 
     //need to remove from blocked?
     async becomeFriend(completeUser1: user, completeUser2: user): Promise<void> {
+
+        // cant find user
+        if (!completeUser1 || !completeUser2)
+            return
+        const idx1: number = completeUser1.friends.indexOf(completeUser2)
+        const idx2: number = completeUser2.friends.indexOf(completeUser1)
+
+        //already friends
+        if (idx1 >= 0 || idx2 >= 0)
+            return
+
         completeUser1.friends.push(completeUser2);
         completeUser2.friends.push(completeUser1);
         await this.UserRepository.save([completeUser1, completeUser2]);
