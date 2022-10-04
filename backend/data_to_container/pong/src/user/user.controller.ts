@@ -99,6 +99,7 @@ export class UserController {
   async acceptFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     console.log("acceptFriendRequest", userToHandle);
     await this.UserService.acceptFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
+    res.send(req.user.requestPending);
   }
 
   @Post('refuseFriendRequest')
@@ -108,6 +109,7 @@ export class UserController {
   async refuseFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     console.log("refuseFriendRequest", userToHandle);
     await this.UserService.refuseFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
+    res.send(req.user.requestPending);
   }
 
   @Post('removeFriend')

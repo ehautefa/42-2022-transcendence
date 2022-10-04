@@ -26,12 +26,13 @@ function Request() {
 	}
 
 	async function handleRequest(userUuid: string, accept: boolean) {
+		let newRequest = [];
 		if (accept) {
-			await acceptFriendRequest(userUuid);
+			newRequest = await acceptFriendRequest(userUuid);
 		} else {
-			await refuseFriendRequest(userUuid);
+			newRequest = await refuseFriendRequest(userUuid);
 		}
-		fetchRequest();
+		setRequests(newRequest);
 	}
 
 

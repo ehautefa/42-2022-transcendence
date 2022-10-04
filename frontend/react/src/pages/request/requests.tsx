@@ -17,6 +17,7 @@ export async function acceptFriendRequest(friendUuid: string) {
 	if (result.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
+	return await result;
 }
 
 export async function refuseFriendRequest(friendUuid: string) {
@@ -36,6 +37,7 @@ export async function refuseFriendRequest(friendUuid: string) {
 	if (result.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
+	return await result;
 }
 
 export async function getMyRequests() {
