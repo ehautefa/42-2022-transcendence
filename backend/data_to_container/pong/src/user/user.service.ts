@@ -121,7 +121,7 @@ export class UserService {
 
     async removeFriend(completeUser1: user, completeUser2: user): Promise<void> {
         // cant find user
-        if (!completeUser1 || !completeUser2)
+        if (!completeUser1 || !completeUser2 || completeUser1.userUuid === completeUser2.userUuid)
             return
 
         const idx1 = completeUser1.friends.findIndex((object) => {
