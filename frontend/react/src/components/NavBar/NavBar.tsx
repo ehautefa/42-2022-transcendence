@@ -1,9 +1,22 @@
 import './NavBar.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import bell from "../../assets/bell.png"
+import { getMyRequests } from "../../pages/request/requests"
+
+
 
 function NavBar() {
 	const [isNavExpanded, setIsNavExpanded] = useState(false)
+	const [isBellExpanded, setIsBellExpanded] = useState(false)
+
+	useEffect(() => {
+		getMyRequests().then(
+			(response) => {
+				console.log("RESPONSE", response.length)
+				setIsBellExpanded(response.length > 0)
+			}
+		)
+	})
 
 	return (
 		<nav className="nav">
@@ -14,20 +27,22 @@ function NavBar() {
 				console.log("clicked:", isNavExpanded);
 				setIsNavExpanded(!isNavExpanded);
 			}}>
-	 			<span></span>
-	 			<span></span>
-	 			<span></span>
-	 			<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
 				<span></span>
 			</button>
 			<div
 				className={isNavExpanded ? "navLinks expanded" : "navLinks"}>
 				<ul>
-					<li className='request'>
-						<a href="/request">
-							<img src={bell} alt="request" />
-						</a>
-					</li>
+					{
+						isBellExpanded && <li className='request'>
+							<a href="/request">
+								<img src={bell} alt="request" />
+							</a>
+						</li>
+					}
 					<li>
 						<a href="/allPlayers" >PLAYERS</a>
 					</li>
