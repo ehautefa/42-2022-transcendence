@@ -59,11 +59,12 @@ export class UserController {
     res.send(req.user.requestPending);
   }
 
-  @Get('isMyFriends')
+  @Post('isMyFriends')
   @ApiOperation({ summary: 'check if we are friends' })
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async isMyFriends(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    console.log("ismyfriend", userToHandle);
     return await this.UserService.isMyFriend(req.user, await this.UserService.getUser(userToHandle.userUuid));
   }
 

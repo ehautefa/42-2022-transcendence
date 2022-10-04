@@ -5,7 +5,7 @@ import { User } from "../../type";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { addFriend, removeFriend } from "../allPlayers/request";
-import { getFriends, FetchUser } from "./request";
+import { getFriends, FetchUser, isMyFriends } from "./request";
 
 var update = true;
 
@@ -20,6 +20,7 @@ function Profile() {
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
+	const [isMyFriend, setIsMyFriend] = useState(false);
 	fetchUser();
 
 	async function fetchUser() {
@@ -27,9 +28,11 @@ function Profile() {
 			const user = await FetchUser(uid);
 			const matchHistory = await GetMatchHistory(uid);
 			const friends = await getFriends(user.userUuid);
+			// const isFriend = await isMyFriends(user.userUuid);
 			setMatchHistory(matchHistory);
 			setUser(user);
 			setFriends(friends);
+			// setIsMyFriend(isMyFriend);
 			update = false;
 		}
 	}
@@ -48,10 +51,13 @@ function Profile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
-					<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
+					{
+						isMyFriend ?
+						<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
+						: <button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
+					}
 				</div>
-				<div className="pp nohover">
+				<div className="ppFriends">
 				</div>
 			</div>
 			<div className="flex">

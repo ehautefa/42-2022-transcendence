@@ -3,7 +3,7 @@
 	flex-direction: column-reverse;
 }
 
-.mainComposantProfile .pp {
+.mainComposantProfile .pp, .ppFriends {
 	width: 80%;
 	aspect-ratio: 1 / 1;
 	border-radius: 400px;
@@ -26,7 +26,7 @@
 	width: 85%;
 	padding: 0 10px;
 	margin: 20px auto;
-	max-height: 250px;
+	max-height: 300px;
 	overflow-y: scroll;
 }
 
@@ -154,6 +154,12 @@
 
 	.mainComposantProfile .info button:hover {
 		border-color: #fef45b;
+	}
+
+	.mainComposantProfile .ppFriends{
+		width: 30%;
+		aspect-ratio: 1 / 1;
+		margin: 50px;
 	}
 
 	.mainComposantProfile .pp {
