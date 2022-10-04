@@ -64,8 +64,10 @@ export class UserService {
             return false
 
         let idx1: number = completeMe.requestPending.indexOf(completeUser2.userUuid)
-        if (idx1 >= 0)
+        if (idx1 >= 0) {
             completeMe.requestPending.splice(idx1);
+            await this.UserRepository.save(completeMe);
+        }
         //no request pending
         else
             return

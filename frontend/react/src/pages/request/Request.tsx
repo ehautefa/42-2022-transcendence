@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./Request.css";
-import { acceptFriendRequest, getMyRequests } from "./requests";
+import { acceptFriendRequest, getMyRequests, refuseFriendRequest } from "./requests";
 import NavBar from "../../components/NavBar/NavBar";
 
 var update = true;
@@ -25,9 +25,16 @@ function Request() {
 		console.log("REquest", response);
 	}
 
-	function refuse(userUuid: string) {
-		// refuseRequest(userUuid);
+	async function handleRequest(userUuid: string, accept: boolean) {
+		if (accept) {
+			await acceptFriendRequest(userUuid);
+		} else {
+			await refuseFriendRequest(userUuid);
+		}
+		fetchRequest();
 	}
+
+
 
 	return (<>
 		<NavBar />
@@ -48,8 +55,8 @@ function Request() {
 							<td className="pp">
 							</td>
 							<td><a href={"./profile?uid=" + request}>elise</a></td>
-							<td><button className="enable" onClick={() => acceptFriendRequest(request)}>Accept</button></td>
-							<td><button className="enable" onClick={() => refuse(request)}>Refuse</button></td>
+							<td><button className="enable" onClick={() => handleRequest(request, true)}>Accept</button></td>
+							<td><button className="enable" onClick={() => handleRequest(request, false)}>Refuse</button></td>
 						</tr>
 						)
 					})}

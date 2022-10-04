@@ -24,17 +24,18 @@ const socketChat = io(URL_BACK + "/chat", socketOptions);
 
 async function createUser(username: string) {
 	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
+	var credentials: RequestCredentials = "include";
 
 	var requestOptions = {
 		method: 'GET',
+		credentials: credentials
 	};
 
-	let result = (await fetch(url, requestOptions));
-	console.log("createUser result:", result);
-	// if (result.statusCode === 401) {
-	// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	// }
-	// window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
+	let result = await (await fetch(url, requestOptions)).json();
+	if (result.statusCode === 401) {
+		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	}
+	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
 }
 
 
