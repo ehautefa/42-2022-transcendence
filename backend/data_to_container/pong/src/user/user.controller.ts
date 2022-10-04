@@ -109,15 +109,21 @@ export class UserController {
     console.log("refuseFriendRequest", userToHandle);
     await this.UserService.refuseFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid))
   }
-// 
-  // @Post('addFriend')
-  // @ApiOperation({ summary: 'Add Friend(with uUid) to me (from cookie)' })
-  // @UseGuards(JwtAuthGuard)
-  // @UsePipes(ValidationPipe)
-  // async addFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-  //   console.log("User COntroller addFriend", req.user, userToHandle)
-  // res.send(this.UserService.addFriend(req.user, userToHandle.userUuidToHandle));
-  // }
+
+  @Post('removeFriend')
+  @ApiOperation({ summary: 'remove Friend(with uUid) to me (from cookie)' })
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+    await this.UserService.removeFriend(req.user, await this.getCompleteUser(userToHandle.userUuid))
+		// return res.status(404).send("User not found");
+	const sendAlert : SendAlertDto = {
+		userUuid: userToHandle.userUuid,
+		message: `${req.user.userName} removed you from his friend list`,
+	}
+	this.StatusGateway.sendAlert(sendAlert);
+  }
+
 
   @Post('addBlocked')
   @ApiOperation({ summary: 'Add Blocked(with uUid) to me (from cookie)' })
@@ -125,23 +131,6 @@ export class UserController {
   @UsePipes(ValidationPipe)
   async addBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     res.send(this.UserService.addBlocked(req.user, userToHandle.userUuid));
-  }
-
-  @Post('removeFriend')
-  @ApiOperation({ summary: 'remove Friend(with uUid) to me (from cookie)' })
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(ValidationPipe)
-  async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    const tofind = await this.UserService.getUser(userToHandle.userUuid);
-	if (!tofind)
-		return res.status(404).send("User not found");
-    res.send(this.UserService.removeFriend(req.user, tofind));
-    res.send(this.UserService.removeFriend(tofind, req.user));
-	const sendAlert : SendAlertDto = {
-		userUuid: userToHandle.userUuid,
-		message: `${req.user.userName} removed you from his friend list`,
-	}
-	this.StatusGateway.sendAlert(sendAlert);
   }
 
   @Post('removeBlocked')
