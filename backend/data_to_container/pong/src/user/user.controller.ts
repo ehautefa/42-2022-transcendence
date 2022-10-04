@@ -116,12 +116,13 @@ export class UserController {
   @UsePipes(ValidationPipe)
   async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     await this.UserService.removeFriend(req.user, await this.getCompleteUser(userToHandle.userUuid))
-		// return res.status(404).send("User not found");
-	const sendAlert : SendAlertDto = {
-		userUuid: userToHandle.userUuid,
-		message: `${req.user.userName} removed you from his friend list`,
-	}
-	this.StatusGateway.sendAlert(sendAlert);
+    // return res.status(404).send("User not found");
+    const sendAlert: SendAlertDto = {
+      userUuid: userToHandle.userUuid,
+      message: `${req.user.userName} removed you from his friend list`,
+    }
+    this.StatusGateway.sendAlert(sendAlert);
+    res.send(req.user.friends);
   }
 
 

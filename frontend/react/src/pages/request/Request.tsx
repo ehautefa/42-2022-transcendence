@@ -51,12 +51,12 @@ function Request() {
 				</thead>
 				<tbody>
 					{requests.map((request: any) => {
-						return (<tr key={request}>
+						return (<tr key={request.userUuid}>
 							<td className="pp">
 							</td>
-							<td><a href={"./profile?uid=" + request}>elise</a></td>
-							<td><button className="enable" onClick={() => handleRequest(request, true)}>Accept</button></td>
-							<td><button className="enable" onClick={() => handleRequest(request, false)}>Refuse</button></td>
+							<td><a href={"./profile?uid=" + request.userUuid}>{request.userName}</a></td>
+							<td><button className="enable" onClick={() => handleRequest(request.userUuid, true)}>Accept</button></td>
+							<td><button className="enable" onClick={() => handleRequest(request.userUuid, false)}>Refuse</button></td>
 						</tr>
 						)
 					})}

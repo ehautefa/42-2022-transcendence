@@ -6,7 +6,6 @@ export async function getMe() {
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
 	var url: string = process.env.REACT_APP_BACK_URL + "/user/me";
-	console.log("GETME URL", url);
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
