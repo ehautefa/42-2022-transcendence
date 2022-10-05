@@ -11,27 +11,23 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
       clientID: process.env.REACT_APP_CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: process.env.REACT_APP_REDIRECT_URI,
-      // profileFields: {
-        // 'id': 'id',
-        // 'username': 'login'
-      // }
       //verify function
     }, async (access_token, refreshToken, profile, done) => {
-    //fuction received acces token from 42 api and create or find user in database
+      //fuction received acces token from 42 api and create or find user in database
 
       console.log("[FortyTwoStrategy] - Find or create user :", profile.id)
-      const user = await userService.FindOrCreateUser({'userName': profile.username, 'user42Id': profile.id, 'accessToken42': access_token});
-      if (!user)
-      {
-        //needToThrow
-        console.log("[FortyTwoStrategy] - Error during creation / finding");
-        return done("[FortyTwoStrategy] - Error during creation / finding");
-      }
-      else
-      {
+      const user = await userService.FindOrCreateUser({ 'userName': profile.username, 'user42Id': profile.id});
+      // if (!user) {
+        // needToThrow
+        // console.log("[FortyTwoStrategy] - Error during creation / finding");
+        // return done("[FortyTwoStrategy] - Error during creation / finding");
+      // }
+      // else {
         console.log("[FortyTwoStrategy] - ", user.userName, "created/found")
+        if (user.twoFactorAuth)
+          console.log("WARNING - TwoFactorAuth ENABLE")
         return done(null, user);
-      }
+      // }
     });
   }
 }

@@ -4,8 +4,6 @@ import { getMe } from "./request"
 
 function MainPage() {
 	getMe();
-	
-
 	return (<>
 		<NavBar />
 			<div className="login" >

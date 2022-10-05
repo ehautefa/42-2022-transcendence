@@ -1,8 +1,8 @@
 export type User = {
 	userUuid: string;
 	userName: string;
-	status?: boolean;
-	twoFfactorAuth?: boolean;
+	online?: boolean;
+	twoFactorAuth?: boolean;
 	wins?: number;
 	losses?: number;
 	friends?: User[];
@@ -22,5 +22,6 @@ export interface GameWindowState {
 	playerRightName: string,
 	scoreRight: number,
 	id: number,
-	isGameOver: boolean
+	isGameOver: boolean,
+	begin: boolean,
 }

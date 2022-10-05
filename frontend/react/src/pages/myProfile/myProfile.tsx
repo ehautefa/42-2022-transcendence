@@ -1,37 +1,36 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { FetchUser, GetMatchHistory, GetAllUsers } from "./request"
+import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, enableTwoFactorAuth } from "./request"
 import { User } from "../../type";
 import { useState } from "react";
 import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
+import Cookies from "js-cookie";
 
 const socketStatus = getSocketStatus();
 
 socketStatus.on('getUserUuid', () => {
-	console.log("GET USER UUID", localStorage.getItem('uid'));
-	socketStatus.emit('getUserUuid', localStorage.getItem('uid'));
+	socketStatus.emit('getUserUuid');
 })
 
 var update = true;
 
 function MyProfile() {
-	const uid = localStorage.getItem('uid');
 	const emptyUser : User = {userUuid: "", userName: ""};
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
-	const [allUsers, setAllUsers] = useState([]);
+	const [friends, setFriends] = useState([]);
 	fetchUser();
-
+	
 	async function fetchUser() {
-		if (uid && update) {
-			const user = await FetchUser(uid);
+		if (update) {
+			const user = await getMe();
 			const matchHistory = await GetMatchHistory(user.userName);
-			const allUsers = await GetAllUsers();
-			setAllUsers(allUsers);
-			socketStatus.emit('getFriendsStatus', allUsers, (data: any) => {
-				setAllUsers(data);
+			const friends = await getMyFriends();
+			setFriends(friends);
+			socketStatus.emit('getFriendsStatus', friends, (data: any) => {
+				setFriends(data);
 			});
 			setMatchHistory(matchHistory);
 			setUser(user);
@@ -39,12 +38,30 @@ function MyProfile() {
 		}
 	}
 
+	async function switch2FA() {
+		let new_user;
+		if (user.twoFactorAuth) {
+			new_user = await disableTwoFactorAuth();
+		} else {
+			new_user = await enableTwoFactorAuth();
+		}
+		setUser(new_user);
+	}
+
+	function logOut() {
+		Cookies.remove('access_token', { path: "/"});
+		window.location.replace(process.env.REACT_APP_FRONT_URL + "/");
+	}
+
 	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
 			<div className="flex">
 				<div className="info container">
-					<h3>Profile</h3>
+					<div className="firstLine">
+						<h3>Profile</h3>
+						<button onClick={logOut}>Log out</button>
+					</div>
 					<ul>
 						<li className="flex-li">
 							<div className="Username">Username : {user.userName}</div>
@@ -53,7 +70,10 @@ function MyProfile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button className="enable">Enable two-factor authentication</button>
+					{user.twoFactorAuth === false ?
+						<button className="enable" onClick={switch2FA}>Enable two-factor authentication</button> :
+						<button className="enable" onClick={switch2FA}>Disable two-factor authentication</button>
+					}
 				</div>
 				<a href="./editProfil">
 					<div className="pp">
@@ -73,10 +93,10 @@ function MyProfile() {
 							</tr>
 						</thead>
 						<tbody>
-							{allUsers.map((users: any) => {
+							{friends.map((users: any) => {
 								return (<tr key={users.userUuid}>
 									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
-									{users.status ? <td>Online</td> : <td>Offline</td>}
+									{users.online ? <td>Online</td> : <td>Offline</td>}
 									<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
 								</tr>);
 							})}
@@ -96,9 +116,9 @@ function MyProfile() {
 						<tbody>
 							{matchHistory.map((match: any) => {
 								return (<tr key={match.matchId}>
-									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
 								</tr>);
 							})}
 						</tbody>

@@ -9,23 +9,25 @@ function EditUsernamePopUp() {
 
     function SaveUserName() {
         if (newUsername.length > 3 // min length of username is 4
-            && newUsername.length < 8 // max length of username is 8
+            && newUsername.length < 12 // max length of username is 12
             && newUsername.match(/^[a-zA-Z0-9]+$/)) { // only alphanumeric characters
             setOpen(false);
-	        const uid = localStorage.getItem('uid');
-	        localStorage.setItem('userName', newUsername);
-            if (uid) 
-                ChangeUsername(uid, newUsername);
+            if (ChangeUsername(newUsername) === null) {
+                console.log("Username changed successfully");
+                alert("Username already taken");
+            }
+            // else 
+                // window.location.reload();
         } else {
-            alert("Username must be between 4 and 8 characters and alphanumeric");
+            alert("Username must be between 4 and 12 characters and alphanumeric");
         }
 
     }
 
     return (<div className="Popup-mother">
-        <button className="Edit" onClick={() => setOpen(true)}>( edit )</button>
+        <button className="Edit" onClick={() => setOpen(true)}>edit</button>
         <Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
-             window.location.reload();
+            //  window.location.reload();
             }}>
             <div className='editUsername'>
                 <label htmlFor="editUsername">New username :</label>
@@ -38,8 +40,8 @@ function EditUsernamePopUp() {
                         autoCorrect="off"
                         placeholder="Username"
                         minLength={4}
-                        maxLength={8}
-                        size={10} />
+                        maxLength={12}
+                        size={12} />
                     <span></span>
                 </div>
                 <button type="submit" onClick={SaveUserName}>Save</button>

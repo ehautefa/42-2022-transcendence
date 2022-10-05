@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Context } from 'vm';
 import ReceivePopUp from '../components/ReceivePopUp/ReceivePopUp';
-import { getSocketStatus } from "../App" 
+import { getSocketStatus } from "../App"
 
 const ModalContext = React.createContext({});
 const socket = getSocketStatus();
@@ -18,9 +18,12 @@ const Modal = (({ modal, unSetModal }: any) => {
 		return () => document.removeEventListener('keyup', bind);
 	}, [modal, unSetModal])
 
-	return (
-		<ReceivePopUp modal={modal} />
-	)
+	return (<>
+		{
+			modal.type === 'receive'
+			&& <ReceivePopUp modal={modal} />
+		}
+	</>)
 });
 
 const useModal = (): Context => {
@@ -33,18 +36,22 @@ const useModal = (): Context => {
 
 const ModalProvider = (props: any) => {
 	const [modal, setModal] = useState();
-	
-	socket.on('invitePlayer', (data: any) => {
+
+	socket.on('sendInvite', (data: any) => {
 		console.log("INVITE PLAYER ON", data);
-		if (data.userName === localStorage.getItem('userName')) {
-			console.log("You are invite by", data.userName);
-			setModal(data);
-		}
+		setModal(data);
+	})
+	socket.on('addFriend', (inviter: any) => {
+		console.log("ADD FRIEND ON", inviter);
+		setModal(inviter);
+	})
+	socket.on('sendAlert', (message: string) => {
+		alert(message);
 	})
 	const unSetModal = useCallback(() => {
 		setModal(undefined);
 	}, [setModal])
-	
+
 	return (
 		<ModalContext.Provider value={{ unSetModal, setModal }} {...props}>
 			{props.children}

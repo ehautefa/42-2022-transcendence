@@ -1,13 +1,13 @@
 import "./Game.css"
 import React from 'react'
-import { getSocketPong } from "../../App" 
+import { getSocketPong } from "../../App"
 import { Navigate } from "react-router-dom";
 import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
 const socket = getSocketPong();
 
-const PADDLE_GAP = process.env.REACT_APP_PADDLE_GAP === undefined ? 3 : parseInt(process.env.REACT_APP_PADDLE_GAP);
-const PADDLE_DEP = process.env.REACT_APP_PADDLE_DEP === undefined ? 2 : parseInt(process.env.REACT_APP_PADDLE_DEP);
+const PADDLE_GAP = process.env.REACT_APP_PADDLE_GAP === undefined ? 0 : parseInt(process.env.REACT_APP_PADDLE_GAP);
+const PADDLE_DEP = process.env.REACT_APP_PADDLE_DEP === undefined ? 0 : parseInt(process.env.REACT_APP_PADDLE_DEP);
 // TO DO : understand why env variable is not working
 
 export class GameWindow extends React.Component<{ id: string }, GameWindowState> {
@@ -27,7 +27,6 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 			isGameOver: false,
 			playerLeft: "",
 			playerRight: "",
-			loading: false,
 			matchMaking: false,
 			playerLeftName: "",
 			playerRightName: ""
@@ -42,11 +41,6 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 
 	gameLoop() {
 		socket.on('game', (data: GameWindowState) => {
-			if (data.matchMaking === false) {
-				this.setState({ loading: true });
-			} else {
-				this.setState({ loading: false });
-			}
 			this.setState({
 				matchId: data.matchId,
 				ballX: data.ballX,
@@ -60,11 +54,8 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 				playerRight: data.playerRight,
 				matchMaking: data.matchMaking,
 				playerLeftName: data.playerLeftName,
-				playerRightName: data.playerRightName
+				playerRightName: data.playerRightName,
 			});
-			if (data.isGameOver) {
-				socket.emit('resetGame', this.state.matchId);
-			}
 		})
 		socket.on('leaveGame', (playerName: string) => {
 			alert(`${playerName} has left the game`);
@@ -87,7 +78,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 				break;
 		}
 		if (deltaPaddleY !== 0) {
-			socket.emit('handlePaddle', deltaPaddleY, this.state.matchId);
+			socket.emit('handlePaddle', { deltaPaddle: deltaPaddleY, matchId: this.state.matchId });
 		}
 	}
 
@@ -108,22 +99,16 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 					(<Navigate to="/endGame/win" replace={true} />) :
 					(<Navigate to="/endGame/lose" replace={true} />))
 			}
-			{this.state.loading ? (
-				<div className="loader-container">
-					<div className="spinner"></div>
-				</div>
-			) : (
-				<>
-					<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
-					<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
-					<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
-					<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
-					<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
-					<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
-					<Ball x={this.state.ballX} y={this.state.ballY} />
-                    <ColorSelector />
-				</>
-			)}
+			<>
+				<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
+				<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
+				<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
+				<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
+				<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
+				<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
+				<Ball x={this.state.ballX} y={this.state.ballY} />
+				<ColorSelector />
+			</>
 		</div>
 	}
 }

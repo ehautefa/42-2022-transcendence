@@ -3,7 +3,7 @@
 	flex-direction: column-reverse;
 }
 
-.mainComposantProfile .pp {
+.mainComposantProfile .pp, .ppFriends {
 	width: 80%;
 	aspect-ratio: 1 / 1;
 	border-radius: 400px;
@@ -26,9 +26,25 @@
 	width: 85%;
 	padding: 0 10px;
 	margin: 20px auto;
-	max-height: 400px;
+	max-height: 300px;
 	overflow-y: scroll;
 }
+
+.mainComposantProfile .info .firstLine {
+	display: flex;
+	justify-content: space-between;
+}
+
+.mainComposantProfile .info .firstLine button {
+	margin: 0;
+	width: 20%;
+	padding: 0;
+	border: none;
+	text-decoration: underline;
+	color: #FA0197;
+	box-shadow: none;
+}
+
 
 .mainComposantProfile .info .flex-li {
 	display: flex;
@@ -130,10 +146,6 @@
 		width: 60%;
 	}
 
-	.mainComposantProfile .info ul {
-		margin-left: 40px;
-	}
-
 	.mainComposantProfile .info button {
 		margin-left: 50%;
 		width: 50%;
@@ -144,14 +156,16 @@
 		border-color: #fef45b;
 	}
 
-	.mainComposantProfile .pp {
-		width: 200px;
-		height: 200px;
-		margin: 40px;
+	.mainComposantProfile .ppFriends{
+		width: 30%;
+		aspect-ratio: 1 / 1;
+		margin: 50px;
 	}
 
-	.mainComposantProfile .nohover:hover {
-		display: none;
+	.mainComposantProfile .pp {
+		width: 180px;
+		aspect-ratio: 1 / 1;
+		margin: 40px;
 	}
 
 	.mainComposantProfile .pp:hover p {
@@ -164,7 +178,7 @@
 	}
 
 	.mainComposantProfile .pp p {
-		line-height: 150px;
+		line-height: 130px;
 		display: none;
 		text-decoration: underline;
 		font-size: 1.5em;

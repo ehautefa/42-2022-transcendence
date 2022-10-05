@@ -1,33 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Logger, Injectable, UseGuards, Req, Body } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
+import { UserService } from 'src/user/user.service';
 import { SendInviteDto } from './dto/sendInvite.dto';
-
-export type User = {
-	userUuid: string;
-	userName: string;
-	status?: boolean;
-	twoFfactorAuth?: boolean;
-	wins?: number;
-	losses?: number;
-	friends?: User[];
-}
+import { SendAlertDto } from './dto/sendAlert.dto';
+import { user } from 'src/bdd/users.entity';
 
 var inline = new Map<string, string>();
 			// Map<userUid, socketId>
 // Map of all users connected and their socketId
 
 @Injectable()
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'status' }) // enable CORS everywhere
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/status' }) // enable CORS everywhere
 export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 
+	private logger: Logger = new Logger('PongGateway')
+	constructor(private readonly UserService: UserService) {}
+
 	@SubscribeMessage('getUserUuid')
-	getUserUid(client: Socket, userUuid: string): void {
-		inline.set(userUuid, client.id);
-		console.log('init', client.id, userUuid);
-		console.log("inline", inline);
+	@UseGuards(JwtAuthGuard)
+	getUserUid(@Req() req): void {
+		inline.set(req.user.userUuid, req.id);
+	}
+
+	sendAlert(sendAlert : SendAlertDto) {
+		let socket = inline.get(sendAlert.userUuid);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return ;
+		}
+		this.server.to(socket).emit('sendAlert', sendAlert.message);
+		console.log("Alert sent to " + sendAlert.userUuid);
 	}
 
 	sendInvitation(sendInvite : SendInviteDto) {
@@ -36,30 +42,31 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log('Error player disconnected');
 			return ;
 		}
-		let response: any = {matchId: sendInvite.matchId, userName: sendInvite.invitedUserName};
+		let response: any = {type: 'receive', matchId: sendInvite.matchId, userName: sendInvite.invitedUserName};
 		this.server.to(socket).emit('sendInvite', response);
 		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
 	@SubscribeMessage('getFriendsStatus')
-	getFriendsStatus(client: Socket, users: User[] ): User[] {
+	@UseGuards(JwtAuthGuard)
+	getFriendsStatus(client: Socket, users: user[] ): user[] {
 		for (let i = 0; i < users.length; i++) {
 			if (inline.has(users[i].userUuid)) {
-				users[i].status = true;
+				users[i].online = true;
 			} else {
-				users[i].status = false;
+				users[i].online = false;
 			}
 		}
 		return users;
 	}
 
-	handleConnection(client: any, ...args: any[]) {
-		console.log('client connected', inline);
-		// client.emit('getUserUuid');
+	handleConnection(client: any) {
+		this.logger.log(`Client status connected: ${client.id}`);
+		client.emit('getUserUuid');
 	}
 
 	handleDisconnect(client: any) {
-		console.log('client disconnected', client.id);
+		this.logger.log(`Client status disconnected: ${client.id}`);
 		for (const [key, value] of inline.entries()) {
 			if (value === client.id) {
 				inline.delete(key);
