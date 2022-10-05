@@ -39,7 +39,7 @@ export class Room {
   type: RoomType;
 
   @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
-  admin: user;
+  admin: user[];
 
   @ManyToMany(() => user, (user) => user.userUuid)
   @JoinTable()

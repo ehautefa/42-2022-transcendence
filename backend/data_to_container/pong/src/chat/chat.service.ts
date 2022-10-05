@@ -42,12 +42,13 @@ export class ChatService {
     }
   }
 
-  async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
-    const owner: user = await this.userService.getUser(createRoomDto.ownerId);
-    if (!owner) {
-      console.error('User not found');
-      return null;
-    }
+  async createRoom(createRoomDto: CreateRoomDto, owner: user): Promise<Room> {
+    // console.log(createRoomDto.ownerId);
+    // const owner: user = await this.userService.getUser(createRoomDto.ownerId);
+    // if (!owner) {
+    //   console.error('User not found');
+    //   return null;
+    // }
     const newRoom: Room = this.roomsRepository.create({
       name: createRoomDto.name,
       owner: owner,
@@ -115,6 +116,7 @@ export class ChatService {
   }
 
   async getAllMessagesInRoom(roomId: string): Promise<Message[]> {
+    console.log('roomId = ', roomId);
     try {
       const messages: Message[] = await this.messagesRepository
         .createQueryBuilder('msg')
@@ -124,6 +126,49 @@ export class ChatService {
       return messages;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
+    try {
+      const room: Room = await this.getRoomById(roomId);
+      room.admin.push(newAdmin);
+      this.roomsRepository.save(room);
+      return room;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async deleteRoom(roomId: string, currentUser: user): Promise<Room> {
+    try {
+      const room: Room = await this.getRoomById(roomId);
+      if (currentUser !== room.owner)
+        throw new Error('A room can only be destroyed by its owner');
+      return this.roomsRepository.remove(room);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async changeOwnership(
+    roomId: string,
+    oldOwner: user,
+    newOwnerId: string,
+  ): Promise<Room> {
+    try {
+      const newOwner: user = await this.userService.getUser(newOwnerId);
+      if (!newOwner) throw new Error('New owner invalid');
+      const room: Room = await this.getRoomById(roomId);
+      if (oldOwner !== room.owner)
+        throw new Error(
+          'Only the current owner can give its room to someone else',
+        );
+      room.owner = newOwner;
+      this.roomsRepository.save(room);
+      return room;
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -146,6 +191,27 @@ export class ChatService {
       return room;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async isAdmin(userId: string, roomId: string): boolean {
+    try {
+      const room: Room = await this.getRoomById(roomId);
+      room.admin.forEach((adm) => {
+        if (adm.userUuid === userId) return true;
+      });
+      return false;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async isOwner(userId: string, roomId: string): boolean {
+    try {
+      const room: Room = await this.getRoomById(roomId);
+      return room.owner.userUuid === userId;
+    } catch (error) {
+      console.error(error);
     }
   }
 }

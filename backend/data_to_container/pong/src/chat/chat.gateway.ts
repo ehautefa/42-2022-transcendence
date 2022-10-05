@@ -5,10 +5,11 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { Message } from 'src/bdd/message.entity';
 import { Room } from 'src/bdd/room.entity';
+import { user } from 'src/bdd/users.entity';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
@@ -44,15 +45,20 @@ export class ChatGateway {
   }
 
   // Create a room in the room table
+  @UseGuards(JwtAuthGuard)
   @SubscribeMessage('createRoom')
-  async createRoom(@MessageBody() createRoomDto: CreateRoomDto): Promise<Room> {
+  async createRoom(
+    @MessageBody() createRoomDto: CreateRoomDto,
+    @Req() req,
+  ): Promise<Room> {
     this.logger.log('Here creating a room');
     console.log(createRoomDto);
-    const newRoom = await this.chatService.createRoom(createRoomDto);
+    const newRoom = await this.chatService.createRoom(createRoomDto, req.user);
     return newRoom;
   }
 
   // Join a room previously created and return it
+  @UseGuards(JwtAuthGuard)
   @SubscribeMessage('joinRoom')
   async joinRoom(roomName: string) {
     const room: Room = await this.chatService.getRoomByName(roomName);
@@ -85,13 +91,41 @@ export class ChatGateway {
     return messages;
   }
 
+  // Add a new administrator to the room
+  @SubscribeMessage('addAdmin')
+  async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
+    const room: Room = await this.chatService.addAdmin(newAdmin, roomId);
+    return room;
+  }
+
+  // Delete a room if user is the owner
+  @SubscribeMessage('deleteRoom')
+  async deleteRoom(roomId: string, @Req() req): Promise<Room> {
+    const room: Room = await this.chatService.deleteRoom(roomId, req.user);
+    return room;
+  }
+
+  // Change the owner of the room
+  @SubscribeMessage('changeOwnership')
+  async changeOwnership(
+    room_id: string,
+    @Req() req,
+    newOwnerId: string,
+  ): Promise<Room> {
+    const room = await this.chatService.changeOwnership(
+      room_id,
+      req.user,
+      newOwnerId,
+    );
+    return room;
+  }
+
   @SubscribeMessage('findAllPublicRooms')
   async findAllPublicRooms(): Promise<Room[]> {
     const rooms: Room[] = await this.chatService.findAllPublicRooms();
     return rooms;
   }
 
-  /*
   afterInit(server: Server) {
     this.logger.log('Init');
   }
@@ -103,5 +137,4 @@ export class ChatGateway {
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
-  */
 }
