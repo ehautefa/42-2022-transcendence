@@ -75,6 +75,9 @@
 	margin: 0 auto 10px;
 }
 
+.mainComposantProfile .info .enable:hover {
+	border-color: #fef45b;
+}
 
 .mainComposantProfile .container table {
 	table-layout: fixed;

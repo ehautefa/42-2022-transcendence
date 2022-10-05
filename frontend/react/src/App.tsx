@@ -17,9 +17,9 @@ let socketOptions = {
 };
 
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
-const socketPong = io(URL_BACK + "/pong", socketOptions);
+const socketPong =  io(URL_BACK + "/pong", socketOptions);
 const socketStatus = io(URL_BACK + "/status", socketOptions);
-const socketChat = io(URL_BACK + "/chat", socketOptions);
+const socketChat =  io(URL_BACK + "/chat", socketOptions);
 
 
 async function createUser(username: string) {
@@ -31,11 +31,7 @@ async function createUser(username: string) {
 		credentials: credentials
 	};
 
-	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
+	let result = await fetch(url, requestOptions);
 }
 
 
