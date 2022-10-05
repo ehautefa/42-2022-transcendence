@@ -134,7 +134,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async addBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    res.send(this.UserService.addBlocked(req.user, userToHandle.userUuid));
+    res.send( await this.UserService.addBlocked(req.user, userToHandle.userUuid));
   }
 
   @Post('removeBlocked')
@@ -142,7 +142,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async removeBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    res.send(this.UserService.removeBlocked(req.user, userToHandle.userUuid));
+    res.send( await this.UserService.removeBlocked(req.user, userToHandle.userUuid));
   }
 
   @Post('enableTwoFactorAuth')
