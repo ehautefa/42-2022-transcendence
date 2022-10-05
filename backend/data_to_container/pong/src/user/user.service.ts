@@ -31,21 +31,21 @@ export class UserService {
         return user.friends;
     }
 
-    async isMyFriend(me: user, user2: user): Promise<boolean | null> {
-        if (!me || !user2)
+    async isMyFriend(completeMe: user, completeUser2: user): Promise<boolean | null> {
+        // cant find user or same user
+        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return null
-        //need to throw
-        const idx1 = me.friends.findIndex((object) => {
-            return object.userUuid === user2.userUuid;
+        const idx1: number = completeMe.friends.findIndex((object) => {
+            return object.userUuid === completeUser2.userUuid;
         })
-        if (idx1 > -1)
+        if (idx1 >= 0)
             return true;
         else
             return false;
     }
 
     async acceptFriendRequest(completeMe: user, completeUser2: user) {
-        // cant find user
+        // cant find user or same user
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return false
 
@@ -61,15 +61,14 @@ export class UserService {
     }
 
     async refuseFriendRequest(completeMe: user, completeUser2: user) {
-        // cant find user
+        // cant find user or same user
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return false
 
         const idx1 = completeMe.requestPending.findIndex((object) => {
             return object.userUuid === completeUser2.userUuid;
         })
-        if (idx1 >= 0)
-        {
+        if (idx1 >= 0) {
             completeMe.requestPending.splice(idx1);
             this.UserRepository.save(completeMe);
         }
@@ -97,7 +96,7 @@ export class UserService {
         })
         //symeetrical request
         if (idx1 >= 0) {
-                completeMe.requestPending.splice(idx1);
+            completeMe.requestPending.splice(idx1);
             if (idx2 >= 0)
                 completeUser2.requestPending.splice(idx2);
             await this.becomeFriend(completeMe, completeUser2);
@@ -150,8 +149,7 @@ export class UserService {
         if (idx2 >= 0)
             completeUser2.friends.splice(idx2);
         //not friend
-        else
-        {
+        else {
             await this.UserRepository.save(completeUser1);
             return
         }
@@ -161,26 +159,28 @@ export class UserService {
 
 
     //need to remove from friends?
-    async addBlocked(user: user, userUuidToAdd: string): Promise<user[]> {
-        const tofind = await this.getCompleteUser(userUuidToAdd);
-        if (!tofind)
+    async addBlocked(completeMe: user, completeUser2: user): Promise<user[]> {
+        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return null;
         //need to throw
-        user.blocked.push(tofind);
-        await this.UserRepository.save(user);
-        return user.blocked;
+        completeMe.blocked.push(completeUser2);
+        await this.UserRepository.save(completeMe);
+        return completeMe.blocked;
     }
 
 
-    async removeBlocked(user: user, userUuidToRemove: string) {
-        const tofind = await this.getUser(userUuidToRemove);
-        const idx = user.blocked.findIndex((object) => {
-            return object.userUuid === tofind.userUuid;
+    async removeBlocked(completeMe: user, completeUser2: user) {
+        // cant find user or same user
+        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
+            return null;
+
+        const idx = completeMe.blocked.findIndex((object) => {
+            return object.userUuid === completeUser2.userUuid;
         })
         if (idx > -1) {
-            user.blocked.splice(idx);
-            await this.UserRepository.save(user);
-            return user.blocked;
+            completeMe.blocked.splice(idx);
+            await this.UserRepository.save(completeMe);
+            return completeMe.blocked;
         }
         return
     }
@@ -198,7 +198,7 @@ export class UserService {
         if (!userUuid)
             return null;
         //need to throw
-        const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true}, where: { userUuid: userUuid } });
+        const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: userUuid } });
         return user;
     }
 
