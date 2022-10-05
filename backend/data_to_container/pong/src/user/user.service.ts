@@ -57,7 +57,7 @@ export class UserService {
             return false;
     }
 
-    async acceptFriendRequest(completeMe: user, completeUser2: user) : Promise<user[]> {
+    async acceptFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
         // cant find user or same user
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return
@@ -65,7 +65,7 @@ export class UserService {
         const idx1 = completeMe.requestPending.findIndex((object) => {
             return object.userUuid === completeUser2.userUuid;
         })
-        if (idx1 >= 0 )
+        if (idx1 >= 0)
             completeMe.requestPending.splice(idx1);
         // cant find request
         else
@@ -74,7 +74,7 @@ export class UserService {
         return completeMe.requestPending;
     }
 
-    async refuseFriendRequest(completeMe: user, completeUser2: user) : Promise<user[]> {
+    async refuseFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
         // cant find user or same user
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return
@@ -92,14 +92,20 @@ export class UserService {
             return
     }
 
-    async makeFriendRequest(completeMe: user, completeUser2: user) :Promise<user[]> {
+    async makeFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
+        //unblock when makeFriend request by me
+
         // cant find user or same user
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return
 
         // allready friends need to throw
-        if (completeMe.friends.indexOf(completeUser2) >= 0)
+        if (this.isMyFriend(completeMe, completeUser2))
             return
+
+        //ignore if I am blocked
+        if (this.isBlocked(completeUser2, completeMe))
+            return completeMe.friends;
 
         const idx1 = completeMe.requestPending.findIndex((object) => {
             return object.userUuid === completeUser2.userUuid;
@@ -112,8 +118,7 @@ export class UserService {
             completeMe.requestPending.splice(idx1);
             if (idx2 >= 0)
                 completeUser2.requestPending.splice(idx2);
-            await this.becomeFriend(completeMe, completeUser2);
-            return completeMe.friends;
+            return await this.becomeFriend(completeMe, completeUser2);
         }
         // not pending?
         else if (idx2 < 0) {
@@ -129,15 +134,21 @@ export class UserService {
     //need to remove from blocked?
     async becomeFriend(completeMe: user, completeUser2: user): Promise<user[]> {
 
-        // cant find user
+        //need to protect if I am blocked
+
+        // cant find user or same
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return
-        const idx1: number = completeMe.friends.indexOf(completeUser2)
-        const idx2: number = completeUser2.friends.indexOf(completeMe)
-
-        //already friends
-        if (idx1 >= 0 || idx2 >= 0)
+        //I'm blocked by the user2, impossible
+        if (this.isBlocked(completeUser2, completeMe))
             return
+        //allreadyFriend need to throw
+        if (this.isMyFriend(completeMe, completeUser2) || this.isMyFriend(completeUser2, completeMe))
+            return
+
+
+        if (this.isBlocked(completeMe, completeUser2))
+            this.removeBlocked(completeMe, completeUser2)
 
         completeMe.friends.push(completeUser2);
         completeUser2.friends.push(completeMe);
@@ -153,6 +164,7 @@ export class UserService {
         const idx1 = completeUser1.friends.findIndex((object) => {
             return object.userUuid === completeUser2.userUuid;
         })
+        //remove for User1
         if (idx1 >= 0)
             completeUser1.friends.splice(idx1);
         //not friend
@@ -162,6 +174,7 @@ export class UserService {
         const idx2 = completeUser2.friends.findIndex((object) => {
             return object.userUuid === completeUser1.userUuid;
         })
+        //remove for User2
         if (idx2 >= 0)
             completeUser2.friends.splice(idx2);
         //not friend
@@ -175,11 +188,15 @@ export class UserService {
     }
 
 
-    //need to remove from friends?
+    //need to remove from friends
+    //need to remove from request
     async addBlocked(completeMe: user, completeUser2: user): Promise<user[]> {
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return null;
         //need to throw
+        if (this.isMyFriend(completeMe, completeUser2))
+            this.removeFriend(completeMe, completeUser2)
+
         completeMe.blocked.push(completeUser2);
         await this.UserRepository.save(completeMe);
         return completeMe.blocked;
