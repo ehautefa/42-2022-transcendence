@@ -102,8 +102,8 @@ function AllPlayers() {
 				</thead>
 				<tbody>
 					{users.map((user: players) => {
-						if (user.userUuid == me.userUuid)
-							return ;
+						if (user.userUuid === me.userUuid)
+							return (<></>);
 						return(<tr key={user.userUuid}>
 							<td className="pp">
 							</td>

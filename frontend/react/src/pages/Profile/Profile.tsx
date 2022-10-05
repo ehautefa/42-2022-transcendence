@@ -29,11 +29,11 @@ function Profile() {
 			const user = await FetchUser(uid);
 			const matchHistory = await GetMatchHistory(uid);
 			const friends = await getFriends(user.userUuid);
-			// const isFriend = await isMyFriends(user.userUuid);
+			const isFriend = await isMyFriends(user.userUuid);
 			setMatchHistory(matchHistory);
 			setUser(user);
 			setFriends(friends);
-			// setIsMyFriend(isMyFriend);
+			setIsMyFriend(isFriend);
 			update = false;
 		}
 	}
