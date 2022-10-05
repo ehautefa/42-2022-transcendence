@@ -18,11 +18,12 @@ type players = {
 
 function AllPlayers() {
 	const emptyUser : players[] = [];
+	const emptyInvites : string[] = [];
 	const [users, setUsers] = useState([]);
 	const [friends, setFriends] = useState(emptyUser);
 	const [blocked, setBlocked] = useState(emptyUser);
 	const [me, setMe] = useState({userUuid: "", userName: ""});
-	const [invitationSent, setInvitationSent] = useState(false);
+	const [invitationSent, setInvitationSent] = useState(emptyInvites);
 
 	if (update) {
 		update = false;
@@ -61,6 +62,10 @@ function AllPlayers() {
 		return false;
 	}
 
+	function invitationIsSent(userUuid: string) {
+		return invitationSent.includes(userUuid);
+	}
+
 	async function handleBlock(userUuid: string, block: boolean) {
 		let newBlocked = [];
 		if (block) {
@@ -74,7 +79,7 @@ function AllPlayers() {
 	async function handleFriend(userUuid: string, friend: boolean) {
 		let newFriends = [];
 		if (friend) {
-			setInvitationSent(true);
+			setInvitationSent([...invitationSent, userUuid]);
 			newFriends = await addFriend(userUuid);
 		} else {
 			newFriends = await removeFriend(userUuid);
@@ -107,8 +112,8 @@ function AllPlayers() {
 							<td>{
 								isMyFriend(user.userUuid) ?
 									<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
-									: ( invitationSent ?
-									<button className="enable unclickable" onClick={() => handleFriend(user.userUuid, true)}>Invitation sent</button>
+									: ( invitationIsSent(user.userUuid) ?
+									<button className="enable unclickable">Invitation sent</button>
 									: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
 									)
 								}</td>
