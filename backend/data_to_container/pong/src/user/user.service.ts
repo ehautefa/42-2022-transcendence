@@ -113,13 +113,13 @@ export class UserService {
             if (idx2 >= 0)
                 completeUser2.requestPending.splice(idx2);
             await this.becomeFriend(completeMe, completeUser2);
-            return completeMe.requestPending;
+            return completeMe.friends;
         }
         // not pending?
         else if (idx2 < 0) {
             completeUser2.requestPending.push(completeMe);
             this.UserRepository.save(completeUser2);
-            return completeMe.requestPending;
+            return completeMe.friends;
         }
         //already in pending
         else
