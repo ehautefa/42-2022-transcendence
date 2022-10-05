@@ -223,8 +223,7 @@ export class UserService {
         if (!userUuid)
             return null;
         //need to throw
-        const user = await this.UserRepository.findOne({ where: { userUuid: userUuid } });
-        return user;
+        return await this.UserRepository.findOne({ where: { userUuid: userUuid } });
     }
 
     async getCompleteUser(userUuid: string): Promise<user> {
@@ -232,28 +231,27 @@ export class UserService {
         if (!userUuid)
             return null;
         //need to throw
-        const user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: userUuid } });
-        return user;
+        return await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: userUuid } });
     }
 
-    async FindOrCreateUser(userToFindOrCreate: FindOrCreateUserDto): Promise<user> {
-        const user = await this.UserRepository.findOne({ where: { user42Id: userToFindOrCreate.user42Id } })
+    async FindOrCreateUser(user42Id: string, userName: string ): Promise<user> {
+        const user = await this.UserRepository.findOne({ where: { user42Id: user42Id } })
         if (user)
             return user;
         else {
             let numberToAdd: number = 1;
-            let uniqueUserName: string = userToFindOrCreate.userName;
+            let uniqueUserName: string = userName;
             while (numberToAdd < 60) {
                 if (await this.UserRepository.findOne({ where: { userName: uniqueUserName } }))
                     numberToAdd++;
                 else
                     break
-                uniqueUserName = userToFindOrCreate.userName + numberToAdd;
+                uniqueUserName = userName + numberToAdd;
             }
 
             return await this.UserRepository.save({
                 userName: uniqueUserName,
-                user42Id: userToFindOrCreate.user42Id,
+                user42Id: user42Id,
                 online: false,
                 requestPending: [],
                 twoFactorAuth: false,
