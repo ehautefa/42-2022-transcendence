@@ -81,7 +81,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get myblocked (from cookie)' })
   @UseGuards(JwtAuthGuard)
   async getMyblocked(@Req() req, @Res() res) {
-    res.send(req.blocked);
+    res.send(req.user.blocked);
   }
 
   @Post('makeFriendRequest')
