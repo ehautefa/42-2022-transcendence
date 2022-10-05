@@ -49,6 +49,9 @@ export async  function ChangeUsername(newName: string) {
 	
 	const URL = process.env.REACT_APP_BACK_URL + "/user/changeUsername";
 	let result = await fetch(URL, requestOptions);
+	console.log(result);
+	if (result == null)
+		return null;
 	if (result.status === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}

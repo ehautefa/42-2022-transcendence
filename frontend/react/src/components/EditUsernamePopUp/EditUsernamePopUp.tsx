@@ -12,7 +12,12 @@ function EditUsernamePopUp() {
             && newUsername.length < 12 // max length of username is 12
             && newUsername.match(/^[a-zA-Z0-9]+$/)) { // only alphanumeric characters
             setOpen(false);
-            ChangeUsername(newUsername);
+            if (ChangeUsername(newUsername) === null) {
+                console.log("Username changed successfully");
+                alert("Username already taken");
+            }
+            // else 
+                // window.location.reload();
         } else {
             alert("Username must be between 4 and 12 characters and alphanumeric");
         }
@@ -22,7 +27,7 @@ function EditUsernamePopUp() {
     return (<div className="Popup-mother">
         <button className="Edit" onClick={() => setOpen(true)}>edit</button>
         <Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
-             window.location.reload();
+            //  window.location.reload();
             }}>
             <div className='editUsername'>
                 <label htmlFor="editUsername">New username :</label>
