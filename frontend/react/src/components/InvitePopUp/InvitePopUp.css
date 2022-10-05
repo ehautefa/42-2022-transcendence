@@ -28,18 +28,6 @@
     text-shadow: none;
 }
 
-.invite {
-    color: #DBACE3;
-    text-align: center;
-    border: 2px solid #DBACE3;
-	box-shadow: 0px 0px 20px #7C4D84;
-    border-radius: 5px;
-    background-color: rgba(0, 0, 0, 0.1);
-    align-items: center;
-    padding: 3px 10px;
-    margin: 2px 0;
-}
-
 .invite:hover {
-    font-weight: bolder;
+    border-color: #fef45b;
 }

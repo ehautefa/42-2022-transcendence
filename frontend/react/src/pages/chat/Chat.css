@@ -1,7 +1,7 @@
 body {
-	background-color: #250021;
-	background-image: url("../../../public/synthwave-wallpaper.jpg");
-	background-repeat: no-repeat;
+    background-color: #250021;
+    background-image: url("../../../public/synthwave-wallpaper.jpg");
+    background-repeat: no-repeat;
 }
 
 .mainComposant {
@@ -36,7 +36,7 @@ body {
 }
 
 .channel li:hover {
-	text-shadow: 1px 1px 1px #FA0197;
+    text-shadow: 1px 1px 1px #FA0197;
     box-shadow: 5px 5px 10px rgb(41, 38, 38);
 }
 
@@ -60,17 +60,16 @@ body {
     margin-left: 5px;
     padding: 10px 10px;
     align-items: center;
-	justify-content: center;
-	background-color: rgba(0, 0, 0, 0);
-	color: #FA0197;
-	border: 2px solid #DBACE3;
-	box-shadow: 0px 0px 20px #7C4D84;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+    color: #FA0197;
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .box button:hover {
     border-color: #fef45b;
-	text-shadow: 1px 1px 1px #DBACE3;
-
+    text-shadow: 1px 1px 1px #DBACE3;
 }
 
 .chat {
@@ -149,18 +148,22 @@ body {
     margin-left: 5px;
     padding: 5px 10px;
     align-items: center;
-	justify-content: center;
+    justify-content: center;
 
     
-	background-color: rgba(0, 0, 0, 0);
-	color: #FA0197;
-	border: 2px solid #DBACE3;
-	box-shadow: 0px 0px 20px #7C4D84;
+    background-color: rgba(0, 0, 0, 0);
+    color: #FA0197;
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .chat button:hover{
     border-color: #fef45b;
+<<<<<<< HEAD
 	text-shadow: 1px 1px 1px #DBACE3;
+=======
+    text-shadow: 1px 1px 1px #DBACE3;
+>>>>>>> main
 }
 
 .fade-appear,
@@ -240,8 +243,13 @@ body {
     padding: 20px;
     background-color: rgba(0, 0, 0, 0.9);
     border: 1px solid #fef45b;
+<<<<<<< HEAD
 	box-shadow: 1px 1px 5px #fef45b;
 	border-radius: 5px;
+=======
+    box-shadow: 1px 1px 5px #fef45b;
+    border-radius: 5px;
+>>>>>>> main
 }
 
 .messagePopup label{
@@ -269,8 +277,16 @@ body {
     font-size: large;
     font-weight: bold;
     cursor: pointer;
+<<<<<<< HEAD
 	/* box-shadow: 1px 1px 5px #fef45b; */
     color: #FAE3E3;
     width: 30%;
     margin: 20px 0 0;
 }
+=======
+    /* box-shadow: 1px 1px 5px #fef45b; */
+    color: #FAE3E3;
+    width: 30%;
+    margin: 20px 0 0;
+}
+>>>>>>> main

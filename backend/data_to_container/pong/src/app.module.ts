@@ -12,11 +12,10 @@ import { MatchModule } from './match/match.module';
 import { PongModule } from './pong/pong.module';
 import { ChatModule } from './chat/chat.module';
 import { StatusModule } from './status/status.module';
-import { StatusGateway } from './status/status.gateway';
 
 @Module({
   imports: [TestModule, ApiModule, ChatModule, BddModule, UserModule, AuthModule, MatchModule, PongModule, StatusModule],
   controllers: [AppController],
-  providers: [AppService, StatusGateway],
+  providers: [AppService],
 })
 export class AppModule {} 

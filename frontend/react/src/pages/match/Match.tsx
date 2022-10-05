@@ -8,9 +8,10 @@ const socket = getSocketPong();
 
 
 function Match() {
-	var emptyState: GameWindowState[] = [];
-	const [games, setGames] = useState(emptyState);
+	const emptyGames : GameWindowState[] = [];
+	const [games, setGames] = useState(emptyGames);
 	socket.emit("getGames", (games: GameWindowState[]) => {
+		console.log("Socket getGames", games);
 		setGames(games);
 	});
 
@@ -27,25 +28,21 @@ function Match() {
 						<th>Score</th>
 						<th>Second Player</th>
 						<th>Score</th>
+						<th>Begin</th>
 					</tr>
 				</thead>
 				<tbody>
-					{games.map((game: GameWindowState) => {
-						if (!game.isGameOver
-							&& game.playerLeftName !== ""
-							&& game.playerRightName !== "") {
-							return (<tr key="{game.id}">
+					{games.map((value) => {
+							return (<tr key="{value.id}">
 								<td>
-									<a href={"./game?id=" + game.id}>Watch</a>
+									<a href={"./game?id=" + value.id}>Watch</a>
 								</td>
-								<td>{game.playerLeftName}</td>
-								<td>{game.scoreLeft}</td>
-								<td>{game.playerRightName}</td>
-								<td>{game.scoreRight}</td>
-							</tr>);
-						}
-						else
-							return null;
+								<td>{value.playerLeftName}</td>
+								<td>{value.scoreLeft}</td>
+								<td>{value.playerRightName}</td>
+								<td>{value.scoreRight}</td>
+								<td>{value.begin}</td>
+							</tr>)
 					})}
 
 				</tbody>

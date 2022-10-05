@@ -1,53 +1,55 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
-import { getSocketPong } from "../../App" 
+import { getSocketPong } from "../../App"
 import { useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
-
-// create setModal;
 
 const socket = getSocketPong();
 
 function Game() {
 	var index = new URLSearchParams(useLocation().search).get('id');
-	const displaying_state = index === null ? { display: "block" } : { display: "none" };
-	const [displaying, setDisplaying] = useState(displaying_state);
-	index = index === null ? "" : index;
-	const id = index;
-	const [loading, setLoading] = useState(false);
-	const uid = localStorage.getItem('uid');
-	const userName = localStorage.getItem('userName');
+	const initialLayer = index === null ? 0 : 1;
+	console.log(initialLayer);
+	const [layer, setLayer] = useState(initialLayer); // 0 - matchMaking button, 1 - waiting for opponent, 2 - game 
 
-	
-	if (id !== "") {
-		socket.emit('joinGame', index, userName);
+	if (index !== null) {
+		socket.emit('joinGame', index);
+	} else {
+		index = "";
 	}
-	
+
 	function matchMaking() {
-		let arg = {
-			"userUuid": uid,
-			"userName": userName
-		}
-		socket.emit('getPlayer', arg , (matchId: string) => {
-			setDisplaying({ display: "none" });
+		socket.emit('getPlayer', (matchId: string) => {
 			if (matchId === "")
-				setLoading(true);
+				setLayer(1);
 			else
-				setLoading(false);
+				setLayer(2)
 		});
 	}
+
+	socket.on('beginGame', () => {
+		setLayer(2);
+	});
+
 	return (<>
 		<NavBar />
 		<div className="mainComposantGame">
-			<GameWindow id={id} />
-			<button style={displaying}
-				className="matchMakingButton"
-				onClick={() => matchMaking()}>
-				Find another player
-			</button>
+			<GameWindow id={index} />
+			{ layer === 0 &&
+				<button
+					className="matchMakingButton"
+					onClick={() => matchMaking()}>
+					Find another player
+				</button>
+			}
+			{ layer === 1 &&
+				<div className="loader-container">
+					<div className="spinner"></div>
+				</div>
+			}
 		</div>
-	</>)
+	</>);
 }
 
 export default Game;
