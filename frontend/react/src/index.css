@@ -64,3 +64,17 @@ a:hover {
 	width: 100%;
 	text-align: center;
 }
+
+button {
+	color: #DBACE3;
+	background-color: rgba(0, 0, 0, 0);
+    border: 2px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
+    border-radius: 5px;
+    padding: 5px 10px;
+    align-items: center;
+}
+
+.button:hover {
+    border-color: #fef45b;
+}

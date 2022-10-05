@@ -1,9 +1,11 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "../myProfile/Profil.css";
-import { FetchUser, GetMatchHistory } from "../myProfile/request"
+import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { addFriend, removeFriend } from "../allPlayers/request";
+import { getFriends, FetchUser, isMyFriends } from "./request";
 
 var update = true;
 
@@ -17,14 +19,20 @@ function Profile() {
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
+	const [friends, setFriends] = useState([]);
+	const [isMyFriend, setIsMyFriend] = useState(false);
 	fetchUser();
 
 	async function fetchUser() {
 		if (uid && update) {
 			const user = await FetchUser(uid);
 			const matchHistory = await GetMatchHistory(uid);
+			const friends = await getFriends(user.userUuid);
+			// const isFriend = await isMyFriends(user.userUuid);
 			setMatchHistory(matchHistory);
 			setUser(user);
+			setFriends(friends);
+			// setIsMyFriend(isMyFriend);
 			update = false;
 		}
 	}
@@ -43,14 +51,34 @@ function Profile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button className="enable">Add in friends</button>
+					{
+						isMyFriend ?
+						<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
+						: <button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
+					}
 				</div>
-				<div className="pp nohover">
+				<div className="ppFriends">
 				</div>
 			</div>
 			<div className="flex">
 				<div className="friends container">
 					<h3>Friends</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>UserName</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							{friends.map((users: any) => {
+								return (<tr key={users.userUuid}>
+									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
+									{users.status ? <td>Online</td> : <td>Offline</td>}
+								</tr>);
+							})}
+						</tbody>
+					</table>
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
@@ -65,7 +93,7 @@ function Profile() {
 						</thead>
 						<tbody>
 							{matchHistory.map((match: any) => {
-								return (<tr key="{match.matchId}">
+								return (<tr key={match.matchId}>
 									<td>{match.matchId}</td>
 									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
 									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>

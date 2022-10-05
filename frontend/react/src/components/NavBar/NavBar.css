@@ -54,6 +54,35 @@
 }
 
 
+.request a {
+	margin: 0;
+	padding: 0;
+}
+
+.request img {
+	width: 30px;
+	padding: 0;
+	margin-top: 10px;
+	animation: shake 0.5s;
+	animation-iteration-count: infinite; 
+}
+
+@keyframes shake {
+	0%		{ transform: rotate(0deg); }
+	10% 	{ transform: rotate(4deg); }
+	20% 	{ transform: rotate(8deg); }
+	30% 	{ transform: rotate(4deg); }
+	40% 	{ transform: rotate(0deg); }
+	50% 	{ transform: rotate(-4deg); }
+	60% 	{ transform: rotate(-8deg); }
+	70% 	{ transform: rotate(-12deg); }
+	80% 	{ transform: rotate(-8deg); }
+	90% 	{ transform: rotate(-4deg); }
+	100% 	{ transform: rotate(0deg); }
+  }
+
+
+
 @media (max-width:600px) {
 	.navButton {
 		position: absolute;
