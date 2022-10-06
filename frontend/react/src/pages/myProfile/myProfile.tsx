@@ -7,7 +7,6 @@ import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 import Cookies from "js-cookie";
-import PictureUploader from "../../components/PictureUploader/PictureUploader";
 
 const socketStatus = getSocketStatus();
 
@@ -16,24 +15,24 @@ socketStatus.on('getUserUuid', () => {
 })
 
 function MyProfile() {
-	const emptyUser : User = {userUuid: "", userName: ""};
+	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
 	const [pp, setPp] = useState("");
-	
+
 	async function fetchUser() {
-			const user = await getMe();
-			const matchHistory = await GetMatchHistory(user.userName);
-			const friends = await getMyFriends();
-			const pp = await getMyPicture();
-			setPp(pp);
-			setFriends(friends);
-			socketStatus.emit('getFriendsStatus', friends, (data: any) => {
-				setFriends(data);
-			});
-			setMatchHistory(matchHistory);
-			setUser(user);
+		const user = await getMe();
+		const matchHistory = await GetMatchHistory(user.userName);
+		const friends = await getMyFriends();
+		const pp = await getMyPicture();
+		setPp(pp);
+		setFriends(friends);
+		socketStatus.emit('getFriendsStatus', friends, (data: any) => {
+			setFriends(data);
+		});
+		setMatchHistory(matchHistory);
+		setUser(user);
 	}
 
 	useEffect(() => {
@@ -51,7 +50,7 @@ function MyProfile() {
 	}
 
 	function logOut() {
-		Cookies.remove('access_token', { path: "/"});
+		Cookies.remove('access_token', { path: "/" });
 		window.location.replace(process.env.REACT_APP_FRONT_URL + "/");
 	}
 
@@ -79,7 +78,7 @@ function MyProfile() {
 				</div>
 				<a href="./myProfile/editProfilePicture">
 					<div className="pp">
-						<img src={pp} alt="profile picture" />
+						<img src={pp} alt={"Avatar of " + user.userName} />
 					</div>
 				</a>
 			</div>

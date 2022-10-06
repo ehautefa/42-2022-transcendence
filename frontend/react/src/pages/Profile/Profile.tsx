@@ -2,12 +2,11 @@ import NavBar from "../../components/NavBar/NavBar"
 import "../myProfile/Profil.css";
 import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends } from "./request";
 
-var update = true;
 
 function Profile() {
 
@@ -23,22 +22,23 @@ function Profile() {
 	const [isMyFriend, setIsMyFriend] = useState(false);
 	const [isBlocked, setIsBlocked] = useState(false);
 	const [invitationSent, setInvitationSent] = useState(false);
-
-	fetchUser();
-
-	async function fetchUser() {
-		if (uid && update) {
-			const user = await FetchUser(uid);
-			const matchHistory = await GetMatchHistory(uid);
-			const friends = await getFriends(user.userUuid);
-			// const isFriend = await isMyFriends(user.userUuid);
-			setMatchHistory(matchHistory);
-			setUser(user);
-			setFriends(friends);
-			// setIsMyFriend(isFriend);
-			update = false;
-		}
+	
+	async function fetchUser(uid: string) {
+		const user = await FetchUser(uid);
+		const matchHistory = await GetMatchHistory(uid);
+		const friends = await getFriends(user.userUuid);
+		const isFriend = await isMyFriends(user.userUuid);
+		setMatchHistory(matchHistory);
+		setUser(user);
+		setFriends(friends);
+		setIsMyFriend(isFriend);
 	}
+	
+	useEffect(() => {
+		if (uid)
+			fetchUser(uid);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	async function handleBlock(userUuid: string, block: boolean) {
 		if (block) {
@@ -127,9 +127,9 @@ function Profile() {
 							{matchHistory.map((match: any) => {
 								return (<tr key={match.matchId}>
 									<td>{match.matchId}</td>
-									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
 								</tr>);
 							})}
 						</tbody>

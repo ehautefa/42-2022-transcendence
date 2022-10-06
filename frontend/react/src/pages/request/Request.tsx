@@ -1,22 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { acceptFriendRequest, getMyRequests, refuseFriendRequest } from "./requests";
 import NavBar from "../../components/NavBar/NavBar";
 
-var update = true;
-
 function Request() {
 	const [requests, setRequests] = useState([]);
-	if (update) {
-		update = false;
-		fetchRequest();
-	}
-
 
 	async function fetchRequest() {
 		const response = await getMyRequests();
 		setRequests(response);
 		console.log("REquest", response);
 	}
+
+	useEffect(() => {
+		fetchRequest();
+	}, []);
 
 	async function handleRequest(userUuid: string, accept: boolean) {
 		let newRequest = [];
@@ -34,15 +31,6 @@ function Request() {
 		<NavBar />
 		<div className="allPlayers">
 			<table>
-				{/* <thead>
-					<tr>
-						<th></th>
-						<th>UserName</th>
-						<th>Status</th>
-						<th></th>
-						<th></th>
-					</tr>
-				</thead> */}
 				<tbody>
 					{requests.map((request: any) => {
 						return (<tr key={request.userUuid}>

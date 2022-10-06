@@ -1,5 +1,5 @@
 import { getAllUuidWithUserName } from "./request";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./allPlayers.css";
 import { addFriend, removeFriend, getMyBlocked, addBlocked, removeBlocked } from "./request";
 import NavBar from "../../components/NavBar/NavBar";
@@ -8,7 +8,6 @@ import { getMyFriends } from "../myProfile/request";
 import { getMe } from "../myProfile/request";
 
 const socketStatus = getSocketStatus();
-var update = true;
 
 type players = {
 	userUuid: string;
@@ -25,12 +24,6 @@ function AllPlayers() {
 	const [me, setMe] = useState({userUuid: "", userName: ""});
 	const [invitationSent, setInvitationSent] = useState(emptyInvites);
 
-	if (update) {
-		update = false;
-		fetchPlayers();
-	}
-
-
 	async function fetchPlayers() {
 		const response = await getAllUuidWithUserName();
 		socketStatus.emit('getFriendsStatus', response, (data: any) => {
@@ -43,6 +36,10 @@ function AllPlayers() {
 		const me = await getMe();
 		setMe(me);
 	}
+
+	useEffect(() => {
+		fetchPlayers();
+	}, []);
 
 	function isMyFriend(userUuid: string) {
 		for (let i = 0; i < friends.length; i++) {
@@ -95,15 +92,6 @@ function AllPlayers() {
 		<NavBar />
 		<div className="allPlayers">
 			<table>
-				{/* <thead>
-					<tr>
-						<th></th>
-						<th>UserName</th>
-						<th>Status</th>
-						<th></th>
-						<th></th>
-					</tr>
-				</thead> */}
 				<tbody>
 					{users.map((user: players) => {
 						if (user.userUuid === me.userUuid)

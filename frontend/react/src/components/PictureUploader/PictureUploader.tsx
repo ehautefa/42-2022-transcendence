@@ -27,7 +27,7 @@ export default class PictureUploader extends React.Component<{}, MyState>{
     renderPreview() {
         if (this.state.src !== "") {
             return (
-                <img src={this.state.src} />
+                <img src={this.state.src} alt="Preview of your avatar" />
             );
         } else {
             return (
