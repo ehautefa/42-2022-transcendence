@@ -210,7 +210,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async endOfMatch(@Body() players: EndOfMatchDto): Promise<void> {
-    return await this.UserService.endOfMatch(players);
+    return await this.UserService.endOfMatch(players.loserUuid, players.winnerUuid);
   }
 
 

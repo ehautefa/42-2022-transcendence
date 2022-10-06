@@ -14,6 +14,7 @@ import GameOver from "./pages/endGame/GameOver";
 import Profile from './pages/Profile/Profile';
 import AllPlayers from './pages/allPlayers/allPlayers';
 import Request from './pages/request/Request';
+import EditProfilePicture from './pages/myProfile/editProfilePicture';
 import { ModalProvider } from './context/modal-context';
 
 const root = ReactDOM.createRoot(
@@ -36,6 +37,7 @@ root.render(<>
 				<Route path="allPlayers" element={<AllPlayers />} />
 				<Route path="endGame/gameOver" element={<GameOver />} />
 				<Route path="request" element={<Request />} />
+				<Route path="myProfile/editProfilePicture" element={<EditProfilePicture />} />
 			</Routes>
 		</BrowserRouter>
 	</ModalProvider>
