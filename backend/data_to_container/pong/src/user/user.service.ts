@@ -32,31 +32,23 @@ export class UserService {
 
     isMyFriend(completeMe: user, completeUser2: user): boolean {
         this.checkUsers(completeMe, completeUser2);
-
-        const idx1: number = completeMe.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
-        if (idx1 >= 0)
+        if (0 <= completeMe.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid }))
             return true;
-        else
-            return false;
+        return false;
     }
 
     isBlocked(completeMe: user, completeUser2: user): boolean {
         this.checkUsers(completeMe, completeUser2);
-
-        const idx1: number = completeMe.blocked.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
-        if (idx1 >= 0)
+        if (0 <= completeMe.blocked.findIndex((object) => { return object.userUuid === completeUser2.userUuid }))
             return true;
-        else
-            return false;
+        return false;
     }
 
     async acceptFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
         this.checkUsers(completeMe, completeUser2);
-
         const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0)
         completeMe.requestPending.splice(idx1);
-        // cant find request
         else{
             throw new FailToFindObjectFromanEntity(completeUser2.userUuid, "requestPending", 'users')
         }
@@ -68,28 +60,22 @@ export class UserService {
 
     async refuseFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
         this.checkUsers(completeMe, completeUser2);
-
         const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
-        if (idx1 >= 0) {
-            completeMe.requestPending.splice(idx1);
-            await this.UserRepository.save(completeMe);
-            return completeMe.requestPending;
-        }
-        else
+        if (idx1 < 0)
             throw new FailToFindObjectFromanEntity(completeUser2.userName, "requestPending", 'users')
+        completeMe.requestPending.splice(idx1);
+        await this.UserRepository.save(completeMe);
+        return completeMe.requestPending;
     }
 
     async makeFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
         this.checkUsers(completeMe, completeUser2);
-
         // allready friends need to throw
         if (this.isMyFriend(completeMe, completeUser2))
             throw new UserAreAlreadyFriends(completeMe.userName, completeUser2.userName)
-
         //ignore if I am blocked
         if (await this.isBlocked(completeUser2, completeMe))
             return completeMe.friends;
-
         //If I blocked the user unblock it
         if (this.isBlocked(completeMe, completeUser2))
             await this.removeBlocked(completeMe, completeUser2)
