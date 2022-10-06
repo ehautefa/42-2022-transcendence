@@ -4,7 +4,7 @@ import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { addFriend, removeFriend } from "../allPlayers/request";
+import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends } from "./request";
 
 var update = true;
@@ -21,6 +21,7 @@ function Profile() {
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
 	const [isMyFriend, setIsMyFriend] = useState(false);
+	const [isBlocked, setIsBlocked] = useState(false);
 	fetchUser();
 
 	async function fetchUser() {
@@ -28,14 +29,34 @@ function Profile() {
 			const user = await FetchUser(uid);
 			const matchHistory = await GetMatchHistory(uid);
 			const friends = await getFriends(user.userUuid);
-			// const isFriend = await isMyFriends(user.userUuid);
+			const isFriend = await isMyFriends(user.userUuid);
 			setMatchHistory(matchHistory);
 			setUser(user);
 			setFriends(friends);
-			// setIsMyFriend(isMyFriend);
+			setIsMyFriend(isFriend);
 			update = false;
 		}
 	}
+
+	async function handleBlock(userUuid: string, block: boolean) {
+		if (block) {
+			addBlocked(userUuid);
+			setIsBlocked(true);
+		} else {
+			removeBlocked(userUuid);
+			setIsBlocked(false);
+		}
+	}
+
+	async function handleFriend(userUuid: string, friend: boolean) {
+		if (friend) {
+			addFriend(userUuid);
+		} else {
+			removeFriend(userUuid);
+			setIsMyFriend(false);
+		}
+	}
+
 
 	return (<>
 		<NavBar />
@@ -53,8 +74,13 @@ function Profile() {
 					</ul>
 					{
 						isMyFriend ?
-						<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
-						: <button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
+						<button className="enable" onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
+						: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add in friends</button>
+					}
+					{
+						isBlocked ?
+						<button className="enable" onClick={() => handleBlock(user.userUuid, false)}>Unblock</button>
+						: <button className="enable" onClick={() => handleBlock(user.userUuid, true)}>Block</button>
 					}
 				</div>
 				<div className="ppFriends">

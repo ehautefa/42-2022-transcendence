@@ -5,12 +5,6 @@ import NavBar from "../../components/NavBar/NavBar";
 
 var update = true;
 
-type players = {
-	userUuid: string;
-	userName: string;
-	status: boolean;
-}
-
 function Request() {
 	const [requests, setRequests] = useState([]);
 	if (update) {

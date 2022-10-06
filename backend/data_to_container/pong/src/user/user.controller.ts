@@ -4,13 +4,10 @@ import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
-import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
 import { StatusGateway } from 'src/status/status.gateway';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
-
-//removeFriend
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -55,7 +52,6 @@ export class UserController {
   @ApiOperation({ summary: 'Get myFriends (from cookie)' })
   @UseGuards(JwtAuthGuard)
   async getMyRequests(@Req() req, @Res() res) {
-    console.log("getMyRequests", req.user.requestPending);
     res.send(req.user.requestPending);
   }
 

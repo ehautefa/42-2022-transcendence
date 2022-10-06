@@ -12,13 +12,18 @@ var inline = new Map<string, string>();
 // Map of all users connected and their socketId
 
 @Injectable()
-@WebSocketGateway({ cors: { origin: '*' }, namespace: '/status' }) // enable CORS everywhere
+@WebSocketGateway({ cors: 
+	{
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST"],
+		credentials: true,
+	}, 
+	namespace: '/status',
+ })
 export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
-
-	private logger: Logger = new Logger('PongGateway')
-	constructor(private readonly UserService: UserService) {}
+	private logger: Logger = new Logger('StatusGateway')
 
 	@SubscribeMessage('getUserUuid')
 	@UseGuards(JwtAuthGuard)
@@ -62,7 +67,9 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleConnection(client: any) {
 		this.logger.log(`Client status connected: ${client.id}`);
-		client.emit('getUserUuid');
+		if (client.handshake.headers.cookie)
+			client.emit('getUserUuid');
+	
 	}
 
 	handleDisconnect(client: any) {
