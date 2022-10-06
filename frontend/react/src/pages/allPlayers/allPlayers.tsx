@@ -74,6 +74,8 @@ function AllPlayers() {
 			newBlocked = await removeBlocked(userUuid);
 		}
 		setBlocked(newBlocked);
+		const myFriends = await getMyFriends();
+		setFriends(myFriends);
 	}
 
 	async function handleFriend(userUuid: string, friend: boolean) {
@@ -85,13 +87,15 @@ function AllPlayers() {
 			newFriends = await removeFriend(userUuid);
 		}
 		setFriends(newFriends);
+		const myBlocked = await getMyBlocked();
+		setBlocked(myBlocked);
 	}
 
 	return (<>
 		<NavBar />
 		<div className="allPlayers">
 			<table>
-				<thead>
+				{/* <thead>
 					<tr>
 						<th></th>
 						<th>UserName</th>
@@ -99,7 +103,7 @@ function AllPlayers() {
 						<th></th>
 						<th></th>
 					</tr>
-				</thead>
+				</thead> */}
 				<tbody>
 					{users.map((user: players) => {
 						if (user.userUuid === me.userUuid)

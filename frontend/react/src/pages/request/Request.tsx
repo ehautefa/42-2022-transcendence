@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./Request.css";
 import { acceptFriendRequest, getMyRequests, refuseFriendRequest } from "./requests";
 import NavBar from "../../components/NavBar/NavBar";
 
@@ -35,7 +34,7 @@ function Request() {
 		<NavBar />
 		<div className="allPlayers">
 			<table>
-				<thead>
+				{/* <thead>
 					<tr>
 						<th></th>
 						<th>UserName</th>
@@ -43,7 +42,7 @@ function Request() {
 						<th></th>
 						<th></th>
 					</tr>
-				</thead>
+				</thead> */}
 				<tbody>
 					{requests.map((request: any) => {
 						return (<tr key={request.userUuid}>
