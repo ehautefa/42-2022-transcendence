@@ -100,11 +100,11 @@ export class UserService {
             return
 
         // allready friends need to throw
-        if (this.isMyFriend(completeMe, completeUser2))
+        if (await this.isMyFriend(completeMe, completeUser2))
             return
 
         //ignore if I am blocked
-        if (this.isBlocked(completeUser2, completeMe))
+        if (await this.isBlocked(completeUser2, completeMe))
             return completeMe.friends;
 
         const idx1 = completeMe.requestPending.findIndex((object) => {
