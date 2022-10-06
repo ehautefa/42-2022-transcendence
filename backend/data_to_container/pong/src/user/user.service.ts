@@ -61,7 +61,6 @@ export class UserService {
         // cant find user or same user
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return
-        console.log("acceptFriendRequest 1");
 
         const idx1 = completeMe.requestPending.findIndex((object) => {
             return object.userUuid === completeUser2.userUuid;
@@ -72,7 +71,6 @@ export class UserService {
         else
             return
         await this.becomeFriend(completeMe, completeUser2);
-        console.log("acceptFriendRequest 2", completeMe.requestPending);
         return completeMe.requestPending;
     }
 
