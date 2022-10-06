@@ -7,6 +7,7 @@ import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 import Cookies from "js-cookie";
+import PictureUploader from "../../components/PictureUploader/PictureUploader";
 
 const socketStatus = getSocketStatus();
 
@@ -75,11 +76,11 @@ function MyProfile() {
 						<button className="enable" onClick={switch2FA}>Disable two-factor authentication</button>
 					}
 				</div>
-				<a href="./editProfil">
+				{/* <a href="./editProfil"> */}
 					<div className="pp">
-						<p>Edit</p>
+						<PictureUploader />
 					</div>
-				</a>
+				{/* </a> */}
 			</div>
 			<div className="flex">
 				<div className="friends container">
