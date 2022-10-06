@@ -76,5 +76,11 @@ button {
 }
 
 .button:hover {
-    border-color: #fef45b;
+	border-color: #fef45b;
+}
+
+.unclickable {
+	border: none;
+	box-shadow: none;
+	font-style: italic;
 }

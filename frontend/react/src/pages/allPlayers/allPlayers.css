@@ -60,9 +60,3 @@
 	background-size: cover;
 
 }
-
-.allPlayers .unclickable {
-	border: none;
-	box-shadow: none;
-	font-style: italic;
-}

@@ -22,6 +22,8 @@ function Profile() {
 	const [friends, setFriends] = useState([]);
 	const [isMyFriend, setIsMyFriend] = useState(false);
 	const [isBlocked, setIsBlocked] = useState(false);
+	const [invitationSent, setInvitationSent] = useState(false);
+
 	fetchUser();
 
 	async function fetchUser() {
@@ -29,11 +31,11 @@ function Profile() {
 			const user = await FetchUser(uid);
 			const matchHistory = await GetMatchHistory(uid);
 			const friends = await getFriends(user.userUuid);
-			const isFriend = await isMyFriends(user.userUuid);
+			// const isFriend = await isMyFriends(user.userUuid);
 			setMatchHistory(matchHistory);
 			setUser(user);
 			setFriends(friends);
-			setIsMyFriend(isFriend);
+			// setIsMyFriend(isFriend);
 			update = false;
 		}
 	}
@@ -50,6 +52,7 @@ function Profile() {
 
 	async function handleFriend(userUuid: string, friend: boolean) {
 		if (friend) {
+			setInvitationSent(true);
 			addFriend(userUuid);
 		} else {
 			removeFriend(userUuid);
@@ -74,9 +77,12 @@ function Profile() {
 					</ul>
 					{
 						isMyFriend ?
-						<button className="enable" onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
-						: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add in friends</button>
-					}
+							<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
+							: ( invitationSent ?
+							<button className="enable unclickable">Invitation sent</button>
+							: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
+							)
+						}
 					{
 						isBlocked ?
 						<button className="enable" onClick={() => handleBlock(user.userUuid, false)}>Unblock</button>

@@ -93,7 +93,6 @@ export async function getMyFriends() {
 	};
 
 	let friends = await( await fetch(url, requestOptions)).json();
-	console.log("FRIENDS", friends);
 	if (friends.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
