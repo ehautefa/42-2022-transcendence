@@ -79,7 +79,6 @@ export class UserService {
             throw new FailToFindObjectFromanEntity(completeUser2.userName, "requestPending", 'users')
     }
 
-    //unblock when makeFriend request by me
     async makeFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
         this.checkUsers(completeMe, completeUser2);
 
@@ -90,6 +89,10 @@ export class UserService {
         //ignore if I am blocked
         if (await this.isBlocked(completeUser2, completeMe))
             return completeMe.friends;
+
+        //If I blocked the user unblock it
+        if (this.isBlocked(completeMe, completeUser2))
+            await this.removeBlocked(completeMe, completeUser2)
 
         const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         const idx2 = completeUser2.requestPending.findIndex((object) => { return object.userUuid === completeMe.userUuid })
@@ -111,8 +114,6 @@ export class UserService {
             throw new UserFriendRequestAlreadyPendingException();
     }
 
-    //need to remove from blocked?
-    //need to protect if I am blocked
     async becomeFriend(completeMe: user, completeUser2: user): Promise<user[]> {
         this.checkUsers(completeMe, completeUser2);
         if (this.isBlocked(completeUser2, completeMe))
@@ -160,14 +161,24 @@ export class UserService {
     }
 
 
-    //need to remove from friends
     //need to remove from request
     async addBlocked(completeMe: user, completeUser2: user): Promise<user[]> {
         this.checkUsers(completeMe, completeUser2);
 
+        //remove from friend
         if (this.isMyFriend(completeMe, completeUser2))
             await this.removeFriend(completeMe, completeUser2)
-
+        //remove from pending request
+        const idx1: number = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
+        if (idx1 >= 0)
+            completeMe.requestPending.splice(idx1);
+        //remove from me from his pending request
+        const idx2: number = completeUser2.requestPending.findIndex((object) => { return object.userUuid === completeMe.userUuid })
+        if (idx2 >= 0) {
+            completeUser2.requestPending.splice(idx2);
+            await this.UserRepository.save(completeUser2);
+        }
+        //blocked user
         completeMe.blocked.push(completeUser2);
         await this.UserRepository.save(completeMe);
         return completeMe.blocked;
