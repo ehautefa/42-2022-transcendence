@@ -42,6 +42,7 @@ export class UserController {
   }
 
   @Get('myPicture')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get my picture' })
   async getMyPicture(@Req() req, @Res() res) {
     return (of(res.sendFile(join(process.cwd(), `uploads/pp/${req.user.userUuid}.jpeg`))));
