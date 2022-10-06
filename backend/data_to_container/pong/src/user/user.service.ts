@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user } from 'src/bdd/users.entity';
 import { Repository, UpdateResult } from 'typeorm';
@@ -7,6 +7,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
 import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 import { FlipTwoFactorAuthDto } from './dto/flipTwoFactorAuyh.dto';
+import { ArgUndefinedException, FailToFindAUniqNameException, FailToFindObjectFromanEntity, FailToFindObjectFromDBException, TwoFactorAuthAlreadyDisableException, TwoFactorAuthAlreadyEnableException, UserAreAlreadyFriends, UserAreNotBlocked, UserAreNotFriends, UserFriendRequestAlreadyPendingException, UserIsBlockedException, UserIsTheSameException, UserNameAlreadyExistException } from '../exceptions/user.exception';
 
 @Injectable()
 export class UserService {
@@ -19,38 +20,30 @@ export class UserService {
         return await this.UserRepository.find({ relations: { friends: true, blocked: true } });
     }
 
-    async getAllUserUuidWithUserName() {
+    async getAllUserUuidWithUserName(): Promise<user[]> {
         return await this.UserRepository.find({ select: { userUuid: true, userName: true } });
     }
 
-    async getFriends(userUuid: string) {
-        const user = await this.getCompleteUser(userUuid);
-        if (!user)
-            return null;
-        //need to throw
-        return user.friends;
+    async getFriends(userUuid: string): Promise<user[]> {
+        if (!userUuid)
+            throw new ArgUndefinedException('userUuid')
+        return (await this.getCompleteUser(userUuid)).friends
     }
 
-    async isMyFriend(completeMe: user, completeUser2: user): Promise<boolean> {
-        // cant find user or same user
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return
-        const idx1: number = completeMe.friends.findIndex((object) => {
-            return object.userUuid === completeUser2.userUuid;
-        })
+    isMyFriend(completeMe: user, completeUser2: user): boolean {
+        this.checkUsers(completeMe, completeUser2);
+
+        const idx1: number = completeMe.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0)
             return true;
         else
             return false;
     }
 
-    async isBlocked(completeMe: user, completeUser2: user): Promise<boolean> {
-        // cant find user or same user
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return
-        const idx1: number = completeMe.blocked.findIndex((object) => {
-            return object.userUuid === completeUser2.userUuid;
-        })
+    isBlocked(completeMe: user, completeUser2: user): boolean {
+        this.checkUsers(completeMe, completeUser2);
+
+        const idx1: number = completeMe.blocked.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0)
             return true;
         else
@@ -58,61 +51,45 @@ export class UserService {
     }
 
     async acceptFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
-        // cant find user or same user
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return
+        this.checkUsers(completeMe, completeUser2);
 
-        const idx1 = completeMe.requestPending.findIndex((object) => {
-            return object.userUuid === completeUser2.userUuid;
-        })
+        const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0)
             completeMe.requestPending.splice(idx1);
         // cant find request
         else
-            return
+            throw new FailToFindObjectFromanEntity(completeUser2.userUuid, "requestPending", 'users')
         await this.becomeFriend(completeMe, completeUser2);
         return completeMe.requestPending;
     }
 
     async refuseFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
-        // cant find user or same user
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return
+        this.checkUsers(completeMe, completeUser2);
 
-        const idx1 = completeMe.requestPending.findIndex((object) => {
-            return object.userUuid === completeUser2.userUuid;
-        })
+        const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0) {
             completeMe.requestPending.splice(idx1);
-            this.UserRepository.save(completeMe);
+            await this.UserRepository.save(completeMe);
             return completeMe.requestPending;
         }
-        //no request pending
         else
-            return
+            throw new FailToFindObjectFromanEntity(completeUser2.userName, "requestPending", 'users')
     }
 
+    //unblock when makeFriend request by me
     async makeFriendRequest(completeMe: user, completeUser2: user): Promise<user[]> {
-        //unblock when makeFriend request by me
-
-        // cant find user or same user
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return
+        this.checkUsers(completeMe, completeUser2);
 
         // allready friends need to throw
         if (this.isMyFriend(completeMe, completeUser2))
-            return
+            throw new UserAreAlreadyFriends(completeMe.userName, completeUser2.userName)
 
         //ignore if I am blocked
         if (this.isBlocked(completeUser2, completeMe))
             return completeMe.friends;
 
-        const idx1 = completeMe.requestPending.findIndex((object) => {
-            return object.userUuid === completeUser2.userUuid;
-        })
-        const idx2 = completeUser2.requestPending.findIndex((object) => {
-            return object.userUuid === completeMe.userUuid;
-        })
+        const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
+        const idx2 = completeUser2.requestPending.findIndex((object) => { return object.userUuid === completeMe.userUuid })
         //symeetrical request
         if (idx1 >= 0) {
             completeMe.requestPending.splice(idx1);
@@ -123,32 +100,25 @@ export class UserService {
         // not pending?
         else if (idx2 < 0) {
             completeUser2.requestPending.push(completeMe);
-            this.UserRepository.save(completeUser2);
+            await this.UserRepository.save(completeUser2);
             return completeMe.friends;
         }
         //already in pending
         else
-            return
+            throw new UserFriendRequestAlreadyPendingException();
     }
 
     //need to remove from blocked?
+    //need to protect if I am blocked
     async becomeFriend(completeMe: user, completeUser2: user): Promise<user[]> {
-
-        //need to protect if I am blocked
-
-        // cant find user or same
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return
-        //I'm blocked by the user2, impossible
+        this.checkUsers(completeMe, completeUser2);
         if (this.isBlocked(completeUser2, completeMe))
-            return
-        //allreadyFriend need to throw
+            throw new UserIsBlockedException(completeMe.userName, completeUser2.userName);
         if (this.isMyFriend(completeMe, completeUser2) || this.isMyFriend(completeUser2, completeMe))
-            return
-
+            throw new UserAreAlreadyFriends(completeMe.userName, completeUser2.userName)
 
         if (this.isBlocked(completeMe, completeUser2))
-            this.removeBlocked(completeMe, completeUser2)
+            await this.removeBlocked(completeMe, completeUser2)
 
         completeMe.friends.push(completeUser2);
         completeUser2.friends.push(completeMe);
@@ -157,30 +127,24 @@ export class UserService {
     }
 
     async removeFriend(completeUser1: user, completeUser2: user): Promise<user[]> {
-        // cant find user
-        if (!completeUser1 || !completeUser2 || completeUser1.userUuid === completeUser2.userUuid)
-            return
+        this.checkUsers(completeUser1, completeUser2);
 
-        const idx1 = completeUser1.friends.findIndex((object) => {
-            return object.userUuid === completeUser2.userUuid;
-        })
+        const idx1 = completeUser1.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         //remove for User1
         if (idx1 >= 0)
             completeUser1.friends.splice(idx1);
         //not friend
         else
-            return
+            throw new UserAreNotFriends(completeUser1.userName, completeUser2.userName)
 
-        const idx2 = completeUser2.friends.findIndex((object) => {
-            return object.userUuid === completeUser1.userUuid;
-        })
+        const idx2 = completeUser2.friends.findIndex((object) => { return object.userUuid === completeUser1.userUuid })
         //remove for User2
         if (idx2 >= 0)
             completeUser2.friends.splice(idx2);
         //not friend
         else {
             await this.UserRepository.save(completeUser1);
-            return
+            throw new UserAreNotFriends(completeUser1.userName, completeUser2.userName)
         }
 
         await this.UserRepository.save([completeUser1, completeUser2]);
@@ -191,11 +155,10 @@ export class UserService {
     //need to remove from friends
     //need to remove from request
     async addBlocked(completeMe: user, completeUser2: user): Promise<user[]> {
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return null;
-        //need to throw
+        this.checkUsers(completeMe, completeUser2);
+
         if (this.isMyFriend(completeMe, completeUser2))
-            this.removeFriend(completeMe, completeUser2)
+            await this.removeFriend(completeMe, completeUser2)
 
         completeMe.blocked.push(completeUser2);
         await this.UserRepository.save(completeMe);
@@ -203,51 +166,62 @@ export class UserService {
     }
 
 
-    async removeBlocked(completeMe: user, completeUser2: user) {
-        // cant find user or same user
-        if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
-            return null;
+    async removeBlocked(completeMe: user, completeUser2: user): Promise<user[]> {
+        this.checkUsers(completeMe, completeUser2);
 
         const idx = completeMe.blocked.findIndex((object) => {
             return object.userUuid === completeUser2.userUuid;
         })
-        if (idx > -1) {
+        if (idx >= 0) {
             completeMe.blocked.splice(idx);
             await this.UserRepository.save(completeMe);
             return completeMe.blocked;
         }
-        return
+        else
+            throw new UserAreNotBlocked(completeMe.userName, completeUser2.userName)
     }
 
     async getUser(userUuid: string): Promise<user> {
         if (!userUuid)
-            return null;
-        //need to throw
-        return await this.UserRepository.findOne({ where: { userUuid: userUuid } });
+            throw new ArgUndefinedException('userUuid');
+        const user: user = await this.UserRepository.findOne({ where: { userUuid: userUuid } });
+        if (!user)
+            throw new FailToFindObjectFromDBException(userUuid, 'user');
+        return user;
     }
 
     async getCompleteUser(userUuid: string): Promise<user> {
-        // console.log("getCompleteUser", userUuid);
         if (!userUuid)
-            return null;
-        //need to throw
-        return await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: userUuid } });
+            throw new ArgUndefinedException('userUuid');
+        const completeUser: user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: userUuid } });
+        //need to put it?
+        // if (!completeUser)
+        // throw new FailToFindObjectFromDBException(userUuid, 'user');
+        return completeUser;
     }
 
-    async FindOrCreateUser(user42Id: string, userName: string ): Promise<user> {
+    async FindOrCreateUser(user42Id: string, userName: string): Promise<user> {
+        if (!user42Id)
+            throw new ArgUndefinedException('user42Id');
+        else if (!userName)
+            throw new ArgUndefinedException('userName');
         const user = await this.UserRepository.findOne({ where: { user42Id: user42Id } })
         if (user)
             return user;
         else {
             let numberToAdd: number = 1;
             let uniqueUserName: string = userName;
-            while (numberToAdd < 60) {
-                if (await this.UserRepository.findOne({ where: { userName: uniqueUserName } }))
-                    numberToAdd++;
-                else
-                    break
-                uniqueUserName = userName + numberToAdd;
-            }
+            while (numberToAdd < 60 && await this.UserRepository.findOne({ where: { userName: uniqueUserName } }))
+                uniqueUserName = userName + ++numberToAdd;
+            // while (numberToAdd < 60) {
+            // if (await this.UserRepository.findOne({ where: { userName: uniqueUserName } }))
+            // numberToAdd++;
+            // else
+            // break
+            // uniqueUserName = userName + numberToAdd;
+            // }
+            if (numberToAdd >= 60)
+                throw new FailToFindAUniqNameException(uniqueUserName)
 
             return await this.UserRepository.save({
                 userName: uniqueUserName,
@@ -261,10 +235,15 @@ export class UserService {
         }
     }
 
+
     async FindOrCreateUserLocal(userToFindOrCreate: string): Promise<user> {
-        let user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'local' } })
-        if (!user) {
-            user = await this.UserRepository.save({
+        if (!userToFindOrCreate)
+            throw new ArgUndefinedException('userToFindOrCreate');
+        const user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'local' } })
+        if (user)
+            return user
+        else
+            return await this.UserRepository.save({
                 userName: userToFindOrCreate,
                 user42Id: 'local',
                 requestPending: [],
@@ -273,35 +252,55 @@ export class UserService {
                 wins: 0,
                 losses: 0,
             });
-        }
+    }
+
+    async changeUserName(user: user, newName: string): Promise<user> {
+        if (!user)
+            throw new ArgUndefinedException('user');
+        if (!newName)
+            throw new ArgUndefinedException('newName');
+        if (await this.UserRepository.findOne({ where: { userName: newName } }))
+            throw new UserNameAlreadyExistException(newName)
+        user.userName = newName;
+        await this.UserRepository.save(user)
         return user;
     }
 
-    async changeUserName(user: user, newName: string): Promise<void> {
-        //need check if userName already exist
-
-        if (await this.UserRepository.findOne({ where: { userName: newName } })) {
-            console.log("Error username already exist");
-            return null;
-            //need to throw
-        }
-        await this.UserRepository.update(user.userUuid, { userName: newName });
-    }
-
     async disableTwoFactorAuth(user: user): Promise<user> {
+        if (!user)
+            throw new ArgUndefinedException('user');
+        else if (!user.twoFactorAuth)
+            throw new TwoFactorAuthAlreadyDisableException
         user.twoFactorAuth = false;
         await this.UserRepository.save(user);
         return user;
     }
 
     async enableTwoFactorAuth(user: user): Promise<user> {
+        if (!user)
+            throw new ArgUndefinedException('user');
+        else if (user.twoFactorAuth)
+            throw new TwoFactorAuthAlreadyEnableException()
         user.twoFactorAuth = true;
         await this.UserRepository.save(user);
         return user;
     }
 
-    async endOfMatch(players: EndOfMatchDto): Promise<void> {
-        await this.UserRepository.increment({ userUuid: players.loserUuid }, "losses", 1)
-        await this.UserRepository.increment({ userUuid: players.winnerUuid }, "wins", 1)
+    async endOfMatch(loserUuid: string, winnerUuid: string): Promise<void> {
+        if (!loserUuid)
+            throw new ArgUndefinedException('loserUuid');
+        if (!winnerUuid)
+            throw new ArgUndefinedException('winnerUuid');
+        await this.UserRepository.increment({ userUuid: loserUuid }, "losses", 1)
+        await this.UserRepository.increment({ userUuid: winnerUuid }, "wins", 1)
+    }
+
+    checkUsers(user1: user, user2: user): void {
+        if (!user1)
+            throw new ArgUndefinedException('user1')
+        else if (!user2)
+            throw new ArgUndefinedException('user2')
+        else if (user1.userUuid === user2.userUuid)
+            throw new UserIsTheSameException();
     }
 }
