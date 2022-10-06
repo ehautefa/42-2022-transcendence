@@ -61,6 +61,7 @@ export class UserService {
         // cant find user or same user
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return
+        console.log("acceptFriendRequest 1");
 
         const idx1 = completeMe.requestPending.findIndex((object) => {
             return object.userUuid === completeUser2.userUuid;
@@ -71,6 +72,7 @@ export class UserService {
         else
             return
         await this.becomeFriend(completeMe, completeUser2);
+        console.log("acceptFriendRequest 2", completeMe.requestPending);
         return completeMe.requestPending;
     }
 
@@ -140,14 +142,14 @@ export class UserService {
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return
         //I'm blocked by the user2, impossible
-        if (this.isBlocked(completeUser2, completeMe))
+        if (await this.isBlocked(completeUser2, completeMe))
             return
         //allreadyFriend need to throw
-        if (this.isMyFriend(completeMe, completeUser2) || this.isMyFriend(completeUser2, completeMe))
+        if (await this.isMyFriend(completeMe, completeUser2) || await this.isMyFriend(completeUser2, completeMe))
             return
 
 
-        if (this.isBlocked(completeMe, completeUser2))
+        if (await this.isBlocked(completeMe, completeUser2))
             this.removeBlocked(completeMe, completeUser2)
 
         completeMe.friends.push(completeUser2);
@@ -194,7 +196,7 @@ export class UserService {
         if (!completeMe || !completeUser2 || completeMe.userUuid === completeUser2.userUuid)
             return null;
         //need to throw
-        if (this.isMyFriend(completeMe, completeUser2))
+        if (await this.isMyFriend(completeMe, completeUser2))
             this.removeFriend(completeMe, completeUser2)
 
         completeMe.blocked.push(completeUser2);
