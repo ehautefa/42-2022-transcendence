@@ -1,16 +1,18 @@
-import { Body, Controller, Get, Inject, Param, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user } from 'src/bdd/users.entity';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
-import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
 import { StatusGateway } from 'src/status/status.gateway';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
-
-//removeFriend
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { of } from 'rxjs';
+import { join } from 'path';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -20,6 +22,31 @@ export class UserController {
 
   @Inject(StatusGateway)
   private readonly StatusGateway: StatusGateway;
+
+  @Post('uploadPicture')
+  @ApiOperation({ summary: 'Upload picture' })
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file',
+    {
+      storage: diskStorage({
+        destination: './uploads/pp',
+        filename: (req, file, cb) => {
+          const filename: string = req.user.userUuid;
+          cb(null, `${filename}.jpeg`);
+        }})
+    }))
+  uploadPicture(@UploadedFile(
+    new ParseFilePipe({validators: [ new MaxFileSizeValidator({ maxSize: 1000 }), new FileTypeValidator({ fileType: 'jpeg' }),],}),
+  ) file: any, @Req() req) {
+    console.log("uploadPicture", file);
+  }
+
+  @Get('myPicture')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my picture' })
+  async getMyPicture(@Req() req, @Res() res) {
+    return (of(res.sendFile(join(process.cwd(), `uploads/pp/${req.user.userUuid}.jpeg`))));
+  }
 
   @Get('all')
   @ApiOperation({ summary: 'Get all user of the table' })
@@ -55,7 +82,6 @@ export class UserController {
   @ApiOperation({ summary: 'Get myFriends (from cookie)' })
   @UseGuards(JwtAuthGuard)
   async getMyRequests(@Req() req, @Res() res) {
-    console.log("getMyRequests", req.user.requestPending);
     res.send(req.user.requestPending);
   }
 
@@ -108,7 +134,7 @@ export class UserController {
   @UsePipes(ValidationPipe)
   async acceptFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     console.log("acceptFriendRequest", userToHandle);
-    res.send( await this.UserService.acceptFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid)));
+    res.send(await this.UserService.acceptFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid)));
   }
 
   @Post('refuseFriendRequest')
@@ -117,7 +143,7 @@ export class UserController {
   @UsePipes(ValidationPipe)
   async refuseFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
     console.log("refuseFriendRequest", userToHandle);
-    res.send( await this.UserService.refuseFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid)));
+    res.send(await this.UserService.refuseFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid)));
   }
 
   @Post('removeFriend')
@@ -125,7 +151,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-    const ret : user[] = await this.UserService.removeFriend(req.user, await this.getCompleteUser(userToHandle.userUuid))
+    const ret: user[] = await this.UserService.removeFriend(req.user, await this.getCompleteUser(userToHandle.userUuid))
     // return res.status(404).send("User not found");
     const sendAlert: SendAlertDto = {
       userUuid: userToHandle.userUuid,
@@ -185,7 +211,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async endOfMatch(@Body() players: EndOfMatchDto): Promise<void> {
-    return await this.UserService.endOfMatch(players);
+    return await this.UserService.endOfMatch(players.loserUuid, players.winnerUuid);
   }
 
 

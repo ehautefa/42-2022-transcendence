@@ -2,12 +2,11 @@ import NavBar from "../../components/NavBar/NavBar"
 import "../myProfile/Profil.css";
 import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { addFriend, removeFriend } from "../allPlayers/request";
+import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends } from "./request";
 
-var update = true;
 
 function Profile() {
 
@@ -21,21 +20,46 @@ function Profile() {
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
 	const [isMyFriend, setIsMyFriend] = useState(false);
-	fetchUser();
+	const [isBlocked, setIsBlocked] = useState(false);
+	const [invitationSent, setInvitationSent] = useState(false);
+	
+	async function fetchUser(uid: string) {
+		const user = await FetchUser(uid);
+		const matchHistory = await GetMatchHistory(uid);
+		const friends = await getFriends(user.userUuid);
+		const isFriend = await isMyFriends(user.userUuid);
+		setMatchHistory(matchHistory);
+		setUser(user);
+		setFriends(friends);
+		setIsMyFriend(isFriend);
+	}
+	
+	useEffect(() => {
+		if (uid)
+			fetchUser(uid);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
-	async function fetchUser() {
-		if (uid && update) {
-			const user = await FetchUser(uid);
-			const matchHistory = await GetMatchHistory(uid);
-			const friends = await getFriends(user.userUuid);
-			// const isFriend = await isMyFriends(user.userUuid);
-			setMatchHistory(matchHistory);
-			setUser(user);
-			setFriends(friends);
-			// setIsMyFriend(isMyFriend);
-			update = false;
+	async function handleBlock(userUuid: string, block: boolean) {
+		if (block) {
+			addBlocked(userUuid);
+			setIsBlocked(true);
+		} else {
+			removeBlocked(userUuid);
+			setIsBlocked(false);
 		}
 	}
+
+	async function handleFriend(userUuid: string, friend: boolean) {
+		if (friend) {
+			setInvitationSent(true);
+			addFriend(userUuid);
+		} else {
+			removeFriend(userUuid);
+			setIsMyFriend(false);
+		}
+	}
+
 
 	return (<>
 		<NavBar />
@@ -53,8 +77,16 @@ function Profile() {
 					</ul>
 					{
 						isMyFriend ?
-						<button className="enable" onClick={() => removeFriend(user.userUuid)}>Remove from friends</button>
-						: <button className="enable" onClick={() => addFriend(user.userUuid)}>Add in friends</button>
+							<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
+							: ( invitationSent ?
+							<button className="enable unclickable">Invitation sent</button>
+							: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
+							)
+						}
+					{
+						isBlocked ?
+						<button className="enable" onClick={() => handleBlock(user.userUuid, false)}>Unblock</button>
+						: <button className="enable" onClick={() => handleBlock(user.userUuid, true)}>Block</button>
 					}
 				</div>
 				<div className="ppFriends">
@@ -95,9 +127,9 @@ function Profile() {
 							{matchHistory.map((match: any) => {
 								return (<tr key={match.matchId}>
 									<td>{match.matchId}</td>
-									<td>{uid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
-									<td>{uid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
+									<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
 								</tr>);
 							})}
 						</tbody>
