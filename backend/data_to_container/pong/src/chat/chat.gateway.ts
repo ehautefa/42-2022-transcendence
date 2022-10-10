@@ -52,7 +52,7 @@ export class ChatGateway {
     @Req() req,
   ): Promise<Room> {
     this.logger.log('Here creating a room');
-    console.log(createRoomDto);
+    // console.log(createRoomDto);
     const newRoom = await this.chatService.createRoom(createRoomDto, req.user);
     return newRoom;
   }
@@ -73,8 +73,8 @@ export class ChatGateway {
     @MessageBody() joinDMRoomDto: JoinDMRoomDto,
     @Req() req,
   ): Promise<Room> {
-    this.logger.log(req);
-    console.log(req);
+    // this.logger.log(req);
+    // console.log(req);
     const room: Room = await this.chatService.joinDMRoom(
       req.user.userUuid,
       joinDMRoomDto.recipientId,

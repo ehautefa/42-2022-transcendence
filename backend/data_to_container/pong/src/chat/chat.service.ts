@@ -118,11 +118,16 @@ export class ChatService {
   async getAllMessagesInRoom(roomId: string): Promise<Message[]> {
     console.log('roomId = ', roomId);
     try {
-      const messages: Message[] = await this.messagesRepository
-        .createQueryBuilder('msg')
-        .leftJoinAndSelect('msg.room', 'room')
-        .where('room.id = :roomId', { roomId })
-        .getRawMany();
+      const messages: Message[] = await this.messagesRepository.find({
+        relations: { room: true },
+        where: {
+          room: { id: roomId },
+        },
+      });
+      // .createQueryBuilder('msg')
+      // .leftJoinAndSelect('msg.room', 'room')
+      // .where('room.id = :roomId', { roomId })
+      // .getRawMany();
       return messages;
     } catch (error) {
       throw error;
@@ -194,7 +199,7 @@ export class ChatService {
     }
   }
 
-  async isAdmin(userId: string, roomId: string): boolean {
+  async isAdmin(userId: string, roomId: string): Promise<boolean> {
     try {
       const room: Room = await this.getRoomById(roomId);
       room.admin.forEach((adm) => {
@@ -206,7 +211,7 @@ export class ChatService {
     }
   }
 
-  async isOwner(userId: string, roomId: string): boolean {
+  async isOwner(userId: string, roomId: string): Promise<boolean> {
     try {
       const room: Room = await this.getRoomById(roomId);
       return room.owner.userUuid === userId;
