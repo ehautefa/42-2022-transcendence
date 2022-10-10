@@ -7,7 +7,8 @@
 	height: 80vh;
 	margin: auto;
 	background-color: rgba(0, 0, 0, 0.5);
-	box-shadow: 5px 5px 10px #000;
+	box-shadow: 0px 0px 20px #7C4D84;
+	border: 2px solid #DBACE3;
 	border-radius: 5px;
 	overflow-y: scroll;
 }
@@ -16,20 +17,10 @@
 	width: 100%;
 }
 
-.allPlayers table thead {
-	border-bottom: 1px solid #DBACE3;
-	box-shadow: 1px 0px 5px #7C4D84;
-}
-
-.allPlayers table thead th {
-	padding: 10px;
-	font-size: large;
-}
-
 .allPlayers tbody tr {
 	width: 100%;
 	text-align: center;
-	padding: 10px 0;
+	margin: 30px;
 	border-bottom: 1px solid #DBACE3;
 	box-shadow: 1px 0px 5px #7C4D84;
 }
@@ -52,17 +43,10 @@
 }
 
 .allPlayers tbody .pp {
-	width: 40px;
-	height: 40px;
-	margin: 20px;
+	width: 60px;
+	height: 60px;
 	border-radius: 50%;
 	background-image: url(../../../public/default_avatar.png);
 	background-size: cover;
 
-}
-
-.allPlayers .unclickable {
-	border: none;
-	box-shadow: none;
-	font-style: italic;
 }

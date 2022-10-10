@@ -11,7 +11,7 @@ import { UserService } from 'src/user/user.service';
 @Injectable()
 export class MatchService {
 	@Inject(UserService)
-	private readonly userService : UserService;
+	private readonly userService: UserService;
 	constructor(
 		@InjectRepository(match) private MatchRepository: Repository<match>,
 	) { }
@@ -24,7 +24,7 @@ export class MatchService {
 			},
 		});
 	}
-	
+
 	async getMatch(matchId: string): Promise<match> {
 		return await this.MatchRepository.findOne({ where: { matchId: matchId } });
 	}
@@ -36,8 +36,8 @@ export class MatchService {
 				user2: true
 			},
 			where: [
-				{user1: {userName: userName}},
-				{user2: {userName: userName}}
+				{ user1: { userName: userName } },
+				{ user2: { userName: userName } }
 			]
 		});
 	}
@@ -55,13 +55,10 @@ export class MatchService {
 
 	async endOfMatch(saveScore: SaveScoreDto): Promise<void> {
 		console.log("END OF MATCH", saveScore);
-		if (saveScore.score1 > saveScore.score2) {
-			await this.userService.endOfMatch(
-				{winnerUuid : saveScore.player1Uuid, loserUuid : saveScore.player2Uuid})
-		} else {
-			await this.userService.endOfMatch(
-				{winnerUuid : saveScore.player2Uuid, loserUuid : saveScore.player1Uuid})
-		}
+		if (saveScore.score1 > saveScore.score2)
+			await this.userService.endOfMatch(saveScore.player2Uuid, saveScore.player1Uuid)
+		else
+			await this.userService.endOfMatch(saveScore.player1Uuid, saveScore.player2Uuid)
 		await this.MatchRepository.increment({ matchId: saveScore.matchId }, "score1", saveScore.score1);
 		await this.MatchRepository.increment({ matchId: saveScore.matchId }, "score2", saveScore.score2);
 	}

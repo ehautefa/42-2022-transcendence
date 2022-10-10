@@ -2,17 +2,17 @@ var credentials: RequestCredentials = "include";
 
 export async function getMe() {
 
-    var myHeaders = new Headers();
+	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
 	var url: string = process.env.REACT_APP_BACK_URL + "/user/me";
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
-        credentials: credentials,
+		credentials: credentials,
 	};
 
-	let user =  await (await fetch(url, requestOptions)).json()
+	let user = await (await fetch(url, requestOptions)).json()
 	if (user.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
@@ -20,7 +20,7 @@ export async function getMe() {
 }
 
 export async function GetMatchHistory(userName: string) {
-	var url: string = process.env.REACT_APP_BACK_URL +  "/match/user/" + userName;
+	var url: string = process.env.REACT_APP_BACK_URL + "/match/user/" + userName;
 	var requestOptions = {
 		method: 'GET',
 		credentials: credentials
@@ -33,20 +33,20 @@ export async function GetMatchHistory(userName: string) {
 	return await match;
 }
 
-export async  function ChangeUsername(newName: string) {
+export async function ChangeUsername(newName: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("newName", newName);
-	
+
 	const requestOptions = {
 		method: 'POST',
 		headers: myHeaders,
 		body: urlencoded,
-        credentials: credentials
+		credentials: credentials
 	};
-	
+
 	const URL = process.env.REACT_APP_BACK_URL + "/user/changeUsername";
 	let result = await fetch(URL, requestOptions);
 	console.log(result);
@@ -92,10 +92,33 @@ export async function getMyFriends() {
 		credentials: credentials
 	};
 
-	let friends = await( await fetch(url, requestOptions)).json();
-	console.log("FRIENDS", friends);
+	let friends = await (await fetch(url, requestOptions)).json();
 	if (friends.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await friends;
+}
+
+export async function getMyPicture(): Promise<string> {
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/myPicture";
+	var requestOptions = {
+		method: 'GET',
+		credentials: credentials
+	};
+
+	// let picture = await fetch(url, requestOptions);
+	// const imageBlob = await Response.blob();
+	// const imageUrl: string = URL.createObjectURL(imageBlob);
+
+	let picture = await fetch(url, requestOptions)
+		.then((response) => response.blob())
+		.then((myBlob) => {
+			const objectURL = URL.createObjectURL(myBlob);
+			return objectURL;
+		});
+
+	// if (picture.statusCode === 401) {
+	// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	// }
+	return picture;
 }

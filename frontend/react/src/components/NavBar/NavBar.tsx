@@ -12,7 +12,6 @@ function NavBar() {
 	useEffect(() => {
 		getMyRequests().then(
 			(response) => {
-				console.log("RESPONSE", response.length)
 				setIsBellExpanded(response.length > 0)
 			}
 		)
