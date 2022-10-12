@@ -1,4 +1,11 @@
-import { Logger, Req, UseGuards } from '@nestjs/common';
+import {
+  Logger,
+  Req,
+  UseFilters,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import {
   MessageBody,
   SubscribeMessage,
@@ -13,7 +20,9 @@ import { user } from 'src/bdd/users.entity';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
+import { FindAllMessagesInRoomDto } from './dto/findAllMessagesInRoom.dto';
 import { JoinDMRoomDto } from './dto/joinDMRoom.dto';
+import { WsExceptionFilter } from './ws-exception.filter';
 
 // Not sure if this is going to be usefull to me ...
 /*
@@ -23,6 +32,9 @@ const URL_BACK: string =
     : process.env.REACT_APP_BACK_URL;
 */
 
+@UseGuards(JwtAuthGuard)
+@UseFilters(WsExceptionFilter)
+@UsePipes(ValidationPipe)
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
 // implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 export class ChatGateway {
@@ -45,7 +57,6 @@ export class ChatGateway {
   }
 
   // Create a room in the room table
-  @UseGuards(JwtAuthGuard)
   @SubscribeMessage('createRoom')
   async createRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
@@ -58,7 +69,6 @@ export class ChatGateway {
   }
 
   // Join a room previously created and return it
-  @UseGuards(JwtAuthGuard)
   @SubscribeMessage('joinRoom')
   async joinRoom(roomName: string) {
     const room: Room = await this.chatService.getRoomByName(roomName);
@@ -68,7 +78,6 @@ export class ChatGateway {
 
   // Join a DM room (create it if the room does not exist yet)
   @SubscribeMessage('joinDMRoom')
-  @UseGuards(JwtAuthGuard)
   async joinDMRoom(
     @MessageBody() joinDMRoomDto: JoinDMRoomDto,
     @Req() req,
@@ -82,11 +91,16 @@ export class ChatGateway {
     return room;
   }
 
-  @SubscribeMessage('getAllMessagesInRoom')
-  async getAllMessagesInRoom(roomId: string): Promise<Message[]> {
-    this.logger.log('Getting messages of room ', roomId);
-    const messages: Message[] = await this.chatService.getAllMessagesInRoom(
-      roomId,
+  @SubscribeMessage('findAllMessagesInRoom')
+  async findAllMessagesInRoom(
+    findAllMessagesInRoomDto: FindAllMessagesInRoomDto,
+  ): Promise<Message[]> {
+    this.logger.log(
+      'Getting messages of room ',
+      findAllMessagesInRoomDto.roomId,
+    );
+    const messages: Message[] = await this.chatService.findAllMessagesInRoom(
+      findAllMessagesInRoomDto.roomId,
     );
     return messages;
   }

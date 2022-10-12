@@ -5,6 +5,7 @@ export class CreateMessageDto {
   @IsUUID()
   senderId: string;
 
+  @IsNotEmpty()
   message: string;
 
   @IsNotEmpty()
