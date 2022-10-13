@@ -21,10 +21,6 @@ export class user extends BaseEntity {
     @Column('boolean')
     online: boolean;
 
-    @ApiProperty({ example: 'false', description: 'The two factor authentication boolean'})
-    @Column('boolean')
-    twoFactorAuth: boolean;
-
     @ApiProperty({ example: '0', description: 'The number of win of the user'})
     @Column('smallint')
     wins: number;
@@ -47,6 +43,14 @@ export class user extends BaseEntity {
     @ManyToMany(() => user, usr => usr.userUuid)
     @JoinTable()
     blocked: user[];
+
+    @ApiProperty({ example: 'false', description: 'The two factor authentication boolean'})
+    @Column('boolean')
+    twoFactorAuth: boolean;
+
+    @ApiProperty({ example: 'fgdldsfggfdgdg;dkg;djhgjdfg;d;g', description: 'secret for 2fa'})
+    @Column('varchar')
+    twoFactorAuthenticationSecret: string
 
     // match_history
 

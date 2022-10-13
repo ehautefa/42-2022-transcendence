@@ -1,4 +1,4 @@
-import { Controller, Request, Post, UseGuards, Get, Req, Param, UsePipes, ValidationPipe, Body, Res, ConsoleLogger, Head, Headers, createParamDecorator } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Get, Req, Param, UsePipes, ValidationPipe, Body, Res, ConsoleLogger, Head, Headers, createParamDecorator, UnauthorizedException, HttpCode, Response } from '@nestjs/common';
 import { FortyTwoAuthGuard } from './guards/fortyTwoAuth.gards';
 import { AuthService } from './auth.service';
 import { FirstConnectionDto } from './dto/firstConnection.dto';
@@ -14,7 +14,8 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthController {
     constructor(
         private readonly jwtService: JwtService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly authService: AuthService,
     ) { }
 
     @Get('localLogin/:userName')
@@ -51,24 +52,47 @@ export class AuthController {
         return "fsdfsd"
     }
 
-    // @UsePipes(ValidationPipe)
-    // @Post('firstConnection')
-    // firstConnection(@Body() data: FirstConnectionDto) {
-    // return this.authService.firstConnection(data);
-    // }
+    
+    @Post('2fa/generate')
+  @UseGuards(JwtAuthGuard)
+  async register(@Response() response, @Request() request) {
+    const { otpauthUrl } =
+      await this.authService.generateTwoFactorAuthenticationSecret(
+        request.user,
+      );
 
-    // @Get('test')
-    // test(@Req() req) {
-    // console.log(req.headers.cookie);
-    // return "test";
-    // }
-    // 
+    return response.json(
+      await this.authService.generateQrCodeDataURL(otpauthUrl),
+    );
+  }
 
-    // @UseGuards(LocalAuthGuard)
-    // @Post('login')
-    // login(@Request() req) : any
-    // {
-    // return this.authService.login(req.user);
-    // }
+    @Post('2fa/turn-on')
+    @UseGuards(JwtAuthGuard)
+    async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+        const isCodeValid =
+            this.authService.isTwoFactorAuthenticationCodeValid(
+                body.twoFactorAuthenticationCode,
+                request.user,
+            );
+        if (!isCodeValid) {
+            throw new UnauthorizedException('Wrong authentication code');
+        }
+        await this.userService.enableTwoFactorAuth(request.user);
+    }
 
+    @Post('2fa/authenticate')
+    @HttpCode(200)
+    @UseGuards(JwtAuthGuard)
+    async authenticate(@Request() request, @Body() body) {
+        const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+            body.twoFactorAuthenticationCode,
+            request.user,
+        );
+
+        if (!isCodeValid) {
+            throw new UnauthorizedException('Wrong authentication code');
+        }
+
+        return this.authService.loginWith2fa(request.user);
+    }
 }
