@@ -11,8 +11,10 @@ import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
-import { of } from 'rxjs';
 import { join } from 'path';
+
+//import fs
+import * as fs from 'fs';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -45,7 +47,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get my picture' })
   async getMyPicture(@Req() req, @Res() res) {
-    return (of(res.sendFile(join(process.cwd(), `uploads/pp/${req.user.userUuid}.jpeg`))));
+	const path : string = join(process.cwd(), `uploads/pp/${req.user.userUuid}.jpeg`);
+	if (fs.existsSync(path)) {
+		console.log("getMyPicture", path);
+		res.sendFile(path);
+	} else {
+		res.sendFile(join(process.cwd(), `uploads/pp/default_avatar.png`));
+	} 
+
   }
 
   @Get('all')
