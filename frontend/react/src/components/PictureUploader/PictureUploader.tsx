@@ -1,4 +1,5 @@
 import React from "react";
+import "./PictureUploader.css"
 
 type MyState = {
     picture: any;
@@ -27,11 +28,15 @@ export default class PictureUploader extends React.Component<{}, MyState>{
     renderPreview() {
         if (this.state.src !== "") {
             return (
-                <img src={this.state.src} alt="Preview of your avatar" />
+				<div className="preview">
+                	<img src={this.state.src} alt="Preview of your avatar" />
+				</div>
             );
         } else {
             return (
-                <div>No preview</div>
+                <div className="preview">
+					No preview available
+				</div>
             );
         }
     }
