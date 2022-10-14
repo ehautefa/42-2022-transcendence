@@ -76,9 +76,11 @@ function MyProfile() {
 						<button className="enable" onClick={switch2FA}>Disable two-factor authentication</button>
 					}
 				</div>
-				<a href="./myProfile/editProfilePicture">
+				<a className="pp-containers" href="./myProfile/editProfilePicture">
 					<div className="pp">
 						<img src={pp} alt={"Avatar of " + user.userName} />
+					</div>
+					<div className="pphover">Edit
 					</div>
 				</a>
 			</div>
