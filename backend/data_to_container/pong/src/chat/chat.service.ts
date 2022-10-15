@@ -28,8 +28,8 @@ export class ChatService {
    */
 
   async createMessage(createMessageDto: CreateMessageDto) {
-    this.logger.log('Creating a message');
-    this.logger.log(createMessageDto);
+    // this.logger.log('Creating a message');
+    // this.logger.log(createMessageDto);
     const room = await this.roomsRepository.findOneOrFail({
       where: { id: createMessageDto.roomId },
     });

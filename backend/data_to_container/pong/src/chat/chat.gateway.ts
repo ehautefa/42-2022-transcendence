@@ -17,12 +17,12 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { Message } from 'src/bdd/message.entity';
 import { Room } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
+import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { FindAllMessagesInRoomDto } from './dto/findAllMessagesInRoom.dto';
 import { JoinDMRoomDto } from './dto/joinDMRoom.dto';
-import { WsExceptionFilter } from './ws-exception.filter';
 
 // Not sure if this is going to be usefull to me ...
 /*
@@ -33,8 +33,13 @@ const URL_BACK: string =
 */
 
 @UseGuards(JwtAuthGuard)
-@UseFilters(WsExceptionFilter)
-@UsePipes(ValidationPipe)
+@UseFilters(ChatExceptionFilter)
+@UsePipes(
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }),
+)
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
 // implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 export class ChatGateway {
@@ -60,17 +65,17 @@ export class ChatGateway {
   @SubscribeMessage('createRoom')
   async createRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
-    @Req() req,
+    @Req() { user }: { user: user },
   ): Promise<Room> {
     this.logger.log('Here creating a room');
-    // console.log(createRoomDto);
-    const newRoom = await this.chatService.createRoom(createRoomDto, req.user);
+    const newRoom = await this.chatService.createRoom(createRoomDto, user);
     return newRoom;
   }
 
   // Join a room previously created and return it
   @SubscribeMessage('joinRoom')
   async joinRoom(roomName: string) {
+    this.logger.log('Joining a room');
     const room: Room = await this.chatService.getRoomByName(roomName);
     this.server.socketsJoin(roomName);
     return room;
@@ -82,8 +87,8 @@ export class ChatGateway {
     @MessageBody() joinDMRoomDto: JoinDMRoomDto,
     @Req() req,
   ): Promise<Room> {
-    // this.logger.log(req);
-    // console.log(req);
+    this.logger.log('req');
+    console.log(req);
     const room: Room = await this.chatService.joinDMRoom(
       req.user.userUuid,
       joinDMRoomDto.recipientId,
