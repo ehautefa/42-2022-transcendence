@@ -235,7 +235,7 @@ export class UserController {
 			console.log("getMyPicture", path);
 			res.sendFile(path);
 		} else {
-			res.sendFile(join(process.cwd(), `uploads/pp/default_avatar.png`));
+			res.sendFile(join(process.cwd(), `uploads/default_avatar.png`));
 		}
 	}
 
@@ -256,7 +256,7 @@ export class UserController {
 		if (fs.existsSync(path)) {
 			res.sendFile(path);
 		} else {
-			res.sendFile(join(process.cwd(), `uploads/pp/default_avatar.png`));
+			res.sendFile(join(process.cwd(), `uploads/default_avatar.png`));
 		}
 	}
 
