@@ -98,27 +98,3 @@ export async function getMyFriends() {
 	}
 	return await friends;
 }
-
-export async function getMyPicture(): Promise<string> {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/myPicture";
-	var requestOptions = {
-		method: 'GET',
-		credentials: credentials
-	};
-
-	// let picture = await fetch(url, requestOptions);
-	// const imageBlob = await Response.blob();
-	// const imageUrl: string = URL.createObjectURL(imageBlob);
-
-	let picture = await fetch(url, requestOptions)
-		.then((response) => response.blob())
-		.then((myBlob) => {
-			const objectURL = URL.createObjectURL(myBlob);
-			return objectURL;
-		});
-
-	// if (picture.statusCode === 401) {
-	// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	// }
-	return picture;
-}
