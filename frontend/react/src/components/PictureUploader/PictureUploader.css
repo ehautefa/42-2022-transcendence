@@ -18,8 +18,8 @@
 	border: 2px solid #fef45b;
 }
 
-.pictureUploader input {
-	/* background-color: #7C4D84; */
+.pictureUploader input button {
+	background-color: #7C4D84;
 }
 
 .pictureUploader .preview  img {

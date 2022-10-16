@@ -35,7 +35,6 @@ export default class PictureUploader extends React.Component<{}, MyState>{
         } else {
             return (
                 <div className="preview">
-					No preview available
 				</div>
             );
         }
@@ -58,9 +57,8 @@ export default class PictureUploader extends React.Component<{}, MyState>{
         if (result.statusCode === 401) {
             window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
         }
+		window.location.replace(process.env.REACT_APP_FRONT_URL + "/myProfile");
     }
-
-
 
     render() {
         return (
