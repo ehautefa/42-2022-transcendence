@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, enableTwoFactorAuth, getMyPicture } from "./request"
+import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, enableTwoFactorAuth } from "./request"
 import { User } from "../../type";
 import { useEffect, useState } from "react";
 import { getSocketStatus } from "../../App";
@@ -19,14 +19,11 @@ function MyProfile() {
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
-	const [pp, setPp] = useState("");
 
 	async function fetchUser() {
 		const user = await getMe();
 		const matchHistory = await GetMatchHistory(user.userName);
 		const friends = await getMyFriends();
-		const pp = await getMyPicture();
-		setPp(pp);
 		setFriends(friends);
 		socketStatus.emit('getFriendsStatus', friends, (data: any) => {
 			setFriends(data);
@@ -78,7 +75,7 @@ function MyProfile() {
 				</div>
 				<a className="pp-containers" href="./myProfile/editProfilePicture">
 					<div className="pp">
-						<img src={pp} alt={"Avatar of " + user.userName} />
+						<img src={process.env.REACT_APP_BACK_URL + "/user/myPicture"} alt={"Avatar of " + user.userName} />
 					</div>
 					<div className="pphover">Edit
 					</div>
