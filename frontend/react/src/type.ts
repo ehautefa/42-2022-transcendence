@@ -25,3 +25,9 @@ export interface GameWindowState {
 	isGameOver: boolean,
 	begin: boolean,
 }
+
+export type Players = {
+	userUuid: string;
+	userName: string;
+	online: boolean;
+}

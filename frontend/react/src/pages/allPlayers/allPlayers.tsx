@@ -4,24 +4,19 @@ import "./allPlayers.css";
 import { addFriend, removeFriend, getMyBlocked, addBlocked, removeBlocked } from "./request";
 import NavBar from "../../components/NavBar/NavBar";
 import { getSocketStatus } from "../../App";
+import { Players } from "../../type"
 import { getMyFriends } from "../myProfile/request";
 import { getMe } from "../myProfile/request";
 
 const socketStatus = getSocketStatus();
 
-type players = {
-	userUuid: string;
-	userName: string;
-	online: boolean;
-}
-
 function AllPlayers() {
-	const emptyUser : players[] = [];
-	const emptyInvites : string[] = [];
+	const emptyUser: Players[] = [];
+	const emptyInvites: string[] = [];
 	const [users, setUsers] = useState([]);
 	const [friends, setFriends] = useState(emptyUser);
 	const [blocked, setBlocked] = useState(emptyUser);
-	const [me, setMe] = useState({userUuid: "", userName: ""});
+	const [me, setMe] = useState({ userUuid: "", userName: "" });
 	const [invitationSent, setInvitationSent] = useState(emptyInvites);
 
 	async function fetchPlayers() {
@@ -93,29 +88,31 @@ function AllPlayers() {
 		<div className="allPlayers">
 			<table>
 				<tbody>
-					{users.map((user: players) => {
+					{users.map((user: Players) => {
 						if (user.userUuid === me.userUuid)
 							return (<></>);
-						return(<tr key={user.userUuid}>
+						return (<tr key={user.userUuid}>
 							<td className="pp">
+								<img src={process.env.REACT_APP_BACK_URL + "/user/picture/" + user.userUuid} alt={"Avatar of " + user.userName} />
 							</td>
 							<td><a href={"./profile?uid=" + user.userUuid}>{user.userName}</a></td>
 							<td>{user.online ? <p>Online</p> : <p>Offline</p>}</td>
 							<td>{
 								isMyFriend(user.userUuid) ?
-									<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
-									: ( invitationIsSent(user.userUuid) ?
-									<button className="enable unclickable">Invitation sent</button>
-									: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
+									<button className="enable" onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
+									: (invitationIsSent(user.userUuid) ?
+										<button className="enable unclickable">Invitation sent</button>
+										: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
 									)
-								}</td>
+							}</td>
 							<td>{
 								isBlocked(user.userUuid) ?
 									<button className="enable" onClick={() => handleBlock(user.userUuid, false)}>Unblock</button>
 									: <button className="enable" onClick={() => handleBlock(user.userUuid, true)}> Block </button>
 							}</td>
 						</tr>
-					)})}
+						)
+					})}
 				</tbody>
 			</table>
 		</div>

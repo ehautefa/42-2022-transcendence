@@ -202,16 +202,7 @@ export class UserController {
 	}
 
 
-	@Get('/:userUid')
-	@ApiOperation({ summary: 'Get user by userUid' })
-	@ApiResponse({ status: 200, description: 'Found user by uid', type: user })
-	@UseGuards(JwtAuthGuard)
-	@UsePipes(ValidationPipe)
-	async getCompleteUser(@Param('userUid') userUid: string): Promise<user> {
-		//   console.log("getCompleteUser conrtoller", userUid)
-		return await this.UserService.getCompleteUser(userUid);
-	}
-
+	
 	/*******************************/
 	/**      PROFILE PICTURE      **/
 	/*******************************/
@@ -248,16 +239,34 @@ export class UserController {
 		}
 	}
 
-	@Get('picture/:userUid')
+	@Get('allPictures')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: 'Get all pictures' })
+	async getAllPictures(@Req() req, @Res() res) {
+		// TO DO
+
+	}
+
+	
+	@Get('picture/:userUuid')
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get picture of user' })
-	async getPicture(@Req() req, @Res() res, @Param('userUuid') userUid: string) {
-		const path: string = join(process.cwd(), `uploads/pp/${userUid}.jpeg`);
+	async getPicture(@Res() res, @Param('userUuid') userUuid: string) {
+		const path: string = join(process.cwd(), `uploads/pp/${userUuid}.jpeg`);
 		if (fs.existsSync(path)) {
-			console.log("getPicture", path);
 			res.sendFile(path);
 		} else {
 			res.sendFile(join(process.cwd(), `uploads/pp/default_avatar.png`));
 		}
+	}
+
+	@Get('/:userUid')
+	@ApiOperation({ summary: 'Get user by userUid' })
+	@ApiResponse({ status: 200, description: 'Found user by uid', type: user })
+	@UseGuards(JwtAuthGuard)
+	@UsePipes(ValidationPipe)
+	async getCompleteUser(@Param('userUid') userUid: string): Promise<user> {
+		//   console.log("getCompleteUser conrtoller", userUid)
+		return await this.UserService.getCompleteUser(userUid);
 	}
 }
