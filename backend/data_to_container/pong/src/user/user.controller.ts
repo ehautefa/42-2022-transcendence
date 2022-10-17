@@ -252,6 +252,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'Get picture of user' })
 	async getPicture(@Res() res, @Param('userUuid') userUuid: string) {
+		console.log("getPicture", userUuid);
 		const path: string = join(process.cwd(), `uploads/pp/${userUuid}.jpeg`);
 		if (fs.existsSync(path)) {
 			res.sendFile(path);

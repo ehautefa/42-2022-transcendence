@@ -16,6 +16,15 @@
 	padding: auto;
 }
 
+.mainComposantProfile .ppFriends img {
+	width: 80%;
+	margin: 0 10%;
+	border-radius: 500px;
+	box-shadow: 5px 5px 10px #000;
+	border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+}
+
 .mainComposantProfile .container {
 	background-color: rgba(0, 0, 0, 0.5);
 	box-shadow: 5px 5px 10px #000;
@@ -184,6 +193,19 @@
 	.mainComposantProfile .pphover:hover  {
 		opacity: 0.7;
 		transition: 0.5s;
+	}
+
+	.mainComposantProfile .ppFriends {
+		/* background-color: #FA0197; */
+		margin: 10px;
+		padding: 0;
+	}
+
+	.mainComposantProfile .ppFriends img {
+		width: 100%;
+		max-width: 300px;
+		max-height: 300px;
+		margin: 0;
 	}
 
 
