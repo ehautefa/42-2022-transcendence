@@ -7,7 +7,6 @@ import { useLocation } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends } from "./request";
 
-
 function Profile() {
 
 	// get user uid in url
@@ -18,19 +17,19 @@ function Profile() {
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
 	const [matchHistory, setMatchHistory] = useState([]);
-	const [friends, setFriends] = useState([]);
 	const [isMyFriend, setIsMyFriend] = useState(false);
+	const [friends, setFriends] = useState([]);
 	const [isBlocked, setIsBlocked] = useState(false);
 	const [invitationSent, setInvitationSent] = useState(false);
 	
 	async function fetchUser(uid: string) {
 		const user = await FetchUser(uid);
-		const matchHistory = await GetMatchHistory(uid);
-		const friends = await getFriends(user.userUuid);
-		const isFriend = await isMyFriends(user.userUuid);
-		setMatchHistory(matchHistory);
 		setUser(user);
+		const matchHistory = await GetMatchHistory(user.userName);
+		setMatchHistory(matchHistory);
+		const friends = await getFriends(user.userUuid);
 		setFriends(friends);
+		const isFriend = await isMyFriends(user.userUuid);
 		setIsMyFriend(isFriend);
 	}
 	
@@ -90,6 +89,7 @@ function Profile() {
 					}
 				</div>
 				<div className="ppFriends">
+					<img src={process.env.REACT_APP_BACK_URL + "/user/picture/" + user.userUuid} alt={"Avatar of " + user.userName} />
 				</div>
 			</div>
 			<div className="flex">
@@ -117,7 +117,6 @@ function Profile() {
 					<table>
 						<thead>
 							<tr>
-								<th>ID</th>
 								<th>Other Player</th>
 								<th>My Score</th>
 								<th>Other Score</th>
@@ -126,7 +125,6 @@ function Profile() {
 						<tbody>
 							{matchHistory.map((match: any) => {
 								return (<tr key={match.matchId}>
-									<td>{match.matchId}</td>
 									<td>{user.userUuid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
 									<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
 									<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
