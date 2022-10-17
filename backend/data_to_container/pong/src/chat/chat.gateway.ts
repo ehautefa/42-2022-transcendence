@@ -19,10 +19,13 @@ import { Room } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { CreateMessageDto } from './dto/createMessage.dto';
-import { CreateRoomDto } from './dto/createRoom.dto';
-import { FindAllMessagesInRoomDto } from './dto/findAllMessagesInRoom.dto';
-import { JoinDMRoomDto } from './dto/joinDMRoom.dto';
+import {
+  CreateMessageDto,
+  CreateRoomDto,
+  FindAllMessagesInRoomDto,
+  JoinDMRoomDto,
+  JoinRoomDto,
+} from './dto';
 
 // Not sure if this is going to be usefull to me ...
 /*
@@ -74,10 +77,12 @@ export class ChatGateway {
 
   // Join a room previously created and return it
   @SubscribeMessage('joinRoom')
-  async joinRoom(roomName: string) {
+  async joinRoom(joinRoomDto: JoinRoomDto) {
     this.logger.log('Joining a room');
-    const room: Room = await this.chatService.getRoomByName(roomName);
-    this.server.socketsJoin(roomName);
+    const room: Room = await this.chatService.getRoomByName(
+      joinRoomDto.roomName,
+    );
+    this.server.socketsJoin(joinRoomDto.roomName);
     return room;
   }
 
@@ -85,12 +90,11 @@ export class ChatGateway {
   @SubscribeMessage('joinDMRoom')
   async joinDMRoom(
     @MessageBody() joinDMRoomDto: JoinDMRoomDto,
-    @Req() req,
+    @Req() { user }: { user: user },
   ): Promise<Room> {
     this.logger.log('req');
-    console.log(req);
     const room: Room = await this.chatService.joinDMRoom(
-      req.user.userUuid,
+      user.userUuid,
       joinDMRoomDto.recipientId,
     );
     return room;
@@ -128,12 +132,12 @@ export class ChatGateway {
   @SubscribeMessage('changeOwnership')
   async changeOwnership(
     room_id: string,
-    @Req() req,
+    @Req() { user }: { user: user },
     newOwnerId: string,
   ): Promise<Room> {
     const room = await this.chatService.changeOwnership(
       room_id,
-      req.user,
+      user,
       newOwnerId,
     );
     return room;
