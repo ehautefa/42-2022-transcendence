@@ -9,6 +9,7 @@ import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
 
 @Injectable()
+// @UseFilters(ChatExceptionFilter)
 export class ChatService {
   constructor(
     @InjectRepository(Message)
@@ -53,7 +54,7 @@ export class ChatService {
       type: createRoomDto.type,
       users: [owner],
     });
-    this.roomsRepository.save(newRoom);
+    await this.roomsRepository.save(newRoom);
     return newRoom;
   }
 
@@ -117,7 +118,7 @@ export class ChatService {
     return messages;
   }
 
-  async findLastMessageInRoom(roomId: string) {
+  async findLastMessageInRoom(roomId: string): Promise<Message> {
     const messages: Message[] = await this.findAllMessagesInRoom(roomId);
     return messages[messages.length - 1]; // return the last element of the array
   }

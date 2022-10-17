@@ -19,13 +19,7 @@ import { Room } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import {
-  CreateMessageDto,
-  CreateRoomDto,
-  FindAllMessagesInRoomDto,
-  JoinRoomDto,
-  UuidDto,
-} from './dto';
+import { CreateMessageDto, CreateRoomDto, JoinRoomDto, UuidDto } from './dto';
 
 // Not sure if this is going to be usefull to me ...
 /*
@@ -102,14 +96,11 @@ export class ChatGateway {
 
   @SubscribeMessage('findAllMessagesInRoom')
   async findAllMessagesInRoom(
-    findAllMessagesInRoomDto: FindAllMessagesInRoomDto,
+    findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
-    this.logger.log(
-      'Getting messages of room ',
-      findAllMessagesInRoomDto.roomId,
-    );
+    this.logger.log('Getting messages of room ', findAllMessagesInRoomDto.uuid);
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
-      findAllMessagesInRoomDto.roomId,
+      findAllMessagesInRoomDto.uuid,
     );
     return messages;
   }
