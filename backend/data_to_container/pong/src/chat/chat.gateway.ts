@@ -23,8 +23,8 @@ import {
   CreateMessageDto,
   CreateRoomDto,
   FindAllMessagesInRoomDto,
-  JoinDMRoomDto,
   JoinRoomDto,
+  UuidDto,
 } from './dto';
 
 // Not sure if this is going to be usefull to me ...
@@ -89,13 +89,13 @@ export class ChatGateway {
   // Join a DM room (create it if the room does not exist yet)
   @SubscribeMessage('joinDMRoom')
   async joinDMRoom(
-    @MessageBody() joinDMRoomDto: JoinDMRoomDto,
+    @MessageBody() joinDMRoomDto: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<Room> {
     this.logger.log('req');
     const room: Room = await this.chatService.joinDMRoom(
       user.userUuid,
-      joinDMRoomDto.recipientId,
+      joinDMRoomDto.uuid,
     );
     return room;
   }
@@ -114,6 +114,16 @@ export class ChatGateway {
     return messages;
   }
 
+  @SubscribeMessage('findLastMessageInRoom')
+  async findLastMessageInRoom(
+    findLastMessageInRoomDto: UuidDto,
+  ): Promise<Message> {
+    const message: Message = await this.chatService.findLastMessageInRoom(
+      findLastMessageInRoomDto.uuid,
+    );
+    return message;
+  }
+
   // Add a new administrator to the room
   @SubscribeMessage('addAdmin')
   async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
@@ -123,8 +133,11 @@ export class ChatGateway {
 
   // Delete a room if user is the owner
   @SubscribeMessage('deleteRoom')
-  async deleteRoom(roomId: string, @Req() req): Promise<Room> {
-    const room: Room = await this.chatService.deleteRoom(roomId, req.user);
+  async deleteRoom(
+    roomId: string,
+    @Req() { user }: { user: user },
+  ): Promise<Room> {
+    const room: Room = await this.chatService.deleteRoom(roomId, user);
     return room;
   }
 

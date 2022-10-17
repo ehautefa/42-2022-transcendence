@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WsException } from '@nestjs/websockets';
 import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
@@ -104,7 +103,6 @@ export class ChatService {
   }
 
   async findAllMessagesInRoom(roomId: string): Promise<Message[]> {
-    if (!roomId) throw new WsException('error in getAllMessages');
     console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository.find({
       relations: { room: true },
@@ -117,6 +115,11 @@ export class ChatService {
     // .where('room.id = :roomId', { roomId })
     // .getRawMany();
     return messages;
+  }
+
+  async findLastMessageInRoom(roomId: string) {
+    const messages: Message[] = await this.findAllMessagesInRoom(roomId);
+    return messages[messages.length - 1]; // return the last element of the array
   }
 
   async addAdmin(newAdmin: user, roomId: string): Promise<Room> {

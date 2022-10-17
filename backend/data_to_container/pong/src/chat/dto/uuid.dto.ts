@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class JoinDMRoomDto {
+export class UuidDto {
   @IsNotEmpty()
   @IsUUID()
-  recipientId: string;
+  uuid: string;
 }
