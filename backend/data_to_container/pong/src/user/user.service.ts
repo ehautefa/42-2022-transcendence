@@ -32,8 +32,9 @@ export class UserService {
 
     isMyFriend(completeMe: user, completeUser2: user): boolean {
         this.checkUsers(completeMe, completeUser2);
-        if (0 <= completeMe.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid }))
+        if (0 <= completeMe.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid })) {
             return true;
+		}
         return false;
     }
 

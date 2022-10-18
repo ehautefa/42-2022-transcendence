@@ -56,7 +56,6 @@ export async function isMyFriends(userUuid: string) {
 }
 
 export async function getPicture(uid: string) {
-	console.log("getPicture");
 	var url: string = process.env.REACT_APP_BACK_URL + "/user/picture/" + uid;
 	var requestOptions = {
 		method: 'GET',
