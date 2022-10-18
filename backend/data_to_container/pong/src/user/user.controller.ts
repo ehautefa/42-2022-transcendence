@@ -248,12 +248,13 @@ export class UserController {
 	}
 
 	
-	@Get('picture/:userUuid')
-	@UseGuards(JwtAuthGuard)
+	@Get('picture/:userUid')
 	@ApiOperation({ summary: 'Get picture of user' })
-	async getPicture(@Res() res, @Param('userUuid') userUuid: string) {
-		console.log("getPicture", userUuid);
-		const path: string = join(process.cwd(), `uploads/pp/${userUuid}.jpeg`);
+	@UseGuards(JwtAuthGuard)
+	@UsePipes(ValidationPipe)
+	async getPicture(@Res() res, @Param('userUid') userUid: string) {
+		console.log("getPicture", userUid);
+		const path: string = join(process.cwd(), `uploads/pp/${userUid}.jpeg`);
 		if (fs.existsSync(path)) {
 			res.sendFile(path);
 		} else {
