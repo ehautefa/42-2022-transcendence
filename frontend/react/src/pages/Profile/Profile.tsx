@@ -27,26 +27,18 @@ function Profile() {
 		const user = await FetchUser(uid);
 		setUser(user);
 		const picture = await getPicture(user.userUuid);
-		console.log("picture", picture);
 		setPicture(picture.url);
 		const matchHistory = await GetMatchHistory(user.userName);
 		setMatchHistory(matchHistory);
 		const friends = await getFriends(user.userUuid);
 		setFriends(friends);
 		const isFriend = await isMyFriends(user.userUuid);
-		console.log("fetchUser");
-		// TO FIX 403 FORBIDDEN
 		setIsMyFriend(isFriend);
-		console.log("isFriend", isFriend);
-
 	}
 	
 	useEffect(() => {
 		if (uid) {
-			console.log("uid", uid);
 			fetchUser(uid);
-			console.log("uid2", uid);
-
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

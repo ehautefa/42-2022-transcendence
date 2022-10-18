@@ -71,9 +71,9 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async isMyFriends(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-		console.log("ismyfriend", userToHandle);
-		return await this.UserService.isMyFriend(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid));
-	}
+		var to_ret = await this.UserService.isMyFriend(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid));
+		res.send(to_ret);
+}
 
 	@Get('friends/:userUuid')
 	@ApiOperation({ summary: 'Get friends of a user' })
