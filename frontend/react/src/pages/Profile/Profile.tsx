@@ -5,7 +5,7 @@ import { User } from "../../type";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
-import { getFriends, FetchUser, isMyFriends } from "./request";
+import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
 
 function Profile() {
 
@@ -21,21 +21,33 @@ function Profile() {
 	const [friends, setFriends] = useState([]);
 	const [isBlocked, setIsBlocked] = useState(false);
 	const [invitationSent, setInvitationSent] = useState(false);
+	const [picture, setPicture] = useState("");
 	
 	async function fetchUser(uid: string) {
 		const user = await FetchUser(uid);
 		setUser(user);
+		const picture = await getPicture(user.userUuid);
+		console.log("picture", picture);
+		setPicture(picture.url);
 		const matchHistory = await GetMatchHistory(user.userName);
 		setMatchHistory(matchHistory);
 		const friends = await getFriends(user.userUuid);
 		setFriends(friends);
 		const isFriend = await isMyFriends(user.userUuid);
+		console.log("fetchUser");
+		// TO FIX 403 FORBIDDEN
 		setIsMyFriend(isFriend);
+		console.log("isFriend", isFriend);
+
 	}
 	
 	useEffect(() => {
-		if (uid)
+		if (uid) {
+			console.log("uid", uid);
 			fetchUser(uid);
+			console.log("uid2", uid);
+
+		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -89,7 +101,7 @@ function Profile() {
 					}
 				</div>
 				<div className="ppFriends">
-					<img src={process.env.REACT_APP_BACK_URL + "/user/picture/" + user.userUuid} alt={"Avatar of " + user.userName} />
+					<img src={picture} alt={"Avatar of " + user.userName} />
 				</div>
 			</div>
 			<div className="flex">

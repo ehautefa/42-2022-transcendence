@@ -55,3 +55,14 @@ export async function isMyFriends(userUuid: string) {
 	return await result;
 }
 
+export async function getPicture(uid: string) {
+	console.log("getPicture");
+	var url: string = process.env.REACT_APP_BACK_URL + "/user/picture/" + uid;
+	var requestOptions = {
+		method: 'GET',
+        credentials: credentials
+	};
+	
+	return await fetch(url, requestOptions);
+}
+
