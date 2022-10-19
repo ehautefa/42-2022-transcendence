@@ -4,7 +4,7 @@ import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { UuidDto } from './dto';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
@@ -97,10 +97,12 @@ export class ChatService {
     return newDMRoom;
   }
 
-  async findAllPublicRooms(): Promise<Room[]> {
+  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     const rooms: Room[] = await this.roomsRepository.find({
+      select: { id: true, name: true },
       where: { type: RoomType.PUBLIC },
     });
+    console.log(rooms);
     return rooms;
   }
 
@@ -121,7 +123,7 @@ export class ChatService {
 
   async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
     const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
-    return messages[messages.length - 1]; // return the last element of the array
+    return messages[messages.length - 1];
   }
 
   async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
