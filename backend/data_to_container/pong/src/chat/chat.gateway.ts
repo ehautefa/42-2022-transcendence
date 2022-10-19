@@ -96,21 +96,21 @@ export class ChatGateway {
 
   @SubscribeMessage('findAllMessagesInRoom')
   async findAllMessagesInRoom(
-    findAllMessagesInRoomDto: UuidDto,
+    @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
     this.logger.log('Getting messages of room ', findAllMessagesInRoomDto.uuid);
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
-      findAllMessagesInRoomDto.uuid,
+      findAllMessagesInRoomDto,
     );
     return messages;
   }
 
   @SubscribeMessage('findLastMessageInRoom')
   async findLastMessageInRoom(
-    findLastMessageInRoomDto: UuidDto,
+    @MessageBody() findLastMessageInRoomDto: UuidDto,
   ): Promise<Message> {
     const message: Message = await this.chatService.findLastMessageInRoom(
-      findLastMessageInRoomDto.uuid,
+      findLastMessageInRoomDto,
     );
     return message;
   }

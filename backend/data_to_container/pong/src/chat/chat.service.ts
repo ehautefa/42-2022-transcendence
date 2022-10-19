@@ -5,6 +5,7 @@ import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
+import { UuidDto } from './dto';
 import { CreateMessageDto } from './dto/createMessage.dto';
 import { CreateRoomDto } from './dto/createRoom.dto';
 
@@ -103,7 +104,11 @@ export class ChatService {
     return rooms;
   }
 
-  async findAllMessagesInRoom(roomId: string): Promise<Message[]> {
+  async findAllMessagesInRoom({
+    uuid: roomId,
+  }: {
+    uuid: string;
+  }): Promise<Message[]> {
     console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository.find({
       relations: { room: true },
@@ -111,15 +116,11 @@ export class ChatService {
         room: { id: roomId },
       },
     });
-    // .createQueryBuilder('msg')
-    // .leftJoinAndSelect('msg.room', 'room')
-    // .where('room.id = :roomId', { roomId })
-    // .getRawMany();
     return messages;
   }
 
-  async findLastMessageInRoom(roomId: string): Promise<Message> {
-    const messages: Message[] = await this.findAllMessagesInRoom(roomId);
+  async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
+    const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
     return messages[messages.length - 1]; // return the last element of the array
   }
 
