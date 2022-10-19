@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WsException } from '@nestjs/websockets';
 import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
@@ -31,20 +30,11 @@ export class ChatService {
     const room = await this.roomsRepository.findOneOrFail({
       where: { id: createMessageDto.roomId },
     });
-    if (room.type === RoomType.DM) {
-      const recipient: user =
-        room.users[0] === sender ? room.users[1] : room.users[0];
-      if (this.userService.isBlocked(sender, recipient) === true)
-        throw new WsException(
-          'Can not send message: you have been blocked by the user.',
-        );
-    } else {
-    }
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
       room: room,
       sender: sender,
-      time: new Date(),
+      time: Date.now(),
     });
     this.messagesRepository.save(newMessage);
     this.logger.log('createMessage is OK');
@@ -111,12 +101,8 @@ export class ChatService {
       select: { id: true, name: true },
       where: { type: RoomType.PUBLIC },
     });
-<<<<<<< HEAD
-    return rooms.map((room) => ({ name: room.name, id: room.id }));
-=======
     console.log(rooms);
     return rooms;
->>>>>>> 0cec8f0 (findAllMessagesInRoom() now returns only the name and the id of the room (in an array of rooms))
   }
 
   async findAllMessagesInRoom({

@@ -1,16 +1,16 @@
 import {
-    Logger,
-    Req,
-    UseFilters,
-    UseGuards,
-    UsePipes,
-    ValidationPipe
+  Logger,
+  Req,
+  UseFilters,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
-    MessageBody,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
@@ -54,10 +54,13 @@ export class ChatGateway {
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
-    @Req { user }: { user: user },
+    @Req() { user }: { user: user },
   ) {
     this.logger.log('Creating a message');
-    const message = await this.chatService.createMessage(createMessageDto, usernest js);
+    const message = await this.chatService.createMessage(
+      createMessageDto,
+      user,
+    );
     this.server.to(message.room.id).emit('message', message);
     return message;
   }
