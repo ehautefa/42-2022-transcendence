@@ -46,9 +46,10 @@ function Chat() {
 	})
 
     useEffect(() => {
-		if (selectedRoom !== "")
+		console.log('retrieving messages from ', selectedRoom);
+		if (selectedRoom !== "" && selectedRoom !== undefined)
 		{
-			socket.emit('findAllMessagesInRoom', {roomId: selectedRoom}, (msgs:any) => {
+			socket.emit('findAllMessagesInRoom', {uuid: selectedRoom}, (msgs:any) => {
 				setMessages(msgs)});
 		}
     }, [selectedRoom, socket]);
@@ -67,7 +68,6 @@ function Chat() {
 	async function chooseRoom(thisRoom : string){ 
 		console.log ("You chose room ", thisRoom);
 		await setSelectedRoom(thisRoom);
-		console.log ("And voilà ", selectedRoom);
 	}
     
 	function sendMessage()
@@ -104,7 +104,7 @@ function Chat() {
 
                 <div className="channel">
                 {channels.map((room:any) => (
-                        <li key = {room.name} onClick={() => chooseRoom(room.name)}>{room.name}</li>
+                        <li key = {room.name} onClick={() => chooseRoom(room.id)}>{room.name}</li>
                     ))}
                 </div>
             </div>
