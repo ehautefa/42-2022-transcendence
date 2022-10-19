@@ -4,10 +4,8 @@ import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
-import { DeepPartial, Repository } from 'typeorm';
-import { UuidDto } from './dto';
-import { CreateMessageDto } from './dto/createMessage.dto';
-import { CreateRoomDto } from './dto/createRoom.dto';
+import { Repository } from 'typeorm';
+import { CreateMessageDto, CreateRoomDto } from './dto';
 
 @Injectable()
 // @UseFilters(ChatExceptionFilter)
@@ -41,6 +39,10 @@ export class ChatService {
     this.messagesRepository.save(newMessage);
     this.logger.log('createMessage is OK');
     return newMessage;
+  }
+
+  async findOtherUserDMRoom(roomDM: Room, user: user): Promise<user> {
+    return;
   }
 
   async createRoom(createRoomDto: CreateRoomDto, owner: user): Promise<Room> {

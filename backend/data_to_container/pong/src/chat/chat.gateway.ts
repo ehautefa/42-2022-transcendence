@@ -54,7 +54,7 @@ export class ChatGateway {
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
-    { user }: { user: user },
+    @Req() { user }: { user: user },
   ) {
     this.logger.log('Creating a message');
     const message = await this.chatService.createMessage(
