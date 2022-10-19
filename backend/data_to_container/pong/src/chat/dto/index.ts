@@ -1,4 +1,4 @@
-export * from './createMessage.dto';
-export * from './createRoom.dto';
-export * from './joinRoom.dto';
+export * from './create-message.dto';
+export * from './create-room.dto';
+export * from './join-room.dto';
 export * from './uuid.dto';

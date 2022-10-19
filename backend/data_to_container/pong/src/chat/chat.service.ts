@@ -1,13 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { WsException } from '@nestjs/websockets';
 import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
-import { DeepPartial, Repository } from 'typeorm';
-import { UuidDto } from './dto';
-import { CreateMessageDto } from './dto/createMessage.dto';
-import { CreateRoomDto } from './dto/createRoom.dto';
+import { Repository } from 'typeorm';
+import { CreateMessageDto, CreateRoomDto } from './dto';
 
 @Injectable()
 // @UseFilters(ChatExceptionFilter)
@@ -28,22 +27,32 @@ export class ChatService {
    ** service functions called by the gateway
    */
 
-  async createMessage(createMessageDto: CreateMessageDto) {
-    // this.logger.log('Creating a message');
-    // this.logger.log(createMessageDto);
+  async createMessage(createMessageDto: CreateMessageDto, sender: user) {
     const room = await this.roomsRepository.findOneOrFail({
       where: { id: createMessageDto.roomId },
     });
-    const sender = await this.userService.getUser(createMessageDto.senderId);
+    if (room.type === RoomType.DM) {
+      const recipient: user =
+        room.users[0] === sender ? room.users[1] : room.users[0];
+      if (this.userService.isBlocked(sender, recipient) === true)
+        throw new WsException(
+          'Can not send message: you have been blocked by the user.',
+        );
+    } else {
+    }
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
       room: room,
       sender: sender,
-      time: Date.now().toString(),
+      time: new Date(),
     });
     this.messagesRepository.save(newMessage);
     this.logger.log('createMessage is OK');
     return newMessage;
+  }
+
+  async findOtherUserDMRoom(roomDM: Room, user: user): Promise<user> {
+    return;
   }
 
   async createRoom(createRoomDto: CreateRoomDto, owner: user): Promise<Room> {

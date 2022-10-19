@@ -19,16 +19,26 @@ export class Room {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar', { nullable: true, unique: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+  })
   name: string;
 
   @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
   owner: user;
 
-  @Column('boolean', { default: false })
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
   isProtected: boolean;
 
-  @Column('varchar', { nullable: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
   password: string;
 
   @Column({
@@ -44,4 +54,10 @@ export class Room {
   @ManyToMany(() => user, (user) => user.userUuid)
   @JoinTable()
   users: user[];
+
+  @ManyToMany(() => user, (user) => user.userUuid)
+  @JoinTable()
+  banned: user[];
+
+  muted: mutedUser[];
 }

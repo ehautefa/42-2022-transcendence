@@ -1,16 +1,16 @@
 import {
-  Logger,
-  Req,
-  UseFilters,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
+    Logger,
+    Req,
+    UseFilters,
+    UseGuards,
+    UsePipes,
+    ValidationPipe
 } from '@nestjs/common';
 import {
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
+    MessageBody,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
@@ -52,9 +52,12 @@ export class ChatGateway {
 
   // Create a message in the message table and inform the sockets in the room that a new message is available
   @SubscribeMessage('createMessage')
-  async createMessage(@MessageBody() createMessageDto: CreateMessageDto) {
+  async createMessage(
+    @MessageBody() createMessageDto: CreateMessageDto,
+    @Req { user }: { user: user },
+  ) {
     this.logger.log('Creating a message');
-    const message = await this.chatService.createMessage(createMessageDto);
+    const message = await this.chatService.createMessage(createMessageDto, usernest js);
     this.server.to(message.room.id).emit('message', message);
     return message;
   }
