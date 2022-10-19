@@ -101,8 +101,12 @@ export class ChatService {
       select: { id: true, name: true },
       where: { type: RoomType.PUBLIC },
     });
+<<<<<<< HEAD
     console.log(rooms);
     return rooms;
+=======
+    return rooms.map((room) => ({ name: room.name, id: room.id }));
+>>>>>>> 7c5c99c (findAllMessagesInRoom() now returns only the name and the id of the room (in an array of rooms))
   }
 
   async findAllMessagesInRoom({
