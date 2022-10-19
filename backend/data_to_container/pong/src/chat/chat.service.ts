@@ -28,18 +28,15 @@ export class ChatService {
    ** service functions called by the gateway
    */
 
-  async createMessage(createMessageDto: CreateMessageDto) {
-    // this.logger.log('Creating a message');
-    // this.logger.log(createMessageDto);
+  async createMessage(createMessageDto: CreateMessageDto, sender: user) {
     const room = await this.roomsRepository.findOneOrFail({
       where: { id: createMessageDto.roomId },
     });
-    const sender = await this.userService.getUser(createMessageDto.senderId);
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
       room: room,
       sender: sender,
-      time: Date.now().toString(),
+      time: Date.now(),
     });
     this.messagesRepository.save(newMessage);
     this.logger.log('createMessage is OK');

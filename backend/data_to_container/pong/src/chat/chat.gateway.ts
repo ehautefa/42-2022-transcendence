@@ -52,9 +52,15 @@ export class ChatGateway {
 
   // Create a message in the message table and inform the sockets in the room that a new message is available
   @SubscribeMessage('createMessage')
-  async createMessage(@MessageBody() createMessageDto: CreateMessageDto) {
+  async createMessage(
+    @MessageBody() createMessageDto: CreateMessageDto,
+    { user }: { user: user },
+  ) {
     this.logger.log('Creating a message');
-    const message = await this.chatService.createMessage(createMessageDto);
+    const message = await this.chatService.createMessage(
+      createMessageDto,
+      user,
+    );
     this.server.to(message.room.id).emit('message', message);
     return message;
   }
