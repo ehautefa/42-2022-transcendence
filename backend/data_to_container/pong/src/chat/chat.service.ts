@@ -4,8 +4,8 @@ import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
-import { CreateMessageDto, CreateRoomDto } from './dto';
+import { DeepPartial, Repository } from 'typeorm';
+import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 
 @Injectable()
 // @UseFilters(ChatExceptionFilter)
