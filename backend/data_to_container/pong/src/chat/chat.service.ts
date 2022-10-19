@@ -5,8 +5,8 @@ import { Message } from 'src/bdd/message.entity';
 import { Room, RoomType } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
-import { CreateMessageDto, CreateRoomDto } from './dto';
+import { DeepPartial, Repository } from 'typeorm';
+import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 
 @Injectable()
 // @UseFilters(ChatExceptionFilter)
@@ -108,9 +108,15 @@ export class ChatService {
 
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     const rooms: Room[] = await this.roomsRepository.find({
+      select: { id: true, name: true },
       where: { type: RoomType.PUBLIC },
     });
+<<<<<<< HEAD
     return rooms.map((room) => ({ name: room.name, id: room.id }));
+=======
+    console.log(rooms);
+    return rooms;
+>>>>>>> 0cec8f0 (findAllMessagesInRoom() now returns only the name and the id of the room (in an array of rooms))
   }
 
   async findAllMessagesInRoom({
