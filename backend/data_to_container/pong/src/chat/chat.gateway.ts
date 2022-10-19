@@ -17,6 +17,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { Message } from 'src/bdd/message.entity';
 import { Room } from 'src/bdd/room.entity';
 import { user } from 'src/bdd/users.entity';
+import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
 import { CreateMessageDto, CreateRoomDto, JoinRoomDto, UuidDto } from './dto';
@@ -148,8 +149,9 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('findAllPublicRooms')
-  async findAllPublicRooms(): Promise<Room[]> {
-    const rooms: Room[] = await this.chatService.findAllPublicRooms();
+  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
+    const rooms: DeepPartial<Room>[] =
+      await this.chatService.findAllPublicRooms();
     return rooms;
   }
 
