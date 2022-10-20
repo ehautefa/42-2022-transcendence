@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WsException } from '@nestjs/websockets';
-import { Message } from 'src/bdd/message.entity';
-import { Room, RoomType } from 'src/bdd/room.entity';
-import { user } from 'src/bdd/users.entity';
+import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { DeepPartial, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
@@ -16,6 +13,8 @@ export class ChatService {
     private messagesRepository: Repository<Message>,
     @InjectRepository(Room)
     private roomsRepository: Repository<Room>,
+    @InjectRepository(ChatMember)
+    private chatMembersRepository: Repository<ChatMember>,
   ) {}
 
   private readonly userService: UserService;
@@ -27,23 +26,39 @@ export class ChatService {
    ** service functions called by the gateway
    */
 
-  async createMessage(createMessageDto: CreateMessageDto, sender: user) {
-    const room = await this.roomsRepository.findOneOrFail({
-      where: { id: createMessageDto.roomId },
-    });
-    if (room.type === RoomType.DM) {
-      const recipient: user =
-        room.users[0] === sender ? room.users[1] : room.users[0];
-      if (this.userService.isBlocked(sender, recipient) === true)
-        throw new WsException(
-          'Can not send message: you have been blocked by the user.',
-        );
-    } else {
+  async getChatMember(user: user, room: Room): Promise<ChatMember> {
+    try {
+      const chatMember: ChatMember =
+        await this.chatMembersRepository.findOneOrFail({
+          relations: {
+            user: true,
+            room: true,
+          },
+          where: {
+            user: { userUuid: user.userUuid },
+            room: { id: room.id },
+          },
+        });
+      return chatMember;
+    } catch (error) {
+      const chatMember = this.chatMembersRepository.create({
+        user: user,
+        room: room,
+      });
+      return this.chatMembersRepository.save(chatMember);
     }
+  }
+
+  async createMessage(
+    createMessageDto: CreateMessageDto,
+    sender: user,
+  ): Promise<Message> {
+    const room: Room = await this.getRoomById(createMessageDto.roomId);
+    const chatMember: ChatMember = await this.getChatMember(sender, room);
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
       room: room,
-      sender: sender,
+      sender: chatMember,
       time: Date.now(),
     });
     this.messagesRepository.save(newMessage);
@@ -58,35 +73,61 @@ export class ChatService {
   async createRoom(createRoomDto: CreateRoomDto, owner: user): Promise<Room> {
     const newRoom: Room = this.roomsRepository.create({
       name: createRoomDto.name,
-      owner: owner,
       isProtected: createRoomDto.isProtected,
       password: createRoomDto.password,
       type: createRoomDto.type,
-      users: [owner],
     });
+    const chatMember: ChatMember = await this.getChatMember(owner, newRoom);
+    newRoom.owner = chatMember;
+    newRoom.members.push(chatMember);
     await this.roomsRepository.save(newRoom);
     return newRoom;
   }
 
-  async joinDMRoom(senderId: string, recipientId: string) {
-    let room: Room = await this.getDMRoom(senderId, recipientId);
-    if (!room) room = await this.createDMRoom(senderId, recipientId);
-    return room;
+  async joinDMRoom(sender: user, recipientId: UuidDto) {
+    try {
+      return await this.getDMRoom(sender.userUuid, recipientId.uuid);
+    } catch (error) {
+      return await this.createDMRoom(sender, recipientId.uuid);
+    }
   }
 
-  async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
-    // SELECT * from rooms
-    // LEFT JOIN room_users_user ON rooms.id = room_users_user.room_id
-    // LEFT JOIN users ON room_users_user.user_id = users.id
-    // WHERE rooms.type = 'dm' AND users.id IN (2, 4)
-    // GROUP BY rooms.id
-    // HAVING COUNT(users.id) = 2;
+  // async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
+  // SELECT * from rooms
+  // LEFT JOIN room_users_user ON rooms.id = room_users_user.room_id
+  // LEFT JOIN users ON room_users_user.user_id = users.id
+  // WHERE rooms.type = 'dm' AND users.id IN (2, 4)
+  // GROUP BY rooms.id
+  // HAVING COUNT(users.id) = 2;
+  // const room: Room = await this.roomsRepository
+  // .createQueryBuilder('room')
+  // .leftJoinAndSelect('room.users', 'users')
+  // .select('room.id', 'roomId')
+  // .where('room.type = :type', { type: 'dm' })
+  // .andWhere('users.id in (:...userId)', {
+  // userId: [senderId, recipientId],
+  // })
+  // .groupBy('room.id')
+  // .having('count(users.id) = 2')
+  // .getOneOrFail();
+  //   const room: Room = await this.roomsRepository
+  //     .createQueryBuilder('room')
+  //     .leftJoinAndSelect('room.members', 'members')
+  //     .leftJoinAndSelect('members.user', 'user')
+  //     .where('room.type = :type', { type: RoomType.DM })
+  //     .andWhere('user.userUuid = :userUuid', { userUuid: recipientId })
+  //     .groupBy('room.id')
+  //     .getOneOrFail();
+
+  //   return room;
+  // }
+  async getDMRoom(senderId: string, recipientId: string) {
     const room: Room = await this.roomsRepository
       .createQueryBuilder('room')
-      .leftJoinAndSelect('room.users', 'users')
-      // .select('room.id', 'roomId')
+      .leftJoinAndSelect('room.members', 'members')
+      .leftJoinAndSelect('members.user', 'user')
       .where('room.type = :type', { type: 'dm' })
-      .andWhere('users.id in (:...userId)', {
+      .andWhere('user.id in (:...userId)', {
         userId: [senderId, recipientId],
       })
       .groupBy('room.id')
@@ -95,14 +136,21 @@ export class ChatService {
     return room;
   }
 
-  async createDMRoom(senderId: string, recipientId: string): Promise<Room> {
-    const sender: user = await this.userService.getUser(senderId);
-    const recipient: user = await this.userService.getUser(recipientId);
-    if (!sender || !recipient) return null;
+  async createDMRoom(sender: user, recipientId: string): Promise<Room> {
     const newDMRoom: Room = this.roomsRepository.create({
       type: RoomType.DM,
-      users: [sender, recipient],
     });
+    const recipient: user = await this.userService.getUser(recipientId);
+    const recipientMember: Promise<ChatMember> = this.getChatMember(
+      recipient,
+      newDMRoom,
+    );
+    const senderMember: Promise<ChatMember> = this.getChatMember(
+      sender,
+      newDMRoom,
+    );
+    newDMRoom.members.push(await senderMember, await recipientMember);
+    this.roomsRepository.save(newDMRoom);
     return newDMRoom;
   }
 
@@ -134,7 +182,7 @@ export class ChatService {
     const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
     return messages[messages.length - 1];
   }
-
+  /*
   async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
     const room: Room = await this.getRoomById(roomId);
     room.admin.push(newAdmin);
@@ -165,7 +213,7 @@ export class ChatService {
     this.roomsRepository.save(room);
     return room;
   }
-
+*/
   async getRoomByName(roomName: string): Promise<Room> {
     const room: Room = await this.roomsRepository.findOneOrFail({
       where: { name: roomName },
@@ -179,7 +227,7 @@ export class ChatService {
     });
     return room;
   }
-
+  /*
   async isAdmin(userId: string, roomId: string): Promise<boolean> {
     const room: Room = await this.getRoomById(roomId);
     room.admin.forEach((adm) => {
@@ -192,4 +240,5 @@ export class ChatService {
     const room: Room = await this.getRoomById(roomId);
     return room.owner.userUuid === userId;
   }
+  */
 }

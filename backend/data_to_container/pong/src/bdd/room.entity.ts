@@ -1,12 +1,12 @@
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { user } from './users.entity';
+import { ChatMember } from './';
 
 export enum RoomType {
   PRIVATE = 'private',
@@ -26,8 +26,10 @@ export class Room {
   })
   name: string;
 
-  @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
-  owner: user;
+  // A DM room does not have an owner
+  @OneToOne(() => ChatMember, { nullable: true })
+  @JoinColumn()
+  owner: ChatMember;
 
   @Column({
     type: 'boolean',
@@ -48,16 +50,6 @@ export class Room {
   })
   type: RoomType;
 
-  @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
-  admin: user[];
-
-  @ManyToMany(() => user, (user) => user.userUuid)
-  @JoinTable()
-  users: user[];
-
-  @ManyToMany(() => user, (user) => user.userUuid)
-  @JoinTable()
-  banned: user[];
-
-  muted: mutedUser[];
+  @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id)
+  members: ChatMember[];
 }
