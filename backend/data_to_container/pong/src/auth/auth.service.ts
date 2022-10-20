@@ -26,7 +26,6 @@ export class AuthService {
     async loginWith2fa(userWithoutPsw: Partial<user>) {
         const payload = {
             userUuid: userWithoutPsw.userUuid,
-            isTwoFactorAuthenticationEnabled: !!userWithoutPsw.twoFactorAuth,
             isTwoFactorAuthenticated: true,
         };
 
@@ -36,14 +35,10 @@ export class AuthService {
     async generateTwoFactorAuthenticationSecret(user: user) {
         const secret = authenticator.generateSecret();
 
-        // const otpauthUrl = authenticator.keyuri(user.email, 'AUTH_APP_NAME', secret);
-        const otpauthUrl = authenticator.keyuri(user.userUuid, process.env.REACT_APP_APP_NAME, secret);
+        const otpauthUrl = authenticator.keyuri(user.userName, process.env.REACT_APP_APP_NAME, secret);
 
         await this.userService.setTwoFactorAuthenticationSecret(user, secret);
-        return {
-            secret,
-            otpauthUrl
-        }
+        return {secret, otpauthUrl}
     }
 
     async generateQrCodeDataURL(otpAuthUrl: string) {
@@ -51,6 +46,8 @@ export class AuthService {
     }
 
     isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: user) {
+        if(!twoFactorAuthenticationCode)
+            return false
         return authenticator.verify({
             token: twoFactorAuthenticationCode,
             secret: user.twoFactorAuthenticationSecret,

@@ -7,6 +7,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guards';
 import { FindOrCreateUserLocalDto } from 'src/user/dto/findOrCreateLocal';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { user } from 'src/bdd/users.entity';
 
 @ApiBearerAuth()
 @ApiTags('auth')
@@ -18,12 +19,69 @@ export class AuthController {
         private readonly authService: AuthService,
     ) { }
 
+
+    // @Get('localLogin/:userName')
+    // @ApiOperation({ summary: 'Create a new user' })
+    // @UsePipes(ValidationPipe)
+    // async localLogin(@Req() req, @Res() res, @Param('userName') userName: string) {
+    // const user = await this.userService.FindOrCreateUserLocal(userName);
+    // res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid }))
+    // console.log("Local username connected with Uuid", user);
+    // res.redirect(process.env.REACT_APP_HOME_PAGE);
+    // }
+
+    // @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
+    // @UseGuards(FortyTwoAuthGuard)
+    // @Get('login')
+    // login(@Req() req, @Res() res) {
+    // console.log("username connected with Uuid", req.user);
+    // res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid }))
+    // if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
+    // res.redirect(process.env.REACT_APP_HOME_PAGE);
+    // else
+    // res.redirect(req.headers.referer);
+    // }
+    // 
+
+    // @Post('2fa/login')
+    // @HttpCode(200)
+    // @UseGuards(JwtAuthGuard)
+    // async TwoFauthenticate(@Request() request, @Response() res, @Body() body) {
+        // const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+            // body.twoFactorAuthenticationCode,
+            // request.user,
+        // );
+// 
+        // if (!isCodeValid) {
+            // throw new UnauthorizedException('Wrong authentication code');
+        // }
+        // res.cookie('access_token', this.authService.loginWith2fa(request.user));
+        // if (request.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !request.headers.referer)
+            // res.redirect(process.env.REACT_APP_HOME_PAGE);
+        // else
+            // res.redirect(request.headers.referer);
+    // }
+// 
     @Get('localLogin/:userName')
     @ApiOperation({ summary: 'Create a new user' })
     @UsePipes(ValidationPipe)
-    async localLogin(@Req() req, @Res() res, @Param('userName') userName: string) {
+    async localLogin(@Req() req, @Res() res, @Body() body, @Param('userName') userName: string) {
+
         const user = await this.userService.FindOrCreateUserLocal(userName);
-        res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid }))
+
+        if (user.twoFactorAuth) {
+            const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+                body.twoFactorAuthenticationCode,
+                user,
+            );
+            if (!isCodeValid) {
+                throw new UnauthorizedException('Wrong authentication code');
+            }
+            res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid, isTwoFactorAuthenticated: true }))
+        }
+        else
+            res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid }))
+
         console.log("Local username connected with Uuid", user);
         // if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
         res.redirect(process.env.REACT_APP_HOME_PAGE);
@@ -34,52 +92,39 @@ export class AuthController {
     @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
-    login(@Req() req, @Res() res) {
+    login(@Req() req, @Res() res, @Body() body) {
+        if (req.user.twoFactorAuth) {
+            const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+                body.twoFactorAuthenticationCode,
+                req.user,
+            );
+            if (!isCodeValid) {
+                throw new UnauthorizedException('Wrong authentication code');
+            }
+            res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid, isTwoFactorAuthenticated: true }))
+        }
+        else
+            res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid }))
         console.log("username connected with Uuid", req.user);
-        res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid }))
         if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
             res.redirect(process.env.REACT_APP_HOME_PAGE);
         else
             res.redirect(req.headers.referer);
     }
 
-    @Post('2fa/login')
-    @HttpCode(200)
+    @Post('2fa/generateQrCode')
     @UseGuards(JwtAuthGuard)
-    async authenticate(@Request() request, @Response() res, @Body() body) {
-        const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-            body.twoFactorAuthenticationCode,
-            request.user,
+    async register(@Response() response, @Request() request) {
+        const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(request.user);
+
+        return response.json(
+            await this.authService.generateQrCodeDataURL(otpauthUrl),
         );
-
-        if (!isCodeValid) {
-            throw new UnauthorizedException('Wrong authentication code');
-        }
-
-        // return this.authService.loginWith2fa(request.user);
-        res.cookie('access_token', this.authService.loginWith2fa(request.user));
-        if (request.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !request.headers.referer)
-            res.redirect(process.env.REACT_APP_HOME_PAGE);
-        else
-            res.redirect(request.headers.referer);
     }
 
-    @Post('2fa/generate')
-  @UseGuards(JwtAuthGuard)
-  async register(@Response() response, @Request() request) {
-    const { otpauthUrl } =
-      await this.authService.generateTwoFactorAuthenticationSecret(
-        request.user,
-      );
-
-    return response.json(
-      await this.authService.generateQrCodeDataURL(otpauthUrl),
-    );
-  }
-
-    @Post('2fa/turn-on')
+    @Post('2fa/verify2FA')
     @UseGuards(JwtAuthGuard)
-    async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+    async turnOnTwoFactorAuthentication(@Req() request, @Res() res, @Body() body) {
         const isCodeValid =
             this.authService.isTwoFactorAuthenticationCodeValid(
                 body.twoFactorAuthenticationCode,
@@ -89,6 +134,8 @@ export class AuthController {
             throw new UnauthorizedException('Wrong authentication code');
         }
         await this.userService.enableTwoFactorAuth(request.user);
+        res.cookie('access_token', this.jwtService.sign({ userUuid: request.user.userUuid, isTwoFactorAuthenticated: true }))
+        res.send("2FA OK")
     }
 
 }

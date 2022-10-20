@@ -12,15 +12,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         super({
             failureRedirect: '/auth/login',
             jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-				let data : string = null;
-				if (request?.cookies && request.cookies['access_token']) { 
-					// check if access_token is in cookies
-					data = request.cookies['access_token'];
-				} else if (request['handshake']
+                let data: string = null;
+                if (request?.cookies && request.cookies['access_token']) {
+                    // check if access_token is in cookies
+                    data = request.cookies['access_token'];
+                } else if (request['handshake']
                     && request['handshake']['headers']
-                    && request['handshake']['headers']['access_token']){
-					// if access_token is not in cookie check if it is in headers
-					data = request['handshake']['headers']['access_token'];
+                    && request['handshake']['headers']['access_token']) {
+                    // if access_token is not in cookie check if it is in headers
+                    data = request['handshake']['headers']['access_token'];
                 }
                 return data
             }]),
@@ -29,16 +29,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             secretOrKey: process.env.JWT_SIGN //Protect in env file
         }, async (jwt_paylod, done) => {
             const user = await userService.getCompleteUser(jwt_paylod.userUuid);
-            //check if user is undefined?
-            // console.log(user)
-            return done(null, user);
+            if (!user.twoFactorAuth)
+                return done(null, user);
+            if (user.twoFactorAuth && jwt_paylod.isTwoFactorAuthenticated)
+                return done(null, user);
+
+                console.log("WARNING JWT - TwoFactorAuth ENABLE")
+                console.log(jwt_paylod);
+                return done(null, false);
         });
     }
 
     // validate(payload: any) {
-        // console.log('vali');
-        // return {
-            // userUuid: payload.userUuid,
-        // };
+    // console.log('vali');
+    // return {
+    // userUuid: payload.userUuid,
+    // };
     // }
 }

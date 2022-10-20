@@ -280,6 +280,7 @@ export class UserService {
         else if (!user.twoFactorAuth)
             throw new TwoFactorAuthAlreadyDisableException
         user.twoFactorAuth = false;
+        user.twoFactorAuthenticationSecret = 'none';
         await this.UserRepository.save(user);
         return user;
     }
