@@ -8,6 +8,7 @@ import { EndOfMatchDto } from './dto/endOfMatch.dto';
 import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
 import { FlipTwoFactorAuthDto } from './dto/flipTwoFactorAuyh.dto';
 import { ArgUndefinedException, FailToFindAUniqNameException, FailToFindObjectFromanEntity, FailToFindObjectFromDBException, TwoFactorAuthAlreadyDisableException, TwoFactorAuthAlreadyEnableException, UserAreAlreadyFriends, UserAreNotBlocked, UserAreNotFriends, UserFriendRequestAlreadyPendingException, UserIsBlockedException, UserIsTheSameException, UserNameAlreadyExistException } from '../exceptions/user.exception';
+import { authenticator } from 'otplib';
 
 @Injectable()
 export class UserService {
@@ -235,6 +236,7 @@ export class UserService {
                 online: false,
                 requestPending: [],
                 twoFactorAuth: false,
+                twoFactorAuthenticationSecret: 'none',
                 wins: 0,
                 losses: 0,
             });
@@ -255,6 +257,7 @@ export class UserService {
                 requestPending: [],
                 online: false,
                 twoFactorAuth: false,
+                twoFactorAuthenticationSecret: 'none',
                 wins: 0,
                 losses: 0,
             });
@@ -278,6 +281,7 @@ export class UserService {
         else if (!user.twoFactorAuth)
             throw new TwoFactorAuthAlreadyDisableException
         user.twoFactorAuth = false;
+        user.twoFactorAuthenticationSecret = 'none';
         await this.UserRepository.save(user);
         return user;
     }
@@ -309,4 +313,17 @@ export class UserService {
         else if (user1.userUuid === user2.userUuid)
             throw new UserIsTheSameException();
     }
+
+    async setTwoFactorAuthenticationSecret(user: user, secret: string) {
+        if (!user)
+            throw new ArgUndefinedException('user')
+        if (!secret)
+            throw new ArgUndefinedException('secret')
+        if (!secret)
+            throw new ArgUndefinedException('secret')
+        user.twoFactorAuthenticationSecret = secret;
+        this.UserRepository.save(user);
+
+      }
+
 }
