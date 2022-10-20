@@ -235,6 +235,7 @@ export class UserService {
                 online: false,
                 requestPending: [],
                 twoFactorAuth: false,
+                twoFactorAuthenticationSecret: 'none',
                 wins: 0,
                 losses: 0,
             });
@@ -255,6 +256,7 @@ export class UserService {
                 requestPending: [],
                 online: false,
                 twoFactorAuth: false,
+                twoFactorAuthenticationSecret: 'none',
                 wins: 0,
                 losses: 0,
             });

@@ -43,16 +43,27 @@ export class AuthController {
             res.redirect(req.headers.referer);
     }
 
+    @Post('2fa/login')
+    @HttpCode(200)
     @UseGuards(JwtAuthGuard)
-    @Get('protected')
-    getHello(@Request() req, @Res() res): string {
-        console.log("protected access")
-        console.log(req.user)
-        res.send("This is protected ressources")
-        return "fsdfsd"
+    async authenticate(@Request() request, @Response() res, @Body() body) {
+        const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+            body.twoFactorAuthenticationCode,
+            request.user,
+        );
+
+        if (!isCodeValid) {
+            throw new UnauthorizedException('Wrong authentication code');
+        }
+
+        // return this.authService.loginWith2fa(request.user);
+        res.cookie('access_token', this.authService.loginWith2fa(request.user));
+        if (request.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !request.headers.referer)
+            res.redirect(process.env.REACT_APP_HOME_PAGE);
+        else
+            res.redirect(request.headers.referer);
     }
 
-    
     @Post('2fa/generate')
   @UseGuards(JwtAuthGuard)
   async register(@Response() response, @Request() request) {
@@ -80,19 +91,4 @@ export class AuthController {
         await this.userService.enableTwoFactorAuth(request.user);
     }
 
-    @Post('2fa/authenticate')
-    @HttpCode(200)
-    @UseGuards(JwtAuthGuard)
-    async authenticate(@Request() request, @Body() body) {
-        const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-            body.twoFactorAuthenticationCode,
-            request.user,
-        );
-
-        if (!isCodeValid) {
-            throw new UnauthorizedException('Wrong authentication code');
-        }
-
-        return this.authService.loginWith2fa(request.user);
-    }
 }

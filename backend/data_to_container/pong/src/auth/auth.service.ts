@@ -30,10 +30,7 @@ export class AuthService {
             isTwoFactorAuthenticated: true,
         };
 
-        return {
-            userUuid: payload.userUuid,
-            access_token: this.jwtService.sign(payload),
-        };
+        return this.jwtService.sign(payload)
     }
 
     async generateTwoFactorAuthenticationSecret(user: user) {
