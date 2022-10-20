@@ -14,9 +14,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
-import { Message } from 'src/bdd/message.entity';
-import { Room } from 'src/bdd/room.entity';
-import { user } from 'src/bdd/users.entity';
+import { Message, Room, user } from 'src/bdd/index';
 import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
@@ -94,10 +92,7 @@ export class ChatGateway {
     @Req() { user }: { user: user },
   ): Promise<Room> {
     this.logger.log('req');
-    const room: Room = await this.chatService.joinDMRoom(
-      user.userUuid,
-      joinDMRoomDto.uuid,
-    );
+    const room: Room = await this.chatService.joinDMRoom(user, joinDMRoomDto);
     return room;
   }
 
@@ -121,7 +116,7 @@ export class ChatGateway {
     );
     return message;
   }
-
+  /*
   // Add a new administrator to the room
   @SubscribeMessage('addAdmin')
   async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
@@ -153,7 +148,7 @@ export class ChatGateway {
     );
     return room;
   }
-
+*/
   @SubscribeMessage('findAllPublicRooms')
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     const rooms: DeepPartial<Room>[] =
