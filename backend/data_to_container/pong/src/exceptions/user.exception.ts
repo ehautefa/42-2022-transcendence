@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 
-export class ArgUndefinedException extends HttpException {
+export class UserException extends HttpException {}
+
+export class ArgUndefinedException extends UserException {
       constructor(ArgsName: string = "An argument") {
     super(ArgsName +' is undefined', HttpStatus.FORBIDDEN);
   }
  }
 
-export class FailToFindObjectFromDBException extends HttpException {
+export class FailToFindObjectFromDBException extends UserException {
       constructor(objectName: string = "an object",
       tableName: string = "a table",
       dbName: string = "the database") {
@@ -14,7 +16,7 @@ export class FailToFindObjectFromDBException extends HttpException {
   }
  }
 
-export class FailToFindObjectFromanEntity extends HttpException {
+export class FailToFindObjectFromanEntity extends UserException {
       constructor(objectName: string = "an object",
       objectField: string = 'Unknown',
       entityName: string = 'Unknown') {
@@ -22,7 +24,7 @@ export class FailToFindObjectFromanEntity extends HttpException {
   }
  }
 
-export class UserAreAlreadyFriends extends HttpException {
+export class UserAreAlreadyFriends extends UserException {
       constructor(
         user1Name: string = 'user1',
         user2Name: string = 'user2',
@@ -31,7 +33,7 @@ export class UserAreAlreadyFriends extends HttpException {
   }
  }
 
-export class UserAreNotFriends extends HttpException {
+export class UserAreNotFriends extends UserException {
       constructor(
         user1Name: string = 'user1',
         user2Name: string = 'user2',
@@ -40,7 +42,7 @@ export class UserAreNotFriends extends HttpException {
   }
  }
 
-export class UserAreNotBlocked extends HttpException {
+export class UserAreNotBlocked extends UserException {
       constructor(
         user1Name: string = 'user1',
         user2Name: string = 'user2',
@@ -49,7 +51,7 @@ export class UserAreNotBlocked extends HttpException {
   }
  }
 
-export class UserIsBlockedException extends HttpException {
+export class UserIsBlockedException extends UserException {
       constructor(
         userName :string = 'user1',
         userName2 :string = 'user2',
@@ -58,13 +60,13 @@ export class UserIsBlockedException extends HttpException {
   }
  }
 
-export class UserIsTheSameException extends HttpException {
+export class UserIsTheSameException extends UserException {
       constructor() {
     super('User is asking for himself', HttpStatus.FORBIDDEN);
   }
  }
 
-export class UserNameAlreadyExistException extends HttpException {
+export class UserNameAlreadyExistException extends UserException {
       constructor(
         userName: string = 'UnknownUserName',
       ) {
@@ -72,13 +74,13 @@ export class UserNameAlreadyExistException extends HttpException {
   }
  }
 
-export class UserFriendRequestAlreadyPendingException extends HttpException {
+export class UserFriendRequestAlreadyPendingException extends UserException {
       constructor() {
     super('Friend request already in pending', HttpStatus.FORBIDDEN);
   }
  }
 
-export class FailToFindAUniqNameException extends HttpException {
+export class FailToFindAUniqNameException extends UserException {
       constructor(
         userName: string = 'the user'
       ) {
@@ -86,13 +88,13 @@ export class FailToFindAUniqNameException extends HttpException {
   }
  }
 
-export class TwoFactorAuthAlreadyDisableException extends HttpException {
+export class TwoFactorAuthAlreadyDisableException extends UserException {
       constructor() {
     super('Two factor Auth Already disable', HttpStatus.FORBIDDEN);
   }
  }
 
-export class TwoFactorAuthAlreadyEnableException extends HttpException {
+export class TwoFactorAuthAlreadyEnableException extends UserException {
       constructor() {
     super('Two factor Auth Already enable', HttpStatus.FORBIDDEN);
   }

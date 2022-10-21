@@ -48,9 +48,21 @@ export class user extends BaseEntity {
     @Column('boolean')
     twoFactorAuth: boolean;
 
+    //to select = NULL
     @ApiProperty({ example: 'fgdldsfggfdgdg;dkg;djhgjdfg;d;g', description: 'secret for 2fa'})
     @Column('varchar')
     twoFactorAuthenticationSecret: string
+
+    //to select = NULL
+    @ApiProperty({ example: 'fgdldsfggfdgdg;dkg;djhgjdfg;d;g', description: 'secret for refresh token'})
+    @Column({
+        type: 'varchar',
+        nullable: true,
+        select: false,
+    })
+    currentHashedRefreshToken: string
+
+
 
     // match_history
 

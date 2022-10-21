@@ -38,7 +38,7 @@ export class AuthService {
         const otpauthUrl = authenticator.keyuri(user.userName, process.env.REACT_APP_APP_NAME, secret);
 
         await this.userService.setTwoFactorAuthenticationSecret(user, secret);
-        return {secret, otpauthUrl}
+        return { secret, otpauthUrl }
     }
 
     async generateQrCodeDataURL(otpAuthUrl: string) {
@@ -46,11 +46,33 @@ export class AuthService {
     }
 
     isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: user) {
-        if(!twoFactorAuthenticationCode)
+        if (!twoFactorAuthenticationCode)
             return false
         return authenticator.verify({
             token: twoFactorAuthenticationCode,
             secret: user.twoFactorAuthenticationSecret,
         });
     }
+
+    // public getCookieWithJwtAccessToken(userId: number) {
+        // const payload: TokenPayload = { userId };
+        // const token = this.jwtService.sign(payload, {
+            // secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+            // expiresIn: `${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
+        // });
+        // return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+    // }
+// 
+    // public getCookieWithJwtRefreshToken(userId: number) {
+        // const payload: TokenPayload = { userId };
+        // const token = this.jwtService.sign(payload, {
+            // secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+            // expiresIn: `${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s`
+        // });
+        // const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}`;
+        // return {
+            // cookie,
+            // token
+        // }
+    // }
 }

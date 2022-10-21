@@ -12,9 +12,26 @@ import { MatchModule } from './match/match.module';
 import { PongModule } from './pong/pong.module';
 import { ChatModule } from './chat/chat.module';
 import { StatusModule } from './status/status.module';
+import { ConfigModule } from '@nestjs/config';
+import * as Joi from '@hapi/joi';
 
 @Module({
-  imports: [TestModule, ApiModule, ChatModule, BddModule, UserModule, AuthModule, MatchModule, PongModule, StatusModule],
+  imports: [TestModule, ApiModule, ChatModule, BddModule, UserModule, AuthModule, MatchModule, PongModule, StatusModule,
+    ConfigModule.forRoot({
+      validationSchema: Joi.object({
+        PGPORT: Joi.number().required(),
+        POSTGRES_USER: Joi.string().required(),
+        POSTGRES_PASSWORD: Joi.string().required(),
+        POSTGRES_DB: Joi.string().required(),
+        FT_CLIENT_SECRET: Joi.string().required(),
+        JWT_ACCESS_TOKEN_SECRET: Joi.string().required(),
+        JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+        JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
+        JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+        REACT_APP_FRONT_URL: Joi.string().required(),
+      }),
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
