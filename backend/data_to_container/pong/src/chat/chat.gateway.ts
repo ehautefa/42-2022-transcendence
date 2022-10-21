@@ -59,7 +59,8 @@ export class ChatGateway {
       createMessageDto,
       user,
     );
-    this.server.to(message.room.id).emit('message', message);
+    this.server.to(message.room.id).emit('updateMessages', message);
+    this.server.emit('updateRooms');
     return message;
   }
 
@@ -71,6 +72,7 @@ export class ChatGateway {
   ): Promise<Room> {
     this.logger.log('Here creating a room');
     const newRoom = await this.chatService.createRoom(createRoomDto, user);
+    this.server.emit('updateRooms');
     return newRoom;
   }
 
