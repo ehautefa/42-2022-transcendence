@@ -1,12 +1,5 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { ChatMember, Room } from '.';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ChatMember } from '.';
 
 @Entity()
 export class Message {
@@ -16,11 +9,10 @@ export class Message {
   @Column('varchar')
   message: string;
 
-  @ManyToOne(() => Room, (room) => room.id)
-  room: Room;
+  // @ManyToOne(() => Room, (room) => room.id)
+  // room: Room;
 
   @OneToMany(() => ChatMember, (chatConnection) => chatConnection.id)
-  @JoinColumn()
   sender: ChatMember;
 
   @Column('timestamp')

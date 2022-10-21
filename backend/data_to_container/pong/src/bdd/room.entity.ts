@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToOne,
@@ -51,5 +52,6 @@ export class Room {
   type: RoomType;
 
   @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id)
+  @Index()
   members: ChatMember[];
 }

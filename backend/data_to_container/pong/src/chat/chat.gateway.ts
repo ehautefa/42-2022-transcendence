@@ -59,7 +59,7 @@ export class ChatGateway {
       createMessageDto,
       user,
     );
-    this.server.to(message.room.id).emit('updateMessages', message);
+    this.server.to(message.sender.room.id).emit('updateMessages', message);
     this.server.emit('updateRooms');
     return message;
   }

@@ -23,31 +23,8 @@ export class ChatService {
   private logger: Logger = new Logger('ChatService');
 
   /*
-   ** service functions called by the gateway
+   ** message functions
    */
-
-  async getChatMember(user: user, room: Room): Promise<ChatMember> {
-    try {
-      const chatMember: ChatMember =
-        await this.chatMembersRepository.findOneOrFail({
-          relations: {
-            user: true,
-            room: true,
-          },
-          where: {
-            user: { userUuid: user.userUuid },
-            room: { id: room.id },
-          },
-        });
-      return chatMember;
-    } catch (error) {
-      const chatMember = this.chatMembersRepository.create({
-        user: user,
-        room: room,
-      });
-      return this.chatMembersRepository.save(chatMember);
-    }
-  }
 
   async createMessage(
     createMessageDto: CreateMessageDto,
@@ -57,7 +34,7 @@ export class ChatService {
     const chatMember: ChatMember = await this.getChatMember(sender, room);
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
-      room: room,
+      // room: room,
       sender: chatMember,
       time: Date.now(),
     });
@@ -66,20 +43,85 @@ export class ChatService {
     return newMessage;
   }
 
-  async findOtherUserDMRoom(roomDM: Room, user: user): Promise<user> {
-    return;
+  async findAllMessagesInRoom({
+    uuid: roomId,
+  }: {
+    uuid: string;
+  }): Promise<Message[]> {
+    console.log('roomId = ', roomId);
+    const messages: Message[] = await this.messagesRepository.find({
+      where: {
+        id: roomId,
+      },
+      join: {
+        alias: 'msg',
+        innerJoin: {
+          sender: 'msg.sender',
+          room: 'sender.room',
+          id: 'room.id',
+        },
+      },
+    });
+    return messages;
   }
 
+  async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
+    const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
+    return messages[messages.length - 1];
+  }
+
+  /*
+   * chatMember functions
+   */
+
+  async getChatMember(user: user, room: Room): Promise<ChatMember> {
+    try {
+      return await this.findChatMember(user, room);
+    } catch (error) {
+      return await this.createChatMember(user, room);
+    }
+  }
+
+  async findChatMember(user: user, room: Room): Promise<ChatMember> {
+    const chatMember: ChatMember = await this.chatMembersRepository.findOne({
+      relations: {
+        user: true,
+        room: true,
+      },
+      where: {
+        user: { userUuid: user.userUuid },
+        room: { id: room.id },
+      },
+    });
+    return chatMember;
+  }
+
+  async createChatMember(user: user, room: Room): Promise<ChatMember> {
+    const chatMember: ChatMember = this.chatMembersRepository.create({
+      user: user,
+      room: room,
+    });
+    await this.chatMembersRepository.save(chatMember);
+    return chatMember;
+  }
+
+  /*
+   * room functions
+   */
+
   async createRoom(createRoomDto: CreateRoomDto, owner: user): Promise<Room> {
-    const newRoom: Room = this.roomsRepository.create({
+    let newRoom: Room = this.roomsRepository.create({
       name: createRoomDto.name,
       isProtected: createRoomDto.isProtected,
       password: createRoomDto.password,
       type: createRoomDto.type,
     });
+    newRoom = await this.roomsRepository.save(newRoom);
     const chatMember: ChatMember = await this.getChatMember(owner, newRoom);
     newRoom.owner = chatMember;
-    newRoom.members.push(chatMember);
+    newRoom.members = [chatMember];
+    console.log(newRoom);
+    this.logger.debug('newRoom');
     await this.roomsRepository.save(newRoom);
     return newRoom;
   }
@@ -92,49 +134,17 @@ export class ChatService {
     }
   }
 
-  // async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
-  // SELECT * from rooms
-  // LEFT JOIN room_users_user ON rooms.id = room_users_user.room_id
-  // LEFT JOIN users ON room_users_user.user_id = users.id
-  // WHERE rooms.type = 'dm' AND users.id IN (2, 4)
-  // GROUP BY rooms.id
-  // HAVING COUNT(users.id) = 2;
-  // const room: Room = await this.roomsRepository
-  // .createQueryBuilder('room')
-  // .leftJoinAndSelect('room.users', 'users')
-  // .select('room.id', 'roomId')
-  // .where('room.type = :type', { type: 'dm' })
-  // .andWhere('users.id in (:...userId)', {
-  // userId: [senderId, recipientId],
-  // })
-  // .groupBy('room.id')
-  // .having('count(users.id) = 2')
-  // .getOneOrFail();
-  //   const room: Room = await this.roomsRepository
-  //     .createQueryBuilder('room')
-  //     .leftJoinAndSelect('room.members', 'members')
-  //     .leftJoinAndSelect('members.user', 'user')
-  //     .where('room.type = :type', { type: RoomType.DM })
-  //     .andWhere('user.userUuid = :userUuid', { userUuid: recipientId })
-  //     .groupBy('room.id')
-  //     .getOneOrFail();
-
-  //   return room;
-  // }
-  async getDMRoom(senderId: string, recipientId: string) {
-    const room: Room = await this.roomsRepository
-      .createQueryBuilder('room')
-      .leftJoinAndSelect('room.members', 'members')
-      .leftJoinAndSelect('members.user', 'user')
-      .where('room.type = :type', { type: 'dm' })
-      .andWhere('user.id in (:...userId)', {
-        userId: [senderId, recipientId],
-      })
-      .groupBy('room.id')
-      .having('count(users.id) = 2')
-      .getOneOrFail();
-    return room;
+  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
+    const rooms: Room[] = await this.roomsRepository.find({
+      select: { id: true, name: true },
+      where: { type: RoomType.PUBLIC },
+    });
+    return rooms;
   }
+
+  /*
+   * dm room functions
+   */
 
   async createDMRoom(sender: user, recipientId: string): Promise<Room> {
     const newDMRoom: Room = this.roomsRepository.create({
@@ -153,35 +163,21 @@ export class ChatService {
     this.roomsRepository.save(newDMRoom);
     return newDMRoom;
   }
-
-  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
-    const rooms: Room[] = await this.roomsRepository.find({
-      select: { id: true, name: true },
-      where: { type: RoomType.PUBLIC },
-    });
-    console.log(rooms);
-    return rooms;
+  async getDMRoom(senderId: string, recipientId: string) {
+    const room: Room = await this.roomsRepository
+      .createQueryBuilder('room')
+      .leftJoinAndSelect('room.members', 'members')
+      .leftJoinAndSelect('members.user', 'user')
+      .where('room.type = :type', { type: 'dm' })
+      .andWhere('user.id in (:...userId)', {
+        userId: [senderId, recipientId],
+      })
+      .groupBy('room.id')
+      .having('count(users.id) = 2')
+      .getOneOrFail();
+    return room;
   }
 
-  async findAllMessagesInRoom({
-    uuid: roomId,
-  }: {
-    uuid: string;
-  }): Promise<Message[]> {
-    console.log('roomId = ', roomId);
-    const messages: Message[] = await this.messagesRepository.find({
-      relations: { room: true },
-      where: {
-        room: { id: roomId },
-      },
-    });
-    return messages;
-  }
-
-  async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
-    const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
-    return messages[messages.length - 1];
-  }
   /*
   async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
     const room: Room = await this.getRoomById(roomId);
