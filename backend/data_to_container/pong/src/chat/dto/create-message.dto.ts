@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateMessageDto {
   @IsString()
@@ -7,8 +7,4 @@ export class CreateMessageDto {
   @IsNotEmpty()
   @IsUUID()
   roomId: string;
-
-  @IsNotEmpty()
-  @IsBoolean()
-  isDM: boolean;
 }
