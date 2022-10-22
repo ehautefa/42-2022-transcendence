@@ -6,10 +6,10 @@ export class ChatMember {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => user, (usr) => usr.userUuid)
+  @ManyToOne(() => user, (usr) => usr.userUuid, { onDelete: 'CASCADE' })
   user: user;
 
-  @ManyToOne(() => Room, (room) => room.id)
+  @ManyToOne(() => Room, (room) => room.id, { onDelete: 'CASCADE' })
   room: Room;
 
   @Column('timestamp', { nullable: true })

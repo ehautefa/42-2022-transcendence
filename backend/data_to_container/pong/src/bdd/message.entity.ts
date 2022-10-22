@@ -9,9 +9,6 @@ export class Message {
   @Column('varchar')
   message: string;
 
-  // @ManyToOne(() => Room, (room) => room.id)
-  // room: Room;
-
   @OneToMany(() => ChatMember, (chatConnection) => chatConnection.id)
   sender: ChatMember;
 

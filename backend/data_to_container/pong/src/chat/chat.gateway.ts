@@ -14,27 +14,23 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
-import { Message, Room, user } from 'src/bdd/index';
+import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
+import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
+import { SetAdminDto } from './dto/set-admin.dto';
 import { StringDto } from './dto/string.dto';
-
-// Not sure if this is going to be usefull to me ...
-/*
-const URL_BACK: string =
-  process.env.REACT_APP_BACK_URL === undefined
-    ? ''
-    : process.env.REACT_APP_BACK_URL;
-*/
+import { RolesGuard } from './guard/roles.guard';
 
 @UseGuards(JwtAuthGuard)
+@UseGuards(RolesGuard)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
     whitelist: true,
-    forbidNonWhitelisted: true,
+    // forbidNonWhitelisted: true,
   }),
 )
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
@@ -124,14 +120,26 @@ export class ChatGateway {
     );
     return message;
   }
-  /*
-  // Add a new administrator to the room
-  @SubscribeMessage('addAdmin')
-  async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
-    const room: Room = await this.chatService.addAdmin(newAdmin, roomId);
-    return room;
+
+  @Roles('owner', 'admin')
+  @SubscribeMessage('setAdmin')
+  async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
+    const chatMember: ChatMember = await this.chatService.setAdmin(setAdminDto);
+    return chatMember;
   }
 
+  // @Roles('owner')
+  // @SubscribeMessage('giveOwnership')
+  // async changeOwnership(room_id: string, newOwnerId: string): Promise<Room> {
+  //   const room = await this.chatService.changeOwnership(
+  //     room_id,
+  //     user,
+  //     newOwnerId,
+  //   );
+  //   return room;
+  // }
+
+  /*
   // Delete a room if user is the owner
   @SubscribeMessage('deleteRoom')
   async deleteRoom(
@@ -143,18 +151,6 @@ export class ChatGateway {
   }
 
   // Change the owner of the room
-  @SubscribeMessage('changeOwnership')
-  async changeOwnership(
-    room_id: string,
-    @Req() { user }: { user: user },
-    newOwnerId: string,
-  ): Promise<Room> {
-    const room = await this.chatService.changeOwnership(
-      room_id,
-      user,
-      newOwnerId,
-    );
-    return room;
   }
 */
   @SubscribeMessage('findAllPublicRooms')
@@ -165,7 +161,7 @@ export class ChatGateway {
   }
 
   afterInit(server: Server) {
-    this.logger.log('Init');
+    this.logger.log(`Init`);
   }
 
   handleDisconnect(client: Socket) {

@@ -4,7 +4,10 @@ import { WsException } from '@nestjs/websockets';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { DeepPartial, Repository } from 'typeorm';
+import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
+import { GiveOwnershipDto } from './dto/give-ownership.dto';
+import { SetAdminDto } from './dto/set-admin.dto';
 import { StringDto } from './dto/string.dto';
 
 @Injectable()
@@ -78,21 +81,21 @@ export class ChatService {
 
   async getChatMember(user: user, room: Room): Promise<ChatMember> {
     try {
-      return await this.findChatMember(user, room);
+      return await this.findChatMember(user.userUuid, room.id);
     } catch (error) {
       return await this.createChatMember(user, room);
     }
   }
 
-  async findChatMember(user: user, room: Room): Promise<ChatMember> {
+  async findChatMember(userId: string, roomId: string): Promise<ChatMember> {
     const chatMember: ChatMember = await this.chatMembersRepository.findOne({
       relations: {
         user: true,
         room: true,
       },
       where: {
-        user: { userUuid: user.userUuid },
-        room: { id: room.id },
+        user: { userUuid: userId },
+        room: { id: roomId },
       },
     });
     return chatMember;
@@ -123,7 +126,6 @@ export class ChatService {
     newRoom.owner = chatMember;
     newRoom.members = [chatMember];
     console.log(newRoom);
-    this.logger.debug('newRoom');
     await this.roomsRepository.save(newRoom);
     return newRoom;
   }
@@ -203,49 +205,37 @@ export class ChatService {
   }
 
   /*
-  async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
-    const room: Room = await this.getRoomById(roomId);
-    room.admin.push(newAdmin);
-    this.roomsRepository.save(room);
-    return room;
+   * admin functions
+   */
+
+  async setAdmin(setAdminDto: SetAdminDto): Promise<ChatMember> {
+    const chatMember: ChatMember = await this.findChatMember(
+      setAdminDto.userId,
+      setAdminDto.roomId,
+    );
+    chatMember.isAdmin = setAdminDto.isAdmin;
+    this.roomsRepository.save(chatMember);
+    return chatMember;
   }
 
-  async deleteRoom(roomId: string, currentUser: user): Promise<Room> {
-    const room: Room = await this.getRoomById(roomId);
-    if (currentUser !== room.owner)
-      throw new Error('A room can only be destroyed by its owner');
-    return this.roomsRepository.remove(room);
-  }
-
-  async changeOwnership(
-    roomId: string,
-    oldOwner: user,
-    newOwnerId: string,
-  ): Promise<Room> {
-    const newOwner: user = await this.userService.getUser(newOwnerId);
-    if (!newOwner) throw new Error('New owner invalid');
-    const room: Room = await this.getRoomById(roomId);
-    if (oldOwner !== room.owner)
-      throw new Error(
-        'Only the current owner can give its room to someone else',
-      );
-    room.owner = newOwner;
-    this.roomsRepository.save(room);
-    return room;
-  }
-*/
   /*
-  async isAdmin(userId: string, roomId: string): Promise<boolean> {
-    const room: Room = await this.getRoomById(roomId);
-    room.admin.forEach((adm) => {
-      if (adm.userUuid === userId) return true;
-    });
-    return false;
+   * owner functions
+   */
+
+  @Roles('owner')
+  async giveOwnership(giveOwnershipDto: GiveOwnershipDto): Promise<Room> {
+    const room: Promise<Room> = this.findRoomById(giveOwnershipDto.roomId);
+    const user: Promise<ChatMember> = this.findChatMember(
+      giveOwnershipDto.userId,
+      giveOwnershipDto.roomId,
+    );
+    (await room).owner = await user;
+    return room;
   }
 
-  async isOwner(userId: string, roomId: string): Promise<boolean> {
-    const room: Room = await this.getRoomById(roomId);
-    return room.owner.userUuid === userId;
+  @Roles('owner')
+  async deleteRoom(roomId: UuidDto): Promise<Room> {
+    const room: Room = await this.findRoomById(roomId.uuid);
+    return await this.roomsRepository.remove(room);
   }
-  */
 }

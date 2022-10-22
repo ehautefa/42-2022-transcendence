@@ -28,7 +28,7 @@ export class Room {
   name: string;
 
   // A DM room does not have an owner
-  @OneToOne(() => ChatMember, { nullable: true })
+  @OneToOne(() => ChatMember, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   owner: ChatMember;
 
