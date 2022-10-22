@@ -23,9 +23,11 @@ import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { SetAdminDto } from './dto/set-admin.dto';
 import { StringDto } from './dto/string.dto';
 import { RolesGuard } from './guard/roles.guard';
+// import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
 
 @UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
+// @UseInterceptors(FilterHashInterceptor)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
@@ -64,9 +66,11 @@ export class ChatGateway {
   async createRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
     @Req() { user }: { user: user },
-  ): Promise<Room> {
-    this.logger.log('Here creating a room');
-    const newRoom = await this.chatService.createRoom(createRoomDto, user);
+  ): Promise<DeepPartial<Room>> {
+    const newRoom: DeepPartial<Room> = await this.chatService.createRoom(
+      createRoomDto,
+      user,
+    );
     this.server.emit('updateRooms');
     return newRoom;
   }

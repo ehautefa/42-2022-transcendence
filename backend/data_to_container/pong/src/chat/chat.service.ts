@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WsException } from '@nestjs/websockets';
+import * as argon from 'argon2';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { DeepPartial, Repository } from 'typeorm';
@@ -115,17 +116,19 @@ export class ChatService {
    */
 
   async createRoom(createRoomDto: CreateRoomDto, owner: user): Promise<Room> {
+    const hash: string = !createRoomDto.password
+      ? ''
+      : await argon.hash(createRoomDto.password);
     let newRoom: Room = this.roomsRepository.create({
       name: createRoomDto.name,
       isProtected: createRoomDto.isProtected,
-      password: createRoomDto.password,
+      hash: hash,
       type: createRoomDto.type,
     });
     newRoom = await this.roomsRepository.save(newRoom);
     const chatMember: ChatMember = await this.getChatMember(owner, newRoom);
     newRoom.owner = chatMember;
     newRoom.members = [chatMember];
-    console.log(newRoom);
     await this.roomsRepository.save(newRoom);
     return newRoom;
   }
@@ -138,14 +141,14 @@ export class ChatService {
     return rooms;
   }
 
-  async findRoomById(roomId: string) {
+  async findRoomById(roomId: string): Promise<Room> {
     const room: Room = await this.roomsRepository.findOneOrFail({
       where: { id: roomId },
     });
     return room;
   }
 
-  async joinPrivateRoom(joinPrivateRoomDto: StringDto) {
+  async joinPrivateRoom(joinPrivateRoomDto: StringDto): Promise<Room> {
     try {
       return await this.findRoomByName(joinPrivateRoomDto.str);
     } catch (error) {
@@ -153,7 +156,7 @@ export class ChatService {
     }
   }
 
-  async findRoomByName(roomName: string) {
+  async findRoomByName(roomName: string): Promise<Room> {
     const room: Room = await this.roomsRepository.findOneOrFail({
       where: { name: roomName },
     });
@@ -181,7 +184,7 @@ export class ChatService {
     this.roomsRepository.save(newDMRoom);
     return newDMRoom;
   }
-  async getDMRoom(senderId: string, recipientId: string) {
+  async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
     const room: Room = await this.roomsRepository
       .createQueryBuilder('room')
       .leftJoinAndSelect('room.members', 'members')
@@ -196,7 +199,7 @@ export class ChatService {
     return room;
   }
 
-  async joinDMRoom(sender: user, recipientId: UuidDto) {
+  async joinDMRoom(sender: user, recipientId: UuidDto): Promise<Room> {
     try {
       return await this.getDMRoom(sender.userUuid, recipientId.uuid);
     } catch (error) {
@@ -237,5 +240,19 @@ export class ChatService {
   async deleteRoom(roomId: UuidDto): Promise<Room> {
     const room: Room = await this.findRoomById(roomId.uuid);
     return await this.roomsRepository.remove(room);
+  }
+
+  /*
+   * utils
+   */
+
+  stripOutHash(room: Room): DeepPartial<Room> {
+    return {
+      name: room.name,
+      owner: room.owner,
+      isProtected: room.isProtected,
+      type: room.type,
+      members: room.members,
+    };
   }
 }

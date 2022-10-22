@@ -42,7 +42,7 @@ export class Room {
     type: 'varchar',
     nullable: true,
   })
-  password: string;
+  hash: string;
 
   @Column({
     type: 'enum',
