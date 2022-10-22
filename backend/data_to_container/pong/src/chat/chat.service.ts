@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { WsException } from '@nestjs/websockets';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { DeepPartial, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
+import { StringDto } from './dto/string.dto';
 
 @Injectable()
 // @UseFilters(ChatExceptionFilter)
@@ -30,7 +32,7 @@ export class ChatService {
     createMessageDto: CreateMessageDto,
     sender: user,
   ): Promise<Message> {
-    const room: Room = await this.getRoomById(createMessageDto.roomId);
+    const room: Room = await this.findRoomById(createMessageDto.roomId);
     const chatMember: ChatMember = await this.getChatMember(sender, room);
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
@@ -126,20 +128,34 @@ export class ChatService {
     return newRoom;
   }
 
-  async joinDMRoom(sender: user, recipientId: UuidDto) {
-    try {
-      return await this.getDMRoom(sender.userUuid, recipientId.uuid);
-    } catch (error) {
-      return await this.createDMRoom(sender, recipientId.uuid);
-    }
-  }
-
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     const rooms: Room[] = await this.roomsRepository.find({
       select: { id: true, name: true },
       where: { type: RoomType.PUBLIC },
     });
     return rooms;
+  }
+
+  async findRoomById(roomId: string) {
+    const room: Room = await this.roomsRepository.findOneOrFail({
+      where: { id: roomId },
+    });
+    return room;
+  }
+
+  async joinPrivateRoom(joinPrivateRoomDto: StringDto) {
+    try {
+      return await this.findRoomByName(joinPrivateRoomDto.str);
+    } catch (error) {
+      throw new WsException(`Room ${joinPrivateRoomDto.str} does not exist.`);
+    }
+  }
+
+  async findRoomByName(roomName: string) {
+    const room: Room = await this.roomsRepository.findOneOrFail({
+      where: { name: roomName },
+    });
+    return room;
   }
 
   /*
@@ -178,6 +194,14 @@ export class ChatService {
     return room;
   }
 
+  async joinDMRoom(sender: user, recipientId: UuidDto) {
+    try {
+      return await this.getDMRoom(sender.userUuid, recipientId.uuid);
+    } catch (error) {
+      return await this.createDMRoom(sender, recipientId.uuid);
+    }
+  }
+
   /*
   async addAdmin(newAdmin: user, roomId: string): Promise<Room> {
     const room: Room = await this.getRoomById(roomId);
@@ -210,19 +234,6 @@ export class ChatService {
     return room;
   }
 */
-  async getRoomByName(roomName: string): Promise<Room> {
-    const room: Room = await this.roomsRepository.findOneOrFail({
-      where: { name: roomName },
-    });
-    return room;
-  }
-
-  async getRoomById(roomId: string) {
-    const room: Room = await this.roomsRepository.findOneOrFail({
-      where: { id: roomId },
-    });
-    return room;
-  }
   /*
   async isAdmin(userId: string, roomId: string): Promise<boolean> {
     const room: Room = await this.getRoomById(roomId);

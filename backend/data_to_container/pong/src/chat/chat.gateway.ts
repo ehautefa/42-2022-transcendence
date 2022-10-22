@@ -18,7 +18,8 @@ import { Message, Room, user } from 'src/bdd/index';
 import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { CreateMessageDto, CreateRoomDto, JoinRoomDto, UuidDto } from './dto';
+import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
+import { StringDto } from './dto/string.dto';
 
 // Not sure if this is going to be usefull to me ...
 /*
@@ -48,7 +49,6 @@ export class ChatGateway {
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatGateway');
 
-  // Create a message in the message table and inform the sockets in the room that a new message is available
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
@@ -64,7 +64,6 @@ export class ChatGateway {
     return message;
   }
 
-  // Create a room in the room table
   @SubscribeMessage('createRoom')
   async createRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
@@ -76,18 +75,24 @@ export class ChatGateway {
     return newRoom;
   }
 
-  // Join a room previously created and return it
   @SubscribeMessage('joinRoom')
-  async joinRoom(joinRoomDto: JoinRoomDto) {
-    this.logger.log('Joining a room');
-    const room: Room = await this.chatService.getRoomByName(
-      joinRoomDto.roomName,
-    );
-    this.server.socketsJoin(joinRoomDto.roomName);
+  async joinRoom(joinRoomDto: UuidDto) {
+    const room: Room = await this.chatService.findRoomById(joinRoomDto.uuid);
+    this.server.socketsJoin(room.id);
+    this.logger.log(`Joined ${room.name} room (${room.id})`);
     return room;
   }
 
-  // Join a DM room (create it if the room does not exist yet)
+  @SubscribeMessage('joinPrivateRoom')
+  async joinPrivateRoom(joinPrivateRoomDto: StringDto) {
+    const room: Room = await this.chatService.joinPrivateRoom(
+      joinPrivateRoomDto,
+    );
+    this.server.socketsJoin(room.id);
+    this.logger.log(`Joined ${room.name} room (${room.id})`);
+    return room;
+  }
+
   @SubscribeMessage('joinDMRoom')
   async joinDMRoom(
     @MessageBody() joinDMRoomDto: UuidDto,
@@ -95,6 +100,7 @@ export class ChatGateway {
   ): Promise<Room> {
     this.logger.log('req');
     const room: Room = await this.chatService.joinDMRoom(user, joinDMRoomDto);
+    this.server.socketsJoin(joinDMRoomDto.uuid);
     return room;
   }
 
