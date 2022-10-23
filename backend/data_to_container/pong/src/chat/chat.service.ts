@@ -241,18 +241,4 @@ export class ChatService {
     const room: Room = await this.findRoomById(roomId.uuid);
     return await this.roomsRepository.remove(room);
   }
-
-  /*
-   * utils
-   */
-
-  stripOutHash(room: Room): DeepPartial<Room> {
-    return {
-      name: room.name,
-      owner: room.owner,
-      isProtected: room.isProtected,
-      type: room.type,
-      members: room.members,
-    };
-  }
 }

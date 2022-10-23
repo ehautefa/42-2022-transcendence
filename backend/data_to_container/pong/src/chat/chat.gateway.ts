@@ -3,6 +3,7 @@ import {
   Req,
   UseFilters,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -23,11 +24,11 @@ import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { SetAdminDto } from './dto/set-admin.dto';
 import { StringDto } from './dto/string.dto';
 import { RolesGuard } from './guard/roles.guard';
-// import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
+import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
 
 @UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
-// @UseInterceptors(FilterHashInterceptor)
+@UseInterceptors(FilterHashInterceptor)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
