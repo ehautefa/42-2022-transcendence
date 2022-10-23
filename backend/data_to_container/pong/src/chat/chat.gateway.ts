@@ -19,18 +19,23 @@ import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
+import { Authorized } from './decorator/authorized.decorator';
 import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
+import { PunishUserDto } from './dto/punish-user.dto';
+import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
 import { StringDto } from './dto/string.dto';
+import { AuthorizedGuard } from './guard/authorized.guard';
 import { ProtectedRoom } from './guard/protected-room.guard';
 import { RolesGuard } from './guard/roles.guard';
 import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
 
 @UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
+@UseGuards(AuthorizedGuard)
 @UseInterceptors(FilterHashInterceptor)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
@@ -51,6 +56,7 @@ export class ChatGateway {
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatGateway');
 
+  @Authorized('notBanned', 'notBlocked', 'notMuted')
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
@@ -79,6 +85,7 @@ export class ChatGateway {
     return newRoom;
   }
 
+  @Authorized('notBanned')
   @SubscribeMessage('joinRoom')
   async joinRoom(joinRoomDto: UuidDto) {
     const room: Room = await this.chatService.findRoomById(joinRoomDto.uuid);
@@ -86,6 +93,7 @@ export class ChatGateway {
     return room;
   }
 
+  @Authorized('notBanned')
   @SubscribeMessage('joinPrivateRoom')
   async joinPrivateRoom(joinPrivateRoomDto: StringDto) {
     const room: Room = await this.chatService.joinPrivateRoom(
@@ -95,6 +103,7 @@ export class ChatGateway {
     return room;
   }
 
+  @Authorized('notBlocked')
   @SubscribeMessage('joinDMRoom')
   async joinDMRoom(
     @MessageBody() joinDMRoomDto: UuidDto,
@@ -106,6 +115,7 @@ export class ChatGateway {
     return room;
   }
 
+  @Authorized('notBanned')
   @SubscribeMessage('findAllMessagesInRoom')
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
@@ -115,6 +125,7 @@ export class ChatGateway {
     );
   }
 
+  @Authorized('notBanned')
   @SubscribeMessage('findLastMessageInRoom')
   async findLastMessageInRoom(
     @MessageBody() findLastMessageInRoomDto: UuidDto,
@@ -151,6 +162,20 @@ export class ChatGateway {
     @MessageBody() changePasswordDto: ChangePasswordDto,
   ): Promise<Room> {
     return await this.chatService.changePassword(changePasswordDto);
+  }
+
+  @Roles('admin')
+  async punishUser(
+    @MessageBody() punishUserDto: PunishUserDto,
+  ): Promise<ChatMember> {
+    return await this.chatService.punishUser(punishUserDto);
+  }
+
+  @Roles('admin')
+  async removePunishment(
+    removePunishmentDto: RemovePunishmentDto,
+  ): Promise<ChatMember> {
+    return await this.chatService.removePunishment(removePunishmentDto);
   }
 
   @SubscribeMessage('findAllPublicRooms')

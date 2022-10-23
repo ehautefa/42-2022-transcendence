@@ -4,14 +4,16 @@ import { WsException } from '@nestjs/websockets';
 import * as argon from 'argon2';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, Not, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
+import { PunishUserDto } from './dto/punish-user.dto';
+import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
 import { StringDto } from './dto/string.dto';
 
 @Injectable()
-// @UseFilters(ChatExceptionFilter)
 export class ChatService {
   constructor(
     @InjectRepository(Message)
@@ -183,6 +185,7 @@ export class ChatService {
     this.roomsRepository.save(newDMRoom);
     return newDMRoom;
   }
+
   async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
     const room: Room = await this.roomsRepository
       .createQueryBuilder('room')
@@ -206,6 +209,18 @@ export class ChatService {
     }
   }
 
+  async getOtherDMUser(userId: string, roomId: string): Promise<user> {
+    const otherChatMember: ChatMember =
+      await this.chatMembersRepository.findOneOrFail({
+        relations: { user: true, room: true },
+        where: {
+          room: { id: roomId },
+          user: { userUuid: Not(userId) },
+        },
+      });
+    return otherChatMember.user;
+  }
+
   /*
    * admin functions
    */
@@ -220,21 +235,46 @@ export class ChatService {
     return chatMember;
   }
 
+  async punishUser(punishUserDto: PunishUserDto): Promise<ChatMember> {
+    const chatMember: ChatMember = await this.findChatMember(
+      punishUserDto.userId,
+      punishUserDto.roomId,
+    );
+    const endPunishment: number = punishUserDto.duration * 1000 + Date.now();
+    chatMember.mutedTime = endPunishment;
+    if (punishUserDto.isBanned === true) chatMember.bannedTime = endPunishment;
+    return await this.chatMembersRepository.save(chatMember);
+  }
+
+  async removePunishment(
+    removePunishmentDto: RemovePunishmentDto,
+  ): Promise<ChatMember> {
+    const chatMember: ChatMember = await this.findChatMember(
+      removePunishmentDto.userId,
+      removePunishmentDto.roomId,
+    );
+    delete chatMember.bannedTime;
+    if (removePunishmentDto.unMute === true) delete chatMember.mutedTime;
+    return await this.chatMembersRepository.save(chatMember);
+  }
+
   /*
    * owner functions
    */
 
   async giveOwnership(giveOwnershipDto: GiveOwnershipDto): Promise<Room> {
     const room: Promise<Room> = this.findRoomById(giveOwnershipDto.roomId);
-    const user: Promise<ChatMember> = this.findChatMember(
+    const chatMember: Promise<ChatMember> = this.findChatMember(
       giveOwnershipDto.userId,
       giveOwnershipDto.roomId,
     );
-    (await room).owner = await user;
-    return room;
+    (await room).owner = await chatMember;
+    (await chatMember).isAdmin = true;
+    await this.chatMembersRepository.save(await chatMember);
+    return await this.roomsRepository.save(await room);
   }
 
-  async changePassword(changePasswordDto): Promise<Room> {
+  async changePassword(changePasswordDto: ChangePasswordDto): Promise<Room> {
     const room: Room = await this.findRoomById(changePasswordDto.roomId);
     room.hash = await argon.hash(changePasswordDto.newPassword);
     return await this.roomsRepository.save(room);
