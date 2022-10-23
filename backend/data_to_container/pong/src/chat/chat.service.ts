@@ -5,7 +5,6 @@ import * as argon from 'argon2';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { DeepPartial, Repository } from 'typeorm';
-import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
@@ -225,7 +224,6 @@ export class ChatService {
    * owner functions
    */
 
-  @Roles('owner')
   async giveOwnership(giveOwnershipDto: GiveOwnershipDto): Promise<Room> {
     const room: Promise<Room> = this.findRoomById(giveOwnershipDto.roomId);
     const user: Promise<ChatMember> = this.findChatMember(
@@ -236,7 +234,12 @@ export class ChatService {
     return room;
   }
 
-  @Roles('owner')
+  async changePassword(changePasswordDto): Promise<Room> {
+    const room: Room = await this.findRoomById(changePasswordDto.roomId);
+    room.hash = await argon.hash(changePasswordDto.newPassword);
+    return await this.roomsRepository.save(room);
+  }
+
   async deleteRoom(roomId: UuidDto): Promise<Room> {
     const room: Room = await this.findRoomById(roomId.uuid);
     return await this.roomsRepository.remove(room);

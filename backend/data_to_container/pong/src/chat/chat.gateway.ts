@@ -13,7 +13,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { DeepPartial } from 'typeorm';
@@ -21,8 +21,11 @@ import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
 import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
 import { StringDto } from './dto/string.dto';
+import { ProtectedRoom } from './guard/protected-room.guard';
 import { RolesGuard } from './guard/roles.guard';
 import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
 
@@ -80,7 +83,6 @@ export class ChatGateway {
   async joinRoom(joinRoomDto: UuidDto) {
     const room: Room = await this.chatService.findRoomById(joinRoomDto.uuid);
     this.server.socketsJoin(room.id);
-    this.logger.log(`Joined ${room.name} room (${room.id})`);
     return room;
   }
 
@@ -90,7 +92,6 @@ export class ChatGateway {
       joinPrivateRoomDto,
     );
     this.server.socketsJoin(room.id);
-    this.logger.log(`Joined ${room.name} room (${room.id})`);
     return room;
   }
 
@@ -109,71 +110,51 @@ export class ChatGateway {
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
-    this.logger.log('Getting messages of room ', findAllMessagesInRoomDto.uuid);
-    const messages: Message[] = await this.chatService.findAllMessagesInRoom(
+    return await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
-    return messages;
   }
 
   @SubscribeMessage('findLastMessageInRoom')
   async findLastMessageInRoom(
     @MessageBody() findLastMessageInRoomDto: UuidDto,
   ): Promise<Message> {
-    const message: Message = await this.chatService.findLastMessageInRoom(
+    return await this.chatService.findLastMessageInRoom(
       findLastMessageInRoomDto,
     );
-    return message;
   }
 
   @Roles('owner', 'admin')
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
-    const chatMember: ChatMember = await this.chatService.setAdmin(setAdminDto);
-    return chatMember;
+    return await this.chatService.setAdmin(setAdminDto);
   }
 
-  // @Roles('owner')
-  // @SubscribeMessage('giveOwnership')
-  // async changeOwnership(room_id: string, newOwnerId: string): Promise<Room> {
-  //   const room = await this.chatService.changeOwnership(
-  //     room_id,
-  //     user,
-  //     newOwnerId,
-  //   );
-  //   return room;
-  // }
-
-  /*
-  // Delete a room if user is the owner
-  @SubscribeMessage('deleteRoom')
-  async deleteRoom(
-    roomId: string,
-    @Req() { user }: { user: user },
+  @Roles('owner')
+  @SubscribeMessage('giveOwnership')
+  async changeOwnership(
+    @MessageBody() giveOwnershipDto: GiveOwnershipDto,
   ): Promise<Room> {
-    const room: Room = await this.chatService.deleteRoom(roomId, user);
-    return room;
+    return await this.chatService.giveOwnership(giveOwnershipDto);
   }
 
-  // Change the owner of the room
+  @Roles('owner')
+  @SubscribeMessage('deleteRoom')
+  async deleteRoom(deleteRoomDto: UuidDto): Promise<Room> {
+    return await this.chatService.deleteRoom(deleteRoomDto);
   }
-*/
+
+  @Roles('owner')
+  @UseGuards(ProtectedRoom)
+  @SubscribeMessage('changePassword')
+  async changePassword(
+    @MessageBody() changePasswordDto: ChangePasswordDto,
+  ): Promise<Room> {
+    return await this.chatService.changePassword(changePasswordDto);
+  }
+
   @SubscribeMessage('findAllPublicRooms')
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
-    const rooms: DeepPartial<Room>[] =
-      await this.chatService.findAllPublicRooms();
-    return rooms;
-  }
-
-  afterInit(server: Server) {
-    this.logger.log(`Init`);
-  }
-
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
-  }
-
-  handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
+    return await this.chatService.findAllPublicRooms();
   }
 }
