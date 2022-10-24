@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user } from 'src/bdd/users.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { Equal, Repository, UpdateResult } from 'typeorm';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
@@ -191,16 +191,17 @@ export class UserService {
     async getUser(userUuid: string): Promise<user> {
         if (!userUuid)
             throw new ArgUndefinedException('userUuid');
-        const user: user = await this.UserRepository.findOne({ where: { userUuid: userUuid } });
+        const user: user = await this.UserRepository.findOne({ where: { userUuid: Equal(userUuid) } });
         if (!user)
             throw new FailToFindObjectFromDBException(userUuid, 'user');
         return user;
     }
 
+
     async getCompleteUser(userUuid: string): Promise<user> {
         if (!userUuid)
             throw new ArgUndefinedException('userUuid');
-        const completeUser: user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: userUuid } });
+        const completeUser: user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: Equal(userUuid) } });
         //need to put it?
         // if (!completeUser)
         // throw new FailToFindObjectFromDBException(userUuid, 'user');
@@ -212,13 +213,13 @@ export class UserService {
             throw new ArgUndefinedException('user42Id');
         else if (!userName)
             throw new ArgUndefinedException('userName');
-        const user = await this.UserRepository.findOne({ where: { user42Id: user42Id } })
+        const user = await this.UserRepository.findOne({ where: { user42Id: Equal(user42Id) } })
         if (user)
             return user;
         else {
             let numberToAdd: number = 1;
             let uniqueUserName: string = userName;
-            while (numberToAdd < 60 && await this.UserRepository.findOne({ where: { userName: uniqueUserName } }))
+            while (numberToAdd < 60 && await this.UserRepository.findOne({ where: { userName: Equal(uniqueUserName) } }))
                 uniqueUserName = userName + ++numberToAdd;
             // while (numberToAdd < 60) {
             // if (await this.UserRepository.findOne({ where: { userName: uniqueUserName } }))
@@ -247,7 +248,7 @@ export class UserService {
     async FindOrCreateUserLocal(userToFindOrCreate: string): Promise<user> {
         if (!userToFindOrCreate)
             throw new ArgUndefinedException('userToFindOrCreate');
-        const user: user = await this.UserRepository.findOne({ where: { userName: userToFindOrCreate, user42Id: 'local' } })
+        const user: user = await this.UserRepository.findOne({ where: { userName: Equal(userToFindOrCreate), user42Id: Equal('local') } })
         if (user)
             return user
         else
@@ -268,7 +269,7 @@ export class UserService {
             throw new ArgUndefinedException('user');
         if (!newName)
             throw new ArgUndefinedException('newName');
-        if (await this.UserRepository.findOne({ where: { userName: newName } }))
+        if (await this.UserRepository.findOne({ where: { userName: Equal(newName) } }))
             throw new UserNameAlreadyExistException(newName)
         user.userName = newName;
         await this.UserRepository.save(user)
@@ -301,8 +302,8 @@ export class UserService {
             throw new ArgUndefinedException('loserUuid');
         if (!winnerUuid)
             throw new ArgUndefinedException('winnerUuid');
-        await this.UserRepository.increment({ userUuid: loserUuid }, "losses", 1)
-        await this.UserRepository.increment({ userUuid: winnerUuid }, "wins", 1)
+        await this.UserRepository.increment({ userUuid: Equal(loserUuid) }, "losses", 1)
+        await this.UserRepository.increment({ userUuid: Equal(winnerUuid) }, "wins", 1)
     }
 
     checkUsers(user1: user, user2: user): void {
