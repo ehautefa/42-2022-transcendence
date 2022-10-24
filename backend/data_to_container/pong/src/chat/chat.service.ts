@@ -2,16 +2,21 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WsException } from '@nestjs/websockets';
 import * as argon from 'argon2';
+import { Socket } from 'socket.io';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { DeepPartial, Not, Repository } from 'typeorm';
-import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { GiveOwnershipDto } from './dto/give-ownership.dto';
-import { PunishUserDto } from './dto/punish-user.dto';
-import { RemovePunishmentDto } from './dto/remove-punishment.dto';
-import { SetAdminDto } from './dto/set-admin.dto';
-import { StringDto } from './dto/string.dto';
+import {
+  ChangePasswordDto,
+  CreateMessageDto,
+  CreateRoomDto,
+  GiveOwnershipDto,
+  PunishUserDto,
+  RemovePunishmentDto,
+  SetAdminDto,
+  StringDto,
+  UuidDto,
+} from './dto';
 
 @Injectable()
 export class ChatService {
@@ -25,8 +30,7 @@ export class ChatService {
   ) {}
 
   private readonly userService: UserService;
-
-  // A logger for debugging purposes
+  private connectedClients: Map<string, Socket>;
   private logger: Logger = new Logger('ChatService');
 
   /*
@@ -37,6 +41,7 @@ export class ChatService {
     createMessageDto: CreateMessageDto,
     sender: user,
   ): Promise<Message> {
+    this.logger.debug('creating a message');
     const room: Room = await this.findRoomById(createMessageDto.roomId);
     const chatMember: ChatMember = await this.getChatMember(sender, room);
     const newMessage = this.messagesRepository.create({
@@ -134,11 +139,16 @@ export class ChatService {
     return newRoom;
   }
 
-  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
-    const rooms: Room[] = await this.roomsRepository.find({
-      select: { id: true, name: true },
-      where: { type: RoomType.PUBLIC },
-    });
+  async findAllJoinedRooms(roomsId: Set<string>): Promise<DeepPartial<Room>[]> {
+    let rooms: Room[];
+    for (const roomId of roomsId) {
+      rooms.push(
+        await this.roomsRepository.findOneOrFail({
+          select: { id: true, name: true },
+          where: { id: roomId },
+        }),
+      );
+    }
     return rooms;
   }
 

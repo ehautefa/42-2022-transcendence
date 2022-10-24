@@ -8,7 +8,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -19,18 +23,19 @@ import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { Authorized } from './decorator/authorized.decorator';
-import { Roles } from './decorator/roles.decorator';
-import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { GiveOwnershipDto } from './dto/give-ownership.dto';
-import { PunishUserDto } from './dto/punish-user.dto';
-import { RemovePunishmentDto } from './dto/remove-punishment.dto';
-import { SetAdminDto } from './dto/set-admin.dto';
-import { StringDto } from './dto/string.dto';
-import { AuthorizedGuard } from './guard/authorized.guard';
-import { ProtectedRoom } from './guard/protected-room.guard';
-import { RolesGuard } from './guard/roles.guard';
+import { Authorized, Roles } from './decorator';
+import {
+  ChangePasswordDto,
+  CreateMessageDto,
+  CreateRoomDto,
+  GiveOwnershipDto,
+  PunishUserDto,
+  RemovePunishmentDto,
+  SetAdminDto,
+  StringDto,
+  UuidDto,
+} from './dto';
+import { AuthorizedGuard, ProtectedRoom, RolesGuard } from './guard';
 import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
 
 @UseGuards(JwtAuthGuard)
@@ -44,9 +49,17 @@ import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
     // forbidNonWhitelisted: true,
   }),
 )
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
-// implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-export class ChatGateway {
+@WebSocketGateway({
+  cors: {
+    origin: 'http://localhost:3000',
+    // methods: ['GET', 'POST'],
+    credentials: true,
+  },
+  namespace: 'chat',
+})
+export class ChatGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private readonly chatService: ChatService) {}
 
   // The socket.io server responsible for handling (receiviing and emitting) events
@@ -81,6 +94,7 @@ export class ChatGateway {
       createRoomDto,
       user,
     );
+    this.server.socketsJoin(newRoom.id);
     this.server.emit('updateRooms');
     return newRoom;
   }
@@ -178,8 +192,22 @@ export class ChatGateway {
     return await this.chatService.removePunishment(removePunishmentDto);
   }
 
-  @SubscribeMessage('findAllPublicRooms')
-  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
-    return await this.chatService.findAllPublicRooms();
+  @SubscribeMessage('findAllJoinedRooms')
+  async findAllJoinedRooms(
+    @ConnectedSocket() { rooms }: { rooms: Set<string> },
+  ): Promise<DeepPartial<Room>[]> {
+    return await this.chatService.findAllJoinedRooms(rooms);
+  }
+
+  afterInit() {
+    this.logger.log(`Socket.io server initialized`);
+  }
+
+  handleConnection(client: any) {
+    this.logger.log(`New client connected: ${client.id}`);
+  }
+
+  handleDisconnect(client: any) {
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
 }
