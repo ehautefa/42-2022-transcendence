@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import Popup from 'reactjs-popup';
 import { User } from "../../type";
 import { getSocketChat, getSocketStatus } from "../../App";
 import NavBar from "../../components/NavBar/NavBar";
+import NewConversationPopup from "./NewConvPopup";
 import {getMe} from "../myProfile/request"
 import "./Chat.css";
 
@@ -20,14 +20,10 @@ function Chat() {
     const socket = getSocketChat();
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
-    const [open, setOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState("");
     const [messages, setMessages] = useState();
     const [channels, setChannels] = useState([]);
 	const [newMessage, setNewMessage] = useState("");
-
-    const [newChannel, setNewChannel] = useState("");
-
 	async function fetchUser() {
 		const user = await getMe();
 		setUser(user);
@@ -35,35 +31,21 @@ function Chat() {
 
 	useEffect(() => {
 		fetchUser();
-	}, []);
+		socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
+	}, [socket]);
 
 	useEffect(() => {
-		socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
-        socket.on('room', (rooms:any) => {
+        socket.on('updateMessages', (rooms:any) => {
             console.log('getting information');
-            setChannels(rooms);
-        });
-	})
-
-    useEffect(() => {
-		console.log('retrieving messages from ', selectedRoom);
-		if (selectedRoom !== "" && selectedRoom !== undefined)
-		{
-			socket.emit('findAllMessagesInRoom', {uuid: selectedRoom}, (msgs:any) => {
+            socket.emit('findAllMessagesInRoom', {uuid: selectedRoom, }, (msgs:any) => {
 				setMessages(msgs)});
-		}
-    }, [selectedRoom, socket]);
-
-    function makeRoom() {
-        console.log('creating room ', newChannel);
-        socket.emit('createRoom', { name: newChannel, ownerId: user.userUuid, 
-            isProtected: false, password: "", type: 'public', 
-            userId:user.userUuid 
         });
-        console.log(channels);
-		setNewChannel("");
-        setOpen(false);
-    }
+		socket.on('updateRooms', (rooms:any) => {
+            console.log('getting information');
+			socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
+        });
+	});
+
 
 	async function chooseRoom(thisRoom : string){ 
 		console.log ("You chose room ", thisRoom);
@@ -73,41 +55,20 @@ function Chat() {
 	function sendMessage()
 	{
 		console.log('sending message: ', newMessage);
-		socket.emit('createMessage', {senderId: user.userUuid, message: newMessage, roomId: selectedRoom});
+		socket.emit('createMessage', {message: newMessage, roomId: selectedRoom});
 	}
     
     return ( <div>
         <NavBar />
         <div className="mainComposant">
-            <div className="box">
-            <button type="submit" onClick={() => setOpen(true)}> New </button>
-            <Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
-             window.location.reload();
-            }}>
-            <div className='messagePopup'>
-                <label htmlFor="messagePopup">Message to :</label>
-                <div className='input-flex'>
-                    <input type="text" id="messagePopup" name="username"
-                        value={newChannel}
-                        onChange={(e: { target: { value: any; }; }) => setNewChannel(e.target.value)}
-                        autoFocus
-                        autoCorrect="off"
-                        placeholder="..."
-                        minLength={1}
-                        maxLength={30}
-                        size={30} />
-                    <span></span>
-                </div>
-                <button type="submit" onClick={makeRoom}>Save</button>
-            </div>
-            </Popup>
-
-                <div className="channel">
-                {channels.map((room:any) => (
-                        <li key = {room.name} onClick={() => chooseRoom(room.id)}>{room.name}</li>
-                    ))}
-                </div>
-            </div>
+			<div className="rooms">
+				<NewConversationPopup />
+				<div className="channel">
+				{channels.map((room:any) => (
+						<li key = {room.name} onClick={() => chooseRoom(room.id)}>{room.name}</li>
+					))}
+				</div>
+			</div>
             <div className="chat">
                 <TransitionGroup className="messages">
                     {messages ? (messages as any).map((message:any) => (
