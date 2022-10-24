@@ -33,27 +33,22 @@ export class AuthorizedGuard implements CanActivate {
       user.userUuid,
       roomId,
     );
-    if (
-      authorization.includes('notBanned') ||
-      authorization.includes('notMuted')
-    ) {
-      let key: string;
-      let unMute: boolean;
-      if (authorization.includes('notBanned')) {
-        key = 'bannedTime';
-        unMute = false;
-      } else {
-        key = 'mutedTime';
-        unMute = true;
-      }
-
-      if (chatMember[key] && Date.now() < chatMember[key]) return false;
+    const unBan: boolean =
+      chatMember.bannedTime && Date.now() > chatMember.bannedTime
+        ? true
+        : false;
+    const unMute: boolean =
+      chatMember.mutedTime && Date.now() > chatMember.mutedTime ? true : false;
+    if (unBan)
       this.chatService.removePunishment({
         userId: chatMember.user.userUuid,
         roomId: chatMember.room.id,
         unMute: unMute,
       });
-    }
+    if (authorization.includes('notBanned') && chatMember.bannedTime)
+      return false;
+    if (authorization.includes('notMuted') && chatMember.mutedTime)
+      return false;
     return true;
   }
 }
