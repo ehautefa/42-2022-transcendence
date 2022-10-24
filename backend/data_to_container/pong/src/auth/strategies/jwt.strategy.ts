@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -8,7 +9,7 @@ import { JwtConfig } from "../config/Jwt.config";
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
-        private readonly userService: UserService
+        private readonly userService: UserService,
     ) {
         super({
             failureRedirect: '/auth/login',
