@@ -1,6 +1,6 @@
 var credentials: RequestCredentials = "include";
 
-export async function getAllUuidWithUserName() {
+export async function getAllUuidWithUserNameWithoutMe(myUserUuid: string) {
 	const url = process.env.REACT_APP_BACK_URL + "/user/allUuidWithUserName";
 	var requestOptions = {
 		method: 'GET',
@@ -10,6 +10,12 @@ export async function getAllUuidWithUserName() {
 	let users = await (await fetch(url, requestOptions)).json();
 	if (users.statusCode === 401) {
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	}
+	for (let i = 0; i < users.length; i++) {
+		if (users[i].userUuid === myUserUuid) {
+			users.splice(i, 1);
+			break;
+		}
 	}
 	return await users;
 }

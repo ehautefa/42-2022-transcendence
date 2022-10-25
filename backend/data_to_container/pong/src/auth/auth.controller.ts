@@ -125,10 +125,10 @@ export class AuthController {
     @Post('2fa/verify2FA')
     @UseGuards(JwtAuthGuard)
     async turnOnTwoFactorAuthentication(@Req() request, @Res() res, @Body() body) {
-        const isCodeValid =
-            this.authService.isTwoFactorAuthenticationCodeValid(
-                body.twoFactorAuthenticationCode,
-                request.user,
+		const isCodeValid =
+		this.authService.isTwoFactorAuthenticationCodeValid(
+			body.twoFactorAuthenticationCode,
+			request.user,
             );
         if (!isCodeValid) {
             throw new UnauthorizedException('Wrong authentication code');

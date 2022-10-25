@@ -1,4 +1,4 @@
-import { getAllUuidWithUserName } from "./request";
+import { getAllUuidWithUserNameWithoutMe } from "./request";
 import { useEffect, useState } from "react";
 import "./allPlayers.css";
 import { addFriend, removeFriend, getMyBlocked, addBlocked, removeBlocked } from "./request";
@@ -20,7 +20,9 @@ function AllPlayers() {
 	const [invitationSent, setInvitationSent] = useState(emptyInvites);
 
 	async function fetchPlayers() {
-		const response = await getAllUuidWithUserName();
+		const me = await getMe();
+		setMe(me);
+		const response = await getAllUuidWithUserNameWithoutMe(me.userUuid);
 		socketStatus.emit('getFriendsStatus', response, (data: any) => {
 			setUsers(data);
 		});
@@ -28,8 +30,6 @@ function AllPlayers() {
 		setFriends(myFriends);
 		const myBlocked = await getMyBlocked();
 		setBlocked(myBlocked);
-		const me = await getMe();
-		setMe(me);
 	}
 
 	useEffect(() => {

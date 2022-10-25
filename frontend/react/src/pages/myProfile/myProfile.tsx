@@ -1,12 +1,13 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, enableTwoFactorAuth } from "./request"
+import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth } from "./request"
 import { User } from "../../type";
 import { useEffect, useState } from "react";
 import { getSocketStatus } from "../../App";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 import Cookies from "js-cookie";
+import Active2FAPopUp from "../../components/Active2FAPopUp/Active2FAPopUp";
 
 const socketStatus = getSocketStatus();
 
@@ -36,13 +37,8 @@ function MyProfile() {
 		fetchUser();
 	}, []);
 
-	async function switch2FA() {
-		let new_user;
-		if (user.twoFactorAuth) {
-			new_user = await disableTwoFactorAuth();
-		} else {
-			new_user = await enableTwoFactorAuth();
-		}
+	async function disable2FA() {
+		let new_user = await disableTwoFactorAuth();
 		setUser(new_user);
 	}
 
@@ -69,8 +65,8 @@ function MyProfile() {
 						<li>Losses : {user.losses}</li>
 					</ul>
 					{user.twoFactorAuth === false ?
-						<button className="enable" onClick={switch2FA}>Enable two-factor authentication</button> :
-						<button className="enable" onClick={switch2FA}>Disable two-factor authentication</button>
+							<Active2FAPopUp /> :
+						<button className="enable" onClick={disable2FA}>Disable two-factor authentication</button>
 					}
 				</div>
 				<a className="pp-containers" href="./myProfile/editProfilePicture">

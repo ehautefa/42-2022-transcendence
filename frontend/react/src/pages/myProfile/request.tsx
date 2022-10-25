@@ -57,20 +57,6 @@ export async function ChangeUsername(newName: string) {
 	}
 }
 
-export async function enableTwoFactorAuth() {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/enableTwoFactorAuth";
-	var requestOptions = {
-		method: 'POST',
-		credentials: credentials
-	};
-
-	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-	}
-	return await result;
-}
-
 export async function disableTwoFactorAuth() {
 	var url: string = process.env.REACT_APP_BACK_URL + "/user/disableTwoFactorAuth";
 	var requestOptions = {
