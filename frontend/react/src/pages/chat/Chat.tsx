@@ -3,7 +3,9 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { User } from "../../type";
 import { getSocketChat, getSocketStatus } from "../../App";
 import NavBar from "../../components/NavBar/NavBar";
-import NewConversationPopup from "./NewConvPopup";
+import NewDMPopup from "./NewDMPopup";
+import JoinAgoraPopup from "./JoinAgoraPopup";
+import NewAgoraopup from "./NewAgoraPopup";
 import {getMe} from "../myProfile/request"
 import "./Chat.css";
 
@@ -56,13 +58,14 @@ function Chat() {
 	{
 		console.log('sending message: ', newMessage);
 		socket.emit('createMessage', {message: newMessage, roomId: selectedRoom});
+		setNewMessage("");
 	}
     
     return ( <div>
         <NavBar />
         <div className="mainComposant">
 			<div className="rooms">
-				<NewConversationPopup />
+				<NewDMPopup />
 				<div className="channel">
 				{channels.map((room:any) => (
 						<li key = {room.name} onClick={() => chooseRoom(room.id)}>{room.name}</li>
@@ -81,15 +84,17 @@ function Chat() {
                     ) : null
                     }
                 </TransitionGroup>
-                <form onSubmit={sendMessage}>
-                    <input
-                        autoComplete="off"
-                        type="text"
+				<div className='input-flex'>
+					<input type="text" id="message" name="username"
+						value={newMessage}
 						onChange={(e: { target: { value: any; }; }) => setNewMessage(e.target.value)}
-                        autoFocus
-                    />
-                    <button type="submit"> Send </button>
-                </form>
+						autoFocus
+						onKeyPress={event => {
+							if (event.key === 'Enter') {sendMessage()}
+						}}
+						minLength={1} />
+				</div>
+				<button type="submit" onClick={sendMessage}>Send</button>
             </div>
         </div>
 

@@ -9,13 +9,13 @@ socketStatus.on('getUserUuid', () => {
 	socketStatus.emit('getUserUuid');
 })
 
-
-function NewConversationPopup() {
+function NewDMPopup() {
 	const socket = getSocketChat();
 	const [open, setOpen] = useState(false);
 	const [newChannel, setNewChannel] = useState("");
 
-	function makeRoom() {
+	const makeRoom = (e: any) => {
+		e.preventDefault();
 		console.log('creating room ', newChannel);
 		socket.emit('createRoom', {
 			name: newChannel, isProtected: false,
@@ -23,7 +23,7 @@ function NewConversationPopup() {
 		});
 		setNewChannel("");
 		setOpen(false);
-	}
+	};
 
 	return (
 		<>
@@ -55,4 +55,4 @@ function NewConversationPopup() {
 	);
 }
 
-export default NewConversationPopup;
+export default NewDMPopup;
