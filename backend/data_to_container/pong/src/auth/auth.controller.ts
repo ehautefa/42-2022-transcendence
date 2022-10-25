@@ -93,6 +93,7 @@ export class AuthController {
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
     login(@Req() req, @Res() res, @Body() body) {
+        console.log("username connected with Uuid", req.user);
         if (req.user.twoFactorAuth) {
             const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
                 body.twoFactorAuthenticationCode,
@@ -125,6 +126,7 @@ export class AuthController {
     @Post('2fa/verify2FA')
     @UseGuards(JwtAuthGuard)
     async turnOnTwoFactorAuthentication(@Req() request, @Res() res, @Body() body) {
+        console.log("code", body.twoFactorAuthenticationCode);
 		const isCodeValid =
 		this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,

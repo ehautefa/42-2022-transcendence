@@ -36,6 +36,13 @@ function Active2FAPopUp() {
 	
 		let result = await fetch(url, requestOptions);
 		console.log(result);
+		if (result.status === 201) {
+			setOpen(false);
+		} else if (result.status === 401) {
+			window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		} else if (result.status === 403) {
+			alert(result.statusText);
+		}
     }
 
     return (<div className="Popup-mother">
@@ -59,7 +66,7 @@ function Active2FAPopUp() {
                         maxLength={6}
                         size={6} />
                 </div>
-                <button type="submit" onClick={SendCode}>Send Code</button>
+                <button type="submit" onClick={SendCode}>Activate</button>
             </div>
         </Popup>
         </div>);

@@ -26,9 +26,11 @@ const socketChat =  io(URL_BACK + "/chat", socketOptions);
 async function createUser(username: string) {
 	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
 	var credentials: RequestCredentials = "include";
+	var redirect: RequestRedirect = "follow";
 	
 	var requestOptions = {
 		method: 'GET',
+		redirect: redirect,
 		credentials: credentials
 	};
 	

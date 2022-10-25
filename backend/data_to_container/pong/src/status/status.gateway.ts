@@ -14,7 +14,7 @@ var inline = new Map<string, string>();
 @Injectable()
 @WebSocketGateway({ cors: 
 	{
-		origin: "http://localhost:3000",
+		origin: "https://localhost:3000",
 		methods: ["GET", "POST"],
 		credentials: true,
 	}, 
@@ -40,6 +40,8 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(socket).emit('sendAlert', sendAlert.message);
 		console.log("Alert sent to " + sendAlert.userUuid);
 	}
+
+
 
 	sendInvitation(sendInvite : SendInviteDto) {
 		let socket = inline.get(sendInvite.invitedUserUuid);
