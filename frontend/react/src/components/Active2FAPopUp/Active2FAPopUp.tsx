@@ -41,7 +41,6 @@ function Active2FAPopUp() {
     return (<div className="Popup-mother">
         <button className="enable" onClick={() => generateQrCode()}>Enable two-factor authentication</button>
         <Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
-            //  window.location.reload();
             }}>
             <div className='editUsername'>
 				<h2>Scan this QrCode with Google Authenticator :</h2>

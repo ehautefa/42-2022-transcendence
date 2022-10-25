@@ -3,6 +3,7 @@ import './App.css';
 import { io } from 'socket.io-client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
+import FormCode2FAPopUp from './components/FormCode2FAPopUp/FormCode2FAPopUp';
 
 // Create my socket
 let socketOptions = {
@@ -35,7 +36,6 @@ async function createUser(username: string) {
 	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
 }
 
-
 export function getSocketPong() {
 	return socketPong;
 }
@@ -51,6 +51,7 @@ export function getSocketChat() {
 export default function App() {
 	// Connect my socket to server
 	const [username, setUsername] = useState("");
+
 	socketPong.on("connect", () => {
 		console.log("SOCKET PONG:", socketPong.id, " : ", socketPong.connected);
 	});
@@ -61,12 +62,10 @@ export default function App() {
 		console.log("SOCKET STATUS:", socketStatus.id, " : ", socketStatus.connected);
 	});
 	return (<>
-		<div className='login'>
-			<a href={"http://localhost:3011/auth/login"}>
-				<h1>Try to login</h1>
-			</a>
+		<div className='login'>		
+			<FormCode2FAPopUp />
 			<div className='createUser'>
-				<h3>Use local profile </h3>
+				<h5>Or use a local profile : </h5>
 				<div>
 					<input type="text" id="createUser" name="username"
 						value={username}

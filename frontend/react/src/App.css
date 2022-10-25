@@ -15,3 +15,21 @@
 .createUser button:hover {
     border: 2px solid #fef45b;
 }
+
+.createUser input{
+    padding: 3px;
+	margin:0;
+    font-size: large;
+    border: 1px solid #FA0197;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #FAE3E3
+}
+
+.login-button {
+	text-align: center;
+	font-size: xx-large;
+	font-weight: bolder;
+	width: 40%;
+	margin: 300px 30%;
+}
