@@ -47,21 +47,21 @@ export class AuthController {
     // @HttpCode(200)
     // @UseGuards(JwtAuthGuard)
     // async TwoFauthenticate(@Request() request, @Response() res, @Body() body) {
-        // const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-            // body.twoFactorAuthenticationCode,
-            // request.user,
-        // );
-// 
-        // if (!isCodeValid) {
-            // throw new UnauthorizedException('Wrong authentication code');
-        // }
-        // res.cookie('access_token', this.authService.loginWith2fa(request.user));
-        // if (request.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !request.headers.referer)
-            // res.redirect(process.env.REACT_APP_HOME_PAGE);
-        // else
-            // res.redirect(request.headers.referer);
+    // const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+    // body.twoFactorAuthenticationCode,
+    // request.user,
+    // );
+    // 
+    // if (!isCodeValid) {
+    // throw new UnauthorizedException('Wrong authentication code');
     // }
-// 
+    // res.cookie('access_token', this.authService.loginWith2fa(request.user));
+    // if (request.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !request.headers.referer)
+    // res.redirect(process.env.REACT_APP_HOME_PAGE);
+    // else
+    // res.redirect(request.headers.referer);
+    // }
+    // 
     @Get('localLogin/:userName')
     @ApiOperation({ summary: 'Create a new user' })
     @UsePipes(ValidationPipe)
@@ -93,18 +93,10 @@ export class AuthController {
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
     login(@Req() req, @Res() res, @Body() body) {
-        if (req.user.twoFactorAuth) {
-            const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-                body.twoFactorAuthenticationCode,
-                req.user,
-            );
-            if (!isCodeValid) {
-                throw new UnauthorizedException('Wrong authentication code');
-            }
-            res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid, isTwoFactorAuthenticated: true }))
-        }
-        else
-            res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid }))
+        let access_token_new = this.authService.login(req.user, body.twoFactorAuthenticationCode);
+        req.res.setHeader('Set-Cookie', [access_token_new]);
+        // let cookie = this.jwtService.sign({ userUuid: req.user.userUuid, isTwoFactorAuthenticated: true })
+        // res.cookie('access_token', cookie);
         console.log("username connected with Uuid", req.user);
         if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
             res.redirect(process.env.REACT_APP_HOME_PAGE);

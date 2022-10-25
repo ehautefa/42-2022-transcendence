@@ -1,35 +1,34 @@
-import { Injectable, Req, Res, Headers } from '@nestjs/common';
+import { Injectable, Req, Res, Headers, UnauthorizedException } from '@nestjs/common';
 import { toDataURL } from 'qrcode';
 import { JwtService } from '@nestjs/jwt';
 import { authenticator } from 'otplib';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
+import { ConfigService } from '@nestjs/config';
+import TokenPayload from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
     constructor(
         private jwtService: JwtService,
-        private userService: UserService
+        private userService: UserService,
+        private configService: ConfigService,
     ) { }
 
-    async login(@Req() req, @Res() res) {
-        console.log("username connected with Uuid", req.user);
-        const access_token = this.jwtService.sign({ userUuid: req.user.userUuid });
-        res.cookie('access_token', access_token);
-        // res.setHeader("Authorization", "Bearer " + access_token)
-        if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
-            res.redirect(process.env.REACT_APP_HOME_PAGE);
+    login(user: user, twoFactorAuthenticationCode: string) :string {
+        let cookie : string
+        if (user.twoFactorAuth) {
+            const isCodeValid = this.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user);
+            if (!isCodeValid)
+                throw new UnauthorizedException('Wrong authentication code');
+            // cookie = this.jwtService.sign({ userUuid: user.userUuid, isTwoFactorAuthenticated: true });
+            cookie = this.getCookieWithJwtAccessToken(user.userUuid, true);
+        }
         else
-            res.redirect(req.headers.referer);
-    }
-
-    async loginWith2fa(userWithoutPsw: Partial<user>) {
-        const payload = {
-            userUuid: userWithoutPsw.userUuid,
-            isTwoFactorAuthenticated: true,
-        };
-
-        return this.jwtService.sign(payload)
+            // cookie = this.jwtService.sign({ userUuid: user.userUuid });
+            cookie = this.getCookieWithJwtAccessToken(user.userUuid, false);
+        console.log("username connected with Uuid", user);
+        return cookie;
     }
 
     async generateTwoFactorAuthenticationSecret(user: user) {
@@ -54,15 +53,16 @@ export class AuthService {
         });
     }
 
-    // public getCookieWithJwtAccessToken(userId: number) {
-        // const payload: TokenPayload = { userId };
-        // const token = this.jwtService.sign(payload, {
-            // secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
-            // expiresIn: `${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
-        // });
-        // return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
-    // }
-// 
+    getCookieWithJwtAccessToken(userUuid: string, isTwoFactorAuthenticated: boolean) {
+        const payload: TokenPayload = { userUuid, isTwoFactorAuthenticated};
+        const token = this.jwtService.sign(payload, {
+            secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+            expiresIn: `${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
+        });
+        console.log(`access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`);
+        return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+    }
+
     // public getCookieWithJwtRefreshToken(userId: number) {
         // const payload: TokenPayload = { userId };
         // const token = this.jwtService.sign(payload, {

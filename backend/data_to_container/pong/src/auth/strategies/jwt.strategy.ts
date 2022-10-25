@@ -15,6 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             failureRedirect: '/auth/login',
             jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
                 let data: string = null;
+                console.log(request.cookies)
                 if (request?.cookies && request.cookies['access_token']) {
                     // check if access_token is in cookies
                     data = request.cookies['access_token'];
