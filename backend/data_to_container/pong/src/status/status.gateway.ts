@@ -17,7 +17,7 @@ var inline = new Map<string, string>();
 		origin: "https://localhost:3000",
 		methods: ["GET", "POST"],
 		credentials: true,
-	}, 
+	},
 	namespace: '/status',
  })
 export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -69,8 +69,9 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleConnection(client: any) {
 		this.logger.log(`Client status connected: ${client.id}`);
-		if (client.handshake.headers.cookie)
+		if (client.handshake.headers.cookie) {
 			client.emit('getUserUuid');
+		}
 	
 	}
 

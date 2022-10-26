@@ -4,18 +4,25 @@ import { AppModule } from './app.module';
 import { readFileSync } from "fs";
 import { createServer } from 'https';
 import * as cookieParser from 'cookie-parser';
+import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 
 
-const httpsOptions = createServer({
+const httpsOptions: HttpsOptions = {
 	key: readFileSync('/usr/src/app/ssl/selfsigned.key'),
 	cert: readFileSync('/usr/src/app/ssl/selfsigned.csr'),
-});
+};
+
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
-	app.enableCors({
-		origin: ['https://localhost:3000'],
-		credentials: true,
+	const app = await NestFactory.create(AppModule, {
+		cors: {
+			origin: ['https://localhost:3000'],
+			methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+			allowedHeaders: ['Content-Type', 'Authorization'],
+			exposedHeaders: ['Authorization'],
+			credentials: true,
+		},
+		httpsOptions
 	});
 
 	const config = new DocumentBuilder()
@@ -31,26 +38,6 @@ async function bootstrap() {
 	SwaggerModule.setup('api', app, document);
 
 	app.use(cookieParser());
-
-	app.use(function (req, res, next) {
-
-		// Website you wish to allow to connect
-		res.setHeader('Access-Control-Allow-Origin', 'https://localhost:3000');
-
-		// Request methods you wish to allow
-		res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-		// Request headers you wish to allow
-		res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-		// Set to true if you need the website to include cookies in the requests sent
-		// to the API (e.g. in case you use sessions)
-		res.setHeader('Access-Control-Allow-Credentials', true);
-
-		// Pass to next layer of middleware
-		next();
-	});
-
 	await app.listen(3011);
 }
 bootstrap();

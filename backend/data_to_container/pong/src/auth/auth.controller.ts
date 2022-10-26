@@ -82,9 +82,10 @@ export class AuthController {
         else
             res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid }))
 
+        res.send("cookies");
         console.log("Local username connected with Uuid", user);
         // if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
-        res.redirect(process.env.REACT_APP_HOME_PAGE);
+        // res.redirect(process.env.REACT_APP_HOME_PAGE);
         // else
         //     res.redirect(req.headers.referer);
     }
@@ -107,10 +108,11 @@ export class AuthController {
         else
             res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid }))
         console.log("username connected with Uuid", req.user);
-        if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
-            res.redirect(process.env.REACT_APP_HOME_PAGE);
-        else
-            res.redirect(req.headers.referer);
+        res.send("cookies");
+        // if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
+        //     res.redirect(process.env.REACT_APP_HOME_PAGE);
+        // else
+        //     res.redirect(req.headers.referer);
     }
 
     @Post('2fa/generateQrCode')

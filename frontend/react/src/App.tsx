@@ -4,16 +4,23 @@ import { io } from 'socket.io-client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import FormCode2FAPopUp from './components/FormCode2FAPopUp/FormCode2FAPopUp';
+import { readFileSync } from 'fs';
 
 // Create my socket
 let socketOptions = {
-	transportOptions: {
-		polling: {
-			extraHeaders: {
-				'access_token': Cookies.get('access_token')
-			}
-		}
-	},
+	// key: readFileSync("key.pem"),
+	// cert: readFileSync("cert.pem"),
+	// ca: [
+	// 	readFileSync("ca.pem")
+	// ],
+	// withCredentials: true,
+	// transportOptions: {
+	// 	polling: {
+	// 		extraHeaders: {
+	// 			'access_token': Cookies.get('access_token')
+	// 		}
+	// 	}
+	// },
 	forceNew: true
 };
 
@@ -22,15 +29,13 @@ const socketPong =  io(URL_BACK + "/pong", socketOptions);
 const socketStatus = io(URL_BACK + "/status", socketOptions);
 const socketChat =  io(URL_BACK + "/chat", socketOptions);
 
-
 async function createUser(username: string) {
 	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
 	var credentials: RequestCredentials = "include";
-	var redirect: RequestRedirect = "follow";
 	
 	var requestOptions = {
 		method: 'GET',
-		redirect: redirect,
+		// redirect: redirect,
 		credentials: credentials
 	};
 	
