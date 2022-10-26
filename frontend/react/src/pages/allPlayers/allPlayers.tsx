@@ -23,9 +23,14 @@ function AllPlayers() {
 		const me = await getMe();
 		setMe(me);
 		const response = await getAllUuidWithUserNameWithoutMe(me.userUuid);
-		socketStatus.emit('getFriendsStatus', response, (data: any) => {
+		try {
+			socketStatus.emit('getFriendsStatus', response, (data: any) => {
+			console.log("data", data);
 			setUsers(data);
 		});
+	} catch (error) {
+		console.log(error);
+	}
 		const myFriends = await getMyFriends();
 		setFriends(myFriends);
 		const myBlocked = await getMyBlocked();

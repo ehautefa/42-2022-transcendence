@@ -4,7 +4,6 @@ import { io } from 'socket.io-client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import FormCode2FAPopUp from './components/FormCode2FAPopUp/FormCode2FAPopUp';
-import { readFileSync } from 'fs';
 
 // Create my socket
 let socketOptions = {
@@ -14,13 +13,13 @@ let socketOptions = {
 	// 	readFileSync("ca.pem")
 	// ],
 	// withCredentials: true,
-	// transportOptions: {
-	// 	polling: {
-	// 		extraHeaders: {
-	// 			'access_token': Cookies.get('access_token')
-	// 		}
-	// 	}
-	// },
+	transportOptions: {
+		polling: {
+			extraHeaders: {
+				'access_token': Cookies.get('access_token')
+			}
+		}
+	},
 	forceNew: true
 };
 
@@ -71,6 +70,7 @@ export default function App() {
 	return (<>
 		<div className='login'>		
 			<FormCode2FAPopUp />
+			<a href="https://localhost:3011/auth/login">Log in</a>
 			<div className='createUser'>
 				<h5>Or use a local profile : </h5>
 				<div>

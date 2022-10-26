@@ -6,7 +6,7 @@ function FormCode2FAPopUp() {
     const [code, setCode] = useState("");
 
 	async function login(new_code: string) {
-			// var credentials: RequestCredentials = "include";
+			var credentials: RequestCredentials = "include";
 			var url: string = process.env.REACT_APP_BACK_URL + "/auth/login";
 			
 			var redirect : RequestRedirect = "follow";
@@ -15,7 +15,7 @@ function FormCode2FAPopUp() {
 				urlencoded.append("twoFactorAuthenticationCode", new_code);
 			var requestOptions = {
 				method: 'GET',
-				// credentials: credentials,
+				credentials: credentials,
                 redirect: redirect,
 				// body: urlencoded
 			};

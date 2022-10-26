@@ -1,17 +1,19 @@
-import { Logger, Injectable, UseGuards, Req, Body } from '@nestjs/common';
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
+import { Logger, Injectable, UseGuards, Req, Body, UseFilters } from '@nestjs/common';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, BaseWsExceptionFilter } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { UserService } from 'src/user/user.service';
 import { SendInviteDto } from './dto/sendInvite.dto';
 import { SendAlertDto } from './dto/sendAlert.dto';
 import { user } from 'src/bdd/users.entity';
+import { AllExceptionsFilter } from './status.exception.filter';
 
 var inline = new Map<string, string>();
 			// Map<userUid, socketId>
 // Map of all users connected and their socketId
 
 @Injectable()
+@UseFilters(new AllExceptionsFilter())
 @WebSocketGateway({ cors: 
 	{
 		origin: "https://localhost:3000",
@@ -57,6 +59,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('getFriendsStatus')
 	@UseGuards(JwtAuthGuard)
 	getFriendsStatus(client: Socket, users: user[] ): user[] {
+		console.log("getFriendsStatus", users);
 		for (let i = 0; i < users.length; i++) {
 			if (inline.has(users[i].userUuid)) {
 				users[i].online = true;

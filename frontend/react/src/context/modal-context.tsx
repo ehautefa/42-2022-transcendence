@@ -48,6 +48,10 @@ const ModalProvider = (props: any) => {
 	socket.on('sendAlert', (message: string) => {
 		alert(message);
 	})
+	socket.on('unauthorized', () => {
+		console.log("UNAUTHORIZED");
+		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+	})
 	const unSetModal = useCallback(() => {
 		setModal(undefined);
 	}, [setModal])
