@@ -1,4 +1,5 @@
 import NavBar from "../../components/NavBar/NavBar"
+import { NavLink } from "react-router-dom";
 
 import "./endGame.css"
 
@@ -8,7 +9,7 @@ function GameOver() {
             <NavBar />
             <div className="endGame">
                 <h1>Game Over</h1>
-                <a href="/match">See all match in Game</a>
+                <NavLink to="/match">See all match in Game</NavLink>
             </div>
         </>
     );

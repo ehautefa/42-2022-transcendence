@@ -2,6 +2,7 @@ import './NavBar.css'
 import { useEffect, useState } from 'react'
 import bell from "../../assets/bell.png"
 import { getMyRequests } from "../../pages/request/requests"
+import {NavLink} from "react-router-dom"
 
 
 
@@ -19,9 +20,9 @@ function NavBar() {
 
 	return (
 		<nav className="nav">
-			<a href="/" className="nav-header">
+			<NavLink to="/" className="nav-header">
 				TRANSCENDENCE
-			</a>
+			</NavLink>
 			<button className="navButton" onClick={() => {
 				console.log("clicked:", isNavExpanded);
 				setIsNavExpanded(!isNavExpanded);
@@ -37,25 +38,25 @@ function NavBar() {
 				<ul>
 					{
 						isBellExpanded && <li className='request'>
-							<a href="/request">
+							<NavLink to="/request">
 								<img src={bell} alt="request" />
-							</a>
+							</NavLink>
 						</li>
 					}
 					<li>
-						<a href="/allPlayers" >PLAYERS</a>
+						<NavLink to="/allPlayers" >PLAYERS</NavLink>
 					</li>
 					<li>
-						<a href="/Match">MATCH</a>
+						<NavLink to="/Match">MATCH</NavLink>
 					</li>
 					<li>
-						<a href="/Game">GAME</a>
+						<NavLink to="/Game">GAME</NavLink>
 					</li>
 					<li>
-						<a href="/Chat">CHAT</a>
+						<NavLink to="/Chat">CHAT</NavLink>
 					</li>
 					<li>
-						<a href="/myProfile" >PROFILE</a>
+						<NavLink to="/myProfile" >PROFILE</NavLink>
 					</li>
 				</ul>
 			</div>

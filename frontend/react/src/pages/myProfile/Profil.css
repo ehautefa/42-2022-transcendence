@@ -80,10 +80,6 @@
 	/* border: 3px solid purple; */
 }
 
-.mainComposantProfile .container a {
-	color: #fef45b;
-	font-weight: bold;
-}
 
 .mainComposantProfile .container td {
 	color: #FAE3E3;
@@ -161,8 +157,10 @@
 
 	.mainComposantProfile .pp-containers {
 		position: relative;
-		width: 20%;
-		margin: 15px 100px;
+		min-width: 20%;
+		max-width: 30%;
+		aspect-ratio: 1/1;
+		margin: 15px;
 	}
 
 	.mainComposantProfile .pp {
@@ -178,7 +176,7 @@
 		position: absolute;
 		border-radius: 100px;
 		width: 101%;
-		height: 95%;
+		aspect-ratio: 1 / 1;
 		top: 0;
 		left: 0;
 		opacity: 0.7;
@@ -187,12 +185,15 @@
 		text-align: center;
 		font-size: 30px;
 		opacity: 0;
-		line-height: 200px;
+	}
+
+	.mainComposantProfile .pphover p {
+		margin-top: 40%;
 	}
 
 	.mainComposantProfile .pphover:hover  {
 		opacity: 0.7;
-		transition: 0.5s;
+		transition: 0.7s;
 	}
 
 	.mainComposantProfile .ppFriends {

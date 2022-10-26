@@ -3,7 +3,7 @@ import "../myProfile/Profil.css";
 import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
 
@@ -11,7 +11,7 @@ function Profile() {
 
 	// get user uid in url
 	// to do a link to the profile of the user 
-	// use <a href={"./profile?uid=" + useruid}>profile</a>
+	// use <NavLink to={"./profile?uid=" + useruid}>profile</NavLink>
 
 	const uid = new URLSearchParams(useLocation().search).get('uid');
 	const emptyUser: User = { userUuid: "", userName: "" };
@@ -109,7 +109,7 @@ function Profile() {
 						<tbody>
 							{friends.map((users: any) => {
 								return (<tr key={users.userUuid}>
-									<td><a href={"./profile?uid=" + users.userUuid}>{users.userName}</a></td>
+									<td><NavLink to={"./profile?uid=" + users.userUuid}>{users.userName}</NavLink></td>
 									{users.status ? <td>Online</td> : <td>Offline</td>}
 								</tr>);
 							})}

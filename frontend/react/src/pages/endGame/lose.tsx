@@ -1,5 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./endGame.css"
+import { NavLink } from "react-router-dom";
 
 function Lose() {
     return (
@@ -7,7 +8,7 @@ function Lose() {
             <NavBar />
             <div className="endGame">
                 <h1>You lost</h1>
-                <a href="/game">Replay</a>
+                <NavLink to="/game">Replay</NavLink>
             </div>
         </>
     );

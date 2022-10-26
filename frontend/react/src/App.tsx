@@ -70,7 +70,7 @@ export default function App() {
 	return (<>
 		<div className='login'>		
 			<FormCode2FAPopUp />
-			<a href="https://localhost:3011/auth/login">Log in</a>
+			<a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a>
 			<div className='createUser'>
 				<h5>Or use a local profile : </h5>
 				<div>

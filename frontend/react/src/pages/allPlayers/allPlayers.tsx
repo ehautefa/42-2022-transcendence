@@ -7,6 +7,7 @@ import { getSocketStatus } from "../../App";
 import { Players } from "../../type"
 import { getMyFriends } from "../myProfile/request";
 import { getMe } from "../myProfile/request";
+import { Link } from "react-router-dom";
 
 const socketStatus = getSocketStatus();
 
@@ -25,12 +26,12 @@ function AllPlayers() {
 		const response = await getAllUuidWithUserNameWithoutMe(me.userUuid);
 		try {
 			socketStatus.emit('getFriendsStatus', response, (data: any) => {
-			console.log("data", data);
-			setUsers(data);
-		});
-	} catch (error) {
-		console.log(error);
-	}
+				console.log("data", data);
+				setUsers(data);
+			});
+		} catch (error) {
+			console.log(error);
+		}
 		const myFriends = await getMyFriends();
 		setFriends(myFriends);
 		const myBlocked = await getMyBlocked();
@@ -100,7 +101,15 @@ function AllPlayers() {
 							<td className="pp">
 								<img src={process.env.REACT_APP_BACK_URL + "/user/picture/" + user.userUuid} alt={"Avatar of " + user.userName} />
 							</td>
-							<td><a href={"./profile?uid=" + user.userUuid}>{user.userName}</a></td>
+							<td>
+								<Link
+									to={{
+										pathname: "/profile",
+										search: "?uid=" + user.userUuid
+									}}>
+									{user.userName}
+								</Link>
+							</td>
 							<td>{user.online ? <p>Online</p> : <p>Offline</p>}</td>
 							<td>{
 								isMyFriend(user.userUuid) ?
