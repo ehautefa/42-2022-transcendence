@@ -33,9 +33,7 @@ export class AuthService {
 
     async generateTwoFactorAuthenticationSecret(user: user) : Promise<string> {
         const secret : string = authenticator.generateSecret();
-
         const otpauthUrl : string = authenticator.keyuri(user.userName, process.env.REACT_APP_APP_NAME, secret);
-
         await this.userService.setTwoFactorAuthenticationSecret(user, secret);
         return otpauthUrl;
     }

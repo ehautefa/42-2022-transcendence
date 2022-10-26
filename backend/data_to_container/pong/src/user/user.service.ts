@@ -1,12 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user } from 'src/bdd/users.entity';
 import { Equal, Repository, UpdateResult } from 'typeorm';
-import { ChangeUserNameDto } from './dto/changeUserName.dto';
-import { CreateUserDto } from './dto/createUser.dto';
-import { EndOfMatchDto } from './dto/endOfMatch.dto';
-import { FindOrCreateUserDto } from './dto/findOrCreate.dto';
-import { FlipTwoFactorAuthDto } from './dto/flipTwoFactorAuyh.dto';
+import * as argon from 'argon2';
 import { ArgUndefinedException, FailToFindAUniqNameException, FailToFindObjectFromanEntity, FailToFindObjectFromDBException, TwoFactorAuthAlreadyDisableException, TwoFactorAuthAlreadyEnableException, UserAreAlreadyFriends, UserAreNotBlocked, UserAreNotFriends, UserFriendRequestAlreadyPendingException, UserIsBlockedException, UserIsTheSameException, UserNameAlreadyExistException } from '../exceptions/user.exception';
 import { authenticator } from 'otplib';
 
@@ -324,8 +320,6 @@ export class UserService {
     async setTwoFactorAuthenticationSecret(user: user, secret: string) : Promise<user>{
         if (!user)
             throw new ArgUndefinedException('user')
-        if (!secret)
-            throw new ArgUndefinedException('secret')
         if (!secret)
             throw new ArgUndefinedException('secret')
         user.twoFactorAuthenticationSecret = secret;
