@@ -13,5 +13,5 @@ export class Message {
   sender: ChatMember;
 
   @Column('timestamp')
-  time: number;
+  time: Date;
 }

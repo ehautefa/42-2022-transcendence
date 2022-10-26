@@ -1,9 +1,8 @@
 import {
   Column,
   Entity,
-  Index,
   JoinColumn,
-  ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -51,7 +50,7 @@ export class Room {
   })
   type: RoomType;
 
-  @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id)
-  @Index()
+  @OneToMany(() => ChatMember, (chatMember) => chatMember.room)
+  @JoinColumn()
   members: ChatMember[];
 }

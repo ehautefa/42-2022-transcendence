@@ -36,18 +36,19 @@ export class ChatService {
   async createMessage(
     createMessageDto: CreateMessageDto,
     sender: user,
-  ): Promise<Message> {
+  ): Promise<string> {
     const room: Room = await this.findRoomById(createMessageDto.roomId);
     const chatMember: ChatMember = await this.getChatMember(sender, room);
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
       // room: room,
       sender: chatMember,
-      time: Date.now(),
+      time: new Date(),
     });
-    this.messagesRepository.save(newMessage);
-    this.logger.log('createMessage is OK');
-    return newMessage;
+    this.logger.debug('createMessage is OK');
+    this.logger.debug(chatMember);
+    await this.messagesRepository.save(newMessage);
+    return chatMember.room.id;
   }
 
   async findAllMessagesInRoom({
@@ -127,9 +128,9 @@ export class ChatService {
       type: createRoomDto.type,
     });
     newRoom = await this.roomsRepository.save(newRoom);
-    const chatMember: ChatMember = await this.getChatMember(owner, newRoom);
+    const chatMember: ChatMember = await this.createChatMember(owner, newRoom);
     newRoom.owner = chatMember;
-    newRoom.members = [chatMember];
+    newRoom.members.push(chatMember);
     await this.roomsRepository.save(newRoom);
     return newRoom;
   }
@@ -283,5 +284,16 @@ export class ChatService {
   async deleteRoom(roomId: UuidDto): Promise<Room> {
     const room: Room = await this.findRoomById(roomId.uuid);
     return await this.roomsRepository.remove(room);
+  }
+
+  async findAllRoomsToJoin(userId: string): Promise<ChatMember[]> {
+    const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      select: { room: { id: true } },
+      where: { user: { userUuid: userId } },
+    });
+    this.logger.debug('Getting all rooms to join');
+    console.log(chatMembers);
+    return chatMembers;
   }
 }

@@ -3,17 +3,18 @@ import {
   Req,
   UseFilters,
   UseGuards,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import {
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { DeepPartial } from 'typeorm';
@@ -31,12 +32,11 @@ import { StringDto } from './dto/string.dto';
 import { AuthorizedGuard } from './guard/authorized.guard';
 import { ProtectedRoom } from './guard/protected-room.guard';
 import { RolesGuard } from './guard/roles.guard';
-import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
 
 @UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
 @UseGuards(AuthorizedGuard)
-@UseInterceptors(FilterHashInterceptor)
+// @UseInterceptors(FilterHashInterceptor)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
@@ -45,8 +45,9 @@ import { FilterHashInterceptor } from './interceptor/filter-hash.interceptor';
   }),
 )
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
-// implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-export class ChatGateway {
+export class ChatGateway
+  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private readonly chatService: ChatService) {}
 
   // The socket.io server responsible for handling (receiviing and emitting) events
@@ -61,15 +62,16 @@ export class ChatGateway {
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
     @Req() { user }: { user: user },
-  ) {
-    this.logger.log('Creating a message');
-    const message = await this.chatService.createMessage(
+  ): Promise<string> {
+    const roomId: string = await this.chatService.createMessage(
       createMessageDto,
       user,
     );
-    this.server.to(message.sender.room.id).emit('updateMessages', message);
+    this.logger.debug('Creating a message');
+    // console.log(message);
+    this.server.to(roomId).emit('updateMessages');
     this.server.emit('updateRooms');
-    return message;
+    return roomId;
   }
 
   @SubscribeMessage('createRoom')
@@ -109,7 +111,6 @@ export class ChatGateway {
     @MessageBody() joinDMRoomDto: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<Room> {
-    this.logger.log('req');
     const room: Room = await this.chatService.joinDMRoom(user, joinDMRoomDto);
     this.server.socketsJoin(joinDMRoomDto.uuid);
     return room;
@@ -182,4 +183,13 @@ export class ChatGateway {
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     return await this.chatService.findAllPublicRooms();
   }
+
+  handleConnection(client: Socket, ...args: any[]) {
+    // const user = { id: 'mock' };
+    this.logger.debug(`client connected: ${client.id}`);
+    if (client.handshake.headers.cookie)
+      this.logger.debug('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH!!!');
+  }
+
+  handleDisconnect(client: Socket) {}
 }
