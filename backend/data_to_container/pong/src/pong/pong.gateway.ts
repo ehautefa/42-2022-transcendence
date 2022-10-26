@@ -17,7 +17,7 @@ var launch_game = true;
 
 @WebSocketGateway({ cors: 
 					{
-						origin: "https://localhost:3000",
+						origin: process.env.REACT_APP_FRONT_URL,
 						methods: ["GET", "POST"],
 						credentials: true,
 					}, 

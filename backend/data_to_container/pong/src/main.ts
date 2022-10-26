@@ -16,7 +16,7 @@ const httpsOptions: HttpsOptions = {
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		cors: {
-			origin: ['https://localhost:3000'],
+			origin: [process.env.REACT_APP_FRONT_URL],
 			methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
 			allowedHeaders: ['Content-Type', 'Authorization'],
 			exposedHeaders: ['Authorization'],

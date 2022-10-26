@@ -16,7 +16,7 @@ var inline = new Map<string, string>();
 @UseFilters(new AllExceptionsFilter())
 @WebSocketGateway({ cors: 
 	{
-		origin: "https://localhost:3000",
+		origin: process.env.REACT_APP_FRONT_URL,
 		methods: ["GET", "POST"],
 		credentials: true,
 	},
