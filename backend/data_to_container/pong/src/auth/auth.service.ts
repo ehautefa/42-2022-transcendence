@@ -15,10 +15,10 @@ export class AuthService {
         private configService: ConfigService,
     ) { }
 
-    login(user: user, twoFactorAuthenticationCode: string) :string {
-        let cookie : string
+    async login(user: user, twoFactorAuthenticationCode: string): Promise<string> {
+        let cookie: string
         if (user.twoFactorAuth) {
-            const isCodeValid = this.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user);
+            const isCodeValid = await this.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user);
             if (!isCodeValid)
                 throw new UnauthorizedException('Wrong authentication code');
             // cookie = this.jwtService.sign({ userUuid: user.userUuid, isTwoFactorAuthenticated: true });
@@ -31,48 +31,38 @@ export class AuthService {
         return cookie;
     }
 
-    async generateTwoFactorAuthenticationSecret(user: user) {
-        const secret = authenticator.generateSecret();
+    async generateTwoFactorAuthenticationSecret(user: user) : Promise<string> {
+        const secret : string = authenticator.generateSecret();
 
-        const otpauthUrl = authenticator.keyuri(user.userName, process.env.REACT_APP_APP_NAME, secret);
+        const otpauthUrl : string = authenticator.keyuri(user.userName, process.env.REACT_APP_APP_NAME, secret);
 
         await this.userService.setTwoFactorAuthenticationSecret(user, secret);
-        return { secret, otpauthUrl }
+        return otpauthUrl;
     }
 
-    async generateQrCodeDataURL(otpAuthUrl: string) {
+    async generateQrCodeDataURL(otpAuthUrl: string) : Promise<string> {
         return toDataURL(otpAuthUrl);
     }
 
-    isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: user) {
+    async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: user) :Promise<boolean> {
         if (!twoFactorAuthenticationCode)
             return false
+        const secret :string = await this.userService.getUserTwoFactorAuthenticationSecret(user)
         return authenticator.verify({
             token: twoFactorAuthenticationCode,
-            secret: user.twoFactorAuthenticationSecret,
+            secret: secret
         });
     }
 
     getCookieWithJwtAccessToken(userUuid: string, isTwoFactorAuthenticated: boolean) {
-        const payload: TokenPayload = { userUuid, isTwoFactorAuthenticated};
+        const payload: TokenPayload = { userUuid, isTwoFactorAuthenticated };
         const token = this.jwtService.sign(payload, {
             secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
             expiresIn: `${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
         });
-        console.log(`access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`);
-        return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+        // console.log(`access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`);
+        // return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+        console.log(`access_token=${token}; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`);
+        return `access_token=${token}; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
     }
-
-    // public getCookieWithJwtRefreshToken(userId: number) {
-        // const payload: TokenPayload = { userId };
-        // const token = this.jwtService.sign(payload, {
-            // secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
-            // expiresIn: `${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s`
-        // });
-        // const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}`;
-        // return {
-            // cookie,
-            // token
-        // }
-    // }
 }

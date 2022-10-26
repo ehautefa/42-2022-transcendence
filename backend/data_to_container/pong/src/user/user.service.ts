@@ -20,9 +20,15 @@ export class UserService {
     async getAllUser(): Promise<user[]> {
         return await this.UserRepository.find({ relations: { friends: true, blocked: true } });
     }
-
+        
     async getAllUserUuidWithUserName(): Promise<user[]> {
         return await this.UserRepository.find({ select: { userUuid: true, userName: true } });
+    }
+
+    async getUserTwoFactorAuthenticationSecret(user: user): Promise<string> {
+        
+        const ret =  await this.UserRepository.findOne({ where : {userUuid: user.userUuid}, select: { twoFactorAuthenticationSecret: true} });
+        return ret.twoFactorAuthenticationSecret;
     }
 
     async getFriends(userUuid: string): Promise<user[]> {
@@ -315,7 +321,7 @@ export class UserService {
             throw new UserIsTheSameException();
     }
 
-    async setTwoFactorAuthenticationSecret(user: user, secret: string) {
+    async setTwoFactorAuthenticationSecret(user: user, secret: string) : Promise<user>{
         if (!user)
             throw new ArgUndefinedException('user')
         if (!secret)
@@ -323,8 +329,7 @@ export class UserService {
         if (!secret)
             throw new ArgUndefinedException('secret')
         user.twoFactorAuthenticationSecret = secret;
-        this.UserRepository.save(user);
-
+        return await this.UserRepository.save(user);
       }
 
 }

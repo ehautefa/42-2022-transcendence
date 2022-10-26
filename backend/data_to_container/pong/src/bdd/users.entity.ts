@@ -50,17 +50,20 @@ export class user extends BaseEntity {
 
     //to select = NULL
     @ApiProperty({ example: 'fgdldsfggfdgdg;dkg;djhgjdfg;d;g', description: 'secret for 2fa'})
-    @Column('varchar')
+    @Column({
+        type: 'varchar',
+        select: false,
+    })
     twoFactorAuthenticationSecret: string
 
     //to select = NULL
-    @ApiProperty({ example: 'fgdldsfggfdgdg;dkg;djhgjdfg;d;g', description: 'secret for refresh token'})
-    @Column({
-        type: 'varchar',
-        nullable: true,
-        select: false,
-    })
-    currentHashedRefreshToken: string
+    // @ApiProperty({ example: 'fgdldsfggfdgdg;dkg;djhgjdfg;d;g', description: 'secret for refresh token'})
+    // @Column({
+        // type: 'varchar',
+        // nullable: true,
+        // select: false,
+    // })
+    // currentHashedRefreshToken: string
 
 
 

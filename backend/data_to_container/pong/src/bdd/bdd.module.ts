@@ -3,15 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { match } from './matchs.entity';
 import { Message } from './message.entity';
-import { Question } from './question.entity';
-import { Quiz } from './quiz.entity';
 import { Room } from './room.entity';
 import { user } from './users.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([user, match, Message, Room, Quiz, Question]),
+    TypeOrmModule.forFeature([user, match, Message, Room]),
   ],
   exports: [TypeOrmModule],
 })

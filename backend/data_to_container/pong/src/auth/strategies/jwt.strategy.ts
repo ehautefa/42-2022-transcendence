@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -15,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             failureRedirect: '/auth/login',
             jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
                 let data: string = null;
-                console.log(request.cookies)
+                // console.log("REQUEST IN JWT STRAT :", request)
                 if (request?.cookies && request.cookies['access_token']) {
                     // check if access_token is in cookies
                     data = request.cookies['access_token'];
@@ -27,7 +26,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 }
                 return data
             }]),
-            // passReqToCallback: true,
             ignoreExpiration: false,
             secretOrKey: JwtConfig.secret //Protect in env file
         }, async (jwt_paylod, done) => {
@@ -42,11 +40,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 return done(null, false);
         });
     }
-
-    // validate(payload: any) {
-    // console.log('vali');
-    // return {
-    // userUuid: payload.userUuid,
-    // };
-    // }
 }
