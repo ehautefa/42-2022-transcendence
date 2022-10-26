@@ -15,7 +15,7 @@ function JoinAgoraPopup() {
 	const [newChannel, setNewChannel] = useState("");
 
 	const makeRoom = (e: any) => {
-		e.preventDefault
+		e.preventDefault();
 		console.log('creating room ', newChannel);
 		socket.emit('createRoom', {
 			name: newChannel, isProtected: false,
@@ -26,15 +26,14 @@ function JoinAgoraPopup() {
 	};
 
 	return (
-		<>
 			<div className="Popup-mother">
-				<button type="submit" onClick={() => setOpen(true)}> New </button>
+				<button type="submit" onClick={() => setOpen(true)}> Join </button>
 				<Popup open={open} closeOnDocumentClick onClose={() => {
 					setOpen(false);
 					window.location.reload();
 				}}>
 					<div className='messagePopup'>
-						<label htmlFor="messagePopup">Message to :</label>
+						<label htmlFor="messagePopup">Join public room: </label>
 						<div className='input-flex'>
 							<input type="text" id="messagePopup" name="username"
 								value={newChannel}
@@ -51,7 +50,6 @@ function JoinAgoraPopup() {
 					</div>
 				</Popup>
 			</div >
-		</>
 	);
 }
 

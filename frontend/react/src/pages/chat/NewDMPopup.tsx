@@ -26,9 +26,8 @@ function NewDMPopup() {
 	};
 
 	return (
-		<>
 			<div className="Popup-mother">
-				<button type="submit" onClick={() => setOpen(true)}> New </button>
+				<button type="submit" onClick={() => setOpen(true)}> DM </button>
 				<Popup open={open} closeOnDocumentClick onClose={() => {
 					setOpen(false);
 					window.location.reload();
@@ -51,7 +50,6 @@ function NewDMPopup() {
 					</div>
 				</Popup>
 			</div >
-		</>
 	);
 }
 

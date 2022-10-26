@@ -5,7 +5,7 @@ import { getSocketChat, getSocketStatus } from "../../App";
 import NavBar from "../../components/NavBar/NavBar";
 import NewDMPopup from "./NewDMPopup";
 import JoinAgoraPopup from "./JoinAgoraPopup";
-import NewAgoraopup from "./NewAgoraPopup";
+import NewAgoraPopup from "./NewAgoraPopup";
 import {getMe} from "../myProfile/request"
 import "./Chat.css";
 
@@ -52,6 +52,8 @@ function Chat() {
 	async function chooseRoom(thisRoom : string){ 
 		console.log ("You chose room ", thisRoom);
 		await setSelectedRoom(thisRoom);
+		socket.emit('findAllMessagesInRoom', {uuid: selectedRoom, }, (msgs:any) => {
+			setMessages(msgs)});
 	}
     
 	function sendMessage()
@@ -66,6 +68,8 @@ function Chat() {
         <div className="mainComposant">
 			<div className="rooms">
 				<NewDMPopup />
+				<NewAgoraPopup />
+				<JoinAgoraPopup/>
 				<div className="channel">
 				{channels.map((room:any) => (
 						<li key = {room.name} onClick={() => chooseRoom(room.id)}>{room.name}</li>

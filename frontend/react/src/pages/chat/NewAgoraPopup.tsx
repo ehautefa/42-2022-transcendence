@@ -15,7 +15,7 @@ function NewAgoraPopup() {
 	const [newChannel, setNewChannel] = useState("");
 
 	const makeRoom = (e: any) => {
-		e.preventDefault
+		e.preventDefault();
 		console.log('creating room ', newChannel);
 		socket.emit('createRoom', {
 			name: newChannel, isProtected: false,
@@ -26,15 +26,14 @@ function NewAgoraPopup() {
 	};
 
 	return (
-		<>
 			<div className="Popup-mother">
-				<button type="submit" onClick={() => setOpen(true)}> New </button>
+				<button type="submit" onClick={() => setOpen(true)}> Create </button>
 				<Popup open={open} closeOnDocumentClick onClose={() => {
 					setOpen(false);
 					window.location.reload();
 				}}>
 					<div className='messagePopup'>
-						<label htmlFor="messagePopup">Message to :</label>
+						<label htmlFor="messagePopup">Make new room :</label>
 						<div className='input-flex'>
 							<input type="text" id="messagePopup" name="username"
 								value={newChannel}
@@ -51,7 +50,6 @@ function NewAgoraPopup() {
 					</div>
 				</Popup>
 			</div >
-		</>
 	);
 }
 
