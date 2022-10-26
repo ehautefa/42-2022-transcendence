@@ -130,9 +130,9 @@ export class ChatService {
     newRoom = await this.roomsRepository.save(newRoom);
     const chatMember: ChatMember = await this.createChatMember(owner, newRoom);
     newRoom.owner = chatMember;
-    newRoom.members.push(chatMember);
-    await this.roomsRepository.save(newRoom);
-    return newRoom;
+    console.log(newRoom);
+    newRoom.members = [chatMember];
+    return await this.roomsRepository.save(newRoom);
   }
 
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {

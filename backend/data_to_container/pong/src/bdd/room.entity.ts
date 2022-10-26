@@ -51,6 +51,5 @@ export class Room {
   type: RoomType;
 
   @OneToMany(() => ChatMember, (chatMember) => chatMember.room)
-  @JoinColumn()
   members: ChatMember[];
 }

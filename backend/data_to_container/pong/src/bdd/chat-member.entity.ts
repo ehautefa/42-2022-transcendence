@@ -1,5 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Room, user } from '.';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Message, Room, user } from '.';
 
 @Entity()
 export class ChatMember {
@@ -9,8 +15,11 @@ export class ChatMember {
   @ManyToOne(() => user, (usr) => usr.userUuid, { onDelete: 'CASCADE' })
   user: user;
 
-  @ManyToOne(() => Room, (room) => room.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Room, (room) => room.members, { onDelete: 'CASCADE' })
   room: Room;
+
+  @OneToMany(() => Message, (msg) => msg.sender)
+  messages: Message[];
 
   @Column('timestamp', { nullable: true })
   bannedTime: number;

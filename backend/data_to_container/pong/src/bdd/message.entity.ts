@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ChatMember } from '.';
 
 @Entity()
@@ -9,7 +9,7 @@ export class Message {
   @Column('varchar')
   message: string;
 
-  @OneToMany(() => ChatMember, (chatConnection) => chatConnection.id)
+  @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id)
   sender: ChatMember;
 
   @Column('timestamp')
