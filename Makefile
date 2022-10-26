@@ -1,5 +1,5 @@
 DC = docker-compose
-DC_FILE = ./docker-compose.yml
+DC_FILE = ./docker-compose_dev.yml
 
 all: dev
 

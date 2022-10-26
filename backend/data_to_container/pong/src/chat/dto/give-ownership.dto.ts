@@ -1,11 +1,9 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class CreateMessageDto {
+export class GiveOwnershipDto {
   @IsNotEmpty()
   @IsUUID()
-  senderId: string;
-
-  message: string;
+  userId: string;
 
   @IsNotEmpty()
   @IsUUID()

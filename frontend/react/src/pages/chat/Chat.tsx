@@ -1,86 +1,85 @@
 import { useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { getSocketChat } from "../../App";
-import Popup from 'reactjs-popup';
+import { User } from "../../type";
+import { getSocketChat, getSocketStatus } from "../../App";
 import NavBar from "../../components/NavBar/NavBar";
+import NewDMPopup from "./NewDMPopup";
+import JoinAgoraPopup from "./JoinAgoraPopup";
+import NewAgoraPopup from "./NewAgoraPopup";
+import {getMe} from "../myProfile/request"
 import "./Chat.css";
+
 //import {Route, NavLink, HashRouter} from 'react-router-dom'
 //import { User } from "../../type";
 
+const socketStatus = getSocketStatus();
+
+socketStatus.on('getUserUuid', () => {
+	socketStatus.emit('getUserUuid');
+})
+
 function Chat() {
     const socket = getSocketChat();
-    const [open, setOpen] = useState(false);
+	const emptyUser: User = { userUuid: "", userName: "" };
+	const [user, setUser] = useState(emptyUser);
     const [selectedRoom, setSelectedRoom] = useState("");
     const [messages, setMessages] = useState();
     const [channels, setChannels] = useState([]);
+	const [newMessage, setNewMessage] = useState("");
+	async function fetchUser() {
+		const user = await getMe();
+		setUser(user);
+	}
 
-    var userUuid = localStorage.getItem('uid');
-    if (userUuid === 'undefined' || userUuid === null)
-        userUuid = 'a433d950-3f11-11ed-b878-0242ac120002';
-    const [newChannel, setNewChannel] = useState("blaaa");
+	useEffect(() => {
+		fetchUser();
+		socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
+	}, [socket]);
 
-
-    useEffect(() => {
-        socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
-        
-        socket.on('room', (rooms:any) => {
+	useEffect(() => {
+        socket.on('updateMessages', (rooms:any) => {
             console.log('getting information');
-            setChannels(rooms);
+            socket.emit('findAllMessagesInRoom', {uuid: selectedRoom, }, (msgs:any) => {
+				setMessages(msgs)});
         });
-    });
-
-    useEffect(() => {
-        socket.emit('getAllMessagesInRoom', selectedRoom, (msgs:any) => {
-            setMessages(msgs)});
-    }, [selectedRoom, socket]);
-
-    function makeRoom() {
-        console.log('creating room ', newChannel);
-        socket.emit('createRoom', { name: newChannel, ownerId: userUuid, 
-            isProtected:false, password: "", type: 'public', 
-            userId:userUuid 
+		socket.on('updateRooms', (rooms:any) => {
+            console.log('getting information');
+			socket.emit('findAllPublicRooms', (rooms:any) => {setChannels(rooms)});
         });
-        console.log(channels);
-        setOpen(false);
-    }
+	});
+
+
+	async function chooseRoom(thisRoom : string){ 
+		console.log ("You chose room ", thisRoom);
+		await setSelectedRoom(thisRoom);
+		socket.emit('findAllMessagesInRoom', {uuid: selectedRoom, }, (msgs:any) => {
+			setMessages(msgs)});
+	}
     
+	function sendMessage()
+	{
+		console.log('sending message: ', newMessage);
+		socket.emit('createMessage', {message: newMessage, roomId: selectedRoom});
+		setNewMessage("");
+	}
     
     return ( <div>
         <NavBar />
         <div className="mainComposant">
-            <div className="box">
-            <button type="submit" onClick={() => setOpen(true)}> New </button>
-            <Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
-             window.location.reload();
-            }}>
-            <div className='messagePopup'>
-                <label htmlFor="messagePopup">Message to :</label>
-                <div className='input-flex'>
-                    <input type="text" id="messagePopup" name="username"
-                        value={newChannel}
-                        onChange={(e) => setNewChannel(e.target.value)}
-                        autoFocus
-                        autoCorrect="off"
-                        placeholder="..."
-                        minLength={1}
-                        maxLength={30}
-                        size={30} />
-                    <span></span>
-                </div>
-                <button type="submit" onClick={makeRoom}>Save</button>
-            </div>
-            </Popup>
-
-                <div className="channel">
-                {channels.map((room:any) => (
-                        <li key = {room.name} onClick={() => setSelectedRoom(room.name)}>{room.name}</li>
-                    ))}
-                </div>
-            </div>
+			<div className="rooms">
+				<NewDMPopup />
+				<NewAgoraPopup />
+				<JoinAgoraPopup/>
+				<div className="channel">
+				{channels.map((room:any) => (
+						<li key = {room.name} onClick={() => chooseRoom(room.id)}>{room.name}</li>
+					))}
+				</div>
+			</div>
             <div className="chat">
                 <TransitionGroup className="messages">
                     {messages ? (messages as any).map((message:any) => (
-                        message.sender.userUuid === userUuid ? 
+                        message.sender.userUuid === user.userUuid ? 
                         (<CSSTransition key={message} timeout={500} classNames="fade">
                         <div className="message_mine">me: {message}</div>
                         </CSSTransition>) : (<CSSTransition key={message} timeout={500} classNames="fade">
@@ -89,15 +88,17 @@ function Chat() {
                     ) : null
                     }
                 </TransitionGroup>
-                <form onSubmit={makeRoom}>
-                    <input
-                        autoComplete="off"
-                        type="text"
-                        onChange={makeRoom}
-                        autoFocus
-                    />
-                    <button type="submit"> Send </button>
-                </form>
+				<div className='input-flex'>
+					<input type="text" id="message" name="username"
+						value={newMessage}
+						onChange={(e: { target: { value: any; }; }) => setNewMessage(e.target.value)}
+						autoFocus
+						onKeyPress={event => {
+							if (event.key === 'Enter') {sendMessage()}
+						}}
+						minLength={1} />
+				</div>
+				<button type="submit" onClick={sendMessage}>Send</button>
             </div>
         </div>
 
