@@ -83,13 +83,15 @@ export class ChatGateway
       createRoomDto,
       user,
     );
+    this.server.socketsJoin(newRoom.id);
     this.server.emit('updateRooms');
     return newRoom;
   }
 
   @Authorized('notBanned')
   @SubscribeMessage('joinRoom')
-  async joinRoom(joinRoomDto: UuidDto) {
+  async joinRoom(@MessageBody() joinRoomDto: UuidDto) {
+    this.logger.debug('pouet');
     const room: Room = await this.chatService.findRoomById(joinRoomDto.uuid);
     this.server.socketsJoin(room.id);
     return room;
@@ -97,7 +99,7 @@ export class ChatGateway
 
   @Authorized('notBanned')
   @SubscribeMessage('joinPrivateRoom')
-  async joinPrivateRoom(joinPrivateRoomDto: StringDto) {
+  async joinPrivateRoom(@MessageBody() joinPrivateRoomDto: StringDto) {
     const room: Room = await this.chatService.joinPrivateRoom(
       joinPrivateRoomDto,
     );
@@ -121,9 +123,11 @@ export class ChatGateway
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
-    return await this.chatService.findAllMessagesInRoom(
+    const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
+    // console.log(messages);
+    return messages;
   }
 
   @Authorized('notBanned')
@@ -152,7 +156,7 @@ export class ChatGateway
 
   @Roles('owner')
   @SubscribeMessage('deleteRoom')
-  async deleteRoom(deleteRoomDto: UuidDto): Promise<Room> {
+  async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
     return await this.chatService.deleteRoom(deleteRoomDto);
   }
 
@@ -174,7 +178,7 @@ export class ChatGateway
 
   @Roles('admin')
   async removePunishment(
-    removePunishmentDto: RemovePunishmentDto,
+    @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
     return await this.chatService.removePunishment(removePunishmentDto);
   }

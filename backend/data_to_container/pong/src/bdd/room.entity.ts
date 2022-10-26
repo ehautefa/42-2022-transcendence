@@ -40,6 +40,7 @@ export class Room {
   @Column({
     type: 'varchar',
     nullable: true,
+    select: false,
   })
   hash: string;
 

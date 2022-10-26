@@ -9,7 +9,9 @@ export class Message {
   @Column('varchar')
   message: string;
 
-  @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id)
+  @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id, {
+    // eager: true,
+  })
   sender: ChatMember;
 
   @Column('timestamp')

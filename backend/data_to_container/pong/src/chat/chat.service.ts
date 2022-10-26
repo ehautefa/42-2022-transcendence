@@ -57,19 +57,18 @@ export class ChatService {
     uuid: string;
   }): Promise<Message[]> {
     console.log('roomId = ', roomId);
-    const messages: Message[] = await this.messagesRepository.find({
-      where: {
-        id: roomId,
-      },
-      join: {
-        alias: 'msg',
-        innerJoin: {
-          sender: 'msg.sender',
-          room: 'sender.room',
-          id: 'room.id',
-        },
-      },
-    });
+    const messages: Message[] = await this.messagesRepository
+      .createQueryBuilder('msg')
+      .select('message')
+      .innerJoin('msg.sender', 'sender')
+      .innerJoin('sender.room', 'room')
+      .where('room.id = :id', { id: roomId })
+      .getRawMany();
+    console.log(
+      messages.map((msg) => {
+        return msg.message;
+      }),
+    );
     return messages;
   }
 
@@ -131,7 +130,6 @@ export class ChatService {
     const chatMember: ChatMember = await this.createChatMember(owner, newRoom);
     newRoom.owner = chatMember;
     console.log(newRoom);
-    newRoom.members = [chatMember];
     return await this.roomsRepository.save(newRoom);
   }
 
