@@ -1,56 +1,66 @@
-import { Injectable, Req, Res, Headers } from '@nestjs/common';
+import { Injectable, Req, Res, Headers, UnauthorizedException } from '@nestjs/common';
 import { toDataURL } from 'qrcode';
 import { JwtService } from '@nestjs/jwt';
 import { authenticator } from 'otplib';
 import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
+import { ConfigService } from '@nestjs/config';
+import TokenPayload from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
     constructor(
         private jwtService: JwtService,
-        private userService: UserService
+        private userService: UserService,
+        private configService: ConfigService,
     ) { }
 
-    async login(@Req() req, @Res() res) {
-        console.log("username connected with Uuid", req.user);
-        const access_token = this.jwtService.sign({ userUuid: req.user.userUuid });
-        res.cookie('access_token', access_token);
-        // res.setHeader("Authorization", "Bearer " + access_token)
-        if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
-            res.redirect(process.env.REACT_APP_HOME_PAGE);
+    async login(user: user, twoFactorAuthenticationCode: string): Promise<string> {
+        let cookie: string
+        if (user.twoFactorAuth) {
+            const isCodeValid = await this.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user);
+            if (!isCodeValid)
+                throw new UnauthorizedException('Wrong authentication code');
+            // cookie = this.jwtService.sign({ userUuid: user.userUuid, isTwoFactorAuthenticated: true });
+            cookie = this.getCookieWithJwtAccessToken(user.userUuid, true);
+        }
         else
-            res.redirect(req.headers.referer);
+            // cookie = this.jwtService.sign({ userUuid: user.userUuid });
+            cookie = this.getCookieWithJwtAccessToken(user.userUuid, false);
+        console.log("username connected with Uuid", user);
+        return cookie;
     }
 
-    async loginWith2fa(userWithoutPsw: Partial<user>) {
-        const payload = {
-            userUuid: userWithoutPsw.userUuid,
-            isTwoFactorAuthenticated: true,
-        };
-
-        return this.jwtService.sign(payload)
-    }
-
-    async generateTwoFactorAuthenticationSecret(user: user) {
-        const secret = authenticator.generateSecret();
-
-        const otpauthUrl = authenticator.keyuri(user.userName, process.env.REACT_APP_APP_NAME, secret);
-
+    async generateTwoFactorAuthenticationSecret(user: user) : Promise<string> {
+        const secret : string = authenticator.generateSecret();
+        const otpauthUrl : string = authenticator.keyuri(user.userName, process.env.REACT_APP_APP_NAME, secret);
         await this.userService.setTwoFactorAuthenticationSecret(user, secret);
-        return {secret, otpauthUrl}
+        return otpauthUrl;
     }
 
-    async generateQrCodeDataURL(otpAuthUrl: string) {
+    async generateQrCodeDataURL(otpAuthUrl: string) : Promise<string> {
         return toDataURL(otpAuthUrl);
     }
 
-    isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: user) {
-        if(!twoFactorAuthenticationCode)
+    async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: user) :Promise<boolean> {
+        if (!twoFactorAuthenticationCode)
             return false
+        const secret :string = await this.userService.getUserTwoFactorAuthenticationSecret(user)
         return authenticator.verify({
             token: twoFactorAuthenticationCode,
-            secret: user.twoFactorAuthenticationSecret,
+            secret: secret
         });
+    }
+
+    getCookieWithJwtAccessToken(userUuid: string, isTwoFactorAuthenticated: boolean) {
+        const payload: TokenPayload = { userUuid, isTwoFactorAuthenticated };
+        const token = this.jwtService.sign(payload, {
+            secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+            expiresIn: `${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
+        });
+        // console.log(`access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`);
+        // return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+        console.log(`access_token=${token}; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`);
+        return `access_token=${token}; Path=/; Max-Age=${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
     }
 }

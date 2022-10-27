@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { typeOrmConfig } from './bdd/config/typeorm.config';
-import { TestModule } from './test/test.module';
 import { ApiModule } from './api/api.module';
 import { BddModule } from './bdd/bdd.module';
 import { UserModule } from './user/user.module';
@@ -12,10 +11,26 @@ import { MatchModule } from './match/match.module';
 import { PongModule } from './pong/pong.module';
 import { ChatModule } from './chat/chat.module';
 import { StatusModule } from './status/status.module';
+import { ConfigModule } from '@nestjs/config';
+import { JwtConfig } from './auth/config/Jwt.config';
+import { Config } from './config/config';
 
 @Module({
-  imports: [TestModule, ApiModule, ChatModule, BddModule, UserModule, AuthModule, MatchModule, PongModule, StatusModule],
+  imports: [
+    ApiModule, 
+    ChatModule,
+    BddModule,
+    UserModule,
+    AuthModule,
+    MatchModule,
+    PongModule, 
+    StatusModule,
+    ConfigModule.forRoot(Config),
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService, 
+    // JwtService,
+  ],
 })
 export class AppModule {} 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Post, Req, Res, UploadedFile, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user } from 'src/bdd/users.entity';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
@@ -15,6 +15,7 @@ import { join } from 'path';
 
 //import fs
 import * as fs from 'fs';
+import { UserExceptionFilter } from 'src/exceptions/user.exception.filter';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -28,6 +29,7 @@ export class UserController {
 	@Get('all')
 	@ApiOperation({ summary: 'Get all user of the table' })
 	@ApiResponse({ status: 200, description: 'Found users', type: user })
+	// @UseFilters(new UserExceptionFilter())
 	@UseGuards(JwtAuthGuard)
 	async getAllUser(): Promise<user[]> {
 		return await this.UserService.getAllUser();

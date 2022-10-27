@@ -3,16 +3,18 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { UserService } from "src/user/user.service";
+import { JwtConfig } from "../config/Jwt.config";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
-        private readonly userService: UserService
+        private readonly userService: UserService,
     ) {
         super({
             failureRedirect: '/auth/login',
             jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
                 let data: string = null;
+                // console.log("REQUEST IN JWT STRAT :", request)
                 if (request?.cookies && request.cookies['access_token']) {
                     // check if access_token is in cookies
                     data = request.cookies['access_token'];
@@ -24,9 +26,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 }
                 return data
             }]),
-            // passReqToCallback: true,
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SIGN //Protect in env file
+            secretOrKey: JwtConfig.secret //Protect in env file
         }, async (jwt_paylod, done) => {
             const user = await userService.getCompleteUser(jwt_paylod.userUuid);
             if (!user.twoFactorAuth)
@@ -39,11 +40,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 return done(null, false);
         });
     }
-
-    // validate(payload: any) {
-    // console.log('vali');
-    // return {
-    // userUuid: payload.userUuid,
-    // };
-    // }
 }

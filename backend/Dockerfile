@@ -10,10 +10,6 @@
 #                                                                              #
 # **************************************************************************** #
 
-###################
-# SOURCES : https://www.tomray.dev/nestjs-docker-compose-postgres
-# BUILD FOR LOCAL DEVELOPMENT
-###################
 
 FROM        node:current-alpine As development
 
@@ -59,8 +55,8 @@ COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 # The Nest CLI is a dev dependency,
 # In the previous development stage we ran `npm ci` which installed all dependencies.
 # So we can copy over the node_modules directory from the development image into this build image.
-COPY        --chown=${USER}:${USER} ${SRC_APP_DIR} ${DST_APP_DIR}
 COPY        --chown=${USER}:${USER} --from=development ${DST_APP_DIR}/node_modules ${DST_APP_DIR}/node_modules
+COPY        --chown=${USER}:${USER} ${SRC_APP_DIR} ${DST_APP_DIR}
 
 
 # Run the build command which creates the production bundle
@@ -73,6 +69,7 @@ ENV         NODE_ENV production
 # Passing in --only=production ensures that only the production dependencies are installed.
 # This ensures that the node_modules directory is as optimized as possible.
 RUN         npm ci --omit=dev && npm cache clean --force
+# RUN         chown -R ${USER}:${USER} ./dist
 
 USER        ${USER}
 
@@ -93,7 +90,7 @@ COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/dist ${DST_APP_DIR}/dis
 COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/ssl ${DST_APP_DIR}/ssl
 
 # Start the server using the production build
-CMD [ "node", "dist/main.js" ]
+CMD [ "node", "dist/src/main.js" ]
 
 
 
