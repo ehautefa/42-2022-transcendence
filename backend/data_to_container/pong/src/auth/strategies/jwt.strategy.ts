@@ -22,6 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                     && request['handshake']['headers']
                     && request['handshake']['headers']['access_token']) {
                     // if access_token is not in cookie check if it is in headers
+                    // console.log("HEADERS IN JWT STRAT :", request['handshake']['headers'])
                     data = request['handshake']['headers']['access_token'];
                 }
                 return data

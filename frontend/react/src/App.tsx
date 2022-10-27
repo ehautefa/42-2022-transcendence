@@ -7,11 +7,6 @@ import FormCode2FAPopUp from './components/FormCode2FAPopUp/FormCode2FAPopUp';
 
 // Create my socket
 let socketOptions = {
-	// key: readFileSync("key.pem"),
-	// cert: readFileSync("cert.pem"),
-	// ca: [
-	// 	readFileSync("ca.pem")
-	// ],
 	withCredentials: true,
 	transportOptions: {
 		polling: {
