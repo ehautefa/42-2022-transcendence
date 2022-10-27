@@ -69,6 +69,8 @@ export class AuthController {
     async localLogin(@Res({ passthrough: true }) res: Response, @Body() tfaCode : LoginDto, @Param('userName') userName: string) {
 
         const user: user = await this.userService.FindOrCreateUserLocal(userName);
+        // if(user.twoFactorAuth)
+            // res.redirect('/2fa');
         const access_token: string = await this.authService.login(user, tfaCode.twoFactorAuthenticationCode);
         res.setHeader('Set-Cookie', access_token);
         return `user : #${user.userName} is logged-in`
@@ -80,6 +82,8 @@ export class AuthController {
     async login(@Res({ passthrough: true}) res : Response, @Req() {user} : {user:user}, @Body() tfaCode : LoginDto) {
         const access_token :string  = await this.authService.login(user, tfaCode.twoFactorAuthenticationCode);
         res.setHeader('Set-Cookie', [access_token]);
+        // if(user.twoFactorAuth)
+            // res.redirect('/2fa');
         return `user : #${user.userName} is local logged-in`
     }
 

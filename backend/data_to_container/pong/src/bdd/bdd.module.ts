@@ -10,7 +10,13 @@ import { user } from './users.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forFeature([user, match, Message, Room]),
+    TypeOrmModule.forFeature([
+      user,
+      match,
+      Message,
+      Room,
+      ChatMember,
+  ]),
   ],
   exports: [TypeOrmModule],
 })
