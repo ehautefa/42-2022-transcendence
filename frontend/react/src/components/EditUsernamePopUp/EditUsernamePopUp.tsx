@@ -7,27 +7,22 @@ function EditUsernamePopUp() {
     const [open, setOpen] = useState(false);
     const [newUsername, setNewUsername] = useState("");
 
-    function SaveUserName() {
+    async function SaveUserName() {
         if (newUsername.length > 3 // min length of username is 4
             && newUsername.length < 12 // max length of username is 12
             && newUsername.match(/^[a-zA-Z0-9]+$/)) { // only alphanumeric characters
-            setOpen(false);
-            if (ChangeUsername(newUsername) === null) {
-                console.log("Username changed successfully");
-                alert("Username already taken");
-            }
-            // else 
-                // window.location.reload();
+                let ret = await ChangeUsername(newUsername);
+                if (ret !== null) 
+                    setOpen(false);
         } else {
             alert("Username must be between 4 and 12 characters and alphanumeric");
         }
-
     }
 
     return (<div className="Popup-mother">
         <button className="Edit" onClick={() => setOpen(true)}>edit</button>
         <Popup open={open} closeOnDocumentClick onClose={() => {setOpen(false);
-            //  window.location.reload();
+             window.location.reload();
             }}>
             <div className='editUsername'>
                 <label htmlFor="editUsername">New username :</label>

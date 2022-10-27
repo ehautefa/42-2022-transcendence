@@ -65,12 +65,13 @@ function MyProfile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					{user.twoFactorAuth === false ?
-							<Active2FAPopUp /> :
+					{
+						user.twoFactorAuth === false ?
+						<Active2FAPopUp /> :
 						<button className="enable" onClick={disable2FA}>Disable two-factor authentication</button>
 					}
 				</div>
-				<Link className="pp-containers" to="./myProfile/editProfilePicture">
+				<Link className="pp-containers" to="./editProfilePicture">
 					<div className="pp">
 						<img src={process.env.REACT_APP_BACK_URL + "/user/myPicture"} alt={"Avatar of " + user.userName} />
 					</div>
@@ -91,12 +92,13 @@ function MyProfile() {
 							</tr>
 						</thead>
 						<tbody>
-							{friends.map((users: any) => {
-								return (<tr key={users.userUuid}>
-									<td><Link to={"./profile?uid=" + users.userUuid}>{users.userName}</Link></td>
-									{users.online ? <td>Online</td> : <td>Offline</td>}
-									<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
-								</tr>);
+							{
+								friends.map((users: any) => {
+									return (<tr key={users.userUuid}>
+										<td><Link to={"./profile?uid=" + users.userUuid}>{users.userName}</Link></td>
+										{users.online ? <td>Online</td> : <td>Offline</td>}
+										<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
+									</tr>);
 							})}
 						</tbody>
 					</table>
@@ -112,12 +114,13 @@ function MyProfile() {
 							</tr>
 						</thead>
 						<tbody>
-							{matchHistory.map((match: any) => {
-								return (<tr key={match.matchId}>
-									<td>{user.userUuid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
-									<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
-									<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
-								</tr>);
+							{
+								matchHistory.map((match: any) => {
+									return (<tr key={match.matchId}>
+										<td>{user.userUuid === match.user1?.userUuid ? (match.user2?.userName) : (match.user1?.userName)}</td>
+										<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
+										<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
+									</tr>);
 							})}
 						</tbody>
 					</table>

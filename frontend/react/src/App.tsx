@@ -34,7 +34,6 @@ async function createUser(username: string) {
 	
 	var requestOptions = {
 		method: 'GET',
-		// redirect: redirect,
 		credentials: credentials
 	};
 	
