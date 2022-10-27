@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { acceptFriendRequest, getMyRequests, refuseFriendRequest } from "./requests";
 import NavBar from "../../components/NavBar/NavBar";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Request() {
 	const [requests, setRequests] = useState([]);
@@ -37,7 +37,7 @@ function Request() {
 						return (<tr key={request.userUuid}>
 							<td className="pp">
 							</td>
-							<td><NavLink to={"./profile?uid=" + request.userUuid}>{request.userName}</NavLink></td>
+							<td><Link to={"./profile?uid=" + request.userUuid}>{request.userName}</Link></td>
 							<td><button className="enable" onClick={() => handleRequest(request.userUuid, true)}>Accept</button></td>
 							<td><button className="enable" onClick={() => handleRequest(request.userUuid, false)}>Refuse</button></td>
 						</tr>

@@ -4,7 +4,7 @@ import { getSocketChat } from "../../App";
 import Popup from 'reactjs-popup';
 import NavBar from "../../components/NavBar/NavBar";
 import "./Chat.css";
-//import {Route, NavLink, HashRouter} from 'react-router-dom'
+//import {Route, Link, HashRouter} from 'react-router-dom'
 //import { User } from "../../type";
 
 function Chat() {

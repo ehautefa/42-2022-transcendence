@@ -8,7 +8,7 @@ import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePo
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 import Cookies from "js-cookie";
 import Active2FAPopUp from "../../components/Active2FAPopUp/Active2FAPopUp";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const socketStatus = getSocketStatus();
 
@@ -70,14 +70,14 @@ function MyProfile() {
 						<button className="enable" onClick={disable2FA}>Disable two-factor authentication</button>
 					}
 				</div>
-				<NavLink className="pp-containers" to="./myProfile/editProfilePicture">
+				<Link className="pp-containers" to="./myProfile/editProfilePicture">
 					<div className="pp">
 						<img src={process.env.REACT_APP_BACK_URL + "/user/myPicture"} alt={"Avatar of " + user.userName} />
 					</div>
 					<div className="pphover">
 						<p>Edit</p>
 					</div>
-				</NavLink>
+				</Link>
 			</div>
 			<div className="flex">
 				<div className="friends container">
@@ -93,7 +93,7 @@ function MyProfile() {
 						<tbody>
 							{friends.map((users: any) => {
 								return (<tr key={users.userUuid}>
-									<td><NavLink to={"./profile?uid=" + users.userUuid}>{users.userName}</NavLink></td>
+									<td><Link to={"./profile?uid=" + users.userUuid}>{users.userName}</Link></td>
 									{users.online ? <td>Online</td> : <td>Offline</td>}
 									<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
 								</tr>);

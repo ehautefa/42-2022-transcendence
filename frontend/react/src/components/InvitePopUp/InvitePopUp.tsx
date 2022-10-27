@@ -3,7 +3,7 @@ import "./InvitePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";
 import { getSocketPong } from "../../App"
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const socket = getSocketPong();
 
@@ -32,7 +32,7 @@ function InvitePopUp(arg: any) {
                 <Popup open={open} closeOnDocumentClick onClose={() => { setOpen(false); }}>
                     <div className='invitePlayer'>
                         <h2>Your invitation has been sent</h2>
-                        <NavLink to={"./game?id=" + id}>Join Game</NavLink>
+                        <Link to={"./game?id=" + id}>Join Game</Link>
                     </div>
                 </Popup>
             </div>

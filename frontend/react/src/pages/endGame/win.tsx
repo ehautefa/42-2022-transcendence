@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import NavBar from "../../components/NavBar/NavBar"
 import "./endGame.css"
 
@@ -8,7 +8,7 @@ function Win() {
             <NavBar />
             <div className="endGame">
                 <h1>You won</h1>
-                <NavLink to="/game">Replay</NavLink>
+                <Link to="/game">Replay</Link>
             </div>
         </>
     );

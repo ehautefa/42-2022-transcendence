@@ -3,7 +3,7 @@ import "./Chat.css"
 import { useState } from 'react'
 import Popup from 'reactjs-popup';
 import { CSSTransition, TransitionGroup} from 'react-transition-group';
-import {Route, NavLink, HashRouter} from 'react-router-dom'
+import {Route, Link, HashRouter} from 'react-router-dom'
 
 
 function ChatPopups() {

@@ -15,6 +15,7 @@ import Profile from './pages/Profile/Profile';
 import AllPlayers from './pages/allPlayers/allPlayers';
 import Request from './pages/request/Request';
 import EditProfilePicture from './pages/myProfile/editProfilePicture';
+import NotFound from './pages/notFound/notFound';
 import { ModalProvider } from './context/modal-context';
 
 const root = ReactDOM.createRoot(
@@ -26,18 +27,19 @@ root.render(<>
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<App />} />
-				<Route path="mainPage" element={<MainPage />} />
-				<Route path="game" element={<Game />} />
-				<Route path="chat" element={<Chat />} />
-				<Route path="myProfile" element={<MyProfile />} />
-				<Route path="match" element={<Match />} />
-				<Route path="endGame/lose" element={<Lose />} />
-				<Route path="endGame/win" element={<Win />} />
-				<Route path="profile" element={<Profile />} />
-				<Route path="allPlayers" element={<AllPlayers />} />
-				<Route path="endGame/gameOver" element={<GameOver />} />
-				<Route path="request" element={<Request />} />
-				<Route path="myProfile/editProfilePicture" element={<EditProfilePicture />} />
+				<Route path="/mainPage" element={<MainPage />} />
+				<Route path="/game" element={<Game />} />
+				<Route path="/chat" element={<Chat />} />
+				<Route path="/myProfile" element={<MyProfile />} />
+				<Route path="/match" element={<Match />} />
+				<Route path="/endGame/lose" element={<Lose />} />
+				<Route path="/endGame/win" element={<Win />} />
+				<Route path="/profile" element={<Profile />} />
+				<Route path="/allPlayers" element={<AllPlayers />} />
+				<Route path="/endGame/gameOver" element={<GameOver />} />
+				<Route path="/request" element={<Request />} />
+				<Route path="/myProfile/editProfilePicture" element={<EditProfilePicture />} />
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</BrowserRouter>
 	</ModalProvider>

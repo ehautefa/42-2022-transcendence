@@ -3,7 +3,7 @@ import "./Match.css"
 import { useState } from "react"
 import { GameWindowState } from "../../type";
 import { getSocketPong } from "../../App"
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const socket = getSocketPong();
 
@@ -36,7 +36,7 @@ function Match() {
 					{games.map((value) => {
 							return (<tr key="{value.id}">
 								<td>
-									<NavLink to={"./game?id=" + value.id}>Watch</NavLink>
+									<Link to={"./game?id=" + value.id}>Watch</Link>
 								</td>
 								<td>{value.playerLeftName}</td>
 								<td>{value.scoreLeft}</td>
