@@ -12,7 +12,7 @@ let socketOptions = {
 	// ca: [
 	// 	readFileSync("ca.pem")
 	// ],
-	// withCredentials: true,
+	withCredentials: true,
 	transportOptions: {
 		polling: {
 			extraHeaders: {

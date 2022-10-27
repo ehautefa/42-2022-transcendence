@@ -42,7 +42,7 @@
 
 
 #GameBoard {
-	aspect-ratio: 11 / 6;
+	aspect-ratio: 12 / 6;
 	background-color: rgba(0, 0, 0, 0.5);
 	background-image: linear-gradient(330deg, #FA0197, #fef45b), linear-gradient(330deg, #FA0197, #fef45b);
 	background-size: 2px 100%, 100% 2px;

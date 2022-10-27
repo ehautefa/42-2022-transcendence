@@ -44,7 +44,7 @@ import { RolesGuard } from './guard/roles.guard';
     // forbidNonWhitelisted: true,
   }),
 )
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
+@WebSocketGateway({ cors: { origin: process.env.REACT_APP_FRONT_URL, credentials: true }, namespace: 'chat' })
 export class ChatGateway
   implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
 {
