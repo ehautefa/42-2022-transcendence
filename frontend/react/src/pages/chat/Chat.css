@@ -44,14 +44,14 @@ body {
     margin: 10px;
 }
 
-.box {
+.rooms {
     margin-right: 5px;
     display: flex;
     flex-direction: column;
     width: 35%;
 }
 
-.box button {
+.rooms button {
 
     width: 30%;
     border-radius: 5px;
@@ -67,10 +67,9 @@ body {
     box-shadow: 0px 0px 20px #7C4D84;
 }
 
-.box button:hover {
+.rooms button:hover {
     border-color: #fef45b;
     text-shadow: 1px 1px 1px #DBACE3;
-
 }
 
 .chat {
@@ -201,7 +200,7 @@ body {
         padding: 0;
     }
 
-    .box {
+    .rooms {
         width: 35%;
 
     }

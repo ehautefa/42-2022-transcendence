@@ -1,6 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Room } from './room.entity';
-import { user } from './users.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ChatMember } from '.';
 
 @Entity()
 export class Message {
@@ -10,12 +9,11 @@ export class Message {
   @Column('varchar')
   message: string;
 
-  @OneToMany(() => Room, (room) => room.id)
-  room: Room;
-
-  @OneToMany(() => user, (user) => user.userUuid)
-  sender: user;
+  @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id, {
+    // eager: true,
+  })
+  sender: ChatMember;
 
   @Column('timestamp')
-  time: string;
+  time: Date;
 }

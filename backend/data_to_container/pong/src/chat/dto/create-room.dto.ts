@@ -1,19 +1,19 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { RoomType } from 'src/bdd/room.entity';
 
 export class CreateRoomDto {
   @IsNotEmpty()
+  @IsString()
   name: string;
 
   @IsNotEmpty()
-  ownerId: string;
-
+  @IsBoolean()
   isProtected: boolean;
 
+  @IsString()
   password: string;
 
-  type: RoomType;
-
   @IsNotEmpty()
-  userId: string;
+  @IsEnum(RoomType)
+  type: RoomType;
 }

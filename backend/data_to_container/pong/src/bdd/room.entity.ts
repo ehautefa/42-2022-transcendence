@@ -1,12 +1,12 @@
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { user } from './users.entity';
+import { ChatMember } from './';
 
 export enum RoomType {
   PRIVATE = 'private',
@@ -19,17 +19,30 @@ export class Room {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar', { nullable: true, unique: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+  })
   name: string;
 
-  @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
-  owner: user;
+  // A DM room does not have an owner
+  @OneToOne(() => ChatMember, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn()
+  owner: ChatMember;
 
-  @Column('boolean', { default: false })
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
   isProtected: boolean;
 
-  @Column('varchar', { nullable: true })
-  password: string;
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    select: false,
+  })
+  hash: string;
 
   @Column({
     type: 'enum',
@@ -38,10 +51,6 @@ export class Room {
   })
   type: RoomType;
 
-  @OneToMany(() => user, (user) => user.userUuid, { nullable: true })
-  admin: user;
-
-  @ManyToMany(() => user, (user) => user.userUuid)
-  @JoinTable()
-  users: user[];
+  @OneToMany(() => ChatMember, (chatMember) => chatMember.room)
+  members: ChatMember[];
 }

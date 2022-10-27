@@ -1,30 +1,53 @@
-import { Logger, Req, UseGuards } from '@nestjs/common';
+import {
+  Logger,
+  Req,
+  UseFilters,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import {
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
-import { Message } from 'src/bdd/message.entity';
-import { Room } from 'src/bdd/room.entity';
+import { ChatMember, Message, Room, user } from 'src/bdd/index';
+import { DeepPartial } from 'typeorm';
+import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { CreateMessageDto } from './dto/createMessage.dto';
-import { CreateRoomDto } from './dto/createRoom.dto';
-import { JoinDMRoomDto } from './dto/joinDMRoom.dto';
+import { Authorized } from './decorator/authorized.decorator';
+import { Roles } from './decorator/roles.decorator';
+import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { GiveOwnershipDto } from './dto/give-ownership.dto';
+import { PunishUserDto } from './dto/punish-user.dto';
+import { RemovePunishmentDto } from './dto/remove-punishment.dto';
+import { SetAdminDto } from './dto/set-admin.dto';
+import { StringDto } from './dto/string.dto';
+import { AuthorizedGuard } from './guard/authorized.guard';
+import { ProtectedRoom } from './guard/protected-room.guard';
+import { RolesGuard } from './guard/roles.guard';
 
-// Not sure if this is going to be usefull to me ...
-/*
-const URL_BACK: string =
-  process.env.REACT_APP_BACK_URL === undefined
-    ? ''
-    : process.env.REACT_APP_BACK_URL;
-*/
-
+@UseGuards(JwtAuthGuard)
+@UseGuards(RolesGuard)
+@UseGuards(AuthorizedGuard)
+// @UseInterceptors(FilterHashInterceptor)
+@UseFilters(ChatExceptionFilter)
+@UsePipes(
+  new ValidationPipe({
+    whitelist: true,
+    // forbidNonWhitelisted: true,
+  }),
+)
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
-// implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-export class ChatGateway {
+export class ChatGateway
+  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private readonly chatService: ChatService) {}
 
   // The socket.io server responsible for handling (receiviing and emitting) events
@@ -34,74 +57,143 @@ export class ChatGateway {
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatGateway');
 
-  // Create a message in the message table and inform the sockets in the room that a new message is available
+  @Authorized('notBanned', 'notBlocked', 'notMuted')
   @SubscribeMessage('createMessage')
-  async createMessage(@MessageBody() createMessageDto: CreateMessageDto) {
-    this.logger.log('Creating a message');
-    const message = await this.chatService.createMessage(createMessageDto);
-    this.server.to(message.room.id).emit('message', message);
-    return message;
+  async createMessage(
+    @MessageBody() createMessageDto: CreateMessageDto,
+    @Req() { user }: { user: user },
+  ): Promise<string> {
+    const roomId: string = await this.chatService.createMessage(
+      createMessageDto,
+      user,
+    );
+    this.logger.debug('Creating a message');
+    // console.log(message);
+    this.server.to(roomId).emit('updateMessages');
+    this.server.emit('updateRooms');
+    return roomId;
   }
 
-  // Create a room in the room table
   @SubscribeMessage('createRoom')
-  async createRoom(@MessageBody() createRoomDto: CreateRoomDto): Promise<Room> {
-    this.logger.log('Here creating a room');
-    console.log(createRoomDto);
-    const newRoom = await this.chatService.createRoom(createRoomDto);
+  async createRoom(
+    @MessageBody() createRoomDto: CreateRoomDto,
+    @Req() { user }: { user: user },
+  ): Promise<DeepPartial<Room>> {
+    const newRoom: DeepPartial<Room> = await this.chatService.createRoom(
+      createRoomDto,
+      user,
+    );
+    this.server.socketsJoin(newRoom.id);
+    this.server.emit('updateRooms');
     return newRoom;
   }
 
-  // Join a room previously created and return it
+  @Authorized('notBanned')
   @SubscribeMessage('joinRoom')
-  async joinRoom(roomName: string) {
-    const room: Room = await this.chatService.getRoomByName(roomName);
-    this.server.socketsJoin(roomName);
+  async joinRoom(@MessageBody() joinRoomDto: UuidDto) {
+    this.logger.debug('pouet');
+    const room: Room = await this.chatService.findRoomById(joinRoomDto.uuid);
+    this.server.socketsJoin(room.id);
     return room;
   }
 
-  // Join a DM room (create it if the room does not exist yet)
+  @Authorized('notBanned')
+  @SubscribeMessage('joinPrivateRoom')
+  async joinPrivateRoom(@MessageBody() joinPrivateRoomDto: StringDto) {
+    const room: Room = await this.chatService.joinPrivateRoom(
+      joinPrivateRoomDto,
+    );
+    this.server.socketsJoin(room.id);
+    return room;
+  }
+
+  @Authorized('notBlocked')
   @SubscribeMessage('joinDMRoom')
-  @UseGuards(JwtAuthGuard)
   async joinDMRoom(
-    @MessageBody() joinDMRoomDto: JoinDMRoomDto,
-    @Req() req,
+    @MessageBody() joinDMRoomDto: UuidDto,
+    @Req() { user }: { user: user },
   ): Promise<Room> {
-    this.logger.log(req);
-    console.log(req);
-    const room: Room = await this.chatService.joinDMRoom(
-      req.user.userUuid,
-      joinDMRoomDto.recipientId,
-    );
+    const room: Room = await this.chatService.joinDMRoom(user, joinDMRoomDto);
+    this.server.socketsJoin(joinDMRoomDto.uuid);
     return room;
   }
 
-  @SubscribeMessage('getAllMessagesInRoom')
-  async getAllMessagesInRoom(roomId: string): Promise<Message[]> {
-    this.logger.log('Getting messages of room ', roomId);
-    const messages: Message[] = await this.chatService.getAllMessagesInRoom(
-      roomId,
+  @Authorized('notBanned')
+  @SubscribeMessage('findAllMessagesInRoom')
+  async findAllMessagesInRoom(
+    @MessageBody() findAllMessagesInRoomDto: UuidDto,
+  ): Promise<Message[]> {
+    const messages: Message[] = await this.chatService.findAllMessagesInRoom(
+      findAllMessagesInRoomDto,
     );
+    // console.log(messages);
     return messages;
   }
 
+  @Authorized('notBanned')
+  @SubscribeMessage('findLastMessageInRoom')
+  async findLastMessageInRoom(
+    @MessageBody() findLastMessageInRoomDto: UuidDto,
+  ): Promise<Message> {
+    return await this.chatService.findLastMessageInRoom(
+      findLastMessageInRoomDto,
+    );
+  }
+
+  @Roles('owner', 'admin')
+  @SubscribeMessage('setAdmin')
+  async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
+    return await this.chatService.setAdmin(setAdminDto);
+  }
+
+  @Roles('owner')
+  @SubscribeMessage('giveOwnership')
+  async changeOwnership(
+    @MessageBody() giveOwnershipDto: GiveOwnershipDto,
+  ): Promise<Room> {
+    return await this.chatService.giveOwnership(giveOwnershipDto);
+  }
+
+  @Roles('owner')
+  @SubscribeMessage('deleteRoom')
+  async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
+    return await this.chatService.deleteRoom(deleteRoomDto);
+  }
+
+  @Roles('owner')
+  @UseGuards(ProtectedRoom)
+  @SubscribeMessage('changePassword')
+  async changePassword(
+    @MessageBody() changePasswordDto: ChangePasswordDto,
+  ): Promise<Room> {
+    return await this.chatService.changePassword(changePasswordDto);
+  }
+
+  @Roles('admin')
+  async punishUser(
+    @MessageBody() punishUserDto: PunishUserDto,
+  ): Promise<ChatMember> {
+    return await this.chatService.punishUser(punishUserDto);
+  }
+
+  @Roles('admin')
+  async removePunishment(
+    @MessageBody() removePunishmentDto: RemovePunishmentDto,
+  ): Promise<ChatMember> {
+    return await this.chatService.removePunishment(removePunishmentDto);
+  }
+
   @SubscribeMessage('findAllPublicRooms')
-  async findAllPublicRooms(): Promise<Room[]> {
-    const rooms: Room[] = await this.chatService.findAllPublicRooms();
-    return rooms;
-  }
-
-  /*
-  afterInit(server: Server) {
-    this.logger.log('Init');
-  }
-
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
+    return await this.chatService.findAllPublicRooms();
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
+    // const user = { id: 'mock' };
+    this.logger.debug(`client connected: ${client.id}`);
+    if (client.handshake.headers.cookie)
+      this.logger.debug('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH!!!');
   }
-  */
+
+  handleDisconnect(client: Socket) {}
 }
