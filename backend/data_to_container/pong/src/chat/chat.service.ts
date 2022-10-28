@@ -67,7 +67,7 @@ export class ChatService {
       .getRawMany();
     console.log(
       messages.map((msg) => {
-        return msg.message, msg.sender.user.userUuid;
+        return msg.message, msg.sender.user.userName;
       }),
     );
     return messages;
