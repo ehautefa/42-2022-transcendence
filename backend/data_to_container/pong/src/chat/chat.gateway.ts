@@ -201,12 +201,22 @@ export class ChatGateway
     return await this.chatService.findAllMutedUsers(roomId.uuid);
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
-    // const user = { id: 'mock' };
+  async handleConnection(client: Socket): Promise<void> {
     this.logger.debug(`client connected: ${client.id}`);
-    if (client.handshake.headers.cookie)
-      this.logger.debug('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH!!!');
+    if (client.handshake.headers.cookie) {
+      const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
+        client.handshake.headers.cookie,
+      );
+      for (const room of roomsToJoin) {
+        this.server.socketsJoin(room.room.id);
+      }
+    }
   }
 
-  handleDisconnect(client: Socket) {}
+  handleDisconnect(client: Socket): void {
+    const roomsToLeave: Set<string> = client.rooms;
+    roomsToLeave.forEach((room) => {
+      this.server.socketsLeave(room);
+    });
+  }
 }
