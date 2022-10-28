@@ -68,7 +68,7 @@ export class ChatGateway
       user,
     );
     this.logger.debug('Creating a message');
-    // console.log(message);
+    console.log(roomId);
     this.server.to(roomId).emit('updateMessages');
     this.server.emit('updateRooms');
     return roomId;
@@ -126,7 +126,7 @@ export class ChatGateway
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
-    // console.log(messages);
+    console.log(messages);
     return messages;
   }
 
