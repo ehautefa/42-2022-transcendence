@@ -26,7 +26,7 @@ export type Room = {
 
 function Chat() {
 	const socket = getSocketChat();
-	const emptyRoom = {id: "", name: ""};
+	const emptyRoom = { id: "", name: "" };
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
 	const [messages, setMessages] = useState([]);
@@ -54,14 +54,14 @@ function Chat() {
 		console.log('getting information');
 		socket.emit('findAllPublicRooms', (rooms: any) => {
 			setChannels(rooms)
-			// if (rooms.length > 0 && selectedRoom.id === "") {
-			// 	console.log("setting selected room", rooms[0].id);
-			// 	setSelectedRoom(rooms[0].id);
-			// 	socket.emit('findAllMessagesInRoom', { uuid: rooms[0].id, }, (msgs: any) => {
-			// 		console.log("msgs", msgs);
-			// 		setMessages(msgs)
-			// 	});
-			// }
+			if (rooms.length > 0 && selectedRoom.id === "") {
+				console.log("setting selected room", rooms[0].id);
+				// 	setSelectedRoom(rooms[0].id);
+				// 	socket.emit('findAllMessagesInRoom', { uuid: rooms[0].id, }, (msgs: any) => {
+				// 		console.log("msgs", msgs);
+				// 		setMessages(msgs)
+				// 	});
+			}
 		});
 	});
 
@@ -97,15 +97,17 @@ function Chat() {
 				<JoinAgoraPopup />
 			</div>
 			<div className="chat">
-				<ChatSideNav Room={selectedRoom}/>
-				{messages.map((message: any) => (
-					<div key={message.id}>
-						{message.userName === user.userName ?
-						<div className="message_mine">{message.message}</div> :
-						<div className="message_other">{message.userName} : {message.message}</div>
-						}
-					</div>
-				))}
+					<ChatSideNav Room={selectedRoom} />
+				<div className="messages">
+					{messages.map((message: any) => (
+						<div key={message.id}>
+							{message.userName === user.userName ?
+								<div className="message_mine">{message.message}</div> :
+								<div className="message_other">{message.userName} : {message.message}</div>
+							}
+						</div>
+					))}
+				</div>
 				{/* // TO DO OSCAR : Transition doesn't work */}
 				{/* <TransitionGroup className="messages">
 					{messages ? (messages as any).map((message: any) => (

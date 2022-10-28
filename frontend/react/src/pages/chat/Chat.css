@@ -80,7 +80,15 @@
     box-shadow: 0px 0px 20px #7C4D84;
 }
 
-.message_mine {
+.messages {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overflow-y: scroll;
+}
+
+
+.messages .message_mine {
     font-family: Monaco, Arial, sans-serif;
     text-align:right;
     width: max-content;
@@ -92,13 +100,12 @@
     margin-right: 5px;
     border-radius: 5px;
     color: #fae3fa;
-    padding: 0.5rem;
     background-color: #FA0197;
     box-shadow: -2px 2px 3px rgb(80, 80, 80), inset 0px 0px 3px 1px  #6d0041;
     padding: 5px;
 }
 
-.message_other {
+.messages .message_other {
     font-family: Monaco, Arial, sans-serif;
     width: max-content;
     max-width: 50%;
@@ -111,11 +118,6 @@
     background-color:  #fae3fa;
     box-shadow: -2px 2px 3px gray, inset 0px 0px 3px 1px   gray;
     padding: 5px;
-}
-
-.messages {
-    height: 100%;
-    overflow-y: scroll;
 }
 
 .chat form {
