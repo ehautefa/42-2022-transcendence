@@ -190,6 +190,11 @@ export class ChatGateway
     return await this.chatService.findAllPublicRooms();
   }
 
+  @SubscribeMessage('findAllInvitableUsers')
+  async findAllInvitableUsers(@MessageBody() roomId: UuidDto): Promise<user[]> {
+    return await this.chatService.findAllInvitableUsers(roomId.uuid);
+  }
+
   @SubscribeMessage('findAllBannedUsersInRoom')
   async findAllBannedUsersInRoom(roomId: UuidDto) {
     return await this.chatService.findAllBannedUsers(roomId.uuid);

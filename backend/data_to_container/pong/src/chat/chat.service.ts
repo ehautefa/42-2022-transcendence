@@ -160,10 +160,32 @@ export class ChatService {
   }
 
   async findRoomByName(roomName: string): Promise<Room> {
-    const room: Room = await this.roomsRepository.findOneOrFail({
+    return await this.roomsRepository.findOneOrFail({
       where: { name: roomName },
     });
-    return room;
+  }
+
+  async findAllInvitableUsers(roomId: string): Promise<user[]> {
+    const users: user[] = await this.userService.getAllUser();
+    const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
+      relations: {
+        user: true,
+        room: true,
+      },
+      select: {
+        user: { userUuid: true },
+      },
+      where: {
+        room: { id: roomId },
+      },
+    });
+    for (const member of chatMembers) {
+      for (const index in users) {
+        if (member.user.userUuid === users[index].userUuid)
+          users.splice(+index);
+      }
+    }
+    return users;
   }
 
   /*
