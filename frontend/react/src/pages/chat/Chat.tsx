@@ -23,9 +23,9 @@ function Chat() {
 	const socket = getSocketChat();
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
-	const [selectedRoom, setSelectedRoom] = useState("");
 	const [messages, setMessages] = useState();
 	const [channels, setChannels] = useState([]);
+	const [selectedRoom, setSelectedRoom] = useState("");
 	const [newMessage, setNewMessage] = useState("");
 	async function fetchUser() {
 		const user = await getMe();
@@ -47,9 +47,18 @@ function Chat() {
 
 	socket.on('updateRooms', (rooms: any) => {
 		console.log('getting information');
-		socket.emit('findAllPublicRooms', (rooms: any) => { setChannels(rooms) });
+		socket.emit('findAllPublicRooms', (rooms: any) => {
+			setChannels(rooms)
+			if (rooms.length > 0 && selectedRoom === "") {
+				console.log("setting selected room", rooms[0].uuid);
+				setSelectedRoom(rooms[0].uuid);
+				socket.emit('findAllMessagesInRoom', { uuid: rooms[0].uuid, }, (msgs: any) => {
+					console.log("msgs", msgs);
+					setMessages(msgs)
+				});
+			}
+		});
 	});
-
 
 	async function chooseRoom(thisRoom: string) {
 		console.log("You chose room ", thisRoom);
