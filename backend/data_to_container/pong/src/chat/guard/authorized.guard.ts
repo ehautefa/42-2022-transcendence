@@ -34,11 +34,11 @@ export class AuthorizedGuard implements CanActivate {
       roomId,
     );
     const unBan: boolean =
-      chatMember.bannedTime && Date.now() > chatMember.bannedTime
+      chatMember.bannedTime && new Date() > chatMember.bannedTime
         ? true
         : false;
     const unMute: boolean =
-      chatMember.mutedTime && Date.now() > chatMember.mutedTime ? true : false;
+      chatMember.mutedTime && new Date() > chatMember.mutedTime ? true : false;
     if (unBan)
       this.chatService.removePunishment({
         userId: chatMember.user.userUuid,

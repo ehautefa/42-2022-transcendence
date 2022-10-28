@@ -4,7 +4,7 @@ import { WsException } from '@nestjs/websockets';
 import * as argon from 'argon2';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
-import { DeepPartial, Not, Repository } from 'typeorm';
+import { DeepPartial, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
@@ -36,37 +36,35 @@ export class ChatService {
   async createMessage(
     createMessageDto: CreateMessageDto,
     sender: user,
-  ): Promise<string> {
+  ): Promise<Message> {
     const room: Room = await this.findRoomById(createMessageDto.roomId);
     const chatMember: ChatMember = await this.getChatMember(sender, room);
     const newMessage = this.messagesRepository.create({
       message: createMessageDto.message,
-      // room: room,
       sender: chatMember,
       time: new Date(),
     });
     this.logger.debug('createMessage is OK');
     this.logger.debug(chatMember);
-    await this.messagesRepository.save(newMessage);
-    return chatMember.room.id;
+    return await this.messagesRepository.save(newMessage);
   }
 
   async findAllMessagesInRoom({
     uuid: roomId,
   }: {
     uuid: string;
-  }): Promise<Message[]> {
+  }): Promise<any[]> {
     console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository
       .createQueryBuilder('msg')
-      .select('message')
+      .select('message', 'sender')
       .innerJoin('msg.sender', 'sender')
       .innerJoin('sender.room', 'room')
       .where('room.id = :id', { id: roomId })
       .getRawMany();
     console.log(
       messages.map((msg) => {
-        return msg.message;
+        return msg.message, msg.sender.user.userUuid;
       }),
     );
     return messages;
@@ -239,7 +237,9 @@ export class ChatService {
       punishUserDto.userId,
       punishUserDto.roomId,
     );
-    const endPunishment: number = punishUserDto.duration * 1000 + Date.now();
+    const endPunishment: Date = new Date(
+      Date() + punishUserDto.duration * 1000,
+    );
     chatMember.mutedTime = endPunishment;
     if (punishUserDto.isBanned === true) chatMember.bannedTime = endPunishment;
     return await this.chatMembersRepository.save(chatMember);
@@ -293,5 +293,31 @@ export class ChatService {
     this.logger.debug('Getting all rooms to join');
     console.log(chatMembers);
     return chatMembers;
+  }
+
+  async findAllBannedUsers(roomId: string): Promise<ChatMember[]> {
+    return await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      select: {
+        user: { userName: true, userUuid: true },
+      },
+      where: {
+        bannedTime: Not(IsNull()) && LessThan(new Date()),
+        room: { id: roomId },
+      },
+    });
+  }
+
+  async findAllMutedUsers(roomId: string): Promise<ChatMember[]> {
+    return await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      select: {
+        user: { userName: true, userUuid: true },
+      },
+      where: {
+        mutedTime: Not(IsNull()) && LessThan(new Date()),
+        room: { id: roomId },
+      },
+    });
   }
 }
