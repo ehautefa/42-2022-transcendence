@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./ChatSideNav.css";
+import InviteUser from "./menu/InviteUser";
 
 function ChatSideNav() {
     var sidenav = document.getElementById("mySidenav");
@@ -22,7 +23,7 @@ function ChatSideNav() {
                 <button id="closeBtn" className="close" onClick={closeNav}>×</button>
                 <ul>
                     {/* All User */}
-                    <li><a href="#">Invite User</a></li>
+                    <li><InviteUser /></li>
                     <li><a href="#">Leave Room</a></li>
                     {/* Admin */}
                     <li><a href="#">Add Admin</a></li>

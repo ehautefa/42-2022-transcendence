@@ -22,10 +22,6 @@
     transition: 0.6s;
 }
 
-.sidenav a:hover {
-    color: #111;
-}
-
 .sidenav ul {
     list-style-type: none;
     padding: 0;
