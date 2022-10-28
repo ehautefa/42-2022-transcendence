@@ -43,12 +43,11 @@ function Chat() {
 		socket.emit('findAllPublicRooms', (rooms: any) => { setChannels(rooms) });
 	}, [socket]);
 
-	// socket.on('updateMessages', () => {
-	// 	socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
-	// 		console.log("msgs", msgs);
-	// 		setMessages(msgs)
-	// 	});
-	// });
+	socket.on('updateMessages', () => {
+		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
+			setMessages(msgs)
+		});
+	});
 
 	socket.on('updateRooms', (rooms: any) => {
 		console.log('getting information');
@@ -78,9 +77,6 @@ function Chat() {
 		console.log('sending message: ', newMessage);
 		socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.id });
 		setNewMessage("");
-		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
-			setMessages(msgs)
-		});
 	}
 
 	return (<div>
