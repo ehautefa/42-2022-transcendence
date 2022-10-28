@@ -69,7 +69,9 @@ function Profile() {
 		<div className="mainComposantProfile">
 			<div className="flex">
 				<div className="info container">
-					<h3>Profile</h3>
+					<div className="flex-message">
+						<h3>Profile</h3>
+					</div>
 					<ul>
 						<li className="flex-li">
 							<div className="Username">Username : {user.userName}</div>
@@ -78,10 +80,11 @@ function Profile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
+					<button className="enable">Write message</button>
 					{
 						isMyFriend ?
-							<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
-							: ( invitationSent ?
+						<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
+						: ( invitationSent ?
 							<button className="enable unclickable">Invitation sent</button>
 							: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
 							)
