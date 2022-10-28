@@ -63,7 +63,7 @@ export default function App() {
 	});
 	return (<>
 		<div className='login'>		
-			<FormCode2FAPopUp />
+			{/* <FormCode2FAPopUp /> */}
 			<a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a>
 			<div className='createUser'>
 				<h5>Or use a local profile : </h5>

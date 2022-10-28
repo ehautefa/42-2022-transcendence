@@ -63,6 +63,7 @@ export class ChatService {
       .select('message', 'sender')
       .innerJoin('msg.sender', 'sender')
       .innerJoin('sender.room', 'room')
+      .innerJoin('sender.user', 'user')
       .where('room.id = :id', { id: roomId })
       .getRawMany();
     console.log(

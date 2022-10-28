@@ -43,3 +43,12 @@
     top: 50%;
 }
 
+.flex-button-popup {
+    padding: 10px 20px;
+    margin: 0 10px;
+}
+
+.flex-button-popup:hover {
+    border: 2px solid #fef45b;
+}
+

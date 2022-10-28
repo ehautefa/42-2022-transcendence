@@ -1,8 +1,9 @@
 import { useState } from "react";
 import "./ChatSideNav.css";
 import InviteUser from "./menu/InviteUser";
+import LeaveRoom from "./menu/LeaveRoom";
 
-function ChatSideNav() {
+function ChatSideNav({Room} : any) {
     var sidenav = document.getElementById("mySidenav");
 
     function openNav() {
@@ -24,7 +25,7 @@ function ChatSideNav() {
                 <ul>
                     {/* All User */}
                     <li><InviteUser /></li>
-                    <li><a href="#">Leave Room</a></li>
+                    <li><LeaveRoom name={Room.name}/></li>
                     {/* Admin */}
                     <li><a href="#">Add Admin</a></li>
                     <li><a href="#">Remove Admin</a></li>
