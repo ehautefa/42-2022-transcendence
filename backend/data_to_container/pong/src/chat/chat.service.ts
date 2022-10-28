@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WsException } from '@nestjs/websockets';
 import * as argon from 'argon2';
+import { JwtConfig } from 'src/auth/config/Jwt.config';
+import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { DeepPartial, IsNull, LessThan, Not, Repository } from 'typeorm';
@@ -22,9 +25,9 @@ export class ChatService {
     private roomsRepository: Repository<Room>,
     @InjectRepository(ChatMember)
     private chatMembersRepository: Repository<ChatMember>,
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
   ) {}
-
-  private readonly userService: UserService;
 
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatService');
@@ -317,6 +320,45 @@ export class ChatService {
       where: {
         mutedTime: Not(IsNull()) && LessThan(new Date()),
         room: { id: roomId },
+      },
+    });
+  }
+
+  /*
+   * socket functions
+   */
+
+  async getUserUuidFromCookies(cookiesStr: string): Promise<string> {
+    const cookies: string[] = cookiesStr.split('; ');
+    const authCookie: string = cookies.filter((s) =>
+      s.includes('access_token='),
+    )[0];
+    const accessToken = authCookie.substring(
+      'access_token'.length + 1,
+      authCookie.length,
+    );
+    const jwtOptions: JwtVerifyOptions = {
+      secret: JwtConfig.secret,
+    };
+    const jwtPayload: TokenPayload = await this.jwtService.verify(
+      accessToken,
+      jwtOptions,
+    );
+    return jwtPayload.userUuid;
+  }
+
+  async handleConnection(cookiesStr: string): Promise<ChatMember[]> {
+    const userId: string = await this.getUserUuidFromCookies(cookiesStr);
+    return await this.chatMembersRepository.find({
+      relations: {
+        room: true,
+        user: true,
+      },
+      select: {
+        room: { id: true },
+      },
+      where: {
+        user: { userUuid: userId },
       },
     });
   }
