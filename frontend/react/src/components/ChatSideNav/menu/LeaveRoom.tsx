@@ -1,10 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Popup from "reactjs-popup";
-import { getAllUuidWithUserNameWithoutMe, getMyBlocked } from "../../../pages/allPlayers/request";
-import { getMe } from "../../../pages/myProfile/request";
 import "./sideMenu.css";
-import Select from "react-select";
-import { Room } from "../../../pages/chat/Chat";
 import { getSocketChat } from "../../../App";
 
 
