@@ -45,7 +45,10 @@ function Chat() {
 
 	socket.on('updateMessages', () => {
 		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
-			setMessages(msgs)
+			setMessages(msgs);
+			var message = document.getElementById('messages');
+			if (message)
+				message.scrollTop = message.scrollHeight;
 		});
 	});
 
@@ -94,7 +97,7 @@ function Chat() {
 			</div>
 			<div className="chat">
 					<ChatSideNav Room={selectedRoom} />
-				<div className="messages">
+				<div id="messages">
 					{messages.map((message: any) => (
 						<div key={message.id}>
 							{message.userName === user.userName ?
