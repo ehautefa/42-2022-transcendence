@@ -44,7 +44,10 @@ import { RolesGuard } from './guard/roles.guard';
     // forbidNonWhitelisted: true,
   }),
 )
-@WebSocketGateway({ cors: { origin: process.env.REACT_APP_FRONT_URL, credentials: true }, namespace: 'chat' })
+@WebSocketGateway({
+  cors: { origin: process.env.REACT_APP_FRONT_URL, credentials: true },
+  namespace: 'chat',
+})
 export class ChatGateway
   implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
 {
@@ -57,21 +60,21 @@ export class ChatGateway
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatGateway');
 
-  @Authorized('notBanned', 'notBlocked', 'notMuted')
+  // @Authorized('notBanned', 'notBlocked', 'notMuted')
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
     @Req() { user }: { user: user },
-  ): Promise<string> {
-    const roomId: string = await this.chatService.createMessage(
+  ): Promise<Message> {
+    const message: Message = await this.chatService.createMessage(
       createMessageDto,
       user,
     );
     this.logger.debug('Creating a message');
-    console.log(roomId);
-    this.server.to(roomId).emit('updateMessages');
-    this.server.emit('updateRooms');
-    return roomId;
+    // console.log(message);
+    this.server.to(message.sender.room.id).emit('updateMessages');
+    // this.server.emit('updateRooms');
+    return message;
   }
 
   @SubscribeMessage('createRoom')
@@ -186,6 +189,16 @@ export class ChatGateway
   @SubscribeMessage('findAllPublicRooms')
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     return await this.chatService.findAllPublicRooms();
+  }
+
+  @SubscribeMessage('findAllBannedUsersInRoom')
+  async findAllBannedUsersInRoom(roomId: UuidDto) {
+    return await this.chatService.findAllBannedUsers(roomId.uuid);
+  }
+
+  @SubscribeMessage('findAllMutedUsersInRoom')
+  async findAllMutedUsersInRoom(roomId: UuidDto) {
+    return await this.chatService.findAllMutedUsers(roomId.uuid);
   }
 
   handleConnection(client: Socket, ...args: any[]) {
