@@ -1,0 +1,29 @@
+.Popup-mother .side-menu-button {
+    background-color: none;
+    border: none;
+    box-shadow: none;
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    font-weight: 300;
+    display: block;
+    transition: 0.6s;
+    width: 100%;
+    text-align: left;
+    padding: 10px 25px;
+    font-family: Courier, 'Courier New', monospace;
+
+}
+
+.Popup-mother .side-menu-button:hover {
+	text-shadow: 1px 1px 1px #fef45b;
+}
+
+.side-menu-popup {
+    width: 300%;
+    padding: 10px;
+    border-radius: 5px;
+    aspect-ratio: 4/3;
+    background-color: rgba(0, 0, 0, 0.8);
+}
