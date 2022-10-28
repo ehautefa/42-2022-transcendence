@@ -20,16 +20,16 @@ socketStatus.on('getUserUuid', () => {
 })
 
 export type Room = {
-	uuid: string,
+	id: string,
 	name: string,
 }
 
 function Chat() {
 	const socket = getSocketChat();
-	const emptyRoom = {uuid: "", name: ""};
+	const emptyRoom = {id: "", name: ""};
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
-	const [messages, setMessages] = useState();
+	const [messages, setMessages] = useState([]);
 	const [channels, setChannels] = useState([]);
 	const [selectedRoom, setSelectedRoom] = useState(emptyRoom);
 	const [newMessage, setNewMessage] = useState("");
@@ -45,7 +45,7 @@ function Chat() {
 
 	socket.on('updateMessages', () => {
 		console.log('updateMessages');
-		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.uuid, }, (msgs: any) => {
+		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
 			console.log("msgs", msgs);
 			setMessages(msgs)
 		});
@@ -55,10 +55,10 @@ function Chat() {
 		console.log('getting information');
 		socket.emit('findAllPublicRooms', (rooms: any) => {
 			setChannels(rooms)
-			if (rooms.length > 0 && selectedRoom.uuid === "") {
-				console.log("setting selected room", rooms[0].uuid);
-				setSelectedRoom(rooms[0].uuid);
-				socket.emit('findAllMessagesInRoom', { uuid: rooms[0].uuid, }, (msgs: any) => {
+			if (rooms.length > 0 && selectedRoom.id === "") {
+				console.log("setting selected room", rooms[0].id);
+				setSelectedRoom(rooms[0].id);
+				socket.emit('findAllMessagesInRoom', { uuid: rooms[0].id, }, (msgs: any) => {
 					console.log("msgs", msgs);
 					setMessages(msgs)
 				});
@@ -69,7 +69,7 @@ function Chat() {
 	async function chooseRoom(thisRoom: Room) {
 		console.log("You chose room ", thisRoom);
 		setSelectedRoom(thisRoom);
-		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom, }, (msgs: any) => {
+		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
 			console.log("msgs", msgs);
 			setMessages(msgs)
 		});
@@ -77,10 +77,9 @@ function Chat() {
 
 	function sendMessage() {
 		console.log('sending message: ', newMessage);
-		socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.uuid });
+		socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.id });
 		setNewMessage("");
-		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.uuid, }, (msgs: any) => {
-			console.log("msgs", msgs);
+		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
 			setMessages(msgs)
 		});
 	}
@@ -92,7 +91,7 @@ function Chat() {
 				<h3>My Rooms</h3>
 				<div className="channel">
 					{channels.map((room: Room) => (
-						<li key={room.uuid} onClick={() => chooseRoom(room)}>{room.name}</li>
+						<li key={room.id} onClick={() => chooseRoom(room)}>{room.name}</li>
 					))}
 				</div>
 				<NewAgoraPopup />
@@ -100,7 +99,16 @@ function Chat() {
 			</div>
 			<div className="chat">
 				<ChatSideNav Room={selectedRoom}/>
-				<TransitionGroup className="messages">
+				{messages.map((message: any) => (
+					<div key={message.message}>
+						{message.userName === user.userName ?
+						<div className="message_mine">{message.message}</div> :
+						<div className="message_other">{message.userName} : {message.message}</div>
+						}
+					</div>
+				))}
+				// TO DO OSCAR : Transition doesn't work
+				{/* <TransitionGroup className="messages">
 					{messages ? (messages as any).map((message: any) => (
 						message.sender.userUuid === user.userUuid ?
 							(<CSSTransition key={message} timeout={500} classNames="fade">
@@ -110,7 +118,7 @@ function Chat() {
 							</CSSTransition>))
 					) : null
 					}
-				</TransitionGroup>
+				</TransitionGroup> */}
 				<div className='input-flex'>
 					<input type="text" id="message" name="username"
 						value={newMessage}
