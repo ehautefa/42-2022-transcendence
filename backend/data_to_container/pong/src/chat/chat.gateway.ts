@@ -129,7 +129,7 @@ export class ChatGateway
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
-    // console.log(messages);
+    console.log(messages);
     return messages;
   }
 

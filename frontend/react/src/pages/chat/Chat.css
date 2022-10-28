@@ -1,9 +1,3 @@
-body {
-    background-color: #250021;
-    background-image: url("../../../public/synthwave-wallpaper.jpg");
-    background-repeat: no-repeat;
-}
-
 .mainComposant {
     width: 80%;
     height: 80vh;
@@ -13,31 +7,31 @@ body {
 }
 
 .channel {
-    width: 94%;
+    width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: 5px;
     outline: none;
-    padding: 0.5rem;
     color: #fae3fa;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+    overflow-y: scroll;
 }
 
 .channel li{
+    list-style-type: none;
     font-size: 0.8rem;
-    width: 93%;
-    padding: 10px 10px;
-    outline:rgb(80, 80, 80);
-    margin-top: 10px;
-    border-radius: 5px;
+    width: 90%;
+    padding: 10px;
     background-color: rgba(0, 0, 0, 0.5);
-    box-shadow: 3px 3px 6px #000;
-    color: #fef45b;
+    color: #DBACE3; 
+    box-shadow: 5px 0px 5px #7C4D84;
     font-weight: bold;
-
 }
 
 .channel li:hover {
-    text-shadow: 1px 1px 1px #FA0197;
-    box-shadow: 5px 5px 10px rgb(41, 38, 38);
+    background-color: rgba(0, 0, 0, 0.9);
+    box-shadow: 5px 0px 10px #DBACE3;
 }
 
 .channel h3 {
@@ -45,23 +39,27 @@ body {
 }
 
 .rooms {
-    margin-right: 5px;
+    margin: 20px;
     display: flex;
     flex-direction: column;
     width: 35%;
+    /* background-color: #fef45b; */
+}
+
+.rooms h3 {
+    margin: 10px;
 }
 
 .rooms button {
-
-    width: 30%;
-    border-radius: 5px;
+    width: 100%;
+    margin: 10px;
     outline: none;
     font-size: 1rem;
     margin-left: 5px;
     padding: 10px 10px;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.5);
     color: #FA0197;
     border: 2px solid #DBACE3;
     box-shadow: 0px 0px 20px #7C4D84;
@@ -69,16 +67,17 @@ body {
 
 .rooms button:hover {
     border-color: #fef45b;
-    text-shadow: 1px 1px 1px #DBACE3;
 }
 
 .chat {
     display: flex;
     flex-direction: column;
-    width: 80%;
-    margin: 10px;
+    width: 90%;
+    margin: 20px;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .message_mine {
@@ -101,7 +100,6 @@ body {
 
 .message_other {
     font-family: Monaco, Arial, sans-serif;
-
     width: max-content;
     max-width: 50%;
     list-style: none;
@@ -123,9 +121,15 @@ body {
 .chat form {
     width: 100%;
     display: flex;
+    flex-direction: row;
     height: 3rem;
     box-sizing: border-box;
     backdrop-filter: blur(10px);
+}
+
+.chat .input-flex {
+    display: flex;
+    flex-direction: row;
 }
 
 .chat input {
@@ -148,9 +152,7 @@ body {
     margin-left: 5px;
     padding: 5px 10px;
     align-items: center;
-    justify-content: center;
-
-    
+    justify-content: center;    
     background-color: rgba(0, 0, 0, 0);
     color: #FA0197;
     border: 2px solid #DBACE3;
