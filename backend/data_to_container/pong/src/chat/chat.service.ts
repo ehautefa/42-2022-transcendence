@@ -66,6 +66,8 @@ export class ChatService {
       .where('room.id = :id', { id: roomId })
       .select('message')
       .addSelect('user.userName', 'userName')
+      .addSelect('msg.id', 'id')
+      .orderBy('msg.time')
       .getRawMany();
     this.logger.debug('These are the messages');
     console.log(messages);
