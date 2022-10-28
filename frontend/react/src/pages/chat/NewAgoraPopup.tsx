@@ -1,19 +1,18 @@
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocketChat, getSocketStatus } from "../../App";
+import { getSocketChat } from "../../App";
 import "./Chat.css";
-
-const socketStatus = getSocketStatus();
-
-socketStatus.on('getUserUuid', () => {
-	socketStatus.emit('getUserUuid');
-})
+import "./ChatPopup.css";
 
 function NewAgoraPopup() {
 	const socket = getSocketChat();
 	const [open, setOpen] = useState(false);
 	const [roomType, setRoomType] = useState("public");
 	const [newChannel, setNewChannel] = useState("");
+
+	function handleChange(event: any) {
+		setRoomType(event.target.value);
+	}
 
 	const makeRoom = (e: any) => {
 		e.preventDefault();
@@ -47,10 +46,12 @@ function NewAgoraPopup() {
 							size={30} />
 						<span></span>
 					</div>
-					<div className="RoomTypeSelector" onChange={(e) => console.log(e.target)}>
+					<div className="RoomTypeSelector">
 						<p>Room Type :</p>
-						<input type="radio" value="public" name="roomType" /> Public
-						<input type="radio" value="private" name="roomType" /> Private
+						<div className='room-type-selector-flex'>
+							<input type="radio" value="public" name="roomType" onChange={handleChange}/> Public
+							<input type="radio" value="private" name="roomType"  onChange={handleChange} /> Private
+						</div>
 					</div>
 
 					<button type="submit" onClick={makeRoom}>Save</button>

@@ -21,9 +21,25 @@
 }
 
 .side-menu-popup {
-    width: 300%;
+    position:fixed;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    border: 2px solid #fef45b;
+    box-shadow: 0 0 10px #fef45b;
     padding: 10px;
     border-radius: 5px;
-    aspect-ratio: 4/3;
+    /* aspect-ratio: 4/3; */
     background-color: rgba(0, 0, 0, 0.8);
 }
+
+.side-menu-popup h3 {
+    text-align: center;
+}
+
+.side-menu-popup button {
+    position: relative;
+    left: 37%;
+    top: 50%;
+}
+

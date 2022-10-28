@@ -264,14 +264,15 @@
 
 .messagePopup button {
     background-color: rgba(0, 0, 0, 0.1);
-    border: 1px solid #FAE3E3;
     border-radius: 5px;
     padding: 5px;
     font-size: large;
     font-weight: bold;
     cursor: pointer;
-    /* box-shadow: 1px 1px 5px #fef45b; */
-    color: #FAE3E3;
     width: 30%;
     margin: 20px 0 0;
+}
+
+.messagePopup button:hover { 
+    border: 2px solid #fef45b;
 }

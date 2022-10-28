@@ -47,6 +47,10 @@ function InviteUser(me : any) {
         fetchPlayers();
     }, []);
 
+    function Submit() {
+        setOpen(false);
+    }
+
 
     return (<div className="Popup-mother">
         <button className="side-menu-button" onClick={() => setOpen(true)}>Invite User</button>
@@ -54,8 +58,9 @@ function InviteUser(me : any) {
             setOpen(false);
         }}>
             <div className='side-menu-popup'>
-                <h3>Users</h3>
+                <h3>Select Users</h3>
                 <Select styles={customStyles} options={selectOptions} isMulti />
+                <button onClick={Submit}>Send Invitation</button>
             </div>
         </Popup>
     </div>);
