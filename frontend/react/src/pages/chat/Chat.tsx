@@ -43,34 +43,33 @@ function Chat() {
 		socket.emit('findAllPublicRooms', (rooms: any) => { setChannels(rooms) });
 	}, [socket]);
 
-	socket.on('updateMessages', () => {
-		console.log('updateMessages');
-		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
-			console.log("msgs", msgs);
-			setMessages(msgs)
-		});
-	});
+	// socket.on('updateMessages', () => {
+	// 	socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
+	// 		console.log("msgs", msgs);
+	// 		setMessages(msgs)
+	// 	});
+	// });
 
 	socket.on('updateRooms', (rooms: any) => {
 		console.log('getting information');
 		socket.emit('findAllPublicRooms', (rooms: any) => {
 			setChannels(rooms)
-			if (rooms.length > 0 && selectedRoom.id === "") {
-				console.log("setting selected room", rooms[0].id);
-				setSelectedRoom(rooms[0].id);
-				socket.emit('findAllMessagesInRoom', { uuid: rooms[0].id, }, (msgs: any) => {
-					console.log("msgs", msgs);
-					setMessages(msgs)
-				});
-			}
+			// if (rooms.length > 0 && selectedRoom.id === "") {
+			// 	console.log("setting selected room", rooms[0].id);
+			// 	setSelectedRoom(rooms[0].id);
+			// 	socket.emit('findAllMessagesInRoom', { uuid: rooms[0].id, }, (msgs: any) => {
+			// 		console.log("msgs", msgs);
+			// 		setMessages(msgs)
+			// 	});
+			// }
 		});
 	});
 
 	async function chooseRoom(thisRoom: Room) {
 		console.log("You chose room ", thisRoom);
 		setSelectedRoom(thisRoom);
-		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
-			console.log("msgs", msgs);
+		socket.emit('findAllMessagesInRoom', { uuid: thisRoom.id, }, (msgs: any) => {
+			console.log("FIND ALL MSG", msgs);
 			setMessages(msgs)
 		});
 	}
@@ -100,14 +99,14 @@ function Chat() {
 			<div className="chat">
 				<ChatSideNav Room={selectedRoom}/>
 				{messages.map((message: any) => (
-					<div key={message.message}>
+					<div key={message.id}>
 						{message.userName === user.userName ?
 						<div className="message_mine">{message.message}</div> :
 						<div className="message_other">{message.userName} : {message.message}</div>
 						}
 					</div>
 				))}
-				// TO DO OSCAR : Transition doesn't work
+				{/* // TO DO OSCAR : Transition doesn't work */}
 				{/* <TransitionGroup className="messages">
 					{messages ? (messages as any).map((message: any) => (
 						message.sender.userUuid === user.userUuid ?
