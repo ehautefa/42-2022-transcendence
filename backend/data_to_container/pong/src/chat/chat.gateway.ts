@@ -24,6 +24,7 @@ import { Authorized } from './decorator/authorized.decorator';
 import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { FilterUsersDto } from './dto/filter-users.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
@@ -195,14 +196,11 @@ export class ChatGateway
     return await this.chatService.findAllInvitableUsers(roomId.uuid);
   }
 
-  @SubscribeMessage('findAllBannedUsersInRoom')
-  async findAllBannedUsersInRoom(roomId: UuidDto) {
-    return await this.chatService.findAllBannedUsers(roomId.uuid);
-  }
-
-  @SubscribeMessage('findAllMutedUsersInRoom')
-  async findAllMutedUsersInRoom(roomId: UuidDto) {
-    return await this.chatService.findAllMutedUsers(roomId.uuid);
+  @SubscribeMessage('filterUsersInRoom')
+  async filterUsersInRoom(
+    @MessageBody() filterUsersDto: FilterUsersDto,
+  ): Promise<ChatMember[]> {
+    return await this.chatService.filterUsersInRoom(filterUsersDto);
   }
 
   async handleConnection(client: Socket): Promise<void> {

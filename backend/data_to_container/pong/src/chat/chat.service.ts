@@ -10,6 +10,7 @@ import { UserService } from 'src/user/user.service';
 import { DeepPartial, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { FilterUsersDto } from './dto/filter-users.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
@@ -284,6 +285,25 @@ export class ChatService {
     return await this.chatMembersRepository.save(chatMember);
   }
 
+  async filterUsersInRoom(
+    filterUsersDto: FilterUsersDto,
+  ): Promise<ChatMember[]> {
+    let timeNow: Date;
+    if (filterUsersDto.banned || filterUsersDto.muted) timeNow = new Date();
+    return await this.chatMembersRepository.find({
+      relations: { user: true, room: true },
+      select: {
+        user: { userName: true, userUuid: true },
+      },
+      where: {
+        room: { id: filterUsersDto.roomId },
+        isAdmin: filterUsersDto.admin,
+        bannedTime: filterUsersDto.banned && Not(IsNull) && LessThan(timeNow),
+        mutedTime: filterUsersDto.muted && Not(IsNull) && LessThan(timeNow),
+      },
+    });
+  }
+
   /*
    * owner functions
    */
@@ -311,42 +331,42 @@ export class ChatService {
     return await this.roomsRepository.remove(room);
   }
 
-  async findAllRoomsToJoin(userId: string): Promise<ChatMember[]> {
-    const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
-      relations: { room: true, user: true },
-      select: { room: { id: true } },
-      where: { user: { userUuid: userId } },
-    });
-    this.logger.debug('Getting all rooms to join');
-    console.log(chatMembers);
-    return chatMembers;
-  }
+  // async findAllRoomsToJoin(userId: string): Promise<ChatMember[]> {
+  //   const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
+  //     relations: { room: true, user: true },
+  //     select: { room: { id: true } },
+  //     where: { user: { userUuid: userId } },
+  //   });
+  //   this.logger.debug('Getting all rooms to join');
+  //   console.log(chatMembers);
+  //   return chatMembers;
+  // }
 
-  async findAllBannedUsers(roomId: string): Promise<ChatMember[]> {
-    return await this.chatMembersRepository.find({
-      relations: { room: true, user: true },
-      select: {
-        user: { userName: true, userUuid: true },
-      },
-      where: {
-        bannedTime: Not(IsNull()) && LessThan(new Date()),
-        room: { id: roomId },
-      },
-    });
-  }
+  // async findAllBannedUsers(roomId: string): Promise<ChatMember[]> {
+  //   return await this.chatMembersRepository.find({
+  //     relations: { room: true, user: true },
+  //     select: {
+  //       user: { userName: true, userUuid: true },
+  //     },
+  //     where: {
+  //       bannedTime: Not(IsNull()) && LessThan(new Date()),
+  //       room: { id: roomId },
+  //     },
+  //   });
+  // }
 
-  async findAllMutedUsers(roomId: string): Promise<ChatMember[]> {
-    return await this.chatMembersRepository.find({
-      relations: { room: true, user: true },
-      select: {
-        user: { userName: true, userUuid: true },
-      },
-      where: {
-        mutedTime: Not(IsNull()) && LessThan(new Date()),
-        room: { id: roomId },
-      },
-    });
-  }
+  // async findAllMutedUsers(roomId: string): Promise<ChatMember[]> {
+  //   return await this.chatMembersRepository.find({
+  //     relations: { room: true, user: true },
+  //     select: {
+  //       user: { userName: true, userUuid: true },
+  //     },
+  //     where: {
+  //       mutedTime: Not(IsNull()) && LessThan(new Date()),
+  //       room: { id: roomId },
+  //     },
+  //   });
+  // }
 
   /*
    * socket functions
