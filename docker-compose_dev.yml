@@ -1,8 +1,26 @@
 
 #https://dev.to/erezhod/setting-up-a-nestjs-project-with-docker-for-back-end-development-30lg
+# https://www.grottedubarbu.fr/docker-nginx-reverse-proxy/
 
 version: '3.8'
 services:
+  reverse-proxy:
+    depends_on:
+      - backend
+      - frontend
+      - postgres
+    container_name: reverse_proxy
+    image: nginx
+    volumes:
+      - ./reverse_proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./reverse_proxy/ssl/:/etc/ssl/pong/
+    restart: unless-stopped
+    env_file:
+    - env/.env
+    - env/urls.env
+    ports:
+       - 4443:443
+
   frontend:
     depends_on:
       - backend
