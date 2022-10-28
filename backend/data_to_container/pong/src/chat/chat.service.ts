@@ -60,16 +60,16 @@ export class ChatService {
     console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository
       .createQueryBuilder('msg')
-      .select('message', 'sender')
       .innerJoin('msg.sender', 'sender')
       .innerJoin('sender.room', 'room')
+      .innerJoin('sender.user', 'user')
       .where('room.id = :id', { id: roomId })
+      .select('message')
+      .addSelect('user.userName', 'userName')
       .getRawMany();
-    console.log(
-      messages.map((msg) => {
-        return msg.message, msg.sender.user.userName;
-      }),
-    );
+    this.logger.debug('These are the messages');
+    console.log(messages);
+    this.logger.debug('These were the messages');
     return messages;
   }
 
