@@ -73,10 +73,10 @@ export class ChatService {
     return messages;
   }
 
-  async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
-    const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
-    return messages[messages.length - 1];
-  }
+  // async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
+  //   const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
+  //   return messages[messages.length - 1];
+  // }
 
   /*
    * chatMember functions

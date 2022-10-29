@@ -1,25 +1,14 @@
 import { useEffect, useState } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+// import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { User } from "../../type";
-import { getSocketChat, getSocketStatus } from "../../App";
+import { getSocketChat } from "../../App";
 import NavBar from "../../components/NavBar/NavBar";
-import NewDMPopup from "./NewDMPopup";
 import JoinAgoraPopup from "./JoinAgoraPopup";
 import NewAgoraPopup from "./NewAgoraPopup";
 import { getMe } from "../myProfile/request"
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import "./Chat.css";
 import { Room } from "../../type";
-
-
-//import {Route, NavLink, HashRouter} from 'react-router-dom'
-//import { User } from "../../type";
-
-const socketStatus = getSocketStatus();
-
-socketStatus.on('getUserUuid', () => {
-	socketStatus.emit('getUserUuid');
-})
 
 function Chat() {
 	const socket = getSocketChat();
@@ -30,6 +19,7 @@ function Chat() {
 	const [channels, setChannels] = useState([]);
 	const [selectedRoom, setSelectedRoom] = useState(emptyRoom);
 	const [newMessage, setNewMessage] = useState("");
+
 	async function fetchUser() {
 		const user = await getMe();
 		setUser(user);
@@ -39,51 +29,54 @@ function Chat() {
 		fetchUser();
 		socket.emit('findAllJoinedRooms', (rooms: any) => {
 			console.log("findAllJoined", rooms);
-			 setChannels(rooms) });
-		
+			setChannels(rooms)
+		});
 	}, [socket]);
 
-	useEffect(() => {
-	
+
 	socket.on('updateMessages', () => {
-		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
-			setMessages(msgs);
-			var message = document.getElementById('messages');
-			if (message)
-				message.scrollTop = message.scrollHeight;
-		});
+		if (selectedRoom.id !== "") {
+			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
+				setMessages(msgs);
+				var message = document.getElementById('messages');
+				if (message)
+					message.scrollTop = message.scrollHeight;
+			});
+		}
 	});
-	}, [socket, selectedRoom]);
+
+	useEffect(() => {
+		console.log("USE EFFECT SELECTED ROOM", selectedRoom);
+		if (selectedRoom.id !== "") {
+			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
+				setMessages(msgs);
+				var message = document.getElementById('messages');
+				if (message)
+					message.scrollTop = message.scrollHeight;
+			});
+		}
+	}, [selectedRoom]);
+
 
 	socket.on('updateRooms', (rooms: any) => {
 		console.log('getting information');
 		socket.emit('findAllJoinedRooms', (rooms: any) => {
 			console.log("findAllJoined", rooms);
 			setChannels(rooms)
-			if (rooms.length > 0 && selectedRoom.id === "") {
-				console.log("setting selected room", rooms[0].id);
-				// 	setSelectedRoom(rooms[0].id);
-				// 	socket.emit('findAllMessagesInRoom', { uuid: rooms[0].id, }, (msgs: any) => {
-				// 		console.log("msgs", msgs);
-				// 		setMessages(msgs)
-				// 	});
-			}
 		});
 	});
 
 	async function chooseRoom(thisRoom: Room) {
 		console.log("You chose room ", thisRoom);
 		setSelectedRoom(thisRoom);
-		// socket.emit('findAllMessagesInRoom', { uuid: thisRoom.id, }, (msgs: any) => {
-		// 	console.log("FIND ALL MSG", msgs);
-		// 	setMessages(msgs)
-		// });
 	}
 
 	function sendMessage() {
-		console.log('sending message: ', newMessage);
-		socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.id });
-		setNewMessage("");
+		if (selectedRoom.id !== "" && newMessage !== "") {
+			console.log('sending message: ', newMessage);
+			socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.id });
+			setNewMessage("");
+		}
 	}
 
 	return (<div>
@@ -100,7 +93,7 @@ function Chat() {
 				<JoinAgoraPopup />
 			</div>
 			<div className="chat">
-					<ChatSideNav Room={selectedRoom} />
+				<ChatSideNav Room={selectedRoom} />
 				<div id="messages">
 					{messages.map((message: any) => (
 						<div key={message.id}>

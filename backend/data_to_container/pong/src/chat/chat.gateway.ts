@@ -73,7 +73,7 @@ export class ChatGateway
     );
     this.logger.debug('Creating a message');
     // console.log(message);
-    // this.server.to(message.sender.room.id).emit('updateMessages');
+    this.server.to(message.sender.room.id).emit('updateMessages');
     // this.server.emit('updateRooms');
     return message;
   }
@@ -137,21 +137,22 @@ export class ChatGateway
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
+    console.log("bonjour");
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
     return messages;
   }
 
-  @Authorized('notBanned')
-  @SubscribeMessage('findLastMessageInRoom')
-  async findLastMessageInRoom(
-    @MessageBody() findLastMessageInRoomDto: UuidDto,
-  ): Promise<Message> {
-    return await this.chatService.findLastMessageInRoom(
-      findLastMessageInRoomDto,
-    );
-  }
+  // @Authorized('notBanned')
+  // @SubscribeMessage('findLastMessageInRoom')
+  // async findLastMessageInRoom(
+  //   @MessageBody() findLastMessageInRoomDto: UuidDto,
+  // ): Promise<Message> {
+  //   return await this.chatService.findLastMessageInRoom(
+  //     findLastMessageInRoomDto,
+  //   );
+  // }
 
   @Roles('owner', 'admin')
   @SubscribeMessage('setAdmin')

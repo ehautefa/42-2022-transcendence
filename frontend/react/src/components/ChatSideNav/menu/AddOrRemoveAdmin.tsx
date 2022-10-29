@@ -4,29 +4,32 @@ import "./sideMenu.css";
 import { getSocketChat } from "../../../App";
 import Select from "react-select";
 import { SelectClass } from "./toolsBox"
-import { User } from "../../../type"
 
-function AddAdmin({ room }: any) {
+function AddOrRemoveAdmin(param: any) {
     const socketChat = getSocketChat();
     const [open, setOpen] = useState(false);
     const [newAdmin, setNewAdmin] = useState("");
     const [users, setUsers] = useState([] as SelectClass[]);
-    
+
+    let room = param.room;
+    let AddAdmin = param.AddAdmin;
+
     useEffect(() => {
-        console.log("AddAdmin useEffect: room: ", room)
-        const param = {
-            roomId: room.id,
-            isAdmin: true,
+        if (room.id !== "") {
+            const param = {
+                roomId: room.id,
+                isAdmin: AddAdmin,
+            }
+            socketChat.emit("filterByAdminRightsInRoom", param, (users: any) => {
+                let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
+                setUsers(selectTab);
+            });
         }
-        socketChat.emit("filterByAdminRightsInRoom", param, (users: any) => {
-            let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
-            setUsers(selectTab);
-        });
     }, [room]);
 
     const handleChange = (newValue: any) => {
-		setNewAdmin(newValue.value);
-	}
+        setNewAdmin(newValue.value);
+    }
 
 
     const customStyles = {
@@ -70,19 +73,25 @@ function AddAdmin({ room }: any) {
     }
 
     function Submit() {
-		const param = {
-			userId: newAdmin,
-			roomId: room.id,
-            isAdmin: false
-		}
-		console.log("Add Admin : ", param);
-		socketChat.emit('setAdmin', param);
-		setOpen(false);
-	}
+        const param = {
+            userId: newAdmin,
+            roomId: room.id,
+            isAdmin: !AddAdmin,
+        }
+        console.log("Add Admin emit : ", param);
+        socketChat.emit('setAdmin', param);
+        setOpen(false);
+    }
 
 
     return (<div className="Popup-mother">
-        <button className="side-menu-button" onClick={() => setOpen(true)}>Add Admin</button>
+        <button className="side-menu-button" onClick={() => setOpen(true)}>
+            {
+                AddAdmin ?
+                    "Add Admin" :
+                    "Remove Admin"
+            }
+        </button>
         <Popup open={open} closeOnDocumentClick onClose={() => {
             setOpen(false);
         }}>
@@ -92,10 +101,14 @@ function AddAdmin({ room }: any) {
                     onChange={handleChange}
                     styles={customStyles}
                     options={users} />
-                <button onClick={Submit}>Give Admin right</button>
+                {
+                    AddAdmin ?
+                        <button onClick={Submit}>Give Admin right</button> :
+                        <button onClick={Submit}>Remove Admin right</button>
+                }
             </div>
         </Popup>
     </div>);
 }
 
-export default AddAdmin;
+export default AddOrRemoveAdmin;

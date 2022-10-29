@@ -1,12 +1,10 @@
-import { useState } from "react";
 import "./ChatSideNav.css";
-import AddAdmin from "./menu/AddAdmin";
+import AddOrRemoveAdmin from "./menu/AddOrRemoveAdmin";
 import InviteUser from "./menu/InviteUser";
 import LeaveRoom from "./menu/LeaveRoom";
 
 function ChatSideNav({Room} : any) {
     var sidenav = document.getElementById("mySidenav");
-
     function openNav() {
         if (sidenav !== null) {
             sidenav.classList.add("active");
@@ -28,8 +26,8 @@ function ChatSideNav({Room} : any) {
                     <li><InviteUser /></li>
                     <li><LeaveRoom name={Room.name}/></li>
                     {/* Admin */}
-                    <li><AddAdmin room={Room}/></li>
-                    <li><a href="#">Remove Admin</a></li>
+                    <li><AddOrRemoveAdmin room={Room} AddAdmin={true} /></li>
+                    <li><AddOrRemoveAdmin room={Room} AddAdmin={false} /></li>
                     <li><a href="#">Mute User</a></li>
                     <li><a href="#">Unmute User</a></li>
                     <li><a href="#">Ban User</a></li>

@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
-import { getAllUuidWithUserNameWithoutMe, getMyBlocked } from "../../../pages/allPlayers/request";
-import { getMe } from "../../../pages/myProfile/request";
 import "./sideMenu.css";
 import Select from "react-select";
 
 
 function InviteUser(me : any) {
     const [open, setOpen] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [blocked, setBlocked] = useState([]);
     var selectOptions: any = [];
 
     const customStyles = {
@@ -31,21 +27,6 @@ function InviteUser(me : any) {
         }
       }
 
-    async function fetchPlayers() {
-        const users = await getAllUuidWithUserNameWithoutMe(me.userUuid);
-        setUsers(users);
-        const blocked = await getMyBlocked();
-        setBlocked(blocked);
-        for (let i = 0; i < users.length; i++) {
-            if (!blocked.includes(users[i].userUuid)) 
-                selectOptions.push({ value: users[i].userUuid, label: users[i].userName });
-        }
-
-    }
-
-    useEffect(() => {
-        fetchPlayers();
-    }, []);
 
     function Submit() {
         setOpen(false);

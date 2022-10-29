@@ -9,14 +9,16 @@ import { SelectClass } from "../../components/ChatSideNav/menu/toolsBox";
 function JoinAgoraPopup() {
 	const socket = getSocketChat();
 	const [open, setOpen] = useState(false);
-	// const emptyRoom: SelectClass[] = [];
+	const [completeRooms, setCompleteRooms] = useState([] as Room[]);
 	const [rooms, setRooms] = useState([] as SelectClass[]);
 	const [newRoomId, setNewRoomId] = useState("");
+	const [password, setPassword] = useState(false);
 
 	useEffect(() => {
-		socket.emit('findAllPublicRooms', (rooms: Room[]) => {
+		socket.emit('findAllPublicOrProtectedRooms', (rooms: Room[]) => {
 			let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
 			setRooms(selectTab);
+			setCompleteRooms(rooms);
 		})
 	}, []);
 
@@ -63,11 +65,14 @@ function JoinAgoraPopup() {
 
 	const handleChange = (newValue: any) => {
 		setNewRoomId(newValue.value);
+		if (completeRooms.find((room) => room.id === newValue.id)?.isProtected === "public") {
+			setPassword(true);
+		}
 	}
 
 	function Submit() {
 		const param = {
-			uuid: newRoomId,
+			roomId: newRoomId,
 			password: ""
 		}
 		console.log("Join ROOM : ", param);
@@ -87,9 +92,10 @@ function JoinAgoraPopup() {
 					<h3>Select a Room :</h3>
 					<Select 
 						// value={value}
-						onChange={handleChange}
+							onChange={handleChange}
 							styles={customStyles}
 							options={rooms} />
+					{password && <input type="password" placeholder="Password" />}
 					<button onClick={Submit}>Join</button>
 				</div>
 			</Popup>
