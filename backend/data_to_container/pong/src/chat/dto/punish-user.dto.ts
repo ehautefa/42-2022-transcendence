@@ -11,6 +11,7 @@ export class PunishUserDto {
 
   @IsNotEmpty()
   @IsNumber()
+  // @Transform((val) => val.)
   duration: number;
 
   @IsNotEmpty()

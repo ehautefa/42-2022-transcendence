@@ -118,15 +118,16 @@ export class ChatGateway
   */
 
   // @Authorized('notBlocked')
+  //return the room id
   @SubscribeMessage('joinDMRoom')
-  async joinDMRoom(
-    @MessageBody() joinDMRoomDto: UuidDto,
-    @Req() { user }: { user: user },
-  ): Promise<Room> {
-    const room: Room = await this.chatService.joinDMRoom(user, joinDMRoomDto);
-    this.server.socketsJoin(joinDMRoomDto.uuid);
-    return room;
-  }
+  // async joinDMRoom(
+  //   @MessageBody() recipiendId: UuidDto,
+  //   @Req() { user }: { user: user },
+  // ): Promise<Room> {
+  // const room: Room = await this.chatService.joinDMRoom(user);
+  // this.server.socketsJoin(joinDMRoomDto.uuid);
+  // return room;
+  // };
 
   // @Authorized('notBanned')
   @SubscribeMessage('findAllMessagesInRoom')
