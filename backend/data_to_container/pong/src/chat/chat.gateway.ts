@@ -187,8 +187,10 @@ export class ChatGateway
   }
 
   @SubscribeMessage('findAllJoinedRooms')
-  async findAllJoinedRooms(userId: UuidDto): Promise<ChatMember[]> {
-    return await this.chatService.findAllJoinedRooms(userId.uuid);
+  async findAllJoinedRooms(
+    @Req() { user }: { user: user },
+  ): Promise<ChatMember[]> {
+    return await this.chatService.findAllJoinedRooms(user.userUuid);
   }
 
   @SubscribeMessage('findAllPublicRooms')
