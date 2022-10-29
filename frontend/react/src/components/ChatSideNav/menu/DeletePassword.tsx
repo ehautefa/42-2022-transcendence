@@ -33,7 +33,7 @@ function DeletePassword({ room }: any) {
             setOpen(false);
         }}>
             <div className='side-menu-popup'>
-                <input type="text" id="messagePopup" name="password"
+                <input type="password" id="messagePopup" name="password"
                     onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
                     autoFocus
                     autoCorrect="off"
