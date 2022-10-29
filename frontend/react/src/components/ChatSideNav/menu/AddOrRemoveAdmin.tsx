@@ -25,7 +25,7 @@ function AddOrRemoveAdmin(param: any) {
                 setUsers(selectTab);
             });
         }
-    }, [room]);
+    }, [room, AddAdmin, socketChat]);
 
     const handleChange = (newValue: any) => {
         setNewAdmin(newValue.value);

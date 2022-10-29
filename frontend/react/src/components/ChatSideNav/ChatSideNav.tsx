@@ -10,6 +10,7 @@ import SetPassword from "./menu/SetPassword";
 import PunishUser from "./menu/PunishUser";
 import UnpunishUser from "./menu/UnpunishUser";
 import GiveOwnership from "./menu/GiveOwnership";
+import DeleteRoom from "./menu/DeleteRoom";
 
 function ChatSideNav({ Room }: any) {
     const socket = getSocketChat();
@@ -29,7 +30,7 @@ function ChatSideNav({ Room }: any) {
                 console.log("AM I OWNER ?", Owner);
             })
         }
-    }, [Room]);
+    }, [Room, socket]);
 
     function openNav() {
         if (sidenav !== null) {
@@ -50,7 +51,7 @@ function ChatSideNav({ Room }: any) {
                 <ul>
                     {/* All User */}
                     <li><InviteUser /></li>
-                    <li><LeaveRoom name={Room.name} /></li>
+                    <li><LeaveRoom room={Room} /></li>
                     {/* Admin */}
                     {amIAdmin &&
                         <>
@@ -69,7 +70,7 @@ function ChatSideNav({ Room }: any) {
                             <li><ChangePassword romm={Room} /></li>
                             <li><DeletePassword room={Room} /></li>
                             <li><GiveOwnership room={Room} /></li>
-                            <li><a href="#">Delete Room</a></li>
+                            <li><DeleteRoom room={Room} /></li>
                         </>
                     }
                 </ul>

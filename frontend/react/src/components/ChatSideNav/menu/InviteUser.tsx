@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
 import Select from "react-select";

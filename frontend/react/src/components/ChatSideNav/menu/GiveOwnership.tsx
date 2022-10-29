@@ -18,7 +18,7 @@ function GiveOwnership({room}: any) {
                 setUsers(selectTab);
             });
         }
-    }, [room]);
+    }, [room, socket]);
 
     const handleChange = (newValue: any) => {
         setNewOwner(newValue.value);

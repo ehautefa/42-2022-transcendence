@@ -29,7 +29,7 @@ function UnpunishUser(param: any) {
                 });
             }
         }
-    }, [room]);
+    }, [room, ban, socket]);
 
     const handleChange = (newValue: any) => {
         setNewPunish(newValue.value);
