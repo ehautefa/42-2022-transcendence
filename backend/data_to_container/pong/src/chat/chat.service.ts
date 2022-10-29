@@ -347,11 +347,11 @@ export class ChatService {
 
   async amIOwner(userId: string, roomId: string): Promise<boolean> {
     const room: Room = await this.roomsRepository.findOneOrFail({
-      relations: { owner: true },
+      relations: { owner: { user: true } },
       select: { owner: { id: true } },
       where: { id: roomId },
     });
-    return room.owner.id === userId;
+    return room.owner.user.userUuid === userId;
   }
 
   async filterByAdminRightsInRoom(
