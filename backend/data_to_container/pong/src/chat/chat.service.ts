@@ -356,8 +356,22 @@ export class ChatService {
     return room.owner.user.userUuid === userId;
   }
 
+  async findAllUsersInRoom(userId: string, roomId: string) {
+    return await this.roomsRepository
+      .createQueryBuilder('room')
+      .innerJoin('room.members', 'members')
+      .innerJoin('members.user', 'user')
+      .innerJoin('members.room', 'room')
+      .where('room.id = :roomId', { roomId: roomId })
+      .andWhere('user.userUuid = Not(:userId)', { userId: userId })
+      .select('user.userUuid', 'userUuuid')
+      .addSelect('user.userName', 'userName')
+      .getRawMany();
+  }
+
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,
+    userId: string,
   ): Promise<ChatMember[]> {
     return await this.chatMembersRepository.find({
       relations: { room: true, user: true },
@@ -367,6 +381,7 @@ export class ChatService {
       where: {
         isAdmin: filterByAdminRightsDto.isAdmin,
         room: { id: filterByAdminRightsDto.roomId },
+        user: { userUuid: Not(userId) },
       },
     });
   }
