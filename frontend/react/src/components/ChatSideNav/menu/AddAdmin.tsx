@@ -1,14 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
 import { getSocketChat } from "../../../App";
 import Select from "react-select";
 
-
-
 function AddAdmin({room} : any) {
     const socketChat = getSocketChat();
     const [open, setOpen] = useState(false);
+    const param = {
+        roomId: room.id,
+        admin: false,
+        banned: false,
+        muted: false,
+    }
+
+    useEffect(() => {
+        console.log("AddAdmin useEffect");
+        socketChat.emit("filterUsersInRoom", param ,(users: any) => {
+            console.log("AddAdmin users", users);
+        });
+    }, []);
+
 
     const customStyles = {
         option: (provided: any, state: any) => ({
