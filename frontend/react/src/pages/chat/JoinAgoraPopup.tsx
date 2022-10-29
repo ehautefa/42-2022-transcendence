@@ -19,6 +19,7 @@ function JoinAgoraPopup() {
 			let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
 			setRooms(selectTab);
 			setCompleteRooms(rooms);
+			console.log("find room", rooms);
 		})
 	}, [socket]);
 
