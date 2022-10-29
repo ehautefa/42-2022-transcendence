@@ -30,9 +30,6 @@ function JoinAgoraPopup() {
 		})
 	}, []);
 
-	// const Control = ({ children, ...props }) => (
-		
-	//   );
 
 	const customStyles = {
 		option: (provided: any, state: any) => ({

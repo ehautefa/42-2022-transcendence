@@ -37,7 +37,10 @@ function Chat() {
 
 	useEffect(() => {
 		fetchUser();
-		socket.emit('findAllPublicRooms', (rooms: any) => { setChannels(rooms) });
+		socket.emit('findAllJoinedRooms', (rooms: any) => {
+			console.log("findAllJoined", rooms);
+			 setChannels(rooms) });
+		
 	}, [socket]);
 
 	socket.on('updateMessages', () => {
@@ -51,7 +54,8 @@ function Chat() {
 
 	socket.on('updateRooms', (rooms: any) => {
 		console.log('getting information');
-		socket.emit('findAllPublicRooms', (rooms: any) => {
+		socket.emit('findAllJoinedRooms', (rooms: any) => {
+			console.log("findAllJoined", rooms);
 			setChannels(rooms)
 			if (rooms.length > 0 && selectedRoom.id === "") {
 				console.log("setting selected room", rooms[0].id);
