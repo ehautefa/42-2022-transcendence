@@ -66,7 +66,7 @@ function JoinAgoraPopup() {
 
 	const handleChange = (newValue: any) => {
 		setNewRoomId(newValue.value);
-		console.log("handleChnge join room ", completeRooms.find((room) => room.id === newValue.id))
+		console.log("handleCahnge join room ", completeRooms.find((room) => room.id === newValue.id))
 		if (completeRooms.find((room) => room.id === newValue.id)?.type === "public") {
 			setPassword(true);
 		}

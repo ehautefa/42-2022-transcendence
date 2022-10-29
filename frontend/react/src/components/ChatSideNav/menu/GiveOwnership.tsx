@@ -13,12 +13,10 @@ function GiveOwnership({room}: any) {
 
     useEffect(() => {
         if (room.id !== "") {
-            console.log("give pwnership", users);
-
+            console.log("give  hip", users);
             socket.emit("findAllUsersInRoom", {uuid: room.id}, (users: any) => {
-                let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
+                let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user));
                 setUsers(selectTab);
-                console.log("give pwnership", users);
             });
         }
     }, [room, socket]);
