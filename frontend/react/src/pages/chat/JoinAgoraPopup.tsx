@@ -20,7 +20,7 @@ function JoinAgoraPopup() {
 			setRooms(selectTab);
 			setCompleteRooms(rooms);
 		})
-	}, []);
+	}, [socket]);
 
 
 	const customStyles = {
@@ -65,7 +65,7 @@ function JoinAgoraPopup() {
 
 	const handleChange = (newValue: any) => {
 		setNewRoomId(newValue.value);
-		if (completeRooms.find((room) => room.id === newValue.id)?.isProtected === "public") {
+		if (completeRooms.find((room) => room.id === newValue.id)?.type === "public") {
 			setPassword(true);
 		}
 	}

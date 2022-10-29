@@ -35,5 +35,5 @@ export type Players = {
 export type Room = {
 	id: string,
 	name: string,
-	isProtected: string,
+	type: string,
 }

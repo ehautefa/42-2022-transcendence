@@ -12,12 +12,11 @@ import { Room } from "../../type";
 
 function Chat() {
 	const socket = getSocketChat();
-	const emptyRoom = { id: "", name: "" };
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
 	const [messages, setMessages] = useState([]);
-	const [channels, setChannels] = useState([]);
-	const [selectedRoom, setSelectedRoom] = useState(emptyRoom);
+	const [channels, setChannels] = useState([] as Room[]);
+	const [selectedRoom, setSelectedRoom] = useState({} as Room);
 	const [newMessage, setNewMessage] = useState("");
 
 	async function fetchUser() {
@@ -55,7 +54,7 @@ function Chat() {
 					message.scrollTop = message.scrollHeight;
 			});
 		}
-	}, [selectedRoom]);
+	}, [socket, selectedRoom]);
 
 
 	socket.on('updateRooms', (rooms: any) => {

@@ -1,10 +1,30 @@
+import { useEffect, useState } from "react";
+import { getSocketChat } from "../../App";
 import "./ChatSideNav.css";
 import AddOrRemoveAdmin from "./menu/AddOrRemoveAdmin";
 import InviteUser from "./menu/InviteUser";
 import LeaveRoom from "./menu/LeaveRoom";
+import SetPassword from "./menu/SetPassword";
 
-function ChatSideNav({Room} : any) {
+function ChatSideNav({ Room }: any) {
+    const socket = getSocketChat();
+    const [amIAdmin, setAmIAdmin] = useState(false);
+    const [amIOwner, setAmIOwner] = useState(false);
     var sidenav = document.getElementById("mySidenav");
+
+    useEffect(() => {
+        if (Room && Room !== undefined && Room.id !== undefined) {
+            console.log("USE EFFECT AM I", Room.id);
+            socket.emit('amIAdmin', { uuid: Room.id }, (amIAdmin: boolean) => {
+                setAmIAdmin(amIAdmin);
+                console.log("AM I ADMIN ?", amIAdmin);
+            })
+            socket.emit('amIOwner', { uuid: Room.id }, (amIOwner: boolean) => {
+                setAmIOwner(amIOwner);
+            })
+        }
+    }, [Room]);
+
     function openNav() {
         if (sidenav !== null) {
             sidenav.classList.add("active");
@@ -12,7 +32,7 @@ function ChatSideNav({Room} : any) {
     }
 
     function closeNav() {
-        if (sidenav !== null)  {
+        if (sidenav !== null) {
             sidenav.classList.remove("active");
         }
     }
@@ -24,20 +44,28 @@ function ChatSideNav({Room} : any) {
                 <ul>
                     {/* All User */}
                     <li><InviteUser /></li>
-                    <li><LeaveRoom name={Room.name}/></li>
+                    <li><LeaveRoom name={Room.name} /></li>
                     {/* Admin */}
-                    <li><AddOrRemoveAdmin room={Room} AddAdmin={true} /></li>
-                    <li><AddOrRemoveAdmin room={Room} AddAdmin={false} /></li>
-                    <li><a href="#">Mute User</a></li>
-                    <li><a href="#">Unmute User</a></li>
-                    <li><a href="#">Ban User</a></li>
-                    <li><a href="#">Unban User</a></li>
+                    {amIAdmin &&
+                        <>
+                            <li><AddOrRemoveAdmin room={Room} AddAdmin={true} /></li>
+                            <li><AddOrRemoveAdmin room={Room} AddAdmin={false} /></li>
+                            <li><a href="#">Mute User</a></li>
+                            <li><a href="#">Unmute User</a></li>
+                            <li><a href="#">Ban User</a></li>
+                            <li><a href="#">Unban User</a></li>
+                        </>
+                    }
                     {/* Owner */}
-                    <li><a href="#">Set Password</a></li>
-                    <li><a href="#">Edit Password</a></li>
-                    <li><a href="#">Remove Password</a></li>
-                    <li><a href="#">Give Ownership</a></li>
-                    <li><a href="#">Delete Room</a></li>
+                    {amIOwner &&
+                        <>
+                            <li><SetPassword room={Room}/></li>
+                            <li><a href="#">Edit Password</a></li>
+                            <li><a href="#">Remove Password</a></li>
+                            <li><a href="#">Give Ownership</a></li>
+                            <li><a href="#">Delete Room</a></li>
+                        </>
+                    }
                 </ul>
             </div>
 

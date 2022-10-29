@@ -233,7 +233,7 @@ export class ChatGateway
 
   @SubscribeMessage('amIAdmin')
   async amIAdmin(
-    roomId: UuidDto,
+    @MessageBody() roomId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<boolean> {
     return await this.chatService.amIAdmin(user.userUuid, roomId.uuid);
@@ -241,7 +241,7 @@ export class ChatGateway
 
   @SubscribeMessage('amIOwner')
   async amIOwner(
-    roomId: UuidDto,
+    @MessageBody() roomId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<boolean> {
     return await this.chatService.amIOwner(user.userUuid, roomId.uuid);
