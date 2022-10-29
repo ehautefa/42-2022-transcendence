@@ -66,11 +66,14 @@
 }
 
 .flex-button-popup {
-    padding: 10px 20px;
-    margin: 0 10px;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
 }
 
-.flex-button-popup:hover {
-    border: 2px solid #fef45b;
+.flex-button-popup button {
+    left: 0;
+    font-size: 15px;
+    font-weight: 600;
 }
 

@@ -4,7 +4,7 @@ import "./sideMenu.css";
 import { getSocketChat } from "../../../App";
 
 
-function LeaveRoom({name} : any) {
+function LeaveRoom({ name }: any) {
     const socketChat = getSocketChat();
     const [open, setOpen] = useState(false);
 
@@ -25,8 +25,10 @@ function LeaveRoom({name} : any) {
         }}>
             <div className='side-menu-popup'>
                 <h3>Are you sure you want to leave the room {name} ?</h3>
-                <button className="flex-button-popup" onClick={No}>No</button>
-                <button className="flex-button-popup" onClick={Yes}>Yes</button>
+                <div className="flex-button-popup">
+                    <button onClick={No}>No</button>
+                    <button onClick={Yes}>Yes</button>
+                </div>
             </div>
         </Popup>
     </div>);

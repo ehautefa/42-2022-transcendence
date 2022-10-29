@@ -4,13 +4,21 @@ import "./sideMenu.css";
 import { getSocketChat } from "../../../App";
 
 
-function DeletePassword({name} : any) {
+function DeletePassword({ room }: any) {
     const socketChat = getSocketChat();
     const [open, setOpen] = useState(false);
+    const [password, setPassword] = useState("");
 
-    function Yes() {
+    const Yes = (e: any) => {
         setOpen(false);
-        // TO DO : Add an event to delete the password
+        e.preventDefault();
+        console.log('set password ', password);
+        // TO DO : send password to backend
+        let param = {
+            rommId: room.id,
+            password: password,
+            newPassword: ""
+        }
     }
 
     function No() {
@@ -24,9 +32,19 @@ function DeletePassword({name} : any) {
             setOpen(false);
         }}>
             <div className='side-menu-popup'>
-                <h3>Are you sure you want to delete the passsword of the room {name} ?</h3>
-                <button className="flex-button-popup" onClick={No}>No</button>
-                <button className="flex-button-popup" onClick={Yes}>Yes</button>
+                <input type="text" id="messagePopup" name="password"
+                    onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
+                    autoFocus
+                    autoCorrect="off"
+                    placeholder="Old password"
+                    minLength={1}
+                    maxLength={30}
+                    size={30} />
+                <h3>Are you sure you want to delete the passsword of the room {room.name} ?</h3>
+                <div className="flex-button-popup">
+                    <button onClick={No}>No</button>
+                    <button onClick={Yes}>Yes</button>
+                </div>
             </div>
         </Popup>
     </div>);
