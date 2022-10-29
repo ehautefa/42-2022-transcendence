@@ -325,6 +325,8 @@ export class ChatService {
 
   async changePassword(changePasswordDto: ChangePasswordDto): Promise<Room> {
     const room: Room = await this.findRoomById(changePasswordDto.roomId);
+    if (!changePasswordDto.password) room.type = RoomType.PROTECTED;
+    if (!changePasswordDto.newPassword) room.type = RoomType.PUBLIC;
     room.hash = await argon.hash(changePasswordDto.newPassword);
     return await this.roomsRepository.save(room);
   }

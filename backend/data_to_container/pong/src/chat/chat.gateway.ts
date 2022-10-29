@@ -20,8 +20,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { Authorized } from './decorator/authorized.decorator';
-import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { DoubleUuidDto } from './dto/double-uuid';
@@ -30,14 +28,11 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
-import { AuthorizedGuard } from './guard/authorized.guard';
-import { ProtectedRoom } from './guard/protected-room.guard';
 import { RolesGuard } from './guard/roles.guard';
 
 @UseGuards(JwtAuthGuard)
 @UseGuards(RolesGuard)
-@UseGuards(AuthorizedGuard)
-// @UseInterceptors(FilterHashInterceptor)
+// @UseGuards(AuthorizedGuard)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
@@ -93,7 +88,7 @@ export class ChatGateway
     return newRoom;
   }
 
-  @Authorized('notBanned')
+  // @Authorized('notBanned')
   @SubscribeMessage('joinRoom')
   async joinRoom(
     @MessageBody() joinRoomDto: JoinRoomDto,
@@ -122,7 +117,7 @@ export class ChatGateway
   }
   */
 
-  @Authorized('notBlocked')
+  // @Authorized('notBlocked')
   @SubscribeMessage('joinDMRoom')
   async joinDMRoom(
     @MessageBody() joinDMRoomDto: UuidDto,
@@ -133,7 +128,7 @@ export class ChatGateway
     return room;
   }
 
-  @Authorized('notBanned')
+  // @Authorized('notBanned')
   @SubscribeMessage('findAllMessagesInRoom')
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
@@ -155,13 +150,13 @@ export class ChatGateway
   //   );
   // }
 
-  @Roles('owner', 'admin')
+  // @Roles('owner', 'admin')
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
     return await this.chatService.setAdmin(setAdminDto);
   }
 
-  @Roles('owner')
+  // @Roles('owner')
   @SubscribeMessage('giveOwnership')
   async changeOwnership(
     @MessageBody() giveOwnershipDto: DoubleUuidDto,
@@ -169,22 +164,24 @@ export class ChatGateway
     return await this.chatService.giveOwnership(giveOwnershipDto);
   }
 
-  @Roles('owner')
+  // @Roles('owner')
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
     return await this.chatService.deleteRoom(deleteRoomDto);
   }
 
-  @Roles('owner')
-  @UseGuards(ProtectedRoom)
+  // @Roles('owner')
+  // @UseGuards(ProtectedRoom)
   @SubscribeMessage('changePassword')
   async changePassword(
     @MessageBody() changePasswordDto: ChangePasswordDto,
   ): Promise<Room> {
+    this.logger.debug('Change Password');
+    console.log(changePasswordDto);
     return await this.chatService.changePassword(changePasswordDto);
   }
 
-  @Roles('admin')
+  // @Roles('admin')
   @SubscribeMessage('punishUser')
   async punishUser(
     @MessageBody() punishUserDto: PunishUserDto,
@@ -192,7 +189,7 @@ export class ChatGateway
     return await this.chatService.punishUser(punishUserDto);
   }
 
-  @Roles('admin')
+  // @Roles('admin')
   @SubscribeMessage('removePunishment')
   async removePunishment(
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
