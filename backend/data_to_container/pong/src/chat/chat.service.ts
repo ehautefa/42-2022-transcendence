@@ -361,10 +361,9 @@ export class ChatService {
       .createQueryBuilder('room')
       .innerJoin('room.members', 'members')
       .innerJoin('members.user', 'user')
-      .innerJoin('members.room', 'room')
       .where('room.id = :roomId', { roomId: roomId })
-      .andWhere('user.userUuid = Not(:userId)', { userId: userId })
-      .select('user.userUuid', 'userUuuid')
+      .andWhere('user.userUuid != :userId', { userId: userId })
+      .select('user.userUuid', 'userUuid')
       .addSelect('user.userName', 'userName')
       .getRawMany();
   }
