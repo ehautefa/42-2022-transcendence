@@ -31,3 +31,8 @@ export type Players = {
 	userName: string;
 	online: boolean;
 }
+
+export type Room = {
+	id: string,
+	name: string,
+}

@@ -9,6 +9,8 @@ import NewAgoraPopup from "./NewAgoraPopup";
 import { getMe } from "../myProfile/request"
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import "./Chat.css";
+import { Room } from "../../type";
+
 
 //import {Route, NavLink, HashRouter} from 'react-router-dom'
 //import { User } from "../../type";
@@ -18,11 +20,6 @@ const socketStatus = getSocketStatus();
 socketStatus.on('getUserUuid', () => {
 	socketStatus.emit('getUserUuid');
 })
-
-export type Room = {
-	id: string,
-	name: string,
-}
 
 function Chat() {
 	const socket = getSocketChat();
