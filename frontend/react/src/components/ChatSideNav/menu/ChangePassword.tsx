@@ -20,6 +20,7 @@ function ChangePassword({ room }: any) {
 			password: password,
 			newPassword: newPassword
 		}
+		socket.emit('changePassword', param);
 		setOpen(false);
 	};
 

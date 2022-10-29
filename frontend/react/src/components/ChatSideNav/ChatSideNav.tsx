@@ -9,6 +9,7 @@ import LeaveRoom from "./menu/LeaveRoom";
 import SetPassword from "./menu/SetPassword";
 import PunishUser from "./menu/PunishUser";
 import UnpunishUser from "./menu/UnpunishUser";
+import GiveOwnership from "./menu/GiveOwnership";
 
 function ChatSideNav({ Room }: any) {
     const socket = getSocketChat();
@@ -67,7 +68,7 @@ function ChatSideNav({ Room }: any) {
                             <li><SetPassword room={Room} /></li>
                             <li><ChangePassword romm={Room} /></li>
                             <li><DeletePassword room={Room} /></li>
-                            <li><a href="#">Give Ownership</a></li>
+                            <li><GiveOwnership room={Room} /></li>
                             <li><a href="#">Delete Room</a></li>
                         </>
                     }

@@ -5,12 +5,11 @@ import { getSocketChat } from "../../../App";
 
 
 function DeletePassword({ room }: any) {
-    const socketChat = getSocketChat();
+    const socket = getSocketChat();
     const [open, setOpen] = useState(false);
     const [password, setPassword] = useState("");
 
     const Yes = (e: any) => {
-        setOpen(false);
         e.preventDefault();
         console.log('set password ', password);
         // TO DO : send password to backend
@@ -19,6 +18,8 @@ function DeletePassword({ room }: any) {
             password: password,
             newPassword: ""
         }
+		socket.emit('changePassword', param);
+        setOpen(false);
     }
 
     function No() {
