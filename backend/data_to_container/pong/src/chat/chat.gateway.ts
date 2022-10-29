@@ -73,7 +73,7 @@ export class ChatGateway
     );
     this.logger.debug('Creating a message');
     // console.log(message);
-    this.server.to(message.sender.room.id).emit('updateMessages');
+    // this.server.to(message.sender.room.id).emit('updateMessages');
     // this.server.emit('updateRooms');
     return message;
   }
@@ -203,9 +203,9 @@ export class ChatGateway
     return await this.chatService.findAllJoinedRooms(user.userUuid);
   }
 
-  @SubscribeMessage('findAllPublicRooms')
-  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
-    return await this.chatService.findAllPublicRooms();
+  @SubscribeMessage('findAllPublicOrProtectedRooms')
+  async findAllPublicOrProtectedRooms(): Promise<DeepPartial<Room>[]> {
+    return await this.chatService.findAllPublicOrProtectedRooms();
   }
 
   @SubscribeMessage('findAllInvitableUsers')
