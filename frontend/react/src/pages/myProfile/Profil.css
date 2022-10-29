@@ -144,7 +144,6 @@
 	.mainComposantProfile .info button {
 		margin-left: 50%;
 		width: 50%;
-		cursor: pointer;
 	}
 
 	.mainComposantProfile .info button:hover {
