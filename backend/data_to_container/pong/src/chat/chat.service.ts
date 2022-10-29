@@ -164,11 +164,14 @@ export class ChatService {
   }
 
   async findAllJoinedRooms(userId: string): Promise<ChatMember[]> {
-    return await this.chatMembersRepository.find({
-      relations: { user: true, room: true },
-      select: { room: { id: true, name: true } },
-      where: { user: { userUuid: userId } },
-    });
+    return await this.chatMembersRepository
+      .createQueryBuilder('members')
+      .innerJoin('members.room', 'room')
+      .innerJoin('members.user', 'user')
+      .where('user.userUuid = :userId', { userId: userId })
+      .select('room.id', 'id')
+      .addSelect('room.name', 'name')
+      .getRawMany();
   }
 
   async findAllInvitableUsers(roomId: string): Promise<user[]> {
@@ -393,41 +396,38 @@ export class ChatService {
    */
 
   async getUserUuidFromCookies(cookie: string): Promise<string> {
-    const accessToken: string = cookie
-      .split('; ')
-      .find((cookie: string) => cookie.startsWith('access_token='))
-      .split('=')[1];
-    // const cookies: string[] = cookiesStr.split('; ');
-    // const authCookie: string = cookies.filter((s) =>
-    //   s.includes('access_token='),
-    // )[0];
-    // const accessToken = authCookie.substring(
-    //   'access_token'.length + 1,
-    //   authCookie.length,
-    // );
-    const jwtOptions: JwtVerifyOptions = {
-      secret: JwtConfig.secret,
-    };
-    const jwtPayload: TokenPayload = await this.jwtService.verify(
-      accessToken,
-      jwtOptions,
-    );
-    return jwtPayload.userUuid;
+    try {
+      const accessToken: string = cookie
+        .split('; ')
+        .find((cookie: string) => cookie.startsWith('access_token='))
+        .split('=')[1];
+      // const cookies: string[] = cookiesStr.split('; ');
+      // const authCookie: string = cookies.filter((s) =>
+      //   s.includes('access_token='),
+      // )[0];
+      // const accessToken = authCookie.substring(
+      //   'access_token'.length + 1,
+      //   authCookie.length,
+      // );
+      const jwtOptions: JwtVerifyOptions = {
+        secret: JwtConfig.secret,
+      };
+      const jwtPayload: TokenPayload = await this.jwtService.verify(
+        accessToken,
+        jwtOptions,
+      );
+      return jwtPayload.userUuid;
+    } catch (error) {
+      throw new WsException('Invalid access token');
+    }
   }
 
   async handleConnection(cookie: string): Promise<ChatMember[]> {
     const userId: string = await this.getUserUuidFromCookies(cookie);
     return await this.chatMembersRepository.find({
-      relations: {
-        room: true,
-        user: true,
-      },
-      select: {
-        room: { id: true },
-      },
-      where: {
-        user: { userUuid: userId },
-      },
+      relations: { room: true, user: true },
+      select: { room: { id: true } },
+      where: { user: { userUuid: userId } },
     });
   }
 }
