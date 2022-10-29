@@ -1,10 +1,9 @@
 import Popup from 'reactjs-popup';
 import { useState } from "react";
 import { getSocketChat } from "../../../App";
-import "../../../pages/chat/Chat.css";
-import "../../../pages/chat/ChatPopup.css";
+import "./sideMenu.css";
 
-function SetPassword({room} : any) {
+function SetPassword({ room }: any) {
 	const socket = getSocketChat();
 	const [open, setOpen] = useState(false);
 	const [password, setPassword] = useState("");
@@ -14,7 +13,12 @@ function SetPassword({room} : any) {
 		e.preventDefault();
 		console.log('set password ', password);
 		// TO DO : send password to backend
-
+		let param = {
+			rommId: room.id,
+			password: "",
+			newPassword: password
+		}
+		socket.emit('changePassword', param);
 		setOpen(false);
 	};
 
@@ -24,20 +28,20 @@ function SetPassword({room} : any) {
 			<Popup open={open} closeOnDocumentClick onClose={() => {
 				setOpen(false);
 			}}>
-				<div className='messagePopup'>
+				{/* <div className='messagePopup'> */}
+				<div className='side-menu-popup'>
 					<h3>Set a password :</h3>
-					<div className='side-menu-popup'>
-						<input type="text" id="messagePopup" name="password"
-							onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
-							autoFocus
-							autoCorrect="off"
-							placeholder="password"
-							minLength={1}
-							maxLength={30}
-							size={30} />
-					</div>
+					<input type="text" name="password"
+						onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
+						autoFocus
+						autoCorrect="off"
+						placeholder="password"
+						minLength={1}
+						maxLength={30}
+						size={30} />
 					<button onClick={SendPassword}>Save Password</button>
 				</div>
+				{/* </div> */}
 			</Popup>
 		</div >
 	);

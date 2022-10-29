@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { getSocketChat } from "../../App";
 import "./ChatSideNav.css";
 import AddOrRemoveAdmin from "./menu/AddOrRemoveAdmin";
+import ChangePassword from "./menu/ChangePassword";
+import DeletePassword from "./menu/DeletePassword";
 import InviteUser from "./menu/InviteUser";
 import LeaveRoom from "./menu/LeaveRoom";
 import SetPassword from "./menu/SetPassword";
@@ -15,12 +17,13 @@ function ChatSideNav({ Room }: any) {
     useEffect(() => {
         if (Room && Room !== undefined && Room.id !== undefined) {
             console.log("USE EFFECT AM I", Room.id);
-            socket.emit('amIAdmin', { uuid: Room.id }, (amIAdmin: boolean) => {
-                setAmIAdmin(amIAdmin);
-                console.log("AM I ADMIN ?", amIAdmin);
+            socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
+                console.log("AM I ADMIN ?", Admin);
+                setAmIAdmin(Admin);
             })
-            socket.emit('amIOwner', { uuid: Room.id }, (amIOwner: boolean) => {
-                setAmIOwner(amIOwner);
+            socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
+                setAmIOwner(Owner);
+                console.log("AM I OWNER ?", Owner);
             })
         }
     }, [Room]);
@@ -59,9 +62,9 @@ function ChatSideNav({ Room }: any) {
                     {/* Owner */}
                     {amIOwner &&
                         <>
-                            <li><SetPassword room={Room}/></li>
-                            <li><a href="#">Edit Password</a></li>
-                            <li><a href="#">Remove Password</a></li>
+                            <li><SetPassword room={Room} /></li>
+                            <li><ChangePassword romm={Room} /></li>
+                            <li><DeletePassword room={Room} /></li>
                             <li><a href="#">Give Ownership</a></li>
                             <li><a href="#">Delete Room</a></li>
                         </>
