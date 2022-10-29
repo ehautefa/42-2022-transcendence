@@ -129,7 +129,7 @@ export class ChatService {
     newRoom = await this.roomsRepository.save(newRoom);
     const chatMember: ChatMember = await this.createChatMember(owner, newRoom);
     chatMember.isAdmin = true;
-    this.roomsRepository.save(chatMember);
+    await this.chatMembersRepository.save(chatMember);
     newRoom.owner = chatMember;
     console.log(newRoom);
     return await this.roomsRepository.save(newRoom);
