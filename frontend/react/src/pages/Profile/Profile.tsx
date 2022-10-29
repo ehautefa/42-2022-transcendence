@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
+import { getSocketChat } from "../../App";
 
 function Profile() {
 
@@ -63,6 +64,14 @@ function Profile() {
 		}
 	}
 
+	function writeDM() {
+		const socketChat = getSocketChat();
+		socketChat.emit("joinDMRoom", {uuid: user.userUuid}, (roomId: string) => {
+			console.log("roomId", roomId);
+			window.location.href = "/chat?room=" + roomId;
+		});
+	}
+
 
 	return (<>
 		<NavBar />
@@ -80,7 +89,7 @@ function Profile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
-					<button className="enable">Write message</button>
+					<button className="enable" onClick={writeDM}>Write message</button>
 					{
 						isMyFriend ?
 						<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>

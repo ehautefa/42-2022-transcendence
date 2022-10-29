@@ -19,7 +19,7 @@ function DeleteRoom({ room }: any) {
 
 
     return (<div className="Popup-mother">
-        <button className="side-menu-button" onClick={() => setOpen(true)}>Leave Room</button>
+        <button className="side-menu-button" onClick={() => setOpen(true)}>Delete Room</button>
         <Popup open={open} closeOnDocumentClick onClose={() => {
             setOpen(false);
         }}>

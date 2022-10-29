@@ -9,6 +9,7 @@ import { getMe } from "../myProfile/request"
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import "./Chat.css";
 import { Room } from "../../type";
+import { useLocation } from 'react-router-dom';
 
 function Chat() {
 	const socket = getSocketChat();
@@ -18,6 +19,7 @@ function Chat() {
 	const [channels, setChannels] = useState([] as Room[]);
 	const [selectedRoom, setSelectedRoom] = useState({} as Room);
 	const [newMessage, setNewMessage] = useState("");
+	const roomId = new URLSearchParams(useLocation().search).get('room');
 
 	async function fetchUser() {
 		const user = await getMe();
@@ -29,6 +31,9 @@ function Chat() {
 		socket.emit('findAllJoinedRooms', (rooms: any) => {
 			console.log("findAllJoined", rooms);
 			setChannels(rooms)
+			if (roomId) {
+				setSelectedRoom(rooms.find((room: any) => room.roomId === roomId));
+			}
 		});
 	}, [socket]);
 
