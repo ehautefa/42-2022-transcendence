@@ -39,8 +39,16 @@
 
 .side-menu-popup button {
     position: relative;
-    left: 37%;
+    left: 30%;
+    width: 40%;
     top: 50%;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.side-menu-popup button:hover {
+    border: 2px solid #fef45b;
+    box-shadow: 0 0 10px #fef45b;
 }
 
 .flex-button-popup {

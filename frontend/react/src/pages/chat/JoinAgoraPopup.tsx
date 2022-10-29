@@ -1,6 +1,6 @@
 import Popup from 'reactjs-popup';
 import { useEffect, useState } from "react";
-import { getSocketChat, getSocketStatus } from "../../App";
+import { getSocketChat } from "../../App";
 import "./Chat.css";
 import Select from "react-select";
 import { Room } from "../../type";
@@ -22,6 +22,7 @@ function JoinAgoraPopup() {
 	const [open, setOpen] = useState(false);
 	const emptyRoom: SelectClass[] = [];
 	const [rooms, setRooms] = useState(emptyRoom);
+	const [newRoomId, setNewRoomId] = useState("");
 
 	useEffect(() => {
 		socket.emit('findAllPublicRooms', (rooms: Room[]) => {
@@ -35,8 +36,8 @@ function JoinAgoraPopup() {
 		option: (provided: any, state: any) => ({
 			...provided,
 			color: '#FA0197',
-			'border-top': '1px solid #DBACE3',
-			'box-shadow': '0px 0px 20px #7C4D84',
+			borderTop: '1px solid #DBACE3',
+			boxShadow: '0px 0px 20px #7C4D84',
 			backgroundColor: 'rgba(0, 0, 0, 1)',
 			padding: 10,
 		}),
@@ -44,7 +45,7 @@ function JoinAgoraPopup() {
 			...styles,
 			color: '#FA0197',
 			border: '1px solid #DBACE3',
-			'box-shadow': '0px 0px 10px #7C4D84',
+			boxShadow: '0px 0px 10px #7C4D84',
 			borderRadius: '5px',
 			backgroundColor: 'rgba(0, 0, 0, 1)',
 			padding: 5,
@@ -62,7 +63,7 @@ function JoinAgoraPopup() {
 			...styles,
 			color: '#FA0197',
 			border: '1px solid #DBACE3',
-			'box-shadow': '0px 0px 10px #7C4D84',
+			boxShadow: '0px 0px 10px #7C4D84',
 			borderRadius: '5px',
 			backgroundColor: 'rgba(0, 0, 0, 1)',
 			padding: 5,
@@ -71,12 +72,17 @@ function JoinAgoraPopup() {
 		
 	}
 
+	const handleChange = (newValue: any) => {
+		setNewRoomId(newValue.value);
+	}
+
 	function Submit() {
 		const param = {
-			roomId: 1,
+			uuid: newRoomId,
 			password: ""
 		}
-		socket.emit('joinRoom',)
+		console.log("Join ROOM : ", param);
+		socket.emit('joinRoom', param);
 		setOpen(false);
 	}
 
@@ -86,15 +92,16 @@ function JoinAgoraPopup() {
 			<button type="submit" onClick={() => setOpen(true)}> Join Room </button>
 			<Popup open={open} closeOnDocumentClick onClose={() => {
 				setOpen(false);
-				window.location.reload();
+				// window.location.reload();
 			}}>
 				<div className='side-menu-popup'>
 					<h3>Select a Room :</h3>
 					<Select 
-					// components={{ Control }} 
+						// value={value}
+						onChange={handleChange}
 							styles={customStyles}
 							options={rooms} />
-					<button onClick={Submit}>Send Invitation</button>
+					<button onClick={Submit}>Join</button>
 				</div>
 			</Popup>
 		</div >
