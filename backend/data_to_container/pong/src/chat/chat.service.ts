@@ -166,7 +166,7 @@ export class ChatService {
   async findAllJoinedRooms(userId: string): Promise<ChatMember[]> {
     return await this.chatMembersRepository.find({
       relations: { user: true, room: true },
-      select: { room: { id: true } },
+      select: { room: { id: true, name: true } },
       where: { user: { userUuid: userId } },
     });
   }
