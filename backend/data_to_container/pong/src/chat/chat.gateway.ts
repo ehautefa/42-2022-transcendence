@@ -17,15 +17,14 @@ import {
 import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
-import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
 import { Authorized } from './decorator/authorized.decorator';
 import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { DoubleUuidDto } from './dto/double-uuid';
 import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
-import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
@@ -73,7 +72,7 @@ export class ChatGateway
     );
     this.logger.debug('Creating a message');
     // console.log(message);
-    // this.server.to(message.sender.room.id).emit('updateMessages');
+    this.server.to(message.sender.room.id).emit('updateMessages');
     // this.server.emit('updateRooms');
     return message;
   }
@@ -82,8 +81,8 @@ export class ChatGateway
   async createRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
     @Req() { user }: { user: user },
-  ): Promise<DeepPartial<Room>> {
-    const newRoom: DeepPartial<Room> = await this.chatService.createRoom(
+  ): Promise<Room> {
+    const newRoom: Room = await this.chatService.createRoom(
       createRoomDto,
       user,
     );
@@ -162,7 +161,7 @@ export class ChatGateway
   @Roles('owner')
   @SubscribeMessage('giveOwnership')
   async changeOwnership(
-    @MessageBody() giveOwnershipDto: GiveOwnershipDto,
+    @MessageBody() giveOwnershipDto: DoubleUuidDto,
   ): Promise<Room> {
     return await this.chatService.giveOwnership(giveOwnershipDto);
   }
@@ -204,7 +203,7 @@ export class ChatGateway
   }
 
   @SubscribeMessage('findAllPublicOrProtectedRooms')
-  async findAllPublicOrProtectedRooms(): Promise<DeepPartial<Room>[]> {
+  async findAllPublicOrProtectedRooms(): Promise<Room[]> {
     return await this.chatService.findAllPublicOrProtectedRooms();
   }
 
@@ -227,6 +226,16 @@ export class ChatGateway
     @MessageBody() roomId: UuidDto,
   ): Promise<ChatMember[]> {
     return await this.chatService.findBannedUsersInRoom(roomId.uuid);
+  }
+
+  @SubscribeMessage('amIAdmin')
+  async amIAdmin(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
+    return await this.chatService.amIAdmin(userIdAndRoomIdDto);
+  }
+
+  @SubscribeMessage('amIOwner')
+  async amIUser(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
+    return await this.chatService.amIOwner(userIdAndRoomIdDto);
   }
 
   @SubscribeMessage('findMutedUsersInRoom')

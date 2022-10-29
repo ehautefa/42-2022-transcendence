@@ -10,8 +10,8 @@ import { UserService } from 'src/user/user.service';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { DoubleUuidDto } from './dto/double-uuid';
 import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
-import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
@@ -299,12 +299,19 @@ export class ChatService {
   //     },
   //   });
   // }
+  async amIAdmin(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
+    const chatMember: ChatMember = await this.findChatMember(
+      userIdAndRoomIdDto.userId,
+      userIdAndRoomIdDto.roomId,
+    );
+    return chatMember.isAdmin;
+  }
 
   /*
    * owner functions
    */
 
-  async giveOwnership(giveOwnershipDto: GiveOwnershipDto): Promise<Room> {
+  async giveOwnership(giveOwnershipDto: DoubleUuidDto): Promise<Room> {
     const room: Promise<Room> = this.findRoomById(giveOwnershipDto.roomId);
     const chatMember: Promise<ChatMember> = this.findChatMember(
       giveOwnershipDto.userId,
@@ -337,6 +344,11 @@ export class ChatService {
   //   console.log(chatMembers);
   //   return chatMembers;
   // }
+
+  async amIOwner(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
+    const room: Room = await this.findRoomById(userIdAndRoomIdDto.roomId);
+    return room.owner.id === userIdAndRoomIdDto.userId;
+  }
 
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,
