@@ -11,6 +11,7 @@ import { ChatMember } from './';
 export enum RoomType {
   PRIVATE = 'private',
   PUBLIC = 'public',
+  PROTECTED = 'protected',
   DM = 'dm',
 }
 
@@ -30,12 +31,6 @@ export class Room {
   @OneToOne(() => ChatMember, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   owner: ChatMember;
-
-  @Column({
-    type: 'boolean',
-    default: false,
-  })
-  isProtected: boolean;
 
   @Column({
     type: 'varchar',

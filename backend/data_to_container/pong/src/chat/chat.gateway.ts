@@ -30,7 +30,6 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
-import { StringDto } from './dto/string.dto';
 import { AuthorizedGuard } from './guard/authorized.guard';
 import { ProtectedRoom } from './guard/protected-room.guard';
 import { RolesGuard } from './guard/roles.guard';
@@ -110,6 +109,7 @@ export class ChatGateway
     return chatMember;
   }
 
+  /*
   @Authorized('notBanned')
   @SubscribeMessage('joinPrivateRoom')
   async joinPrivateRoom(@MessageBody() joinPrivateRoomDto: StringDto) {
@@ -119,6 +119,7 @@ export class ChatGateway
     this.server.socketsJoin(room.id);
     return room;
   }
+  */
 
   @Authorized('notBlocked')
   @SubscribeMessage('joinDMRoom')
@@ -237,7 +238,8 @@ export class ChatGateway
 
   async handleConnection(client: Socket): Promise<void> {
     this.logger.debug(`client connected: ${client.id}`);
-    if (client.handshake.headers.cookie) {
+    const cookie: string = client.handshake.headers.cookie;
+    if (cookie && cookie.includes('access_token=')) {
       const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
         client.handshake.headers.cookie,
       );

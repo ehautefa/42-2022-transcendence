@@ -123,7 +123,6 @@ export class ChatService {
       : await argon.hash(createRoomDto.password);
     let newRoom: Room = this.roomsRepository.create({
       name: createRoomDto.name,
-      isProtected: createRoomDto.isProtected,
       hash: hash,
       type: createRoomDto.type,
     });
