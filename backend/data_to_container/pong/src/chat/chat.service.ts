@@ -299,11 +299,8 @@ export class ChatService {
   //     },
   //   });
   // }
-  async amIAdmin(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
-    const chatMember: ChatMember = await this.findChatMember(
-      userIdAndRoomIdDto.userId,
-      userIdAndRoomIdDto.roomId,
-    );
+  async amIAdmin(userId: string, roomId: string): Promise<boolean> {
+    const chatMember: ChatMember = await this.findChatMember(userId, roomId);
     return chatMember.isAdmin;
   }
 
@@ -345,9 +342,9 @@ export class ChatService {
   //   return chatMembers;
   // }
 
-  async amIOwner(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
-    const room: Room = await this.findRoomById(userIdAndRoomIdDto.roomId);
-    return room.owner.id === userIdAndRoomIdDto.userId;
+  async amIOwner(userId: string, roomId: string): Promise<boolean> {
+    const room: Room = await this.findRoomById(roomId);
+    return room.owner.id === userId;
   }
 
   async filterByAdminRightsInRoom(

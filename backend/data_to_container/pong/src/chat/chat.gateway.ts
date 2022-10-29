@@ -73,7 +73,7 @@ export class ChatGateway
       user,
     );
     this.logger.debug('Creating a message');
-    // console.log(message);
+    this.logger.debug(message.sender.room.id);
     client.to(message.sender.room.id).emit('updateMessages');
     // this.server.emit('updateRooms');
     return message;
@@ -138,7 +138,7 @@ export class ChatGateway
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
-    console.log("bonjour");
+    console.log('bonjour');
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
@@ -232,13 +232,19 @@ export class ChatGateway
   }
 
   @SubscribeMessage('amIAdmin')
-  async amIAdmin(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
-    return await this.chatService.amIAdmin(userIdAndRoomIdDto);
+  async amIAdmin(
+    roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<boolean> {
+    return await this.chatService.amIAdmin(user.userUuid, roomId.uuid);
   }
 
   @SubscribeMessage('amIOwner')
-  async amIUser(userIdAndRoomIdDto: DoubleUuidDto): Promise<boolean> {
-    return await this.chatService.amIOwner(userIdAndRoomIdDto);
+  async amIOwner(
+    roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<boolean> {
+    return await this.chatService.amIOwner(user.userUuid, roomId.uuid);
   }
 
   @SubscribeMessage('findMutedUsersInRoom')
