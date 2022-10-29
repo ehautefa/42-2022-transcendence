@@ -15,7 +15,7 @@ function DeletePassword({ room }: any) {
         console.log('set password ', password);
         // TO DO : send password to backend
         let param = {
-            rommId: room.id,
+            roomId: room.id,
             password: password,
             newPassword: ""
         }

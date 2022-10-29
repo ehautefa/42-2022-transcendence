@@ -46,7 +46,7 @@ function Chat() {
 
 	useEffect(() => {
 		console.log("USE EFFECT SELECTED ROOM", selectedRoom);
-		if (selectedRoom.id !== "") {
+		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
 				var message = document.getElementById('messages');
