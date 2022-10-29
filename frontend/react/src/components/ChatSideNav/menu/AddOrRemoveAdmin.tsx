@@ -18,7 +18,7 @@ function AddOrRemoveAdmin(param: any) {
         if (room.id !== "") {
             const param = {
                 roomId: room.id,
-                isAdmin: AddAdmin,
+                isAdmin: !AddAdmin,
             }
             socketChat.emit("filterByAdminRightsInRoom", param, (users: any) => {
                 let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
