@@ -154,6 +154,7 @@ export class ChatGateway
   // @Roles('owner', 'admin')
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
+    console.log('setAdminDto = ', setAdminDto);
     return await this.chatService.setAdmin(setAdminDto);
   }
 

@@ -250,13 +250,13 @@ export class ChatService {
    */
 
   async setAdmin(setAdminDto: SetAdminDto): Promise<ChatMember> {
+    console.log('setAdminDto = ', setAdminDto);
     const chatMember: ChatMember = await this.findChatMember(
       setAdminDto.userId,
       setAdminDto.roomId,
     );
     chatMember.isAdmin = setAdminDto.isAdmin;
-    this.roomsRepository.save(chatMember);
-    return chatMember;
+    return await this.chatMembersRepository.save(chatMember);
   }
 
   async punishUser(punishUserDto: PunishUserDto): Promise<ChatMember> {
