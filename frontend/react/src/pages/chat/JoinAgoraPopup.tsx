@@ -4,24 +4,13 @@ import { getSocketChat } from "../../App";
 import "./Chat.css";
 import Select from "react-select";
 import { Room } from "../../type";
-
-
-class SelectClass {
-	value: string;
-	label: string;
-
-	constructor(room: Room) {
-		this.value = room.id;
-		this.label = room.name;
-	}
-}
-
+import { SelectClass } from "../../components/ChatSideNav/menu/toolsBox";
 
 function JoinAgoraPopup() {
 	const socket = getSocketChat();
 	const [open, setOpen] = useState(false);
-	const emptyRoom: SelectClass[] = [];
-	const [rooms, setRooms] = useState(emptyRoom);
+	// const emptyRoom: SelectClass[] = [];
+	const [rooms, setRooms] = useState([] as SelectClass[]);
 	const [newRoomId, setNewRoomId] = useState("");
 
 	useEffect(() => {

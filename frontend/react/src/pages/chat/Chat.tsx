@@ -43,6 +43,8 @@ function Chat() {
 		
 	}, [socket]);
 
+	useEffect(() => {
+	
 	socket.on('updateMessages', () => {
 		socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id, }, (msgs: any) => {
 			setMessages(msgs);
@@ -51,6 +53,7 @@ function Chat() {
 				message.scrollTop = message.scrollHeight;
 		});
 	});
+	}, [socket, selectedRoom]);
 
 	socket.on('updateRooms', (rooms: any) => {
 		console.log('getting information');
@@ -71,10 +74,10 @@ function Chat() {
 	async function chooseRoom(thisRoom: Room) {
 		console.log("You chose room ", thisRoom);
 		setSelectedRoom(thisRoom);
-		socket.emit('findAllMessagesInRoom', { uuid: thisRoom.id, }, (msgs: any) => {
-			console.log("FIND ALL MSG", msgs);
-			setMessages(msgs)
-		});
+		// socket.emit('findAllMessagesInRoom', { uuid: thisRoom.id, }, (msgs: any) => {
+		// 	console.log("FIND ALL MSG", msgs);
+		// 	setMessages(msgs)
+		// });
 	}
 
 	function sendMessage() {
