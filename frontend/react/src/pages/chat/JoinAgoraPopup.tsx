@@ -69,6 +69,8 @@ function JoinAgoraPopup() {
 		setNewRoomId(newValue.value);
 		if (completeRooms.find((room) => room.id === newValue.value)?.type === "protected") {
 			setIsProtected(true);
+		} else {
+			setIsProtected(false);
 		}
 	}
 
