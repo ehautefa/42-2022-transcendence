@@ -166,6 +166,7 @@ export class ChatService {
       .where('user.userUuid = :userId', { userId: userId })
       .select('room.id', 'id')
       .addSelect('room.name', 'name')
+      .addSelect('room.type', 'type')
       .getRawMany();
   }
 
