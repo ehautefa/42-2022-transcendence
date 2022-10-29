@@ -7,6 +7,8 @@ import DeletePassword from "./menu/DeletePassword";
 import InviteUser from "./menu/InviteUser";
 import LeaveRoom from "./menu/LeaveRoom";
 import SetPassword from "./menu/SetPassword";
+import PunishUser from "./menu/PunishUser";
+import UnpunishUser from "./menu/UnpunishUser";
 
 function ChatSideNav({ Room }: any) {
     const socket = getSocketChat();
@@ -53,10 +55,10 @@ function ChatSideNav({ Room }: any) {
                         <>
                             <li><AddOrRemoveAdmin room={Room} AddAdmin={true} /></li>
                             <li><AddOrRemoveAdmin room={Room} AddAdmin={false} /></li>
-                            <li><a href="#">Mute User</a></li>
-                            <li><a href="#">Unmute User</a></li>
-                            <li><a href="#">Ban User</a></li>
-                            <li><a href="#">Unban User</a></li>
+                            <li><PunishUser room={Room} ban={false} /></li>
+                            <li><UnpunishUser room={Room} ban={false} /></li>
+                            <li><PunishUser room={Room} ban={true} /></li>
+                            <li><UnpunishUser room={Room} ban={true} /></li>
                         </>
                     }
                     {/* Owner */}

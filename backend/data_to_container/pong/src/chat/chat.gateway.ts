@@ -185,6 +185,7 @@ export class ChatGateway
   }
 
   @Roles('admin')
+  @SubscribeMessage('punishUser')
   async punishUser(
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
@@ -192,6 +193,7 @@ export class ChatGateway
   }
 
   @Roles('admin')
+  @SubscribeMessage('removePunishment')
   async removePunishment(
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
