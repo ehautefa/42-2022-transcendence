@@ -24,7 +24,7 @@ import { Authorized } from './decorator/authorized.decorator';
 import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { FilterUsersDto } from './dto/filter-users.dto';
+import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
@@ -186,6 +186,11 @@ export class ChatGateway
     return await this.chatService.removePunishment(removePunishmentDto);
   }
 
+  @SubscribeMessage('findAllJoinedRooms')
+  async findAllJoinedRooms(userId: UuidDto): Promise<ChatMember[]> {
+    return await this.chatService.findAllJoinedRooms(userId.uuid);
+  }
+
   @SubscribeMessage('findAllPublicRooms')
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     return await this.chatService.findAllPublicRooms();
@@ -196,11 +201,27 @@ export class ChatGateway
     return await this.chatService.findAllInvitableUsers(roomId.uuid);
   }
 
-  @SubscribeMessage('filterUsersInRoom')
-  async filterUsersInRoom(
-    @MessageBody() filterUsersDto: FilterUsersDto,
+  @SubscribeMessage('filterByAdminRightsInRoom')
+  async findAdminsInRoom(
+    @MessageBody() filterByAdminRightsDto: FilterByAdminRightsDto,
   ): Promise<ChatMember[]> {
-    return await this.chatService.filterUsersInRoom(filterUsersDto);
+    return await this.chatService.filterByAdminRightsInRoom(
+      filterByAdminRightsDto,
+    );
+  }
+
+  @SubscribeMessage('findBannedUsersInRoom')
+  async findBannedUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+  ): Promise<ChatMember[]> {
+    return await this.chatService.findBannedUsersInRoom(roomId.uuid);
+  }
+
+  @SubscribeMessage('findMutedUsersInRoom')
+  async findMutedUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+  ): Promise<ChatMember[]> {
+    return await this.chatService.findMutedUsersInRoom(roomId.uuid);
   }
 
   async handleConnection(client: Socket): Promise<void> {

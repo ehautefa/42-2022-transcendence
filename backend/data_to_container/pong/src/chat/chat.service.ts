@@ -10,7 +10,7 @@ import { UserService } from 'src/user/user.service';
 import { DeepPartial, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { FilterUsersDto } from './dto/filter-users.dto';
+import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
@@ -70,9 +70,6 @@ export class ChatService {
       .addSelect('msg.id', 'id')
       .orderBy('msg.time')
       .getRawMany();
-    this.logger.debug('These are the messages');
-    console.log(messages);
-    this.logger.debug('These were the messages');
     return messages;
   }
 
@@ -163,6 +160,14 @@ export class ChatService {
   async findRoomByName(roomName: string): Promise<Room> {
     return await this.roomsRepository.findOneOrFail({
       where: { name: roomName },
+    });
+  }
+
+  async findAllJoinedRooms(userId: string): Promise<ChatMember[]> {
+    return await this.chatMembersRepository.find({
+      relations: { user: true, room: true },
+      select: { room: { id: true } },
+      where: { user: { userUuid: userId } },
     });
   }
 
@@ -285,24 +290,24 @@ export class ChatService {
     return await this.chatMembersRepository.save(chatMember);
   }
 
-  async filterUsersInRoom(
-    filterUsersDto: FilterUsersDto,
-  ): Promise<ChatMember[]> {
-    let timeNow: Date;
-    if (filterUsersDto.banned || filterUsersDto.muted) timeNow = new Date();
-    return await this.chatMembersRepository.find({
-      relations: { user: true, room: true },
-      select: {
-        user: { userName: true, userUuid: true },
-      },
-      where: {
-        room: { id: filterUsersDto.roomId },
-        isAdmin: filterUsersDto.admin,
-        bannedTime: filterUsersDto.banned && Not(IsNull) && LessThan(timeNow),
-        mutedTime: filterUsersDto.muted && Not(IsNull) && LessThan(timeNow),
-      },
-    });
-  }
+  // async filterUsersInRoom(
+  //   filterUsersDto: FilterUsersDto,
+  // ): Promise<ChatMember[]> {
+  //   let timeNow: Date;
+  //   if (filterUsersDto.banned || filterUsersDto.muted) timeNow = new Date();
+  //   return await this.chatMembersRepository.find({
+  //     relations: { user: true, room: true },
+  //     select: {
+  //       user: { userName: true, userUuid: true },
+  //     },
+  //     where: {
+  //       room: { id: filterUsersDto.roomId },
+  //       isAdmin: filterUsersDto.admin,
+  //       bannedTime: filterUsersDto.banned && Not(IsNull) && LessThan(timeNow),
+  //       mutedTime: filterUsersDto.muted && Not(IsNull) && LessThan(timeNow),
+  //     },
+  //   });
+  // }
 
   /*
    * owner functions
@@ -342,45 +347,64 @@ export class ChatService {
   //   return chatMembers;
   // }
 
-  // async findAllBannedUsers(roomId: string): Promise<ChatMember[]> {
-  //   return await this.chatMembersRepository.find({
-  //     relations: { room: true, user: true },
-  //     select: {
-  //       user: { userName: true, userUuid: true },
-  //     },
-  //     where: {
-  //       bannedTime: Not(IsNull()) && LessThan(new Date()),
-  //       room: { id: roomId },
-  //     },
-  //   });
-  // }
+  async filterByAdminRightsInRoom(
+    filterByAdminRightsDto: FilterByAdminRightsDto,
+  ): Promise<ChatMember[]> {
+    return await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      select: {
+        user: { userName: true, userUuid: true },
+      },
+      where: {
+        isAdmin: filterByAdminRightsDto.isAdmin,
+        room: { id: filterByAdminRightsDto.roomId },
+      },
+    });
+  }
 
-  // async findAllMutedUsers(roomId: string): Promise<ChatMember[]> {
-  //   return await this.chatMembersRepository.find({
-  //     relations: { room: true, user: true },
-  //     select: {
-  //       user: { userName: true, userUuid: true },
-  //     },
-  //     where: {
-  //       mutedTime: Not(IsNull()) && LessThan(new Date()),
-  //       room: { id: roomId },
-  //     },
-  //   });
-  // }
+  async findBannedUsersInRoom(roomId: string): Promise<ChatMember[]> {
+    return await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      select: {
+        user: { userName: true, userUuid: true },
+      },
+      where: {
+        bannedTime: Not(IsNull()) && LessThan(new Date()),
+        room: { id: roomId },
+      },
+    });
+  }
+
+  async findMutedUsersInRoom(roomId: string): Promise<ChatMember[]> {
+    return await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      select: {
+        user: { userName: true, userUuid: true },
+      },
+      where: {
+        mutedTime: Not(IsNull()) && LessThan(new Date()),
+        room: { id: roomId },
+      },
+    });
+  }
 
   /*
    * socket functions
    */
 
-  async getUserUuidFromCookies(cookiesStr: string): Promise<string> {
-    const cookies: string[] = cookiesStr.split('; ');
-    const authCookie: string = cookies.filter((s) =>
-      s.includes('access_token='),
-    )[0];
-    const accessToken = authCookie.substring(
-      'access_token'.length + 1,
-      authCookie.length,
-    );
+  async getUserUuidFromCookies(cookie: string): Promise<string> {
+    const accessToken: string = cookie
+      .split('; ')
+      .find((cookie: string) => cookie.startsWith('access_token='))
+      .split('=')[1];
+    // const cookies: string[] = cookiesStr.split('; ');
+    // const authCookie: string = cookies.filter((s) =>
+    //   s.includes('access_token='),
+    // )[0];
+    // const accessToken = authCookie.substring(
+    //   'access_token'.length + 1,
+    //   authCookie.length,
+    // );
     const jwtOptions: JwtVerifyOptions = {
       secret: JwtConfig.secret,
     };
@@ -391,8 +415,8 @@ export class ChatService {
     return jwtPayload.userUuid;
   }
 
-  async handleConnection(cookiesStr: string): Promise<ChatMember[]> {
-    const userId: string = await this.getUserUuidFromCookies(cookiesStr);
+  async handleConnection(cookie: string): Promise<ChatMember[]> {
+    const userId: string = await this.getUserUuidFromCookies(cookie);
     return await this.chatMembersRepository.find({
       relations: {
         room: true,
