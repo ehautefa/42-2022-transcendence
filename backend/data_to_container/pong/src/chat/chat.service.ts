@@ -12,10 +12,10 @@ import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
+import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
-import { StringDto } from './dto/string.dto';
 
 @Injectable()
 export class ChatService {
@@ -149,12 +149,9 @@ export class ChatService {
     return room;
   }
 
-  async joinPrivateRoom(joinPrivateRoomDto: StringDto): Promise<Room> {
-    try {
-      return await this.findRoomByName(joinPrivateRoomDto.str);
-    } catch (error) {
-      throw new WsException(`Room ${joinPrivateRoomDto.str} does not exist.`);
-    }
+  async joinRoom(joinRoomDto: JoinRoomDto, user: user): Promise<ChatMember> {
+    const room: Room = await this.findRoomByName(joinRoomDto.roomId);
+    return await this.createChatMember(user, room);
   }
 
   async findRoomByName(roomName: string): Promise<Room> {
@@ -177,16 +174,9 @@ export class ChatService {
   async findAllInvitableUsers(roomId: string): Promise<user[]> {
     const users: user[] = await this.userService.getAllUser();
     const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
-      relations: {
-        user: true,
-        room: true,
-      },
-      select: {
-        user: { userUuid: true },
-      },
-      where: {
-        room: { id: roomId },
-      },
+      relations: { user: true, room: true },
+      select: { user: { userUuid: true } },
+      where: { room: { id: roomId } },
     });
     for (const member of chatMembers) {
       for (const index in users) {

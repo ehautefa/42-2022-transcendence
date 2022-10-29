@@ -26,6 +26,7 @@ import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
 import { GiveOwnershipDto } from './dto/give-ownership.dto';
+import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
@@ -94,11 +95,19 @@ export class ChatGateway
 
   @Authorized('notBanned')
   @SubscribeMessage('joinRoom')
-  async joinRoom(@MessageBody() joinRoomDto: UuidDto) {
-    this.logger.debug('pouet');
-    const room: Room = await this.chatService.findRoomById(joinRoomDto.uuid);
-    this.server.socketsJoin(room.id);
-    return room;
+  async joinRoom(
+    @MessageBody() joinRoomDto: JoinRoomDto,
+    @Req() { user }: { user: user },
+  ) {
+    this.logger.log(
+      `User ${user.userUuid} is joining room ${joinRoomDto.roomId}`,
+    );
+    const chatMember: ChatMember = await this.chatService.joinRoom(
+      joinRoomDto,
+      user,
+    );
+    this.server.socketsJoin(chatMember.room.id);
+    return chatMember;
   }
 
   @Authorized('notBanned')
