@@ -31,7 +31,7 @@ function SetPassword({ room }: any) {
 				{/* <div className='messagePopup'> */}
 				<div className='side-menu-popup'>
 					<h3>Set a password :</h3>
-					<input type="text" name="password"
+					<input type="password" name="password"
 						onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
 						autoFocus
 						autoCorrect="off"

@@ -35,7 +35,7 @@ function Chat() {
 				setSelectedRoom(rooms.find((room: any) => room.roomId === roomId));
 			}
 		});
-	}, [socket]);
+	}, [socket, roomId]);
 
 
 	socket.on('updateMessages', () => {

@@ -12,7 +12,8 @@ function JoinAgoraPopup() {
 	const [completeRooms, setCompleteRooms] = useState([] as Room[]);
 	const [rooms, setRooms] = useState([] as SelectClass[]);
 	const [newRoomId, setNewRoomId] = useState("");
-	const [password, setPassword] = useState(false);
+	const [isProtected, setIsProtected] = useState(false);
+	const [password, setPassword] = useState("");
 
 	useEffect(() => {
 		socket.emit('findAllPublicOrProtectedRooms', (rooms: Room[]) => {
@@ -66,16 +67,15 @@ function JoinAgoraPopup() {
 
 	const handleChange = (newValue: any) => {
 		setNewRoomId(newValue.value);
-		console.log("handleCahnge join room ", completeRooms.find((room) => room.id === newValue.id))
-		if (completeRooms.find((room) => room.id === newValue.id)?.type === "public") {
-			setPassword(true);
+		if (completeRooms.find((room) => room.id === newValue.value)?.type === "protected") {
+			setIsProtected(true);
 		}
 	}
 
 	function Submit() {
 		const param = {
 			roomId: newRoomId,
-			password: ""
+			password: password
 		}
 		console.log("Join ROOM : ", param);
 		socket.emit('joinRoom', param);
@@ -97,7 +97,11 @@ function JoinAgoraPopup() {
 							onChange={handleChange}
 							styles={customStyles}
 							options={rooms} />
-					{password && <input type="password" placeholder="Password" />}
+					{isProtected && 
+						<input type="password"
+								placeholder="Password"
+								onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
+						/>}
 					<button onClick={Submit}>Join</button>
 				</div>
 			</Popup>
