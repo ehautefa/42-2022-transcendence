@@ -7,7 +7,7 @@ import { JwtConfig } from 'src/auth/config/Jwt.config';
 import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
-import { DeepPartial, IsNull, LessThan, Not, Repository } from 'typeorm';
+import { IsNull, LessThan, Not, Repository } from 'typeorm';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
@@ -133,12 +133,11 @@ export class ChatService {
     return await this.roomsRepository.save(newRoom);
   }
 
-  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
-    const rooms: Room[] = await this.roomsRepository.find({
-      select: { id: true, name: true },
-      where: { type: RoomType.PUBLIC },
+  async findAllPublicOrProtectedRooms(): Promise<Room[]> {
+    return await this.roomsRepository.find({
+      select: { id: true, name: true, type: true },
+      where: { type: RoomType.PUBLIC || RoomType.PROTECTED },
     });
-    return rooms;
   }
 
   async findRoomById(roomId: string): Promise<Room> {
@@ -149,7 +148,7 @@ export class ChatService {
   }
 
   async joinRoom(joinRoomDto: JoinRoomDto, user: user): Promise<ChatMember> {
-    const room: Room = await this.findRoomByName(joinRoomDto.roomId);
+    const room: Room = await this.findRoomById(joinRoomDto.roomId);
     return await this.createChatMember(user, room);
   }
 
