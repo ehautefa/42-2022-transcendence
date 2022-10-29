@@ -186,6 +186,11 @@ export class ChatGateway
     return await this.chatService.removePunishment(removePunishmentDto);
   }
 
+  @SubscribeMessage('findAllJoinedRooms')
+  async findAllJoinedRooms(userId: UuidDto): Promise<ChatMember[]> {
+    return await this.chatService.findAllJoinedRooms(userId.uuid);
+  }
+
   @SubscribeMessage('findAllPublicRooms')
   async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
     return await this.chatService.findAllPublicRooms();

@@ -163,6 +163,14 @@ export class ChatService {
     });
   }
 
+  async findAllJoinedRooms(userId: string): Promise<ChatMember[]> {
+    return await this.chatMembersRepository.find({
+      relations: { user: true, room: true },
+      select: { room: { id: true } },
+      where: { user: { userUuid: userId } },
+    });
+  }
+
   async findAllInvitableUsers(roomId: string): Promise<user[]> {
     const users: user[] = await this.userService.getAllUser();
     const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
@@ -384,15 +392,19 @@ export class ChatService {
    * socket functions
    */
 
-  async getUserUuidFromCookies(cookiesStr: string): Promise<string> {
-    const cookies: string[] = cookiesStr.split('; ');
-    const authCookie: string = cookies.filter((s) =>
-      s.includes('access_token='),
-    )[0];
-    const accessToken = authCookie.substring(
-      'access_token'.length + 1,
-      authCookie.length,
-    );
+  async getUserUuidFromCookies(cookie: string): Promise<string> {
+    const accessToken: string = cookie
+      .split('; ')
+      .find((cookie: string) => cookie.startsWith('access_token='))
+      .split('=')[1];
+    // const cookies: string[] = cookiesStr.split('; ');
+    // const authCookie: string = cookies.filter((s) =>
+    //   s.includes('access_token='),
+    // )[0];
+    // const accessToken = authCookie.substring(
+    //   'access_token'.length + 1,
+    //   authCookie.length,
+    // );
     const jwtOptions: JwtVerifyOptions = {
       secret: JwtConfig.secret,
     };
@@ -403,8 +415,8 @@ export class ChatService {
     return jwtPayload.userUuid;
   }
 
-  async handleConnection(cookiesStr: string): Promise<ChatMember[]> {
-    const userId: string = await this.getUserUuidFromCookies(cookiesStr);
+  async handleConnection(cookie: string): Promise<ChatMember[]> {
+    const userId: string = await this.getUserUuidFromCookies(cookie);
     return await this.chatMembersRepository.find({
       relations: {
         room: true,
