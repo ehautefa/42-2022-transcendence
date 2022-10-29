@@ -204,6 +204,17 @@ export class ChatGateway
     return await this.chatService.findAllJoinedRooms(user.userUuid);
   }
 
+  @SubscribeMessage('findAllUsersInRoom')
+  async findAllUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ) {
+    return await this.chatService.findAllUsersInRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
+  }
+
   @SubscribeMessage('findAllPublicOrProtectedRooms')
   async findAllPublicOrProtectedRooms(): Promise<Room[]> {
     return await this.chatService.findAllPublicOrProtectedRooms();
@@ -217,9 +228,11 @@ export class ChatGateway
   @SubscribeMessage('filterByAdminRightsInRoom')
   async findAdminsInRoom(
     @MessageBody() filterByAdminRightsDto: FilterByAdminRightsDto,
+    @Req() { user }: { user: user },
   ): Promise<ChatMember[]> {
     return await this.chatService.filterByAdminRightsInRoom(
       filterByAdminRightsDto,
+      user.userUuid,
     );
   }
 
