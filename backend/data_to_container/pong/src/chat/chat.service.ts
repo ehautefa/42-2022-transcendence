@@ -138,7 +138,7 @@ export class ChatService {
   async findAllPublicOrProtectedRooms(): Promise<Room[]> {
     return await this.roomsRepository.find({
       select: { id: true, name: true, type: true },
-      where: [{ type: RoomType.PUBLIC }, { type: RoomType.PUBLIC }],
+      where: [{ type: RoomType.PUBLIC }, { type: RoomType.PROTECTED }],
     });
   }
 
@@ -225,11 +225,11 @@ export class ChatService {
     return room;
   }
 
-  async joinDMRoom(sender: user, recipientId: UuidDto): Promise<Room> {
+  async joinDMRoom(sender: user, recipientId: string): Promise<Room> {
     try {
-      return await this.getDMRoom(sender.userUuid, recipientId.uuid);
+      return await this.getDMRoom(sender.userUuid, recipientId);
     } catch (error) {
-      return await this.createDMRoom(sender, recipientId.uuid);
+      return await this.createDMRoom(sender, recipientId);
     }
   }
 
