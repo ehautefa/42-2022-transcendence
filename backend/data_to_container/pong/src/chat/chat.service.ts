@@ -138,7 +138,7 @@ export class ChatService {
   async findAllPublicOrProtectedRooms(): Promise<Room[]> {
     return await this.roomsRepository.find({
       select: { id: true, name: true, type: true },
-      where: { type: RoomType.PUBLIC || RoomType.PROTECTED },
+      where: [{ type: RoomType.PUBLIC }, { type: RoomType.PUBLIC }],
     });
   }
 
