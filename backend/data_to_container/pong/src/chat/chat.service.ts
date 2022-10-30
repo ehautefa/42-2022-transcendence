@@ -135,11 +135,22 @@ export class ChatService {
     return await this.roomsRepository.save(newRoom);
   }
 
-  async findAllPublicOrProtectedRooms(): Promise<Room[]> {
-    return await this.roomsRepository.find({
-      select: { id: true, name: true, type: true },
-      where: [{ type: RoomType.PUBLIC }, { type: RoomType.PROTECTED }],
-    });
+  async findAllJoinableRooms(userId: string): Promise<Room[]> {
+    const allRoomId: Room[] = await this.roomsRepository
+      .createQueryBuilder('room')
+      .select('room.id', 'id')
+      .addSelect('room.name', 'name')
+      .getRawMany();
+    const joinedRoomId = await this.chatMembersRepository
+      .createQueryBuilder('members')
+      .innerJoin('members.user', 'user')
+      .innerJoin('members.room', 'room')
+      .where('user.userUuid = :usrId', { usrId: userId })
+      .select('room.id', 'id')
+      .getRawMany();
+    return allRoomId.filter(
+      (elem) => !joinedRoomId.find((elem1) => elem1.id === elem.id),
+    );
   }
 
   async findRoomById(roomId: string): Promise<Room> {
@@ -178,7 +189,7 @@ export class ChatService {
       mbr.mutedTime =
         mbr.mutedTime && mbr.mutedTime < new Date() ? true : false;
     });
-    console.log(chatMember);
+    // console.log(chatMember);
     return chatMember;
   }
 
@@ -190,10 +201,9 @@ export class ChatService {
       where: { room: { id: roomId } },
     });
     for (const member of chatMembers) {
-      for (const index in users) {
+      for (const index in users)
         if (member.user.userUuid === users[index].userUuid)
           users.splice(+index);
-      }
     }
     return users;
   }

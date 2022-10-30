@@ -221,9 +221,11 @@ export class ChatGateway
     );
   }
 
-  @SubscribeMessage('findAllPublicOrProtectedRooms')
-  async findAllPublicOrProtectedRooms(): Promise<Room[]> {
-    return await this.chatService.findAllPublicOrProtectedRooms();
+  @SubscribeMessage('findAllJoinableRooms')
+  async findAllPublicOrProtectedRooms(
+    @Req() { user }: { user: user },
+  ): Promise<Room[]> {
+    return await this.chatService.findAllJoinableRooms(user.userUuid);
   }
 
   @SubscribeMessage('findAllInvitableUsers')
