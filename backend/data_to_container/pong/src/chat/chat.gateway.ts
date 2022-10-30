@@ -199,6 +199,7 @@ export class ChatGateway
   async removePunishment(
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
+    console.log('removePunishmentDto = ', removePunishmentDto);
     return await this.chatService.removePunishment(removePunishmentDto);
   }
 

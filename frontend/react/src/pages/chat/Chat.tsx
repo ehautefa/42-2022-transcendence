@@ -19,6 +19,7 @@ function Chat() {
 	const [channels, setChannels] = useState([] as Room[]);
 	const [selectedRoom, setSelectedRoom] = useState({} as Room);
 	const [newMessage, setNewMessage] = useState("");
+	const [members, setMembers] = useState([] as User[]);
 	const roomId = new URLSearchParams(useLocation().search).get('room');
 
 	async function fetchUser() {
@@ -50,7 +51,6 @@ function Chat() {
 	});
 
 	useEffect(() => {
-		console.log("USE EFFECT SELECTED ROOM", selectedRoom);
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
@@ -58,6 +58,9 @@ function Chat() {
 				if (message)
 					message.scrollTop = message.scrollHeight;
 			});
+			socket.emit("findAllUsersInRoom", {uuid: selectedRoom.id}, (users: any) => {
+                setMembers(users);
+            });
 		}
 	}, [socket, selectedRoom]);
 
@@ -90,7 +93,18 @@ function Chat() {
 				<h3>My Rooms</h3>
 				<div className="channel">
 					{channels.map((room: Room) => (
-						<li key={room.id} onClick={() => chooseRoom(room)}>{room.name}</li>
+						room.name === selectedRoom.name ?
+							<li key={room.id} className="selectedRoom" onClick={() => chooseRoom(room)}>{room.name}</li> :
+							<li key={room.id} onClick={() => chooseRoom(room)}>{room.name}</li>
+					))}
+				</div>
+				<h3>Members</h3>
+				<div className="channel">
+					{members.map((member: User) => (
+							<li key={member.userUuid}>
+								{member.userName}
+								<button className='gameInvite'>Invite in Game</button>
+							</li>
 					))}
 				</div>
 				<NewAgoraPopup />
@@ -98,16 +112,23 @@ function Chat() {
 			</div>
 			<div className="chat">
 				<ChatSideNav Room={selectedRoom} />
-				<div id="messages">
-					{messages.map((message: any) => (
-						<div key={message.id}>
-							{message.userName === user.userName ?
-								<div className="message_mine">{message.message}</div> :
-								<div className="message_other">{message.userName} : {message.message}</div>
-							}
+				{
+					selectedRoom.bannedTime ?
+						<div id="messages">
+							<h3>You are banned from this room</h3>
 						</div>
-					))}
-				</div>
+						:
+						<div id="messages">
+							{messages.map((message: any) => (
+								<div key={message.id}>
+									{message.userName === user.userName ?
+										<div className="message_mine">{message.message}</div> :
+										<div className="message_other">{message.userName} : {message.message}</div>
+									}
+								</div>
+							))}
+						</div>
+				}
 				{/* // TO DO OSCAR : Transition doesn't work */}
 				{/* <TransitionGroup className="messages">
 					{messages ? (messages as any).map((message: any) => (
@@ -121,15 +142,30 @@ function Chat() {
 					}
 				</TransitionGroup> */}
 				<div className='input-flex'>
-					<input type="text" id="message" name="username"
-						value={newMessage}
-						onChange={(e: { target: { value: any; }; }) => setNewMessage(e.target.value)}
-						autoFocus
-						onKeyPress={event => {
-							if (event.key === 'Enter') { sendMessage() }
-						}}
-						minLength={1} />
-					<button type="submit" onClick={sendMessage}>Send</button>
+					{selectedRoom.mutedTime ?
+						<>
+							<input type="text" id="message" name="username"
+								value={newMessage}
+								placeholder="You are muted"
+								onChange={(e: { target: { value: any; }; }) => setNewMessage(e.target.value)}
+								autoFocus
+								onKeyPress={event => {
+									if (event.key === 'Enter') { sendMessage() }
+								}}
+								minLength={1} />
+							<button type="submit" className="mutedButton" onClick={sendMessage}>Send</button>
+						</> : <>
+							<input type="text" id="message" name="username"
+								value={newMessage}
+								onChange={(e: { target: { value: any; }; }) => setNewMessage(e.target.value)}
+								autoFocus
+								onKeyPress={event => {
+									if (event.key === 'Enter') { sendMessage() }
+								}}
+								minLength={1} />
+							<button type="submit" onClick={sendMessage}>Send</button>
+						</>
+					}
 				</div>
 			</div>
 		</div>

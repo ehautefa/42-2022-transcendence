@@ -80,8 +80,9 @@ function UnpunishUser(param: any) {
         let param = {
             userId: newPunish,
             roomId: room.id,
-            isBanned: ban
+            unMute: !ban
         }
+        console.log("remove punishement", param);
         socket.emit('removePunishment', param);
         setOpen(false);
     }

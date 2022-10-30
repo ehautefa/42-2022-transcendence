@@ -36,4 +36,6 @@ export type Room = {
 	id: string,
 	name: string,
 	type: string,
+	bannedTime: boolean,
+	mutedTime: boolean,
 }
