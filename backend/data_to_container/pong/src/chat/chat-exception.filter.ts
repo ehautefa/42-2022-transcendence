@@ -25,7 +25,6 @@ export class ChatExceptionFilter extends BaseWsExceptionFilter {
       // super.catch(error, host);
     }
     if (exception instanceof WsException) {
-      host.switchToWs().getClient().emit('exception', exception);
       super.catch(exception, host);
     }
   }

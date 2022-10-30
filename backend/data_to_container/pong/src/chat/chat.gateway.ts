@@ -93,7 +93,6 @@ export class ChatGateway
     @MessageBody() joinRoomDto: JoinRoomDto,
     @Req() { user }: { user: user },
   ) {
-    // try {
     const chatMember: ChatMember = await this.chatService.joinRoom(
       joinRoomDto,
       user,
@@ -104,10 +103,6 @@ export class ChatGateway
     );
 
     return chatMember;
-    // } catch (error) {
-    //   console.error(error);
-    //   throw error;
-    // }
   }
 
   /*

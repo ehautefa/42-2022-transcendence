@@ -199,7 +199,6 @@ export class ChatService {
       mbr.mutedTime =
         mbr.mutedTime && mbr.mutedTime < new Date() ? true : false;
     });
-    // console.log(chatMember);
     return chatMember;
   }
 
