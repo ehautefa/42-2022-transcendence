@@ -3,7 +3,7 @@ import Popup from "reactjs-popup";
 import "./sideMenu.css";
 import { getSocketChat } from "../../../App";
 import Select from "react-select";
-import { SelectClass } from "./toolsBox"
+import { SelectClass } from "./SelectClass"
 
 function AddOrRemoveAdmin(param: any) {
     const socketChat = getSocketChat();

@@ -4,7 +4,7 @@ import { getSocketChat } from "../../App";
 import "./Chat.css";
 import Select from "react-select";
 import { Room } from "../../type";
-import { SelectClass } from "../../components/ChatSideNav/menu/toolsBox";
+import { SelectClass } from "../../components/ChatSideNav/menu/SelectClass";
 
 function JoinAgoraPopup() {
 	const socket = getSocketChat();

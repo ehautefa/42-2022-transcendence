@@ -20,6 +20,27 @@ export class PongService {
         return game;
     }
 
+    leaveGame(clientId: string, server: any,  games: Map<string, GameWindowState>, players: playerDto[]) {
+		for (let game of games.values()) {
+			if (game.playerLeft === clientId || game.playerRight === clientId) {
+				if (game.playerLeft === clientId) {
+					server.to(game.matchId).emit('leaveGame', game.playerLeftName);
+				} else {
+					server.to(game.matchId).emit('leaveGame', game.playerRightName);
+				}
+				if (game.begin === true) {
+					console.log("DELETING GAME", game.matchId);
+					games.delete(game.matchId);
+				}
+			}
+		}
+		for (let i = 0; i < players.length; i++) {
+			if (players[i].socket.id === clientId) {
+				players.splice(i, 1);
+			}
+		}
+    }
+
     async initGame(client1: playerDto, client2: playerDto) : Promise<GameWindowState> {
 		var client2_socket:string = client2.socket === undefined ? "" : client2.socket.id;
 		var game: GameWindowState = {
