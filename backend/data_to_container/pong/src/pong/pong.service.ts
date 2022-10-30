@@ -22,12 +22,16 @@ export class PongService {
 
     leaveGame(clientId: string, server: any, games: Map<string, GameWindowState>, players: playerDto[]) {
         for (let game of games.values()) {
-            if (game.playerLeft === clientId || game.playerRight === clientId) {
+            if ((game.playerLeft === clientId
+                || game.playerRight === clientId)
+                && game.begin === true) {
                 console.log("leaveGame", game);
-                if (game.playerLeft === clientId) {
-                    server.to(game.playerRight).emit('leaveGame', game.playerLeftName);
-                } else {
-                    server.to(game.playerLeft).emit('leaveGame', game.playerRightName);
+                if (game.isGameOver === false) {
+                    if (game.playerLeft === clientId) {
+                        server.to(game.playerRight).emit('leaveGame', game.playerLeftName);
+                    } else {
+                        server.to(game.playerLeft).emit('leaveGame', game.playerRightName);
+                    }
                 }
                 console.log("DELETING GAME", game.matchId);
                 games.delete(game.matchId);
