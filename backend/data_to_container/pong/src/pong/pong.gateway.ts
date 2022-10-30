@@ -71,7 +71,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let player1: playerDto = {
 			userUuid: req.user.userUuid,
 			userName: req.user.userName,
-			socket: req
+			socket: undefined
 		};
 		let player2: playerDto = {
 			userUuid: invitePlayer.invitedUserUuid,

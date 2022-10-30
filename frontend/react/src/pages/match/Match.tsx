@@ -12,13 +12,10 @@ function Match() {
 	const [games, setGames] = useState([] as GameWindowState[]);
 
 	useEffect(() => {
-		console.log("RERERENDEr")
 		socket.emit("getGames", (games: GameWindowState[]) => {
 			setGames(games);
-			console.log(games);
 		});
 	}, []);
-
 
 	return (<>
 		<NavBar />

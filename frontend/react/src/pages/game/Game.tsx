@@ -5,9 +5,8 @@ import { useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
 
-const socket = getSocketPong();
-
 function Game() {
+	const socket = getSocketPong();
 	var index = new URLSearchParams(useLocation().search).get('id');
 	const initialLayer = index === null ? 0 : 1;
 	console.log(initialLayer);

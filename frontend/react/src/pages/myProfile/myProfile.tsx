@@ -67,8 +67,8 @@ function MyProfile() {
 					</ul>
 					{
 						user.twoFactorAuth === false ?
-						<Active2FAPopUp /> :
-						<button className="enable" onClick={disable2FA}>Disable two-factor authentication</button>
+							<Active2FAPopUp /> :
+							<button className="enable" onClick={disable2FA}>Disable two-factor authentication</button>
 					}
 				</div>
 				<Link className="pp-containers" to="./editProfilePicture">
@@ -96,10 +96,14 @@ function MyProfile() {
 								friends.map((users: any) => {
 									return (<tr key={users.userUuid}>
 										<td><Link to={"./profile?uid=" + users.userUuid}>{users.userName}</Link></td>
-										{users.online ? <td>Online</td> : <td>Offline</td>}
-										<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
+										{users.online ?
+											<>
+												<td>Online</td>
+												<td><InvitePopUp userName={users.userName} userUuid={users.userUuid} user={user} /></td>
+											</>
+											: <td>Offline</td>}
 									</tr>);
-							})}
+								})}
 						</tbody>
 					</table>
 				</div>
@@ -121,7 +125,7 @@ function MyProfile() {
 										<td>{user.userUuid === match.user1?.userUuid ? (match.score1) : (match.score2)}</td>
 										<td>{user.userUuid === match.user1?.userUuid ? (match.score2) : (match.score1)}</td>
 									</tr>);
-							})}
+								})}
 						</tbody>
 					</table>
 				</div>
