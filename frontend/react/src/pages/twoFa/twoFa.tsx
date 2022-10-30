@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./twoFa.css";
 
 function TwoFa() {
     const [code, setCode] = useState("");
@@ -22,7 +23,7 @@ function TwoFa() {
     }
 
     return (
-        <div>
+        <div className="twofa">
             <h1>Two Factor Authentication</h1>
             <h4>Enter Code</h4>
             <div className='input-flex'>
