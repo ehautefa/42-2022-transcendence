@@ -161,7 +161,7 @@ export class ChatService {
   }
 
   async findAllJoinedRooms(userId: string): Promise<ChatMember[]> {
-    return await this.chatMembersRepository
+    const chatMember: ChatMember[] = await this.chatMembersRepository
       .createQueryBuilder('members')
       .innerJoin('members.room', 'room')
       .innerJoin('members.user', 'user')
@@ -169,7 +169,17 @@ export class ChatService {
       .select('room.id', 'id')
       .addSelect('room.name', 'name')
       .addSelect('room.type', 'type')
+      .addSelect('members.mutedTime', 'mutedTime')
+      .addSelect('members.bannedTime', 'bannedTime')
       .getRawMany();
+    chatMember.map((mbr) => {
+      mbr.bannedTime =
+        mbr.bannedTime && mbr.bannedTime < new Date() ? true : false;
+      mbr.mutedTime =
+        mbr.mutedTime && mbr.mutedTime < new Date() ? true : false;
+    });
+    console.log(chatMember);
+    return chatMember;
   }
 
   async findAllInvitableUsers(roomId: string): Promise<user[]> {
@@ -244,6 +254,10 @@ export class ChatService {
       });
     return otherChatMember.user;
   }
+
+  // async leaveRoom(userId: string, roomId: string): Promise<ChatMember> {
+  // this.ch
+  // }
 
   /*
    * admin functions
