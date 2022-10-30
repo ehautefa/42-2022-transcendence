@@ -293,8 +293,8 @@ export class ChatService {
       removePunishmentDto.userId,
       removePunishmentDto.roomId,
     );
-    delete chatMember.bannedTime;
-    if (removePunishmentDto.unMute === true) delete chatMember.mutedTime;
+    chatMember.bannedTime = null;
+    if (removePunishmentDto.unMute === true) chatMember.mutedTime = null;
     return await this.chatMembersRepository.save(chatMember);
   }
 
