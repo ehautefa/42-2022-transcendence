@@ -28,12 +28,10 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
-import { RolesGuard } from './guard/roles.guard';
 
 @UseGuards(JwtAuthGuard)
-@UseGuards(RolesGuard)
-// @UseGuards(AuthorizedGuard)
-@UseFilters(ChatExceptionFilter)
+// @UseGuards(RolesGuard)
+// @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
     whitelist: true,
@@ -88,21 +86,28 @@ export class ChatGateway
     return newRoom;
   }
 
-  // @Authorized('notBanned')
+  // @UseGuards(ProtectedRoomGuard)
+  @UseFilters(ChatExceptionFilter)
   @SubscribeMessage('joinRoom')
   async joinRoom(
     @MessageBody() joinRoomDto: JoinRoomDto,
     @Req() { user }: { user: user },
   ) {
-    this.logger.log(
-      `User ${user.userUuid} is joining room ${joinRoomDto.roomId}`,
-    );
+    // try {
     const chatMember: ChatMember = await this.chatService.joinRoom(
       joinRoomDto,
       user,
     );
     this.server.socketsJoin(chatMember.room.id);
+    this.logger.log(
+      `User ${user.userUuid} is joining room ${joinRoomDto.roomId}`,
+    );
+
     return chatMember;
+    // } catch (error) {
+    //   console.error(error);
+    //   throw error;
+    // }
   }
 
   /*

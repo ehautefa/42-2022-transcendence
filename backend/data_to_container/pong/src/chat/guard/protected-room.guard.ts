@@ -6,7 +6,7 @@ import { ChangePasswordDto } from '../dto/change-password.dto';
 import { JoinRoomDto } from '../dto/join-room.dto';
 
 @Injectable()
-export class ProtectedRoom implements CanActivate {
+export class ProtectedRoomGuard implements CanActivate {
   constructor(private readonly chatService: ChatService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const dto: JoinRoomDto | ChangePasswordDto = context.switchToWs().getData();

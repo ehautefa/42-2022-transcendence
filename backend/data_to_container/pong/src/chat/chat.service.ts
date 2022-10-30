@@ -140,6 +140,7 @@ export class ChatService {
       .createQueryBuilder('room')
       .select('room.id', 'id')
       .addSelect('room.name', 'name')
+      .addSelect('room.type', 'type')
       .where('room.type = :public', { public: RoomType.PUBLIC })
       .orWhere('room.type = :protected', { protected: RoomType.PROTECTED })
       .getRawMany();
@@ -163,7 +164,14 @@ export class ChatService {
   }
 
   async joinRoom(joinRoomDto: JoinRoomDto, user: user): Promise<ChatMember> {
-    const room: Room = await this.findRoomById(joinRoomDto.roomId);
+    const room: Room = await this.roomsRepository.findOneOrFail({
+      where: { id: joinRoomDto.roomId },
+      select: { hash: true, id: true, type: true },
+    });
+    if (room.type === RoomType.PROTECTED) {
+      if (!(await argon.verify(room.hash, joinRoomDto.password)))
+        throw new WsException('Invalid password');
+    }
     return await this.createChatMember(user, room);
   }
 
