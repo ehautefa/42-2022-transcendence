@@ -32,7 +32,7 @@ function InvitePopUp(arg: any) {
                 <Popup open={open} closeOnDocumentClick onClose={() => { setOpen(false); }}>
                     <div className='invitePlayer'>
                         <h2>Your invitation has been sent</h2>
-                        <Link to={"./game?id=" + id}>Join Game</Link>
+                        <Link to={"/game?id=" + id}>Join Game</Link>
                     </div>
                 </Popup>
             </div>

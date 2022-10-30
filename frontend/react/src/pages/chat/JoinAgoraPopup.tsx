@@ -16,7 +16,7 @@ function JoinAgoraPopup() {
 	const [password, setPassword] = useState("");
 
 	useEffect(() => {
-		socket.emit('findAllPublicOrProtectedRooms', (rooms: Room[]) => {
+		socket.emit('findAllJoinableRooms', (rooms: Room[]) => {
 			let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
 			setRooms(selectTab);
 			setCompleteRooms(rooms);

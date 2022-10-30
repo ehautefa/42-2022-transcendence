@@ -174,7 +174,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	leaveGame(@Req() req): void {
 		console.log("LEAVE GAME");
 		this.PongService.leaveGame(req.id, this.server,  this.games, this.players);
-	
 	}
 
 

@@ -58,6 +58,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 			});
 		})
 		socket.on('leaveGame', (playerName: string) => {
+			console.log("leaveGame", this.state);
 			alert(`${playerName} has left the game`);
 		})
 	}
