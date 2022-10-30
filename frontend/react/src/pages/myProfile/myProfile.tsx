@@ -95,7 +95,7 @@ function MyProfile() {
 							{
 								friends.map((users: any) => {
 									return (<tr key={users.userUuid}>
-										<td><Link to={"./profile?uid=" + users.userUuid}>{users.userName}</Link></td>
+										<td><Link to={"/profile?uid=" + users.userUuid}>{users.userName}</Link></td>
 										{users.online ?
 											<>
 												<td>Online</td>

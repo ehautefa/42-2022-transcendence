@@ -52,6 +52,10 @@ const ModalProvider = (props: any) => {
 		console.log("UNAUTHORIZED");
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	})
+	socket.on('exception', (msg: string) => {
+		console.log("EXCEPTION");
+		alert(msg);
+	})
 	const unSetModal = useCallback(() => {
 		setModal(undefined);
 	}, [setModal])

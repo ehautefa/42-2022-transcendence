@@ -9,11 +9,9 @@ function Game() {
 	const socket = getSocketPong();
 	var index = new URLSearchParams(useLocation().search).get('id');
 	const initialLayer = index === null ? 0 : 1;
-	console.log(initialLayer);
 	const [layer, setLayer] = useState(initialLayer); // 0 - matchMaking button, 1 - waiting for opponent, 2 - game 
 
 	window.history.pushState = function () {
-		console.log("pushState", arguments);
 		socket.emit("leaveGame");
 	};
 
