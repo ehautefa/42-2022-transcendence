@@ -1,20 +1,23 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Match.css"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { GameWindowState } from "../../type";
 import { getSocketPong } from "../../App"
 import { Link } from "react-router-dom";
 
-const socket = getSocketPong();
 
 
 function Match() {
-	const emptyGames : GameWindowState[] = [];
-	const [games, setGames] = useState(emptyGames);
-	socket.emit("getGames", (games: GameWindowState[]) => {
-		console.log("Socket getGames", games);
-		setGames(games);
-	});
+	const socket = getSocketPong();
+	const [games, setGames] = useState([] as GameWindowState[]);
+
+	useEffect(() => {
+		console.log("RERERENDEr")
+		socket.emit("getGames", (games: GameWindowState[]) => {
+			setGames(games);
+			console.log(games);
+		});
+	}, []);
 
 
 	return (<>
@@ -33,19 +36,16 @@ function Match() {
 					</tr>
 				</thead>
 				<tbody>
-					{games.map((value) => {
-							return (<tr key="{value.id}">
-								<td>
-									<Link to={"./game?id=" + value.id}>Watch</Link>
-								</td>
-								<td>{value.playerLeftName}</td>
-								<td>{value.scoreLeft}</td>
-								<td>{value.playerRightName}</td>
-								<td>{value.scoreRight}</td>
-								<td>{value.begin}</td>
-							</tr>)
-					})}
-
+					{games.map((game) => (
+						<tr key={game.matchId}>
+							<td><Link to={"/game?id=" + game.matchId}>Watch</Link></td>
+							<td>{game.playerLeftName}</td>
+							<td>{game.scoreLeft}</td>
+							<td>{game.playerRightName}</td>
+							<td>{game.scoreRight}</td>
+							<td>{game.begin}</td>
+						</tr>)
+					)}
 				</tbody>
 			</table>
 		</div>

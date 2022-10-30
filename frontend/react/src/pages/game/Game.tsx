@@ -13,7 +13,6 @@ function Game() {
 	console.log(initialLayer);
 	const [layer, setLayer] = useState(initialLayer); // 0 - matchMaking button, 1 - waiting for opponent, 2 - game 
 
-	const orgPushState = window.history.pushState;
 	window.history.pushState = function () {
 		console.log("pushState", arguments);
 		socket.emit("leaveGame");

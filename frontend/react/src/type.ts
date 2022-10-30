@@ -21,7 +21,7 @@ export interface GameWindowState {
 	playerLeftName: string,
 	playerRightName: string,
 	scoreRight: number,
-	id: number,
+	matchId: number,
 	isGameOver: boolean,
 	begin: boolean,
 }

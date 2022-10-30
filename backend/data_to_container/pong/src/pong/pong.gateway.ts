@@ -10,6 +10,7 @@ import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { handlePaddleDto } from "./dto/handlePaddle.dto";
+import { SendAlertDto } from "src/status/dto/sendAlert.dto";
 
 
 @WebSocketGateway({ cors: 
@@ -86,6 +87,26 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.StatusGateway.sendInvitation(response);
 		console.log("GAME: ", game.matchId, "/n", game);
 		return game.matchId;
+	}
+
+	@SubscribeMessage('refuseInvite')
+	@UseGuards(JwtAuthGuard)
+	refuseInvite(@Req() req, @Body() matchId: string): void {
+		if (this.launch_game == true) {
+			this.launch_game = false;
+			this.GameLoop(); // start game loop
+		}
+		if (req.user.userUuid !== this.games.get(matchId).playerRightUid) {
+			console.log("ERROR: USER IS NOT THE INVITED ONE");
+			return;
+		} else {
+			var param: SendAlertDto = {
+				userUuid: this.games.get(matchId).playerLeftUid,
+				message: "Your opponent refused your invitation"
+			}
+			this.StatusGateway.sendAlert(param);
+			this.games.delete(matchId);
+		}
 	}
 
 	@SubscribeMessage('acceptInvite')

@@ -8,6 +8,7 @@ const socket = getSocketPong();
 function ReceivePopUp(modal: any) {
 	
 	function closePopup() {
+        socket.emit("refuseInvite", modal.modal.matchId);
 		document.getElementById("ReceivePopupBackground")!.style.display = "none";
     }
 	
