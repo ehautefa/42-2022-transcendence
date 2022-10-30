@@ -140,6 +140,8 @@ export class ChatService {
       .createQueryBuilder('room')
       .select('room.id', 'id')
       .addSelect('room.name', 'name')
+      .where('room.type = :public', { public: RoomType.PUBLIC })
+      .orWhere('room.type = :protected', { protected: RoomType.PROTECTED })
       .getRawMany();
     const joinedRoomId = await this.chatMembersRepository
       .createQueryBuilder('members')
