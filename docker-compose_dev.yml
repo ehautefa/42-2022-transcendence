@@ -37,7 +37,6 @@ services:
     env_file:
     - env/.env
     - env/urls.env
-    - env/api.env
     - env/pong.env
     - env/frontend.env
     ports:
@@ -60,7 +59,6 @@ services:
     - env/.env
     - env/.secret.env
     - env/urls.env
-    - env/api.env
     - env/backend.env
     - env/pong.env
     - env/postgres.env

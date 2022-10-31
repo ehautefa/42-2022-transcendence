@@ -12,10 +12,10 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService
     ) {
     super({
-      clientID: configService.get('REACT_APP_CLIENT_ID'),
+      clientID: configService.get('FT_CLIENT_ID'),
       clientSecret: configService.get('FT_CLIENT_SECRET'),
-      // callbackURL: configService.get('REACT_APP_REDIRECT_URI'),
-      callbackURL: 'https://localhost:4443/auth/login/'
+      callbackURL: configService.get('REDIRECT_URI'),
+      // callbackURL: 'https://localhost:4443/auth/login/'
       //verify function
     }, async (access_token, refreshToken, profile, done) => {
 
