@@ -86,7 +86,6 @@ export class AuthController {
             res.redirect(process.env.REACT_APP_HOME_PAGE + '/twoFa');
         else 
             res.redirect(process.env.REACT_APP_HOME_PAGE);
-        return `user : #${user.userName} is local logged-in`
     }
 
     @Post('2fa/generateQrCode')
