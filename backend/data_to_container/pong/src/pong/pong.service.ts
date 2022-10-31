@@ -44,6 +44,10 @@ export class PongService {
         }
     }
 
+    refuseInvite(matchId: string) {
+        this.MatchService.deleteMatch(matchId);
+    }
+
     async initGame(client1: playerDto, client2: playerDto): Promise<GameWindowState> {
         var client1_socket: string = client1.socket === undefined ? "" : client1.socket.id;
         var client2_socket: string = client2.socket === undefined ? "" : client2.socket.id;
