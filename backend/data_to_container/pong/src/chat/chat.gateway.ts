@@ -7,6 +7,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -30,7 +31,7 @@ import { SetAdminDto } from './dto/set-admin.dto';
 
 @UseGuards(JwtAuthGuard)
 // @UseGuards(RolesGuard)
-// @UseFilters(ChatExceptionFilter)
+@UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
     whitelist: true,
@@ -77,6 +78,7 @@ export class ChatGateway
   async createRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
     @Req() { user }: { user: user },
+    @ConnectedSocket() client: Socket,
   ): Promise<Room> {
     const newRoom: Room = await this.chatService.createRoom(
       createRoomDto,
@@ -88,17 +90,18 @@ export class ChatGateway
   }
 
   // @UseGuards(ProtectedRoomGuard)
-  @UseFilters(ChatExceptionFilter)
   @SubscribeMessage('joinRoom')
   async joinRoom(
     @MessageBody() joinRoomDto: JoinRoomDto,
     @Req() { user }: { user: user },
+    @ConnectedSocket() client: Socket,
   ) {
     const chatMember: ChatMember = await this.chatService.joinRoom(
       joinRoomDto,
       user,
     );
     this.server.socketsJoin(chatMember.room.id);
+    this.server.to(client.id).emit('updateRooms');
     this.logger.log(
       `User ${user.userUuid} is joining room ${joinRoomDto.roomId}`,
     );
