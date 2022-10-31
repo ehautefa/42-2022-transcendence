@@ -163,23 +163,21 @@ export class ChatService {
     return room;
   }
 
-  async joinRoom(joinRoomDto: JoinRoomDto, user: user): Promise<ChatMember> {
-    const room: Room = await this.roomsRepository.findOneOrFail({
-      where: { id: joinRoomDto.roomId },
-      select: { hash: true, id: true, type: true },
-    });
-    if (
-      room.type === RoomType.PROTECTED &&
-      !(await argon.verify(room.hash, joinRoomDto.password))
-    )
-      throw new WsException('Invalid password');
-    return await this.createChatMember(user, room);
-  }
-
   async findRoomByName(roomName: string): Promise<Room> {
     return await this.roomsRepository.findOneOrFail({
       where: { name: roomName },
     });
+  }
+
+  async joinRoom(joinRoomDto: JoinRoomDto, user: user): Promise<ChatMember> {
+    const room: Room = await this.findRoomById(joinRoomDto.roomId);
+    return await this.createChatMember(user, room);
+  }
+
+  async leaveRoom(userId: string, roomId: string): Promise<ChatMember> {
+    const chatMember: ChatMember = await this.findChatMember(userId, roomId);
+    this.roomsRepository.delete(chatMember);
+    return chatMember;
   }
 
   async findAllJoinedRooms(userId: string): Promise<ChatMember[]> {

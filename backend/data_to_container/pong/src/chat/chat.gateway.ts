@@ -157,6 +157,7 @@ export class ChatGateway
   // }
 
   // @Roles('owner', 'admin')
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
     console.log('setAdminDto = ', setAdminDto);
@@ -164,6 +165,7 @@ export class ChatGateway
   }
 
   // @Roles('owner')
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('giveOwnership')
   async changeOwnership(
     @MessageBody() giveOwnershipDto: DoubleUuidDto,
@@ -172,6 +174,7 @@ export class ChatGateway
   }
 
   // @Roles('owner')
+  // @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
     const room: Room = await this.chatService.deleteRoom(deleteRoomDto);
@@ -230,6 +233,19 @@ export class ChatGateway
     @Req() { user }: { user: user },
   ): Promise<Room[]> {
     return await this.chatService.findAllJoinableRooms(user.userUuid);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  async leaveRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<ChatMember> {
+    const chatMember: ChatMember = await this.chatService.leaveRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
+    this.server.to(chatMember.room.id).emit('updateRooms');
+    return chatMember;
   }
 
   @SubscribeMessage('findAllInvitableUsers')
