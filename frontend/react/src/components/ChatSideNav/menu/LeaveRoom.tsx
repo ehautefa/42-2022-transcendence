@@ -1,16 +1,16 @@
 import { useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
-// import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../App";
 
 
 function LeaveRoom({ room }: any) {
-    // const socketChat = getSocketChat();
+    const socket = getSocketChat();
     const [open, setOpen] = useState(false);
 
     function Yes() {
         setOpen(false);
-        // TO DO : Add a event leave room
+        socket.emit('leaveRoom', {uuid: room.id})
     }
 
     function No() {

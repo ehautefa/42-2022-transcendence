@@ -50,7 +50,7 @@ function ChatSideNav({ Room }: any) {
                 <button id="closeBtn" className="close" onClick={closeNav}>×</button>
                 <ul>
                     {/* All User */}
-                    <li><InviteUser /></li>
+                    <li><InviteUser room={Room}/></li>
                     <li><LeaveRoom room={Room} /></li>
                     {/* Admin */}
                     {amIAdmin &&

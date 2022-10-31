@@ -79,6 +79,11 @@ function Chat() {
                 setMembers(users);
             });
 		});
+
+		socket.on('updateThisRoom', (thisRoom: any) => {
+			setSelectedRoom(thisRoom);
+		});
+
 		return () => {
 			socket.off('updateRooms');
 			socket.off('updateMessages');
@@ -162,10 +167,10 @@ function Chat() {
 								onChange={(e: { target: { value: any; }; }) => setNewMessage(e.target.value)}
 								autoFocus
 								onKeyPress={event => {
-									if (event.key === 'Enter') { sendMessage() }
+									if (event.key === 'Enter') {}
 								}}
 								minLength={1} />
-							<button type="submit" className="mutedButton" onClick={sendMessage}>Send</button>
+							<button type="submit" className="mutedButton">Send</button>
 						</> : <>
 							<input type="text" id="message" name="username"
 								value={newMessage}
