@@ -2,7 +2,7 @@ import "./Game.css"
 import React from 'react'
 import { getSocketPong } from "../../App"
 import { Navigate } from "react-router-dom";
-import { Ball, Paddle, GameWindowState, ColorSelector, PaddleSizeSelector } from "./element"
+import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
 const socket = getSocketPong();
 
@@ -108,7 +108,6 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 					(<Navigate to="/endGame/lose" replace={true} />))
 			}
 			<>
-				<PaddleSizeSelector />
 				<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
 				<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
 				<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />

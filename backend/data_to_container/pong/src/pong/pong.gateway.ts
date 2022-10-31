@@ -183,6 +183,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('editPaddleSize')
+	@UseGuards(JwtAuthGuard)
+	editPaddleSize(@Req() req, @Body() size: string): void {
+		if ()
+	
+	}
+
 	@SubscribeMessage('handlePaddle')
 	@UseGuards(JwtAuthGuard)
 	handlePaddle(@Req() req, @Body() handlePaddle: handlePaddleDto): void {

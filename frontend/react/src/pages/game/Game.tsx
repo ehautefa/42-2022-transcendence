@@ -1,9 +1,10 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
 import { getSocketPong } from "../../App"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
+import { PaddleSizeSelector } from "./element";
 
 function Game() {
 	const socket = getSocketPong();
@@ -30,22 +31,28 @@ function Game() {
 		});
 	}
 
-	socket.on('beginGame', () => {
-		setLayer(2);
-	});
+	useEffect(() => {
+		socket.on('beginGame', () => {
+			setLayer(2);
+		});
+		return () => {
+			socket.off('beginGame');
+		}
+	}, [socket])
 
 	return (<>
 		<NavBar />
+		<PaddleSizeSelector />
 		<div className="mainComposantGame">
 			<GameWindow id={index} />
-			{ layer === 0 &&
+			{layer === 0 &&
 				<button
 					className="matchMakingButton"
 					onClick={() => matchMaking()}>
 					Find another player
 				</button>
 			}
-			{ layer === 1 &&
+			{layer === 1 &&
 				<div className="loader-container">
 					<div className="spinner"></div>
 				</div>
