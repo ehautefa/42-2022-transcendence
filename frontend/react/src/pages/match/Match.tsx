@@ -15,7 +15,7 @@ function Match() {
 		socket.emit("getGames", (games: GameWindowState[]) => {
 			setGames(games);
 		});
-	}, []);
+	}, [socket]);
 
 	return (<>
 		<NavBar />
