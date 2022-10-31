@@ -43,9 +43,9 @@ function Chat() {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms);
 			});
-			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, async (msgs: any) => {
+			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
-				var message = await document.getElementById('messages');
+				var message = document.getElementById('messages');
 				if (message)
 					message.scroll({
 						top: message.scrollHeight,
@@ -57,32 +57,35 @@ function Chat() {
                 setMembers(users);
             });
 		}
-	}, [socket, selectedRoom]);
-
-	socket.on('updateMessages', (updatedRoom: any) => {
-		console.log('XXXXXXXXXXXXXX');
-		if (selectedRoom && selectedRoom.id !== undefined 
-			&& selectedRoom.id !== "" && selectedRoom.id === updatedRoom) {
-			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
-				setMessages(msgs);
-				var message = document.getElementById('messages');
-				if (message)
-					message.scroll({
-						top: message.scrollHeight,
-						left: 0,
-						behavior: "smooth"
-					  })
-			});
-		}
-	});
-
-	socket.on('updateRooms', (rooms: any) => {
-		console.log('getting information');
-		socket.emit('findAllJoinedRooms', (rooms: any) => {
-			console.log("findAllJoined", rooms);
-			setChannels(rooms)
+		socket.on('updateMessages', (updatedRoom: any) => {
+			console.log('XXXXXXXXXXXXXX');
+			if (selectedRoom && selectedRoom.id !== undefined 
+				&& selectedRoom.id !== "" && selectedRoom.id === updatedRoom) {
+				socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
+					setMessages(msgs);
+					var message = document.getElementById('messages');
+					if (message)
+						message.scroll({
+							top: message.scrollHeight + 1,
+							left: 0,
+							behavior: "smooth"
+						  })
+				});
+			}
 		});
-	});
+	
+		socket.on('updateRooms', (rooms: any) => {
+			console.log('getting information');
+			socket.emit('findAllJoinedRooms', (rooms: any) => {
+				console.log("findAllJoined", rooms);
+				setChannels(rooms)
+			});
+		});
+		return () => {
+			socket.off('updateRooms');
+			socket.off('updateMessages');
+		}
+	}, [socket, selectedRoom]);
 
 	async function chooseRoom(thisRoom: Room) {
 		console.log("You chose room ", thisRoom);
