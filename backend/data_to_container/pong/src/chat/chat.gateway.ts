@@ -7,7 +7,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -59,7 +58,6 @@ export class ChatGateway
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
     @Req() { user }: { user: user },
-    @ConnectedSocket() client: Socket,
   ): Promise<Message> {
     const message: Message = await this.chatService.createMessage(
       createMessageDto,
@@ -67,7 +65,8 @@ export class ChatGateway
     );
     this.logger.debug('Creating a message');
     this.logger.debug(message.sender.room.id);
-    client.to(message.sender.room.id).emit('updateMessages');
+    console.log(message.sender.room.id);
+    this.server.in(message.sender.room.id).emit('updateMessages');
     // this.server.emit('updateRooms');
     return message;
   }

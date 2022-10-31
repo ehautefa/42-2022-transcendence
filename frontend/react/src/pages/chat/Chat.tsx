@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { User } from "../../type";
+import { useLocation } from 'react-router-dom';
 import { getSocketChat } from "../../App";
+import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import NavBar from "../../components/NavBar/NavBar";
+import { Room, User } from "../../type";
+import { getMe } from "../myProfile/request";
+import "./Chat.css";
 import JoinAgoraPopup from "./JoinAgoraPopup";
 import NewAgoraPopup from "./NewAgoraPopup";
-import { getMe } from "../myProfile/request"
-import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
-import "./Chat.css";
-import { Room } from "../../type";
-import { useLocation } from 'react-router-dom';
 
 function Chat() {
 	const socket = getSocketChat();
