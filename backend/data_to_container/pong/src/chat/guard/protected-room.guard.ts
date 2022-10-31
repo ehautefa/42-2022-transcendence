@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 import * as argon from 'argon2';
 import { Room } from 'src/bdd';
 import { ChatService } from '../chat.service';
@@ -11,6 +12,7 @@ export class ProtectedRoomGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const dto: JoinRoomDto | ChangePasswordDto = context.switchToWs().getData();
     const room: Room = await this.chatService.findRoomById(dto.roomId);
-    return await argon.verify(room.hash, dto.password);
+    if (await argon.verify(room.hash, dto.password)) return true;
+    throw new WsException('Invalid Password');
   }
 }
