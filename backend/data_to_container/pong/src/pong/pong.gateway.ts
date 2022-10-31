@@ -107,6 +107,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.StatusGateway.sendAlert(param);
 			this.games.delete(matchId);
 		}
+		this.PongService.refuseInvite(matchId);
 	}
 
 	@SubscribeMessage('acceptInvite')

@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateMatchDto } from './dto/createMatch.dto';
 import { SaveScoreDto } from './dto/saveScore.dto';
 import { UserService } from 'src/user/user.service';
+import { ArgUndefinedException } from 'src/exceptions/user.exception';
 
 
 @Injectable()
@@ -18,11 +19,10 @@ export class MatchService {
 
 	async getAllMatch(): Promise<match[]> {
 		return await this.MatchRepository.find({
-			relations: { // permet de recuperer les users
+			relations: {
 				user1: true,
 				user2: true
-			},
-		});
+			}});
 	}
 
 	async getMatch(matchId: string): Promise<match> {
@@ -30,6 +30,8 @@ export class MatchService {
 	}
 
 	async getMatchHistory(userName: string): Promise<match[]> {
+		if (!userName)
+			throw new ArgUndefinedException('userName');
 		return await this.MatchRepository.find({
 			relations: { // permet de recuperer les users
 				user1: true,
@@ -45,6 +47,8 @@ export class MatchService {
 	async createMatch(matchToCreate: CreateMatchDto): Promise<match> {
 		var user1: user = await this.userService.getUser(matchToCreate.user1uid);
 		var user2: user = await this.userService.getUser(matchToCreate.user2uid);
+		if (!user1 || !user2)
+			throw new ArgUndefinedException('user1 or user2');
 		return await this.MatchRepository.save({
 			user1: user1,
 			user2: user2,
@@ -53,8 +57,11 @@ export class MatchService {
 		});
 	}
 
+	async deleteMatch(matchId: string) {
+		await this.MatchRepository.delete({ matchId: matchId });
+	}
+
 	async endOfMatch(saveScore: SaveScoreDto): Promise<void> {
-		console.log("END OF MATCH", saveScore);
 		if (saveScore.score1 > saveScore.score2)
 			await this.userService.endOfMatch(saveScore.player2Uuid, saveScore.player1Uuid)
 		else

@@ -6,25 +6,22 @@ import { getSocketPong } from "../../App";
 const socket = getSocketPong();
 
 function ReceivePopUp(modal: any) {
-	
-	function close() {
+
+    function close() {
         socket.emit("refuseInvite", modal.modal.matchId);
-		document.getElementById("ReceivePopupBackground")!.style.display = "none";
+        document.getElementById("ReceivePopupBackground")!.style.display = "none";
     }
-	
+
     function joinGame() {
         socket.emit("acceptInvite", modal.modal.matchId);
         console.log("accept invite", modal.modal);
-		document.getElementById("ReceivePopupBackground")!.style.display = "none";
-
-		// navigate to game with good id
-        // window.history.pushState({}, "", "/game?id=" + modal.modal.matchId);
-        // window.location.reload();
+        document.getElementById("ReceivePopupBackground")!.style.display = "none";
+        window.location.href = "/game?id=" + modal.modal.matchId;
     }
-	
+
     return (<>
         <div id="ReceivePopupBackground">
-            <div id="ReceivePopup"> 
+            <div id="ReceivePopup">
                 <h2 id="rcv-h2">You receive an invitation from {modal.modal.username}</h2>
                 <div className="flex-but">
                     <button id="rcv-but" onClick={joinGame}>Join Game</button>

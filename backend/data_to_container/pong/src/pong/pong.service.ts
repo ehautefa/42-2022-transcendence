@@ -25,7 +25,6 @@ export class PongService {
             if ((game.playerLeft === clientId
                 || game.playerRight === clientId)
                 && game.begin === true) {
-                console.log("leaveGame", game);
                 if (game.isGameOver === false) {
                     if (game.playerLeft === clientId) {
                         server.to(game.playerRight).emit('leaveGame', game.playerLeftName);
@@ -42,6 +41,10 @@ export class PongService {
                 players.splice(i, 1);
             }
         }
+    }
+
+    refuseInvite(matchId: string) {
+        this.MatchService.deleteMatch(matchId);
     }
 
     async initGame(client1: playerDto, client2: playerDto): Promise<GameWindowState> {
@@ -72,7 +75,6 @@ export class PongService {
             user1uid: client1.userUuid, // user1 is client Left
             user2uid: client2.userUuid // user2 is client Right
         }).then(match => {
-            console.log("match created", match);
             game.matchId = match.matchId;
             if (client1.socket !== undefined)
                 client1.socket.join(match.matchId);
@@ -82,14 +84,45 @@ export class PongService {
         return game;
     }
 
+    hitLeftPaddle(game: GameWindowState): boolean {
+        if (game.ballX <= parseInt(process.env.PONG_PADDLE_LEFT_X)
+            && game.ballY >= game.paddleLeftY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
+            && game.ballY <= game.paddleLeftY + parseInt(process.env.PONG_PADDLE_SIZE))
+            return true;
+        return false;
+    }
+
+    hitRightPaddle(game: GameWindowState): boolean {
+        if (game.ballX >= parseInt(process.env.PONG_PADDLE_RIGHT_X)
+        && game.ballY >= game.paddleRightY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
+        && game.ballY <= game.paddleRightY + parseInt(process.env.PONG_PADDLE_SIZE))
+            return true;
+        return false;
+    }
+
+    hitBorder(game: GameWindowState): GameWindowState {
+        if (game.ballX <= parseInt(process.env.PONG_LEFT_LIM)) { // Check if the ball hits the left wall
+            game.scoreRight++;
+            game = this.endpoint(game);
+        } else if (game.ballX >= parseInt(process.env.PONG_RIGHT_LIM)) { // Check if the ball hits the right wall
+            game.scoreLeft++;
+            game = this.endpoint(game);
+        } else if (game.ballY <= parseInt(process.env.PONG_TOP_LIM)) { // Check if the ball hits the top wall
+            if (game.ballSpeedY < 0)
+                game.ballSpeedY = -game.ballSpeedY;
+        } else if (game.ballY >= parseInt(process.env.PONG_BOTTOM_LIM)) { // Check if the ball hits the bottom wall
+            if (game.ballSpeedY > 0)
+                game.ballSpeedY = -game.ballSpeedY;
+        }
+        return game;
+    }
+
+
     sendGametoRoom(game: GameWindowState): GameWindowState {
         game.ballX = game.ballX + game.ballSpeedX;
         game.ballY = game.ballY + game.ballSpeedY;
 
-        // Check if the ball hits the left paddle
-        if (game.ballX <= parseInt(process.env.PONG_PADDLE_LEFT_X)
-            && game.ballY >= game.paddleLeftY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
-            && game.ballY <= game.paddleLeftY + parseInt(process.env.PONG_PADDLE_SIZE)) {
+        if (this.hitLeftPaddle(game)) {
             if (game.ballSpeedX < 0
                 && game.ballY >= game.paddleLeftY - (parseInt(process.env.PONG_PADDLE_SIZE) - 1)  //- BALL_DIAM
                 && game.ballY <= game.paddleLeftY + (parseInt(process.env.PONG_PADDLE_SIZE) - 1))
@@ -103,11 +136,8 @@ export class PongService {
                 if (game.ballSpeedX < 0) // check if we have already hit the paddle
                     game.ballSpeedX = -game.ballSpeedX;
             }
-            console.log(game.matchId, ": Hit left paddle", game.ballX, game.ballY);
-        } // Check if the ball hits the right paddle
-        else if (game.ballX >= parseInt(process.env.PONG_PADDLE_RIGHT_X)
-            && game.ballY >= game.paddleRightY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
-            && game.ballY <= game.paddleRightY + parseInt(process.env.PONG_PADDLE_SIZE)) {
+        }
+        else if (this.hitRightPaddle(game)) {
             if (game.ballSpeedX > 0
                 && game.ballY >= game.paddleRightY - (parseInt(process.env.PONG_PADDLE_SIZE) - 1)  //- BALL_DIAM
                 && game.ballY <= game.paddleRightY + (parseInt(process.env.PONG_PADDLE_SIZE) - 1))
@@ -121,25 +151,8 @@ export class PongService {
                 if (game.ballSpeedX > 0) // chck if we have already hit the paddle
                     game.ballSpeedX = -game.ballSpeedX;
             }
-            console.log(game.matchId, ": Hit right paddle", game.ballX, game.ballY);
         } else {
-            if (game.ballX <= parseInt(process.env.PONG_LEFT_LIM)) { // Check if the ball hits the left wall
-                game.scoreRight++;
-                game = this.endpoint(game);
-                console.log(game.matchId, ": Hits the left wall", game.ballX);
-            } else if (game.ballX >= parseInt(process.env.PONG_RIGHT_LIM)) { // Check if the ball hits the right wall
-                game.scoreLeft++;
-                game = this.endpoint(game);
-                console.log(game.matchId, ": Hits the right wall", game.ballX);
-            } else if (game.ballY <= parseInt(process.env.PONG_TOP_LIM)) { // Check if the ball hits the top wall
-                if (game.ballSpeedY < 0)
-                    game.ballSpeedY = -game.ballSpeedY;
-                console.log(game.matchId, ": Hits the top wall", game.ballY);
-            } else if (game.ballY >= parseInt(process.env.PONG_BOTTOM_LIM)) { // Check if the ball hits the bottom wall
-                if (game.ballSpeedY > 0)
-                    game.ballSpeedY = -game.ballSpeedY;
-                console.log(game.matchId, ": Hits the bottom wall", game.ballY);
-            }
+            game = this.hitBorder(game);
         }
         return game;
     }
