@@ -176,6 +176,12 @@ export class ChatService {
 
   async leaveRoom(userId: string, roomId: string): Promise<ChatMember> {
     const chatMember: ChatMember = await this.findChatMember(userId, roomId);
+    if (chatMember.room.owner.id === chatMember.user.userUuid)
+      throw new WsException('You cannot leave a room you own');
+    if (chatMember.bannedTime && chatMember.bannedTime < new Date())
+      throw new WsException('You cannot leave a room you are banned from');
+    if (chatMember.mutedTime && chatMember.mutedTime < new Date())
+      throw new WsException('You cannot leave a room you are muted in');
     this.roomsRepository.delete(chatMember);
     return chatMember;
   }
