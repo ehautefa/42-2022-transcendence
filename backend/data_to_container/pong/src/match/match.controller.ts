@@ -35,7 +35,6 @@ export class MatchController {
 	@ApiResponse({ status: 200, description: 'Match History of the user', type: match})
 	@UsePipes(ValidationPipe)
 	async getMatchHistory(@Param('userName') userName : string) : Promise<match[]> {
-		console.log("GET MATCH HISTORY", userName);
 		return await this.MatchService.getMatchHistory(userName);
 	}
 }
