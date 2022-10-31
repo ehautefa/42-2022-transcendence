@@ -61,7 +61,6 @@ function Chat() {
             });
 		}
 		socket.on('updateMessages', (updatedRoom: any) => {
-			console.log('XXXXXXXXXXXXXX');
 			if (selectedRoom && selectedRoom.id !== undefined 
 				&& selectedRoom.id !== "" && selectedRoom.id === updatedRoom) {
 				socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
