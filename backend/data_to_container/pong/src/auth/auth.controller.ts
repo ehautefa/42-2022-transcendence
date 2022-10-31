@@ -82,8 +82,10 @@ export class AuthController {
     async login(@Res({ passthrough: true}) res : Response, @Req() {user} : {user:user}, @Body() tfaCode : LoginDto) {
         const access_token :string  = await this.authService.login(user, tfaCode.twoFactorAuthenticationCode);
         res.setHeader('Set-Cookie', [access_token]);
-        // if(user.twoFactorAuth)
-            // res.redirect('/2fa');
+        if(user.twoFactorAuth)
+            res.redirect(process.env.REACT_APP_HOME_PAGE + '/twoFa');
+        else 
+            res.redirect(process.env.REACT_APP_HOME_PAGE);
         return `user : #${user.userName} is local logged-in`
     }
 
