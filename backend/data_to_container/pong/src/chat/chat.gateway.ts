@@ -27,6 +27,7 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
+import { ProtectedRoomGuard } from './guard/protected-room.guard';
 
 @UseGuards(JwtAuthGuard)
 // @UseGuards(RolesGuard)
@@ -87,7 +88,7 @@ export class ChatGateway
     return newRoom;
   }
 
-  // @UseGuards(ProtectedRoomGuard)
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('joinRoom')
   async joinRoom(
     @MessageBody() joinRoomDto: JoinRoomDto,
@@ -173,7 +174,9 @@ export class ChatGateway
   // @Roles('owner')
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
-    return await this.chatService.deleteRoom(deleteRoomDto);
+    const room: Room = await this.chatService.deleteRoom(deleteRoomDto);
+    this.server.emit('updateRooms');
+    return room;
   }
 
   // @Roles('owner')

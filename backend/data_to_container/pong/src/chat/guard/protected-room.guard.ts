@@ -13,6 +13,6 @@ export class ProtectedRoomGuard implements CanActivate {
     const dto: JoinRoomDto | ChangePasswordDto = context.switchToWs().getData();
     const room: Room = await this.chatService.findRoomById(dto.roomId);
     if (await argon.verify(room.hash, dto.password)) return true;
-    throw new WsException('Invalid Password');
+    throw new WsException('Invalid password');
   }
 }

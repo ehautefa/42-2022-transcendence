@@ -168,10 +168,11 @@ export class ChatService {
       where: { id: joinRoomDto.roomId },
       select: { hash: true, id: true, type: true },
     });
-    if (room.type === RoomType.PROTECTED) {
-      if (!(await argon.verify(room.hash, joinRoomDto.password)))
-        throw new WsException('Invalid password');
-    }
+    if (
+      room.type === RoomType.PROTECTED &&
+      !(await argon.verify(room.hash, joinRoomDto.password))
+    )
+      throw new WsException('Invalid password');
     return await this.createChatMember(user, room);
   }
 
@@ -366,17 +367,6 @@ export class ChatService {
     const room: Room = await this.findRoomById(roomId.uuid);
     return await this.roomsRepository.remove(room);
   }
-
-  // async findAllRoomsToJoin(userId: string): Promise<ChatMember[]> {
-  //   const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
-  //     relations: { room: true, user: true },
-  //     select: { room: { id: true } },
-  //     where: { user: { userUuid: userId } },
-  //   });
-  //   this.logger.debug('Getting all rooms to join');
-  //   console.log(chatMembers);
-  //   return chatMembers;
-  // }
 
   async amIOwner(userId: string, roomId: string): Promise<boolean> {
     const room: Room = await this.roomsRepository.findOneOrFail({
