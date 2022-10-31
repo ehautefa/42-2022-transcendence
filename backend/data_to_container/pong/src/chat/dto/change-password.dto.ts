@@ -5,11 +5,9 @@ export class ChangePasswordDto {
   @IsUUID()
   roomId: string;
 
-  @IsNotEmpty()
   @IsString()
   password: string;
 
-  @IsNotEmpty()
   @IsString()
   newPassword: string;
 }

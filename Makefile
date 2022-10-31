@@ -16,7 +16,7 @@ stop:
 	$(DC) -f $(DC_FILE) down
 
 down:
-	$(DC) -f $(DC_FILE) down --volume
+	$(DC) -f $(DC_FILE) down
 
 re: down build
 

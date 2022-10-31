@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { readFileSync } from "fs";
-import { createServer } from 'https';
 import * as cookieParser from 'cookie-parser';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 

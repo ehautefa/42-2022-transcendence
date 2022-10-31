@@ -17,6 +17,7 @@ import Request from './pages/request/Request';
 import EditProfilePicture from './pages/myProfile/editProfilePicture';
 import NotFound from './pages/notFound/notFound';
 import { ModalProvider } from './context/modal-context';
+import TwoFa from './pages/twoFa/twoFa';
 
 const root = ReactDOM.createRoot(
 	document.getElementById('root') as HTMLElement
@@ -27,6 +28,7 @@ root.render(<>
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<App />} />
+				<Route path="/twoFa" element={<TwoFa />} />
 				<Route path="/mainPage" element={<MainPage />} />
 				<Route path="/game" element={<Game />} />
 				<Route path="/chat" element={<Chat />} />

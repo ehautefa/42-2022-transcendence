@@ -10,49 +10,56 @@ import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { handlePaddleDto } from "./dto/handlePaddle.dto";
+import { SendAlertDto } from "src/status/dto/sendAlert.dto";
 
-var games = new Map<string, GameWindowState>();
-var players = new Array<playerDto>();
-var launch_game = true;
 
 @WebSocketGateway({ cors: 
-					{
-						origin: process.env.REACT_APP_FRONT_URL,
-						methods: ["GET", "POST"],
-						credentials: true,
-					}, 
-					namespace: '/pong',
-				 }) // enable CORS everywhere
+	{
+		origin: process.env.REACT_APP_FRONT_URL,
+		methods: ["GET", "POST"],
+		credentials: true,
+	}, 
+	namespace: '/pong',
+}) // enable CORS everywhere
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 	private logger: Logger = new Logger('PongGateway');
 
+	games: Map<string, GameWindowState>;
+	players: playerDto[];
+	launch_game: boolean;
+	
 	@Inject(StatusGateway)
 	private readonly StatusGateway : StatusGateway;
-	constructor(private readonly PongService: PongService) {}
 
+	constructor(private readonly PongService: PongService) {
+		this.games = new Map<string, GameWindowState>();
+		this.players = new Array<playerDto>();
+		this.launch_game = true;
+	}
+	
 	@Interval(parseInt(process.env.PONG_INTERVAL_TIME))
 	GameLoop() {
-		for (let [key, value] of games) {
+		for (let [key, value] of this.games) {
 			if (!value.isGameOver && value.begin) {
 				this.sendGametoRoom(key);
 			}
 		}
 	}
-
+	
 	@SubscribeMessage('joinGame') // For spectator
 	@UseGuards(JwtAuthGuard)
 	joinGame(@Req() req, @Body() matchId: string): void {
 		req.join(matchId);
-		console.log("MAtchid ", matchId, games[matchId]);
-		if (games.get(matchId).playerLeftUid === req.user.userUuid)
-			games.get(matchId).playerLeft = req.id;
-		else if (games.get(matchId).playerRightUid === req.user.userUuid)
-			games.get(matchId).playerRight = req.id;
+		console.log("MAtchid ", matchId, this.games[matchId]);
+		if (this.games.get(matchId).playerLeftUid === req.user.userUuid)
+			this.games.get(matchId).playerLeft = req.id;
+		else if (this.games.get(matchId).playerRightUid === req.user.userUuid)
+			this.games.get(matchId).playerRight = req.id;
 
-		if (games.get(matchId).playerLeft !== "" && games.get(matchId).playerRight !== "") {
-			games.get(matchId).begin = true;
+		if (this.games.get(matchId).playerLeft !== "" && this.games.get(matchId).playerRight !== "") {
+			this.games.get(matchId).begin = true;
 			this.server.to(matchId).emit('beginGame');
 		}
 	}
@@ -64,7 +71,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let player1: playerDto = {
 			userUuid: req.user.userUuid,
 			userName: req.user.userName,
-			socket: req
+			socket: undefined
 		};
 		let player2: playerDto = {
 			userUuid: invitePlayer.invitedUserUuid,
@@ -73,8 +80,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		};
 		let game: GameWindowState;
 		game = await this.PongService.initGame(player1, player2);
-		games.set(game.matchId, game);
-		console.log("GAMES VALUES : ", games, games.values());
+		this.games.set(game.matchId, game);
 		let response: SendInviteDto = { matchId: game.matchId,
 			invitedUserName: invitePlayer.invitedUserName,
 			invitedUserUuid: invitePlayer.invitedUserUuid };
@@ -83,14 +89,34 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return game.matchId;
 	}
 
+	@SubscribeMessage('refuseInvite')
+	@UseGuards(JwtAuthGuard)
+	refuseInvite(@Req() req, @Body() matchId: string): void {
+		if (this.launch_game == true) {
+			this.launch_game = false;
+			this.GameLoop(); // start game loop
+		}
+		if (req.user.userUuid !== this.games.get(matchId).playerRightUid) {
+			console.log("ERROR: USER IS NOT THE INVITED ONE");
+			return;
+		} else {
+			var param: SendAlertDto = {
+				userUuid: this.games.get(matchId).playerLeftUid,
+				message: "Your opponent refused your invitation"
+			}
+			this.StatusGateway.sendAlert(param);
+			this.games.delete(matchId);
+		}
+	}
+
 	@SubscribeMessage('acceptInvite')
 	@UseGuards(JwtAuthGuard)
 	acceptInvite(@Req() req, @Body() matchId: string): void {
-		if (launch_game == true) {
-			launch_game = false;
+		if (this.launch_game == true) {
+			this.launch_game = false;
 			this.GameLoop(); // start game loop
 		}
-		if (req.user.userUuid !== games.get(matchId).playerRightUid) {
+		if (req.user.userUuid !== this.games.get(matchId).playerRightUid) {
 			console.log("ERROR: USER IS NOT THE INVITED ONE");
 			return;
 		}
@@ -106,23 +132,23 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			socket: req
 		};
 		let game: GameWindowState;
-		if (launch_game == true) {
-			launch_game = false;
+		if (this.launch_game == true) {
+			this.launch_game = false;
 			this.GameLoop(); // start game loop
 		}
-		if (players.length == 0) { // no player in the queue
-			players.push(player);
-			console.log("Player added to queue", players);
+		if (this.players.length == 0) { // no player in the queue
+			this.players.push(player);
+			console.log("Player added to queue", this.players);
 			return "";
 		} else {
-			for (var i: number = 0; i < players.length; i++) {
-				if (players[i].userUuid == player.userUuid) { // player already in the queue
+			for (var i: number = 0; i < this.players.length; i++) {
+				if (this.players[i].userUuid == player.userUuid) { // player already in the queue
 					console.log("Player already in queue");
 					return "";
 				}
 			}
-			game = await this.PongService.initGame(player, players.shift());
-			games.set(game.matchId, game);
+			game = await this.PongService.initGame(player, this.players.shift());
+			this.games.set(game.matchId, game);
 			this.server.to(game.matchId).emit('beginGame');
 			console.log("GAME: ", game.matchId, "/n", game);
 		}
@@ -133,13 +159,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('getGames')
 	@UseGuards(JwtAuthGuard)
 	getGames() : GameWindowState[] {
-		return Array.from(games.values());
+		return Array.from(this.games.values());
 	}
 
 	sendGametoRoom(matchId: string) {
 		if (matchId == undefined)
 			return;
-		let game: GameWindowState = games.get(matchId);
+		let game: GameWindowState = this.games.get(matchId);
 		if (game.matchMaking == false) {
 			try {
 				this.server.to(matchId).emit('game', game);
@@ -159,26 +185,23 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('handlePaddle')
 	@UseGuards(JwtAuthGuard)
 	handlePaddle(@Req() req, @Body() handlePaddle: handlePaddleDto): void {
-		games[handlePaddle.matchId] = this.PongService.handlePaddle(games.get(handlePaddle.matchId),
+		this.games[handlePaddle.matchId] = this.PongService.handlePaddle(this.games.get(handlePaddle.matchId),
 																	handlePaddle.deltaPaddle,
 																	req.user.userUuid);
 	}
 
+	@SubscribeMessage('leaveGame')
+	@UseGuards(JwtAuthGuard)
+	leaveGame(@Req() req): void {
+		console.log("LEAVE GAME");
+		this.PongService.leaveGame(req.id, this.server,  this.games, this.players);
+	}
+
+
 	handleDisconnect(client: Socket) {
-		this.logger.log(`Client disconnected: ${client.id}`);
-		for (let game of games.values()) {
-			if (game.playerLeft === client.id || game.playerRight === client.id) {
-				if (game.playerLeft === client.id) {
-					this.server.to(game.matchId).emit('leaveGame', game.playerLeftName);
-				} else {
-					this.server.to(game.matchId).emit('leaveGame', game.playerRightName);
-				}
-				if (game.begin === true) {
-					console.log("DELETING GAME", game.matchId);
-					games.delete(game.matchId);
-				}
-			}
-		}
+        this.logger.log(`Client disconnected: ${client.id}`);
+		this.PongService.leaveGame(client.id, this.server,  this.games, this.players);
+		
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {

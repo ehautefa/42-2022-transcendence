@@ -240,15 +240,6 @@ export class UserController {
 			res.sendFile(join(process.cwd(), `uploads/default_avatar.png`));
 		}
 	}
-
-	@Get('allPictures')
-	@UseGuards(JwtAuthGuard)
-	@ApiOperation({ summary: 'Get all pictures' })
-	async getAllPictures(@Req() req, @Res() res) {
-		// TO DO
-
-	}
-
 	
 	@Get('picture/:userUid')
 	@ApiOperation({ summary: 'Get picture of user' })

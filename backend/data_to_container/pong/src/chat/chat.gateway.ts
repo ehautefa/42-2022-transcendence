@@ -7,6 +7,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -17,34 +18,30 @@ import {
 import { Server, Socket } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
-import { DeepPartial } from 'typeorm';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { Authorized } from './decorator/authorized.decorator';
-import { Roles } from './decorator/roles.decorator';
 import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { GiveOwnershipDto } from './dto/give-ownership.dto';
+import { DoubleUuidDto } from './dto/double-uuid';
+import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
+import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
-import { StringDto } from './dto/string.dto';
-import { AuthorizedGuard } from './guard/authorized.guard';
-import { ProtectedRoom } from './guard/protected-room.guard';
-import { RolesGuard } from './guard/roles.guard';
 
 @UseGuards(JwtAuthGuard)
-@UseGuards(RolesGuard)
-@UseGuards(AuthorizedGuard)
-// @UseInterceptors(FilterHashInterceptor)
-@UseFilters(ChatExceptionFilter)
+// @UseGuards(RolesGuard)
+// @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
     whitelist: true,
     // forbidNonWhitelisted: true,
   }),
 )
-@WebSocketGateway({ cors: { origin: process.env.REACT_APP_FRONT_URL, credentials: true }, namespace: 'chat' })
+@WebSocketGateway({
+  cors: { origin: process.env.REACT_APP_FRONT_URL, credentials: true },
+  namespace: 'chat',
+})
 export class ChatGateway
   implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
 {
@@ -57,29 +54,30 @@ export class ChatGateway
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatGateway');
 
-  @Authorized('notBanned', 'notBlocked', 'notMuted')
+  // @Authorized('notBanned', 'notBlocked', 'notMuted')
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
     @Req() { user }: { user: user },
-  ): Promise<string> {
-    const roomId: string = await this.chatService.createMessage(
+    @ConnectedSocket() client: Socket,
+  ): Promise<Message> {
+    const message: Message = await this.chatService.createMessage(
       createMessageDto,
       user,
     );
     this.logger.debug('Creating a message');
-    // console.log(message);
-    this.server.to(roomId).emit('updateMessages');
-    this.server.emit('updateRooms');
-    return roomId;
+    this.logger.debug(message.sender.room.id);
+    client.to(message.sender.room.id).emit('updateMessages');
+    // this.server.emit('updateRooms');
+    return message;
   }
 
   @SubscribeMessage('createRoom')
   async createRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
     @Req() { user }: { user: user },
-  ): Promise<DeepPartial<Room>> {
-    const newRoom: DeepPartial<Room> = await this.chatService.createRoom(
+  ): Promise<Room> {
+    const newRoom: Room = await this.chatService.createRoom(
       createRoomDto,
       user,
     );
@@ -88,15 +86,26 @@ export class ChatGateway
     return newRoom;
   }
 
-  @Authorized('notBanned')
+  // @UseGuards(ProtectedRoomGuard)
+  @UseFilters(ChatExceptionFilter)
   @SubscribeMessage('joinRoom')
-  async joinRoom(@MessageBody() joinRoomDto: UuidDto) {
-    this.logger.debug('pouet');
-    const room: Room = await this.chatService.findRoomById(joinRoomDto.uuid);
-    this.server.socketsJoin(room.id);
-    return room;
+  async joinRoom(
+    @MessageBody() joinRoomDto: JoinRoomDto,
+    @Req() { user }: { user: user },
+  ) {
+    const chatMember: ChatMember = await this.chatService.joinRoom(
+      joinRoomDto,
+      user,
+    );
+    this.server.socketsJoin(chatMember.room.id);
+    this.logger.log(
+      `User ${user.userUuid} is joining room ${joinRoomDto.roomId}`,
+    );
+
+    return chatMember;
   }
 
+  /*
   @Authorized('notBanned')
   @SubscribeMessage('joinPrivateRoom')
   async joinPrivateRoom(@MessageBody() joinPrivateRoomDto: StringDto) {
@@ -106,94 +115,182 @@ export class ChatGateway
     this.server.socketsJoin(room.id);
     return room;
   }
+  */
 
-  @Authorized('notBlocked')
+  // @Authorized('notBlocked')
+  //return the room id
   @SubscribeMessage('joinDMRoom')
   async joinDMRoom(
-    @MessageBody() joinDMRoomDto: UuidDto,
+    @MessageBody() recipiendId: UuidDto,
     @Req() { user }: { user: user },
-  ): Promise<Room> {
-    const room: Room = await this.chatService.joinDMRoom(user, joinDMRoomDto);
-    this.server.socketsJoin(joinDMRoomDto.uuid);
-    return room;
+  ): Promise<string> {
+    const room: Room = await this.chatService.joinDMRoom(
+      user,
+      recipiendId.uuid,
+    );
+    this.server.socketsJoin(room.id);
+    return room.id;
   }
 
-  @Authorized('notBanned')
+  // @Authorized('notBanned')
   @SubscribeMessage('findAllMessagesInRoom')
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
+    console.log('bonjour');
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
-    // console.log(messages);
     return messages;
   }
 
-  @Authorized('notBanned')
-  @SubscribeMessage('findLastMessageInRoom')
-  async findLastMessageInRoom(
-    @MessageBody() findLastMessageInRoomDto: UuidDto,
-  ): Promise<Message> {
-    return await this.chatService.findLastMessageInRoom(
-      findLastMessageInRoomDto,
-    );
-  }
+  // @Authorized('notBanned')
+  // @SubscribeMessage('findLastMessageInRoom')
+  // async findLastMessageInRoom(
+  //   @MessageBody() findLastMessageInRoomDto: UuidDto,
+  // ): Promise<Message> {
+  //   return await this.chatService.findLastMessageInRoom(
+  //     findLastMessageInRoomDto,
+  //   );
+  // }
 
-  @Roles('owner', 'admin')
+  // @Roles('owner', 'admin')
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
+    console.log('setAdminDto = ', setAdminDto);
     return await this.chatService.setAdmin(setAdminDto);
   }
 
-  @Roles('owner')
+  // @Roles('owner')
   @SubscribeMessage('giveOwnership')
   async changeOwnership(
-    @MessageBody() giveOwnershipDto: GiveOwnershipDto,
+    @MessageBody() giveOwnershipDto: DoubleUuidDto,
   ): Promise<Room> {
     return await this.chatService.giveOwnership(giveOwnershipDto);
   }
 
-  @Roles('owner')
+  // @Roles('owner')
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
     return await this.chatService.deleteRoom(deleteRoomDto);
   }
 
-  @Roles('owner')
-  @UseGuards(ProtectedRoom)
+  // @Roles('owner')
+  // @UseGuards(ProtectedRoom)
   @SubscribeMessage('changePassword')
   async changePassword(
     @MessageBody() changePasswordDto: ChangePasswordDto,
   ): Promise<Room> {
+    this.logger.debug('Change Password');
+    console.log(changePasswordDto);
     return await this.chatService.changePassword(changePasswordDto);
   }
 
-  @Roles('admin')
+  // @Roles('admin')
+  @SubscribeMessage('punishUser')
   async punishUser(
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
     return await this.chatService.punishUser(punishUserDto);
   }
 
-  @Roles('admin')
+  // @Roles('admin')
+  @SubscribeMessage('removePunishment')
   async removePunishment(
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
+    console.log('removePunishmentDto = ', removePunishmentDto);
     return await this.chatService.removePunishment(removePunishmentDto);
   }
 
-  @SubscribeMessage('findAllPublicRooms')
-  async findAllPublicRooms(): Promise<DeepPartial<Room>[]> {
-    return await this.chatService.findAllPublicRooms();
+  @SubscribeMessage('findAllJoinedRooms')
+  async findAllJoinedRooms(
+    @Req() { user }: { user: user },
+  ): Promise<ChatMember[]> {
+    return await this.chatService.findAllJoinedRooms(user.userUuid);
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
-    // const user = { id: 'mock' };
+  @SubscribeMessage('findAllUsersInRoom')
+  async findAllUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ) {
+    return await this.chatService.findAllUsersInRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
+  }
+
+  @SubscribeMessage('findAllJoinableRooms')
+  async findAllPublicOrProtectedRooms(
+    @Req() { user }: { user: user },
+  ): Promise<Room[]> {
+    return await this.chatService.findAllJoinableRooms(user.userUuid);
+  }
+
+  @SubscribeMessage('findAllInvitableUsers')
+  async findAllInvitableUsers(@MessageBody() roomId: UuidDto): Promise<user[]> {
+    return await this.chatService.findAllInvitableUsers(roomId.uuid);
+  }
+
+  @SubscribeMessage('filterByAdminRightsInRoom')
+  async findAdminsInRoom(
+    @MessageBody() filterByAdminRightsDto: FilterByAdminRightsDto,
+    @Req() { user }: { user: user },
+  ): Promise<ChatMember[]> {
+    return await this.chatService.filterByAdminRightsInRoom(
+      filterByAdminRightsDto,
+      user.userUuid,
+    );
+  }
+
+  @SubscribeMessage('findBannedUsersInRoom')
+  async findBannedUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+  ): Promise<ChatMember[]> {
+    return await this.chatService.findBannedUsersInRoom(roomId.uuid);
+  }
+
+  @SubscribeMessage('amIAdmin')
+  async amIAdmin(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<boolean> {
+    return await this.chatService.amIAdmin(user.userUuid, roomId.uuid);
+  }
+
+  @SubscribeMessage('amIOwner')
+  async amIOwner(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<boolean> {
+    return await this.chatService.amIOwner(user.userUuid, roomId.uuid);
+  }
+
+  @SubscribeMessage('findMutedUsersInRoom')
+  async findMutedUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+  ): Promise<ChatMember[]> {
+    return await this.chatService.findMutedUsersInRoom(roomId.uuid);
+  }
+
+  async handleConnection(client: Socket): Promise<void> {
     this.logger.debug(`client connected: ${client.id}`);
-    if (client.handshake.headers.cookie)
-      this.logger.debug('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH!!!');
+    const cookie: string = client.handshake.headers.cookie;
+    if (cookie && cookie.includes('access_token=')) {
+      const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
+        client.handshake.headers.cookie,
+      );
+      for (const room of roomsToJoin) {
+        this.server.socketsJoin(room.room.id);
+      }
+    }
   }
 
-  handleDisconnect(client: Socket) {}
+  handleDisconnect(client: Socket): void {
+    const roomsToLeave: Set<string> = client.rooms;
+    roomsToLeave.forEach((room) => {
+      this.server.socketsLeave(room);
+    });
+  }
 }

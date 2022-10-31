@@ -4,10 +4,10 @@ import {
   Catch,
   Logger,
 } from '@nestjs/common';
-import { BaseWsExceptionFilter } from '@nestjs/websockets';
+import { BaseWsExceptionFilter, WsException } from '@nestjs/websockets';
 import { QueryFailedError } from 'typeorm';
 
-@Catch(BadRequestException, QueryFailedError)
+@Catch(BadRequestException, QueryFailedError, WsException)
 export class ChatExceptionFilter extends BaseWsExceptionFilter {
   private logger: Logger = new Logger('ChatException');
   catch(exception: Error, host: ArgumentsHost) {
@@ -23,6 +23,9 @@ export class ChatExceptionFilter extends BaseWsExceptionFilter {
       console.error(exception.message);
       // const error: WsException = new WsException(exception.message);
       // super.catch(error, host);
+    }
+    if (exception instanceof WsException) {
+      super.catch(exception, host);
     }
   }
 }

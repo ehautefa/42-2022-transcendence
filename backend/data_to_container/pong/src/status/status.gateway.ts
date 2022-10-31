@@ -27,6 +27,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	server: Server;
 	private logger: Logger = new Logger('StatusGateway')
 
+
 	@SubscribeMessage('getUserUuid')
 	@UseGuards(JwtAuthGuard)
 	getUserUid(@Req() req): void {

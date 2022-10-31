@@ -3,7 +3,6 @@ import './App.css';
 import { io } from 'socket.io-client'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
-import FormCode2FAPopUp from './components/FormCode2FAPopUp/FormCode2FAPopUp';
 
 // Create my socket
 let socketOptions = {
@@ -63,7 +62,6 @@ export default function App() {
 	});
 	return (<>
 		<div className='login'>		
-			<FormCode2FAPopUp />
 			<a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a>
 			<div className='createUser'>
 				<h5>Or use a local profile : </h5>

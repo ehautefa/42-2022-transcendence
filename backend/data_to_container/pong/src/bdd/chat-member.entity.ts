@@ -22,10 +22,10 @@ export class ChatMember {
   messages: Message[];
 
   @Column('timestamp', { nullable: true })
-  bannedTime: number;
+  bannedTime: Date | boolean;
 
   @Column('timestamp', { nullable: true })
-  mutedTime: number;
+  mutedTime: Date | boolean;
 
   @Column('boolean', { default: false })
   isAdmin: boolean;

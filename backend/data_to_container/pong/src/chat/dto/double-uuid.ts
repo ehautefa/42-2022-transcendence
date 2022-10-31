@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class GiveOwnershipDto {
+export class DoubleUuidDto {
   @IsNotEmpty()
   @IsUUID()
   userId: string;

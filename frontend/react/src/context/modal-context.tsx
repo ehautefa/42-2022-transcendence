@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Context } from 'vm';
+import { getSocketChat, getSocketStatus } from "../App";
 import ReceivePopUp from '../components/ReceivePopUp/ReceivePopUp';
-import { getSocketStatus } from "../App"
 
 const ModalContext = React.createContext({});
 const socket = getSocketStatus();
@@ -36,6 +36,7 @@ const useModal = (): Context => {
 
 const ModalProvider = (props: any) => {
 	const [modal, setModal] = useState();
+	const socketChat = getSocketChat();
 
 	socket.on('sendInvite', (data: any) => {
 		console.log("INVITE PLAYER ON", data);
@@ -52,6 +53,10 @@ const ModalProvider = (props: any) => {
 		console.log("UNAUTHORIZED");
 		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
 	})
+	socketChat.on('exception', (msg: any) => {
+		console.log("EXCEPTION");
+		alert(msg.message);
+	})
 	const unSetModal = useCallback(() => {
 		setModal(undefined);
 	}, [setModal])
@@ -64,4 +69,5 @@ const ModalProvider = (props: any) => {
 	);
 }
 
-export { ModalProvider, useModal }
+export { ModalProvider, useModal };
+

@@ -1,0 +1,17 @@
+.RoomTypeSelector {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.RoomTypeSelector .room-type-selector-flex {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

@@ -8,53 +8,78 @@ export class PongService {
     @Inject(MatchService)
     private readonly MatchService: MatchService;
 
-    handlePaddle(game: GameWindowState, deltaPaddleY: number, userUuid : string) : GameWindowState {
-		if (userUuid == game.playerLeftUid) {
-			if (game.paddleLeftY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleLeftY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
-				game.paddleLeftY += deltaPaddleY;
-		}
-		else if (userUuid == game.playerRightUid) {
-			if (game.paddleRightY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleRightY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
-				game.paddleRightY += deltaPaddleY;
-		}
+    handlePaddle(game: GameWindowState, deltaPaddleY: number, userUuid: string): GameWindowState {
+        if (userUuid == game.playerLeftUid) {
+            if (game.paddleLeftY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleLeftY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
+                game.paddleLeftY += deltaPaddleY;
+        }
+        else if (userUuid == game.playerRightUid) {
+            if (game.paddleRightY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleRightY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
+                game.paddleRightY += deltaPaddleY;
+        }
         return game;
     }
 
-    async initGame(client1: playerDto, client2: playerDto) : Promise<GameWindowState> {
-		var client2_socket:string = client2.socket === undefined ? "" : client2.socket.id;
-		var game: GameWindowState = {
-			matchId: undefined,
-			playerLeftUid: client1.userUuid,
+    leaveGame(clientId: string, server: any, games: Map<string, GameWindowState>, players: playerDto[]) {
+        for (let game of games.values()) {
+            if ((game.playerLeft === clientId
+                || game.playerRight === clientId)
+                && game.begin === true) {
+                console.log("leaveGame", game);
+                if (game.isGameOver === false) {
+                    if (game.playerLeft === clientId) {
+                        server.to(game.playerRight).emit('leaveGame', game.playerLeftName);
+                    } else {
+                        server.to(game.playerLeft).emit('leaveGame', game.playerRightName);
+                    }
+                }
+                console.log("DELETING GAME", game.matchId);
+                games.delete(game.matchId);
+            }
+        }
+        for (let i = 0; i < players.length; i++) {
+            if (players[i].socket.id === clientId) {
+                players.splice(i, 1);
+            }
+        }
+    }
+
+    async initGame(client1: playerDto, client2: playerDto): Promise<GameWindowState> {
+        var client1_socket: string = client1.socket === undefined ? "" : client1.socket.id;
+        var client2_socket: string = client2.socket === undefined ? "" : client2.socket.id;
+        var game: GameWindowState = {
+            matchId: undefined,
+            playerLeftUid: client1.userUuid,
             playerLeftName: client1.userName,
-			playerLeft: client1.socket.id,
-			playerRightUid: client2.userUuid,
+            playerLeft: client1_socket,
+            playerRightUid: client2.userUuid,
             playerRightName: client2.userName,
-			playerRight: client2_socket,
-			ballY: parseInt(process.env.PONG_POS_BALL_Y),
-			ballX: parseInt(process.env.PONG_POS_BALL_X),
-			// randomly choose the direction
-			ballSpeedX: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
-			ballSpeedY: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
-			scoreLeft: 0,
-			scoreRight: 0,
-			paddleLeftY: 50,
-			paddleRightY: 50,
-			isGameOver: false,
-			matchMaking: true,
+            playerRight: client2_socket,
+            ballY: parseInt(process.env.PONG_POS_BALL_Y),
+            ballX: parseInt(process.env.PONG_POS_BALL_X),
+            // randomly choose the direction
+            ballSpeedX: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
+            ballSpeedY: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
+            scoreLeft: 0,
+            scoreRight: 0,
+            paddleLeftY: 50,
+            paddleRightY: 50,
+            isGameOver: false,
+            matchMaking: true,
             begin: false,
-		};
-		await this.MatchService.createMatch({
-			user1uid: client1.userUuid, // user1 is client Left
-			user2uid: client2.userUuid // user2 is client Right
-		}).then(match => {
-			console.log("match created", match);
-			game.matchId = match.matchId;
-			if (client1 !== undefined)
-				client1.socket.join(match.matchId);
-			if (client2.socket !== undefined)
-				client2.socket.join(match.matchId);
-		});
-		return game;
+        };
+        await this.MatchService.createMatch({
+            user1uid: client1.userUuid, // user1 is client Left
+            user2uid: client2.userUuid // user2 is client Right
+        }).then(match => {
+            console.log("match created", match);
+            game.matchId = match.matchId;
+            if (client1.socket !== undefined)
+                client1.socket.join(match.matchId);
+            if (client2.socket !== undefined)
+                client2.socket.join(match.matchId);
+        });
+        return game;
     }
 
     sendGametoRoom(game: GameWindowState): GameWindowState {
@@ -120,28 +145,28 @@ export class PongService {
     }
 
     endpoint(game: GameWindowState): GameWindowState {
-		game.ballX = parseInt(process.env.PONG_POS_BALL_X);
-		if (game.scoreLeft == parseInt(process.env.PONG_END_SCORE) || game.scoreRight == parseInt(process.env.PONG_END_SCORE)) {
-			game.ballY = parseInt(process.env.PONG_POS_BALL_Y);
-			game.ballSpeedX = 0;
-			game.ballSpeedY = 0;
-			if (game.isGameOver == false) {
-				this.MatchService.endOfMatch({
-					player1Uuid: game.playerLeftUid,
-					player2Uuid: game.playerRightUid,
-					score1: game.scoreLeft,
-					score2: game.scoreRight,
-					matchId: game.matchId
-				})
-			}
-            
-			game.isGameOver = true;
-		} else {
-			game.ballY = Math.random() * 80 + 10;
-			game.ballSpeedX = parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1);
-			game.ballSpeedY = parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1);
-		}
+        game.ballX = parseInt(process.env.PONG_POS_BALL_X);
+        if (game.scoreLeft == parseInt(process.env.PONG_END_SCORE) || game.scoreRight == parseInt(process.env.PONG_END_SCORE)) {
+            game.ballY = parseInt(process.env.PONG_POS_BALL_Y);
+            game.ballSpeedX = 0;
+            game.ballSpeedY = 0;
+            if (game.isGameOver == false) {
+                this.MatchService.endOfMatch({
+                    player1Uuid: game.playerLeftUid,
+                    player2Uuid: game.playerRightUid,
+                    score1: game.scoreLeft,
+                    score2: game.scoreRight,
+                    matchId: game.matchId
+                })
+            }
+
+            game.isGameOver = true;
+        } else {
+            game.ballY = Math.random() * 80 + 10;
+            game.ballSpeedX = parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1);
+            game.ballSpeedY = parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1);
+        }
         return game;
-	}
+    }
 
 }

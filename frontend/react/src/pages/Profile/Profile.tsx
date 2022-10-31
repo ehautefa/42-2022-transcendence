@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
+import { getSocketChat } from "../../App";
 
 function Profile() {
 
@@ -63,13 +64,23 @@ function Profile() {
 		}
 	}
 
+	function writeDM() {
+		const socketChat = getSocketChat();
+		socketChat.emit("joinDMRoom", {uuid: user.userUuid}, (roomId: string) => {
+			console.log("roomId", roomId);
+			window.location.href = "/chat?room=" + roomId;
+		});
+	}
+
 
 	return (<>
 		<NavBar />
 		<div className="mainComposantProfile">
 			<div className="flex">
 				<div className="info container">
-					<h3>Profile</h3>
+					<div className="flex-message">
+						<h3>Profile</h3>
+					</div>
 					<ul>
 						<li className="flex-li">
 							<div className="Username">Username : {user.userName}</div>
@@ -78,10 +89,11 @@ function Profile() {
 						<li>Wins : {user.wins}</li>
 						<li>Losses : {user.losses}</li>
 					</ul>
+					<button className="enable" onClick={writeDM}>Write message</button>
 					{
 						isMyFriend ?
-							<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
-							: ( invitationSent ?
+						<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
+						: ( invitationSent ?
 							<button className="enable unclickable">Invitation sent</button>
 							: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
 							)

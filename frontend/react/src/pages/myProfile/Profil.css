@@ -32,7 +32,7 @@
 	width: 85%;
 	padding: 0 10px;
 	margin: 20px auto;
-	max-height: 300px;
+	max-height: 400px;
 	overflow-y: scroll;
 }
 
@@ -70,6 +70,7 @@
 .mainComposantProfile .info .enable {
 	font-size: 15px;
 	width: 100%;
+	max-width: 500px;
 	margin: 0 auto 10px;
 }
 
@@ -115,6 +116,7 @@
 }
 
 @media screen and (min-width: 600px) {
+	.mainComposantProfile .flex .write-messa
 
 	.mainComposantProfile {
 		width: 80%;
@@ -142,7 +144,6 @@
 	.mainComposantProfile .info button {
 		margin-left: 50%;
 		width: 50%;
-		cursor: pointer;
 	}
 
 	.mainComposantProfile .info button:hover {
@@ -150,7 +151,7 @@
 	}
 
 	.mainComposantProfile .ppFriends {
-		width: 30%;
+		width: 40%;
 		aspect-ratio: 1 / 1;
 		margin: 50px;
 	}

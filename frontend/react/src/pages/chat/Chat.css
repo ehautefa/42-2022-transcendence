@@ -1,9 +1,3 @@
-body {
-    background-color: #250021;
-    background-image: url("../../../public/synthwave-wallpaper.jpg");
-    background-repeat: no-repeat;
-}
-
 .mainComposant {
     width: 80%;
     height: 80vh;
@@ -13,31 +7,45 @@ body {
 }
 
 .channel {
-    width: 94%;
+    width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: 5px;
     outline: none;
-    padding: 0.5rem;
     color: #fae3fa;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
+    overflow-y: scroll;
 }
 
 .channel li{
+    list-style-type: none;
     font-size: 0.8rem;
-    width: 93%;
-    padding: 10px 10px;
-    outline:rgb(80, 80, 80);
-    margin-top: 10px;
-    border-radius: 5px;
+    width: 95%;
+    padding: 10px;
     background-color: rgba(0, 0, 0, 0.5);
-    box-shadow: 3px 3px 6px #000;
-    color: #fef45b;
+    color: #DBACE3; 
+    box-shadow: 5px 0px 5px #7C4D84;
     font-weight: bold;
+}
 
+.channel .selectedRoom {
+    border: 1px solid #fef45b;
+    box-shadow: 0px 0px 10px #fef45b;
 }
 
 .channel li:hover {
-    text-shadow: 1px 1px 1px #FA0197;
-    box-shadow: 5px 5px 10px rgb(41, 38, 38);
+    background-color: rgba(0, 0, 0, 0.9);
+    box-shadow: 5px 0px 10px #DBACE3;
+}
+
+.channel li button {
+    position: relative;
+    left: 10%;
+    padding: 5px 2px;
+    margin: 0;
+    width: 50%;
+    font-size: 0.8rem;
 }
 
 .channel h3 {
@@ -45,23 +53,27 @@ body {
 }
 
 .rooms {
-    margin-right: 5px;
+    margin: 20px;
     display: flex;
     flex-direction: column;
     width: 35%;
+    /* background-color: #fef45b; */
+}
+
+.rooms h3 {
+    margin: 10px;
 }
 
 .rooms button {
-
-    width: 30%;
-    border-radius: 5px;
+    width: 100%;
+    margin: 10px;
     outline: none;
     font-size: 1rem;
     margin-left: 5px;
     padding: 10px 10px;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.5);
     color: #FA0197;
     border: 2px solid #DBACE3;
     box-shadow: 0px 0px 20px #7C4D84;
@@ -69,19 +81,34 @@ body {
 
 .rooms button:hover {
     border-color: #fef45b;
-    text-shadow: 1px 1px 1px #DBACE3;
 }
 
 .chat {
     display: flex;
     flex-direction: column;
-    width: 80%;
-    margin: 10px;
+    width: 90%;
+    margin: 20px;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #DBACE3;
+    box-shadow: 0px 0px 20px #7C4D84;
 }
 
-.message_mine {
+#messages {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overflow-y: scroll;
+}
+
+#messages h3 {
+    margin-top: 100px;
+    width: 100%;
+    font-size: 3rem;
+    text-align: center;
+}
+
+#messages .message_mine {
     font-family: Monaco, Arial, sans-serif;
     text-align:right;
     width: max-content;
@@ -93,15 +120,13 @@ body {
     margin-right: 5px;
     border-radius: 5px;
     color: #fae3fa;
-    padding: 0.5rem;
     background-color: #FA0197;
     box-shadow: -2px 2px 3px rgb(80, 80, 80), inset 0px 0px 3px 1px  #6d0041;
     padding: 5px;
 }
 
-.message_other {
+#messages .message_other {
     font-family: Monaco, Arial, sans-serif;
-
     width: max-content;
     max-width: 50%;
     list-style: none;
@@ -115,17 +140,18 @@ body {
     padding: 5px;
 }
 
-.messages {
-    height: 100%;
-    overflow-y: scroll;
-}
-
 .chat form {
     width: 100%;
     display: flex;
+    flex-direction: row;
     height: 3rem;
     box-sizing: border-box;
     backdrop-filter: blur(10px);
+}
+
+.chat .input-flex {
+    display: flex;
+    flex-direction: row;
 }
 
 .chat input {
@@ -148,9 +174,7 @@ body {
     margin-left: 5px;
     padding: 5px 10px;
     align-items: center;
-    justify-content: center;
-
-    
+    justify-content: center;    
     background-color: rgba(0, 0, 0, 0);
     color: #FA0197;
     border: 2px solid #DBACE3;
@@ -161,6 +185,22 @@ body {
     border-color: #fef45b;
     text-shadow: 1px 1px 1px #DBACE3;
 }
+
+.chat .input-flex .mutedButton {
+    box-shadow: none;
+    font-style: italic;
+    color: #DBACE3;
+    font-weight: 100;
+    border: 1px dashed #DBACE3;
+}
+
+.chat .input-flex .mutedButton:hover {
+    border-color: none;
+    text-shadow: none;
+}
+
+
+
 
 .fade-appear,
 .fade-enter {
@@ -262,14 +302,14 @@ body {
 
 .messagePopup button {
     background-color: rgba(0, 0, 0, 0.1);
-    border: 1px solid #FAE3E3;
     border-radius: 5px;
     padding: 5px;
     font-size: large;
     font-weight: bold;
-    cursor: pointer;
-    /* box-shadow: 1px 1px 5px #fef45b; */
-    color: #FAE3E3;
     width: 30%;
     margin: 20px 0 0;
+}
+
+.messagePopup button:hover { 
+    border: 2px solid #fef45b;
 }

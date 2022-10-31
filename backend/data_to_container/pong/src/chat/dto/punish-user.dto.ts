@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
 export class PunishUserDto {
@@ -11,6 +12,7 @@ export class PunishUserDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @Transform(({ value }) => parseInt(value))
   duration: number;
 
   @IsNotEmpty()

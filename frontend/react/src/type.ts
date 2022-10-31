@@ -10,8 +10,6 @@ export type User = {
 
 export type Match = {
 	matchId?: string;
-	// user1?: User;
-	// user2?: User;
 	score1?: number;
 	score2?: number;
 }
@@ -21,7 +19,7 @@ export interface GameWindowState {
 	playerLeftName: string,
 	playerRightName: string,
 	scoreRight: number,
-	id: number,
+	matchId: number,
 	isGameOver: boolean,
 	begin: boolean,
 }
@@ -30,4 +28,12 @@ export type Players = {
 	userUuid: string;
 	userName: string;
 	online: boolean;
+}
+
+export type Room = {
+	id: string,
+	name: string,
+	type: string,
+	bannedTime: boolean,
+	mutedTime: boolean,
 }

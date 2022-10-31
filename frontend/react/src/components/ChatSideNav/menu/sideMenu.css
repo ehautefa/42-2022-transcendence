@@ -1,0 +1,79 @@
+.Popup-mother .side-menu-button {
+    background-color: none;
+    border: none;
+    box-shadow: none;
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    font-weight: 300;
+    display: block;
+    transition: 0.6s;
+    width: 100%;
+    text-align: left;
+    padding: 10px 25px;
+    font-family: Courier, 'Courier New', monospace;
+
+}
+
+.Popup-mother .side-menu-button:hover {
+	text-shadow: 1px 1px 1px #fef45b;
+}
+
+.side-menu-popup {
+    position:fixed;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    border: 2px solid #fef45b;
+    box-shadow: 0 0 10px #fef45b;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+}
+
+.side-menu-popup h3 {
+    text-align: center;
+}
+
+.side-menu-popup input {
+   text-align: center;
+   width: 80%;
+   margin: 0 10% 10px 10%;
+   border-radius: 5px;
+   outline: none;
+   font-size: 1.2rem;
+   padding: 0.5rem;
+   border: 2px solid #FA0197;
+   background-color: rgba(0, 0, 0, 0.5);
+   color: #fae3fa;
+}
+
+.side-menu-popup button {
+    position: relative;
+    left: 30%;
+    width: 40%;
+    top: 50%;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.side-menu-popup button:hover {
+    border: 2px solid #fef45b;
+    box-shadow: 0 0 10px #fef45b;
+}
+
+.flex-button-popup {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+}
+
+.flex-button-popup button {
+    left: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+

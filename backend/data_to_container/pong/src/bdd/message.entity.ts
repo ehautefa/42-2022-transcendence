@@ -10,7 +10,7 @@ export class Message {
   message: string;
 
   @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id, {
-    // eager: true,
+    onDelete: 'CASCADE',
   })
   sender: ChatMember;
 
