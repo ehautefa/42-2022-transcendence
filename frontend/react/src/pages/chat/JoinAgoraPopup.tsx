@@ -16,12 +16,17 @@ function JoinAgoraPopup() {
 	const [password, setPassword] = useState("");
 
 	useEffect(() => {
-		socket.emit('findAllJoinableRooms', (rooms: Room[]) => {
-			let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
-			setRooms(selectTab);
-			setCompleteRooms(rooms);
-			console.log("find room", rooms);
-		})
+		socket.on('updateRooms', () => {
+			socket.emit('findAllJoinableRooms', (rooms: Room[]) => {
+				let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
+				setRooms(selectTab);
+				setCompleteRooms(rooms);
+				console.log("find room", rooms);
+			})
+		});
+		return () => {
+			socket.off('updateRooms');
+		}
 	}, [socket]);
 
 

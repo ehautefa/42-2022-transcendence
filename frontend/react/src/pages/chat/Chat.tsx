@@ -69,12 +69,15 @@ function Chat() {
 			}
 		});
 	
-		socket.on('updateRooms', (rooms: any) => {
+		socket.on('updateRooms', () => {
 			console.log('getting information');
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
+			socket.emit("findAllUsersInRoom", {uuid: selectedRoom.id}, (users: any) => {
+                setMembers(users);
+            });
 		});
 		return () => {
 			socket.off('updateRooms');
