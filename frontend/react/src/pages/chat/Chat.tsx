@@ -38,25 +38,21 @@ function Chat() {
 		});
 	}, [socket, roomId]);
 
-
-	socket.on('updateMessages', () => {
-		if (selectedRoom.id !== "") {
-			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
-				setMessages(msgs);
-				var message = document.getElementById('messages');
-				if (message)
-					message.scrollTop = message.scrollHeight;
-			});
-		}
-	});
-
 	useEffect(() => {
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
+			socket.emit('findAllJoinedRooms', (rooms: any) => {
+				console.log("findAllJoined", rooms);
+				setChannels(rooms)
+			});
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
 				var message = document.getElementById('messages');
 				if (message)
-					message.scrollTop = message.scrollHeight;
+					message.scroll({
+						top: message.scrollHeight,
+						left: 0,
+						behavior: "smooth"
+					  })
 			});
 			socket.emit("findAllUsersInRoom", {uuid: selectedRoom.id}, (users: any) => {
                 setMembers(users);
@@ -64,6 +60,20 @@ function Chat() {
 		}
 	}, [socket, selectedRoom]);
 
+	socket.on('updateMessages', () => {
+		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
+			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
+				setMessages(msgs);
+				var message = document.getElementById('messages');
+				if (message)
+					message.scroll({
+						top: message.scrollHeight,
+						left: 0,
+						behavior: "smooth"
+					  })
+			});
+		}
+	});
 
 	socket.on('updateRooms', (rooms: any) => {
 		console.log('getting information');
@@ -78,11 +88,17 @@ function Chat() {
 		setSelectedRoom(thisRoom);
 	}
 
-	function sendMessage() {
+	async function sendMessage() {
 		if (selectedRoom.id !== "" && newMessage !== "") {
 			console.log('sending message: ', newMessage);
 			socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.id });
 			setNewMessage("");
+			{/*socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
+				setMessages(msgs);
+				var message = document.getElementById('messages');
+				if (message)
+					message.scrollTop = message.scrollHeight;
+			});*/}
 		}
 	}
 
