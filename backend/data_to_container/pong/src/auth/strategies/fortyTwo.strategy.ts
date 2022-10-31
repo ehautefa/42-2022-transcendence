@@ -12,7 +12,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService
     ) {
     super({
-      clientID: configService.get('REACT_APP_CLIENT_ID'),
+      clientID: configService.get('FT_CLIENT_ID'),
       clientSecret: configService.get('FT_CLIENT_SECRET'),
       callbackURL: configService.get('REACT_APP_REDIRECT_URI'),
       //verify function
