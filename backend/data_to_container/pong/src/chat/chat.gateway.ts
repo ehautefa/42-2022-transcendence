@@ -66,7 +66,9 @@ export class ChatGateway
     this.logger.debug('Creating a message');
     this.logger.debug(message.sender.room.id);
     console.log(message.sender.room.id);
-    this.server.in(message.sender.room.id).emit('updateMessages');
+    this.server
+      .in(message.sender.room.id)
+      .emit('updateMessages', message.sender.room.id);
     // this.server.emit('updateRooms');
     return message;
   }

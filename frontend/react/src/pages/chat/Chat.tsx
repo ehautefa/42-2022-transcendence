@@ -60,6 +60,7 @@ function Chat() {
 	}, [socket, selectedRoom]);
 
 	socket.on('updateMessages', () => {
+		console.log('XXXXXXXXXXXXXX');
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
