@@ -53,6 +53,10 @@ export class MatchService {
 		});
 	}
 
+	async deleteMatch(matchId: string) {
+		await this.MatchRepository.delete({ matchId: matchId });
+	}
+
 	async endOfMatch(saveScore: SaveScoreDto): Promise<void> {
 		console.log("END OF MATCH", saveScore);
 		if (saveScore.score1 > saveScore.score2)
