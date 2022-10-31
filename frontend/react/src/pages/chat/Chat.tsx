@@ -38,6 +38,16 @@ function Chat() {
 	}, [socket, roomId]);
 
 	useEffect(() => {
+		var message = document.getElementById('messages');
+			if (message)
+				message.scroll({
+					top: message.scrollHeight,
+					left: 0,
+					behavior: "smooth"
+				})
+	}, [messages]);
+
+	useEffect(() => {
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
@@ -45,13 +55,6 @@ function Chat() {
 			});
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
-				var message = document.getElementById('messages');
-				if (message)
-					message.scroll({
-						top: message.scrollHeight,
-						left: 0,
-						behavior: "smooth"
-					  })
 			});
 			socket.emit("findAllUsersInRoom", {uuid: selectedRoom.id}, (users: any) => {
                 setMembers(users);
@@ -63,13 +66,6 @@ function Chat() {
 				&& selectedRoom.id !== "" && selectedRoom.id === updatedRoom) {
 				socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 					setMessages(msgs);
-					var message = document.getElementById('messages');
-					if (message)
-						message.scroll({
-							top: message.scrollHeight + 1,
-							left: 0,
-							behavior: "smooth"
-						  })
 				});
 			}
 		});
