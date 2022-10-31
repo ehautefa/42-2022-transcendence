@@ -104,7 +104,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 				<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
 				<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
 				<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
-				<Paddle x={80 - PADDLE_GAP} y={this.state.paddleRightY} />
+				<Paddle x={70 - PADDLE_GAP} y={this.state.paddleRightY} />
 				<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 				<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 				<Ball x={this.state.ballX} y={this.state.ballY} />
