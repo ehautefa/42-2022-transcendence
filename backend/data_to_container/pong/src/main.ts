@@ -1,15 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { readFileSync } from "fs";
 import * as cookieParser from 'cookie-parser';
-import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
-
-
-const httpsOptions: HttpsOptions = {
-	key: readFileSync('/usr/src/app/ssl/selfsigned.key'),
-	cert: readFileSync('/usr/src/app/ssl/selfsigned.csr'),
-};
 
 
 async function bootstrap() {
@@ -20,8 +12,7 @@ async function bootstrap() {
 			allowedHeaders: ['Content-Type', 'Authorization'],
 			exposedHeaders: ['Authorization'],
 			credentials: true,
-		},
-		httpsOptions
+		}
 	});
 
 	const config = new DocumentBuilder()
