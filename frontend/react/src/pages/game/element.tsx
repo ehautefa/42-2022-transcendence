@@ -22,6 +22,21 @@ export class Paddle extends React.Component<{ x: number, y: number }> {
     }
 }
 
+export class PaddleSizeSelector extends React.Component {
+    render() {
+        return (
+            <>
+        <p>Size Paddle :</p>
+        <select className="PaddleSizeSelector">
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+        </select>
+            </>
+        )
+    }
+}
+
 export class ColorSelector extends React.Component  {
     constructor(props: any) {
         super(props);

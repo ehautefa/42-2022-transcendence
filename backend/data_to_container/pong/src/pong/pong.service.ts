@@ -9,6 +9,9 @@ export class PongService {
     private readonly MatchService: MatchService;
 
     handlePaddle(game: GameWindowState, deltaPaddleY: number, userUuid: string): GameWindowState {
+        if (!game) {
+            return game;
+        }
         if (userUuid == game.playerLeftUid) {
             if (game.paddleLeftY + deltaPaddleY >= parseInt(process.env.PONG_PADDLE_SIZE) && game.paddleLeftY + deltaPaddleY <= 100 - parseInt(process.env.PONG_PADDLE_SIZE))
                 game.paddleLeftY += deltaPaddleY;

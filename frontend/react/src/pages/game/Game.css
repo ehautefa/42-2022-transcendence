@@ -130,6 +130,25 @@
 	text-shadow: 1px 1px 2px #DBACE3;
 }
 
+.PaddleSizeSelector {
+	position: absolute;
+	top: 0;
+	display: flex;
+	padding: 3px 10px;
+	margin: -40px 30%;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 40%;
+	font-size: 1rem;
+	color: #DBACE3;
+	text-shadow: 0px 0px 10px #7C4D84;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+	border: 1px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
+}
+
 .ColorSelector
 {
 	position: absolute;

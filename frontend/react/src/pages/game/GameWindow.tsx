@@ -2,7 +2,7 @@ import "./Game.css"
 import React from 'react'
 import { getSocketPong } from "../../App"
 import { Navigate } from "react-router-dom";
-import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
+import { Ball, Paddle, GameWindowState, ColorSelector, PaddleSizeSelector } from "./element"
 
 const socket = getSocketPong();
 
@@ -15,6 +15,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 		super(props);
 
 		this.handleKeyDown = this.handleKeyDown.bind(this);
+		this.handleMouseMove = this.handleMouseMove.bind(this);
 		this.state = {
 			matchId: "",
 			ballY: 47.1,
@@ -35,6 +36,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 
 	componentDidMount() {
 		window.addEventListener("keydown", this.handleKeyDown);
+		window.addEventListener("mousemove", this.handleMouseMove);
 		this.gameLoop();
 	}
 
@@ -66,6 +68,11 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 	componentWillUnmount() {
 		clearTimeout(this.state.timeoutId);
 		window.removeEventListener("keydown", this.handleKeyDown);
+		window.removeEventListener("mousemove", this.handleMouseMove);
+	}
+
+	handleMouseMove(event: MouseEvent) {
+		socket.emit('handlePaddle', { deltaPaddle: (event.movementY / 2), matchId: this.state.matchId });
 	}
 
 	handleKeyDown(event: KeyboardEvent) {
@@ -101,6 +108,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 					(<Navigate to="/endGame/lose" replace={true} />))
 			}
 			<>
+				<PaddleSizeSelector />
 				<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
 				<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
 				<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
