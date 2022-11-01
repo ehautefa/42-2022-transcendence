@@ -43,9 +43,8 @@ import { SetAdminDto } from './dto/set-admin.dto';
   namespace: 'chat',
 })
 export class ChatGateway
-  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
-{
-  constructor(private readonly chatService: ChatService) {}
+  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly chatService: ChatService) { }
 
   // The socket.io server responsible for handling (receiviing and emitting) events
   @WebSocketServer()
