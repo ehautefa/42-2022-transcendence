@@ -25,6 +25,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 			timeoutId: 0,
 			paddleLeftY: 50,
 			paddleRightY: 50,
+			paddleSize: 20,
 			isGameOver: false,
 			playerLeft: "",
 			playerRight: "",
@@ -51,6 +52,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 				scoreRight: data.scoreRight,
 				paddleLeftY: data.paddleLeftY,
 				paddleRightY: data.paddleRightY,
+				paddleSize: data.paddleSize,
 				isGameOver: data.isGameOver,
 				playerLeft: data.playerLeft,
 				playerRight: data.playerRight,
@@ -110,8 +112,8 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 			<>
 				<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
 				<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
-				<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} />
-				<Paddle x={70 - PADDLE_GAP} y={this.state.paddleRightY} />
+				<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} size={this.state.paddleSize} />
+				<Paddle x={70 - PADDLE_GAP} y={this.state.paddleRightY} size={this.state.paddleSize} />
 				<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 				<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 				<Ball x={this.state.ballX} y={this.state.ballY} />

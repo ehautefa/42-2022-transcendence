@@ -12,12 +12,13 @@ export class Ball extends React.Component<{ x: number, y: number }> {
     }
 }
 
-export class Paddle extends React.Component<{ x: number, y: number }> {
+export class Paddle extends React.Component<{ x: number, y: number, size: number }> {
     render() {
         return <div
             style={{
                 top: `${this.props.y}%`,
                 left: `${this.props.x}vw`,
+                height: `${this.props.size}%`,
             }}
             className="Paddle" />
     }
@@ -31,8 +32,8 @@ export class PaddleSizeSelector extends React.Component {
 
     onChangeValue(event: any) {
         const socket = getSocketPong();
+        console.log("editPaddleSize", event.target.value);
         socket.emit("editPaddleSize", event.target.value);
-        console.log("onChangeValue", event.target.value);
     }
 
 
@@ -84,6 +85,7 @@ export interface GameWindowState {
     scoreRight: number,
     paddleLeftY: number,
     paddleRightY: number,
+    paddleSize: number,
     isGameOver: boolean,
     playerLeft: string,
     playerRight: string,
