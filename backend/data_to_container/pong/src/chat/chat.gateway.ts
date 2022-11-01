@@ -277,7 +277,11 @@ export class ChatGateway
   async handleConnection(client: Socket): Promise<void> {
     this.logger.debug(`client connected: ${client.id}`);
     const cookie: string = client.handshake.headers.cookie;
-    if (cookie && cookie.includes('access_token=')) {
+    if (cookie !== undefined &&
+			cookie !== null
+			&& cookie !== ""
+			&& cookie.includes('access_token=')) {
+			console.log("cookie", client.handshake.headers.cookie);
       const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
         client.handshake.headers.cookie,
       );

@@ -73,8 +73,13 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleConnection(client: any) {
 		this.logger.log(`Client status connected: ${client.id}`);
-		if (client.handshake.headers.cookie) {
-			client.emit('getUserUuid');
+		var cookie : string = client.handshake.headers.cookie;
+		if (cookie !== undefined &&
+			cookie !== null
+			&& cookie !== ""
+			&& cookie.includes('access_token=')) {
+			console.log("cookie in socket", client.handshake.headers.cookie);
+			// client.emit('getUserUmakuid');
 		}
 	
 	}
