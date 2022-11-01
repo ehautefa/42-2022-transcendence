@@ -14,7 +14,7 @@ services:
     volumes:
       - ./reverse_proxy/nginx.temp:/etc/nginx/nginx.temp
       - ./reverse_proxy/ssl/:/etc/ssl/pong/
-    command: /bin/sh -c "envsubst '$${REACT_APP_RP_BACK_URL} $${REACT_APP_RP_FRONT_URL} '< /etc/nginx/nginx.temp > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"
+    command: /bin/sh -c "envsubst '$${APP_HOST} $${REACT_APP_RP_BACK_URL} $${REACT_APP_RP_FRONT_URL} '< /etc/nginx/nginx.temp > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"
     restart: unless-stopped
     env_file:
     - env/.env
