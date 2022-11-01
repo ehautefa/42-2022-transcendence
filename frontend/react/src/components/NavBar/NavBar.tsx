@@ -16,7 +16,7 @@ function NavBar() {
 				setIsBellExpanded(response.length > 0)
 			}
 		)
-	})
+	}, [])
 
 	return (
 		<nav className="nav">
@@ -24,11 +24,8 @@ function NavBar() {
 				TRANSCENDENCE
 			</NavLink>
 			<button className="navButton" onClick={() => {
-				console.log("clicked:", isNavExpanded);
 				setIsNavExpanded(!isNavExpanded);
 			}}>
-				<span></span>
-				<span></span>
 				<span></span>
 				<span></span>
 				<span></span>

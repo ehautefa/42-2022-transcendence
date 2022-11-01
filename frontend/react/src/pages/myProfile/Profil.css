@@ -51,6 +51,10 @@
 	box-shadow: none;
 }
 
+.mainComposantProfile .pphover {
+	display: none;
+}
+
 
 .mainComposantProfile .info .flex-li {
 	display: flex;
@@ -158,8 +162,9 @@
 
 	.mainComposantProfile .pp-containers {
 		position: relative;
-		min-width: 20%;
-		max-width: 30%;
+		width: 20%;
+		min-width: 200px;
+		max-width: 300px;
 		aspect-ratio: 1/1;
 		margin: 15px;
 	}
@@ -174,8 +179,9 @@
 	}
 
 	.mainComposantProfile .pphover {
+		display: block;
 		position: absolute;
-		border-radius: 100px;
+		border-radius: 200px;
 		width: 101%;
 		aspect-ratio: 1 / 1;
 		top: 0;
