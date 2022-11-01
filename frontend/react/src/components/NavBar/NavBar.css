@@ -85,11 +85,13 @@
 
 @media (max-width:600px) {
 	.navButton {
+		display: block;
 		position: absolute;
-		right: 25px;
-		top: 25%;
+		right: 10px;
+		top: 20%;
 		border: none;
 		background-color: rgba(0, 0, 0, 0);
+		box-shadow: none;
 	}
 
 	.navButton span {
