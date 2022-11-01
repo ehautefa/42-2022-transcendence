@@ -12,10 +12,6 @@ import { Link } from "react-router-dom";
 
 const socketStatus = getSocketStatus();
 
-socketStatus.on('getUserUuid', () => {
-	socketStatus.emit('getUserUuid');
-})
-
 function MyProfile() {
 	const emptyUser: User = { userUuid: "", userName: "" };
 	const [user, setUser] = useState(emptyUser);
