@@ -15,11 +15,10 @@ function Active2FAPopUp() {
 			credentials: credentials
 		};
 	
-		let result = await (await fetch(url, requestOptions)).json();
-		console.log("Qrcode", result);
-		if (result.statusCode === 401) {
-			window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
-		}
+		let result = await (await fetch(url, requestOptions)).text();
+		// if (result.statusCode === 401) {
+		// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		// }
 		setQrCode(result);
 	}
 

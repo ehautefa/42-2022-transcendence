@@ -83,9 +83,9 @@ export class AuthController {
         const access_token :string  = await this.authService.login(user, tfaCode.twoFactorAuthenticationCode);
         res.setHeader('Set-Cookie', [access_token]);
         if(user.twoFactorAuth)
-            res.redirect(process.env.REACT_APP_HOME_PAGE + '/twoFa');
+            res.redirect(process.env.HOME_PAGE + '/twoFa');
         else 
-            res.redirect(process.env.REACT_APP_HOME_PAGE);
+            res.redirect(process.env.HOME_PAGE);
     }
 
     @Post('2fa/generateQrCode')
