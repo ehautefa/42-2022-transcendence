@@ -79,8 +79,6 @@ export class AuthController {
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
     async login(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }) {
-        if (user.twoFactorAuth)
-            return res.redirect(process.env.LOGIN_PAGE + "/twofa");
         const access_token: string = await this.authService.login(user);
         res.setHeader('Set-Cookie', [access_token]);
         return res.redirect(process.env.HOME_PAGE);
