@@ -5,9 +5,9 @@ events {
 http {
   server {
     server_name ${APP_HOST};
-    listen 443;
-    # ssl_certificate /etc/ssl/pong/selfsigned.csr;
-    # ssl_certificate_key /etc/ssl/pong/selfsigned.key;
+    listen 443 ssl;
+    ssl_certificate /etc/ssl/pong.csr;
+    ssl_certificate_key /etc/ssl/.pong.key;
 
     location /socket.io/ {
       proxy_pass ${REACT_APP_RP_BACK_URL};

@@ -1,4 +1,4 @@
-PROTOCOLE="http"
+HTTPS=1
 DC = docker-compose
 DC_FILE = ./docker-compose_dev.yml
 
@@ -22,7 +22,13 @@ down:
 re: down build
 
 setup:
-	sed -Ei "s/^PRT=.*/PRT='$(PROTOCOLE)'/" env/urls.env
+	@if [ "$(HTTPS)" = 1 ]; then \
+		sed -Ei "s/^PRT=.*/PRT='https'/" env/urls.env ; \
+		sed -Ei "s/listen 443.*/listen 443 ssl;/" reverse_proxy/data_to_container/nginx.temp ; \
+	else\
+		sed -Ei "s/^PRT=.*/PRT='http'/" env/urls.env ; \
+		sed -Ei "s/listen 443.*/listen 443;/" reverse_proxy/datas_to_container/nginx.temp ; \
+	fi
 	sed -Ei "s/^APP_HOST=.*/APP_HOST='$(shell hostname)'/" env/urls.env
 
 prune: down

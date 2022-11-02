@@ -14,7 +14,8 @@ let socketOptions = {
 			}
 		}
 	},
-	forceNew: true
+	forceNew: true,
+	secure: true
 };
 
 const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;

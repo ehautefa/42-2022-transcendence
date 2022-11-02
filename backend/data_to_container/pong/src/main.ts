@@ -8,8 +8,9 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		cors: {
 			origin: [process.env.REACT_APP_FRONT_URL,
-				"https://signin.intra.42.fr/",
-				"https://api.intra.42.fr/"],
+				// "https://signin.intra.42.fr/",
+				// "https://api.intra.42.fr/"
+			],
 			methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
 			allowedHeaders: ['Content-Type', 'Authorization'],
 			exposedHeaders: ['Authorization'],
