@@ -22,8 +22,6 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
       const user = await userService.FindOrCreateUser(profile.id, profile.username);
       if (!user)
         return done(null, false)
-      if (user.twoFactorAuth)
-        console.log("WARNING  PASSPORT42- TwoFactorAuth ENABLE")
       return done(null, user);
       // }
     });

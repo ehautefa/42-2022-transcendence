@@ -99,3 +99,9 @@ export class TwoFactorAuthAlreadyEnableException extends UserException {
     super('Two factor Auth Already enable', HttpStatus.FORBIDDEN);
   }
  }
+
+ export class TwoFaCodeNotValidException extends UserException {
+      constructor() {
+    super('Two factor code is not valid', HttpStatus.UNAUTHORIZED);
+  }
+ }

@@ -6,6 +6,7 @@ import { user } from 'src/bdd/users.entity';
 import { UserService } from 'src/user/user.service';
 import { ConfigService } from '@nestjs/config';
 import TokenPayload from './tokenPayload.interface';
+import { TwoFaCodeNotValidException } from 'src/exceptions/user.exception';
 
 @Injectable()
 export class AuthService {
@@ -15,19 +16,20 @@ export class AuthService {
         private configService: ConfigService,
     ) { }
 
-    async login(user: user, twoFactorAuthenticationCode: string): Promise<string> {
+    async login(user: user): Promise<string> {
         let cookie: string
-        if (user.twoFactorAuth) {
+        cookie = this.getCookieWithJwtAccessToken(user.userUuid, false);
+        console.debug("[LOGIN] - ", user.userName);
+        return cookie;
+    }
+
+    async login2fa(user: user, twoFactorAuthenticationCode: string): Promise<string> {
+        let cookie: string
             const isCodeValid = await this.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user);
             if (!isCodeValid)
-                throw new UnauthorizedException('Wrong authentication code');
-            // cookie = this.jwtService.sign({ userUuid: user.userUuid, isTwoFactorAuthenticated: true });
+                throw new TwoFaCodeNotValidException();
             cookie = this.getCookieWithJwtAccessToken(user.userUuid, true);
-        }
-        else
-            // cookie = this.jwtService.sign({ userUuid: user.userUuid });
-            cookie = this.getCookieWithJwtAccessToken(user.userUuid, false);
-        console.log("username connected with Uuid", user);
+        console.debug("[LOGIN2FA] - ", user.userName);
         return cookie;
     }
 
