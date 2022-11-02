@@ -18,7 +18,10 @@ export class AuthService {
 
     async login(user: user): Promise<string> {
         let cookie: string
-        cookie = this.getCookieWithJwtAccessToken(user.userUuid);
+        if (user.twoFactorAuth)
+            cookie = this.getCookieWithJwtAccessToken(user.userUuid, false);
+        else
+            cookie = this.getCookieWithJwtAccessToken(user.userUuid);
         console.debug("[LOGIN] - ", user.userName);
         return cookie;
     }
