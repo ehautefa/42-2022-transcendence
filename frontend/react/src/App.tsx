@@ -55,7 +55,7 @@ export function getSocketChat() {
 export default function App() {
 	// Connect my socket to server
 	const [username, setUsername] = useState("");
-	const [code, setCode] = useState("0");
+	const [code, setCode] = useState("");
 
 	socketPong.on("connect", () => {
 		console.log("SOCKET PONG:", socketPong.id, " : ", socketPong.connected);
