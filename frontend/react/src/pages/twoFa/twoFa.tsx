@@ -6,20 +6,20 @@ function TwoFa() {
 
     async function login() {
         var credentials: RequestCredentials = "include";
-			var url: string = process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code;
-			
-            // var urlencoded = new URLSearchParams();
-			// urlencoded.append("twoFactorAuthenticationCode", code);
+        var url: string = process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code;
 
-			var requestOptions = {
-				method: 'GET',
-				credentials: credentials,
-				// body: urlencoded
-			};
-		
-			let result = await fetch(url, requestOptions);
-			console.log(result);
-			// TO DO = redirect if ok, print error message otherwise
+        // var urlencoded = new URLSearchParams();
+        // urlencoded.append("twoFactorAuthenticationCode", code);
+
+        var requestOptions = {
+            method: 'GET',
+            credentials: credentials,
+            // body: urlencoded
+        };
+
+        let result = await fetch(url, requestOptions);
+        console.log(result);
+        // TO DO = redirect if ok, print error message otherwise
     }
 
     return (
@@ -27,19 +27,20 @@ function TwoFa() {
             <h1>Two Factor Authentication</h1>
             <h4>Enter Code</h4>
             <div className='input-flex'>
-                    <input type="text" id="editUsername" name="username"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        required
-                        autoFocus
-                        autoCorrect="off"
-                        placeholder="000000"
-                        minLength={6}
-                        maxLength={6}
-                        size={6} />
-                </div>
-                <button type="submit" onClick={() => login()}>Send Code</button>
+                <input type="text" id="editUsername" name="username"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    required
+                    autoFocus
+                    autoCorrect="off"
+                    placeholder="000000"
+                    minLength={6}
+                    maxLength={6}
+                    size={6} />
             </div>
+            <a href={process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code} >login</a>
+            <button type="submit" onClick={() => login()}>Send Code</button>
+        </div>
     )
 }
 
