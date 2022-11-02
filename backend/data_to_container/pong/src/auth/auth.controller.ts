@@ -15,7 +15,6 @@ import { TwoFaExceptionFilter } from 'src/exceptions/user2fa.exception.filter';
 @Controller('auth')
 export class AuthController {
     constructor(
-        private readonly jwtService: JwtService,
         private readonly userService: UserService,
         private readonly authService: AuthService,
     ) { }
@@ -80,24 +79,27 @@ export class AuthController {
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
     async login(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }) {
-        if (user.twoFactorAuth)
-            res.redirect('/twoFa');
-        else {
-            const access_token: string = await this.authService.login(user);
-            res.setHeader('Set-Cookie', [access_token]);
-            res.redirect('/mainPage');
-        }
+        const access_token: string = await this.authService.login(user);
+        res.setHeader('Set-Cookie', [access_token]);
+        return res.redirect(process.env.HOME_PAGE);
     }
 
     @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
-    @UseFilters(TwoFaExceptionFilter)
+    // @UseFilters(TwoFaExceptionFilter)
     @UseGuards(FortyTwoAuthGuard)
-    @UsePipes(LoginDto)
     @Get('login2fa/:tfacode')
-    async login2fa(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }, @Param() tfaCode: LoginDto) {
-        const access_token: string = await this.authService.login2fa(user, tfaCode.twoFactorAuthenticationCode);
+    async login2fa(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }, @Param('tfacode') tfaCode: string) {
+        console.log("2FA")
+        console.log("2FA")
+        console.log("2FA")
+        console.log("2FA")
+        console.log("2FA")
+        console.log("2FA")
+        console.log("2FA")
+        console.log("2FA")
+        const access_token: string = await this.authService.login2fa(user, tfaCode);
         res.setHeader('Set-Cookie', [access_token]);
-        res.redirect(process.env.HOME_PAGE);
+        return res.redirect(process.env.HOME_PAGE);
     }
 
     @Post('2fa/generateQrCode')

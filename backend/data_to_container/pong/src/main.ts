@@ -14,9 +14,10 @@ var HttpsOptions : HttpsOptions = {
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		cors: {
+			// origin: "*",
 			origin: [process.env.REACT_APP_FRONT_URL,
-				"https://signin.intra.42.fr/",
-				"https://api.intra.42.fr/"
+				"https://signin.intra.42.fr",
+				"https://api.intra.42.fr"
 			],
 			methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
 			allowedHeaders: ['Content-Type', 'Authorization'],
@@ -39,6 +40,6 @@ async function bootstrap() {
 	SwaggerModule.setup('api', app, document);
 
 	app.use(cookieParser());
-	await app.listen(3011);
+	await app.listen(process.env.BACK_PORT);
 }
 bootstrap();

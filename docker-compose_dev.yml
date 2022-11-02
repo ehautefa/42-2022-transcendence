@@ -9,6 +9,8 @@ services:
       - backend
       - frontend
       - postgres
+    volumes:
+      - ./reverse_proxy/data_to_container/nginx.temp:/etc/nginx/nginx.temp
     build:
       context: ./reverse_proxy
       dockerfile: ./Dockerfile
@@ -41,8 +43,8 @@ services:
     - env/urls.env
     - env/pong.env
     - env/frontend.env
-    ports:
-       - 3000:3000
+    # ports:
+      #  - 3000:3000
     
   backend:
     depends_on:
