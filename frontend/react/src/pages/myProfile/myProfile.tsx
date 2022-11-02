@@ -13,26 +13,32 @@ import { Link } from "react-router-dom";
 const socketStatus = getSocketStatus();
 
 function MyProfile() {
-	const emptyUser: User = { userUuid: "", userName: "" };
-	const [user, setUser] = useState(emptyUser);
+	const [user, setUser] = useState({} as User);
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
 
-	async function fetchUser() {
-		const user = await getMe();
-		const matchHistory = await GetMatchHistory(user.userName);
-		const friends = await getMyFriends();
-		setFriends(friends);
-		socketStatus.emit('getFriendsStatus', friends, (data: any) => {
-			setFriends(data);
-		});
-		setMatchHistory(matchHistory);
-		setUser(user);
-	}
+	useEffect(() => {
+		const fetchData = async () => {
+			const user = await getMe();
+			const matchHistory = await GetMatchHistory(user.userName);
+			const friends = await getMyFriends();
+			setFriends(friends);
+			socketStatus.emit('getFriendsStatus', friends, (data: any) => {
+				setFriends(data);
+			});
+			setMatchHistory(matchHistory);
+			setUser(user);
+		}
+		fetchData().catch(console.error);
+	}, []);
 
 	useEffect(() => {
-		fetchUser();
+		socketStatus.on('refreshUserData', (updatedUser: User) => {
+			console.log("refreshUserData");
+			setUser(updatedUser);
+		})
 	}, []);
+
 
 	async function disable2FA() {
 		let new_user = await disableTwoFactorAuth();

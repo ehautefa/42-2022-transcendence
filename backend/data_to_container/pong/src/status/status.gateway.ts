@@ -52,6 +52,15 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
+	refreshUserData(user : user) {
+		let socket = inline.get(user.userUuid);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return;
+		}
+		this.server.to(socket).emit('refreshUserData', user);
+	}
+
 	@SubscribeMessage('getFriendsStatus')
 	@UseGuards(JwtAuthGuard)
 	getFriendsStatus(client: Socket, users: user[]): user[] {

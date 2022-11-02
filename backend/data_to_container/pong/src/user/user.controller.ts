@@ -75,7 +75,7 @@ export class UserController {
 	async isMyFriends(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
 		var to_ret = await this.UserService.isMyFriend(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid));
 		res.send(to_ret);
-}
+	}
 
 	@Get('friends/:userUuid')
 	@ApiOperation({ summary: 'Get friends of a user' })
@@ -191,7 +191,9 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async changeUserName(@Req() req, @Body() userToChange: ChangeUserNameDto) {
-		return await this.UserService.changeUserName(req.user, userToChange.newName);
+		let updatedUser: user = await this.UserService.changeUserName(req.user, userToChange.newName);
+		this.StatusGateway.refreshUserData(updatedUser);
+		return updatedUser;
 	}
 
 	@Post('endOfMatch')
@@ -204,7 +206,6 @@ export class UserController {
 	}
 
 
-	
 	/*******************************/
 	/**      PROFILE PICTURE      **/
 	/*******************************/
@@ -212,16 +213,16 @@ export class UserController {
 	@Post('uploadPicture')
 	@ApiOperation({ summary: 'Upload picture' })
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(FileInterceptor('file',
-		{
-			storage: diskStorage({
-				destination: './uploads/pp',
-				filename: (req, file, cb) => {
-					const filename: string = req.user.userUuid;
-					cb(null, `${filename}.jpeg`);
-				}
-			})
-		}))
+	// @UseInterceptors(FileInterceptor('file',
+	// 	{
+	// 		storage: diskStorage({
+	// 			destination: './uploads/pp',
+	// 			filename: (req, file, cb) => {
+	// 				const filename: string = req.user.userUuid;
+	// 				cb(null, `${filename}.jpeg`);
+	// 			}
+	// 		})
+	// 	}))
 	uploadPicture(@UploadedFile(
 		new ParseFilePipe({ validators: [new MaxFileSizeValidator({ maxSize: 1000 }), new FileTypeValidator({ fileType: 'jpeg' }),], }),
 	) file: any, @Req() req) {
