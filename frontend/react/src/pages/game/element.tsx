@@ -43,7 +43,7 @@ export class PaddleSizeSelector extends React.Component {
                 <p>Size Paddle :</p>
                 <select className="select-paddle-size-select" onChange={this.onChangeValue}>
                     <option className="option-paddle-size-select" value="small">Small</option>
-                    <option className="option-paddle-size-select" value="medium" selected>Medium</option>
+                    <option className="option-paddle-size-select" value="medium">Medium</option>
                     <option className="option-paddle-size-select" value="large">Large</option>
                 </select>
             </div>
