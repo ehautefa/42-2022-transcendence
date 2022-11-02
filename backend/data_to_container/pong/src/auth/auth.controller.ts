@@ -1,4 +1,4 @@
-import { Controller, Request, Post, UseGuards, Get, Req, Param, UsePipes, ValidationPipe, Body, Res, UnauthorizedException, } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Get, Req, Param, UsePipes, ValidationPipe, Body, Res, UnauthorizedException, UseFilters, } from '@nestjs/common';
 import { FortyTwoAuthGuard } from './guards/fortyTwoAuth.gards';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -7,8 +7,8 @@ import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { user } from 'src/bdd/users.entity';
 import { LoginDto } from './dto/login.dto';
-import { Http2ServerResponse } from 'http2';
 import { Response } from 'express';
+import { TwoFaExceptionFilter } from 'src/exceptions/user2fa.exception.filter';
 
 @ApiBearerAuth()
 @ApiTags('auth')
@@ -66,12 +66,12 @@ export class AuthController {
     @Get('localLogin/:userName')
     @ApiOperation({ summary: 'Create a new user' })
     @UsePipes(ValidationPipe)
-    async localLogin(@Res({ passthrough: true }) res: Response, @Body() tfaCode : LoginDto, @Param('userName') userName: string) {
+    async localLogin(@Res({ passthrough: true }) res: Response, @Body() tfaCode: LoginDto, @Param('userName') userName: string) {
 
         const user: user = await this.userService.FindOrCreateUserLocal(userName);
         // if(user.twoFactorAuth)
-            // res.redirect('/2fa');
-        const access_token: string = await this.authService.login(user, tfaCode.twoFactorAuthenticationCode);
+        // res.redirect('/2fa');
+        const access_token: string = await this.authService.login2fa(user, tfaCode.twoFactorAuthenticationCode);
         res.setHeader('Set-Cookie', access_token);
         return `user : #${user.userName} is logged-in`
     }
@@ -79,25 +79,37 @@ export class AuthController {
     @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
-    async login(@Res({ passthrough: true}) res : Response, @Req() {user} : {user:user}, @Body() tfaCode : LoginDto) {
-        const access_token :string  = await this.authService.login(user, tfaCode.twoFactorAuthenticationCode);
+    async login(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }) {
+        if (user.twoFactorAuth)
+            res.redirect('/twoFa');
+        else {
+            const access_token: string = await this.authService.login(user);
+            res.setHeader('Set-Cookie', [access_token]);
+            res.redirect('/');
+        }
+    }
+
+    @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
+    @UseFilters(TwoFaExceptionFilter)
+    @UseGuards(FortyTwoAuthGuard)
+    @UsePipes(LoginDto)
+    @Get('login2fa')
+    async login2fa(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }, @Body() tfaCode: LoginDto) {
+        const access_token: string = await this.authService.login2fa(user, tfaCode.twoFactorAuthenticationCode);
         res.setHeader('Set-Cookie', [access_token]);
-        if(user.twoFactorAuth)
-            res.redirect(process.env.HOME_PAGE + '/twoFa');
-        else 
-            res.redirect(process.env.HOME_PAGE);
+        res.redirect(process.env.HOME_PAGE);
     }
 
     @Post('2fa/generateQrCode')
     @UseGuards(JwtAuthGuard)
-    async register(@Request() {user} : {user : user}) {
-        const otpauthUrl : string = await this.authService.generateTwoFactorAuthenticationSecret(user);
+    async register(@Request() { user }: { user: user }) {
+        const otpauthUrl: string = await this.authService.generateTwoFactorAuthenticationSecret(user);
         return await this.authService.generateQrCodeDataURL(otpauthUrl);
     }
 
     @Post('2fa/verify2FA')
     @UseGuards(JwtAuthGuard)
-    async turnOnTwoFactorAuthentication(@Req() {user} : {user:user}, @Res({passthrough: true}) res, @Body() tfaCode : LoginDto) {
+    async turnOnTwoFactorAuthentication(@Req() { user }: { user: user }, @Res({ passthrough: true }) res, @Body() tfaCode: LoginDto) {
         const isCodeValid =
             await this.authService.isTwoFactorAuthenticationCodeValid(
                 tfaCode.twoFactorAuthenticationCode,
@@ -107,7 +119,7 @@ export class AuthController {
             throw new UnauthorizedException('Wrong authentication code');
         }
         await this.userService.enableTwoFactorAuth(user);
-        const access_token :string  = this.authService.getCookieWithJwtAccessToken(user.userUuid, true);
+        const access_token: string = this.authService.getCookieWithJwtAccessToken(user.userUuid, true);
         res.setHeader('Set-Cookie', [access_token]);
         return `2FA Ok for #${user.userName}.\n access_token=${access_token}`
     }
