@@ -2,6 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
+import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
+import * as fs from 'fs';
+
+var HttpsOptions : HttpsOptions = {
+	key: fs.readFileSync('.pong.key'),
+	cert: fs.readFileSync('pong.csr')
+}
 
 
 async function bootstrap() {
@@ -15,7 +22,8 @@ async function bootstrap() {
 			allowedHeaders: ['Content-Type', 'Authorization'],
 			exposedHeaders: ['Authorization'],
 			credentials: true,
-		}
+		},
+		httpsOptions: HttpsOptions
 	});
 
 	const config = new DocumentBuilder()
