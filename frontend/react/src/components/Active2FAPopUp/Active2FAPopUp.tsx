@@ -17,7 +17,7 @@ function Active2FAPopUp() {
 	
 		let result = await (await fetch(url, requestOptions)).text();
 		// if (result.statusCode === 401) {
-		// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		// 	window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 		// }
 		setQrCode(result);
 	}
@@ -38,7 +38,7 @@ function Active2FAPopUp() {
 		if (result.status === 201) {
 			setOpen(false);
 		} else if (result.status === 401) {
-			window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+			window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 		} else if (result.status === 403) {
 			alert(result.statusText);
 		}
