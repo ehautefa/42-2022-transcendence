@@ -6,7 +6,6 @@ import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
-import { StatusGateway } from 'src/status/status.gateway';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -22,9 +21,6 @@ import { UserExceptionFilter } from 'src/exceptions/user.exception.filter';
 @Controller('user')
 export class UserController {
 	constructor(private readonly UserService: UserService) { }
-
-	@Inject(StatusGateway)
-	private readonly StatusGateway: StatusGateway;
 
 	@Get('all')
 	@ApiOperation({ summary: 'Get all user of the table' })
@@ -119,12 +115,6 @@ export class UserController {
 	async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
 		const ret: user[] = await this.UserService.removeFriend(req.user, await this.getCompleteUser(userToHandle.userUuid))
 		// return res.status(404).send("User not found");
-		const sendAlert: SendAlertDto = {
-			userUuid: userToHandle.userUuid,
-			message: `${req.user.userName} removed you from his friend list`,
-		}
-		this.StatusGateway.sendAlert(sendAlert);
-
 		//same??
 		res.send(req.user.friend);
 		//same??
@@ -191,9 +181,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async changeUserName(@Req() req, @Body() userToChange: ChangeUserNameDto) {
-		let updatedUser: user = await this.UserService.changeUserName(req.user, userToChange.newName);
-		this.StatusGateway.refreshUserData(updatedUser);
-		return updatedUser;
+		return await this.UserService.changeUserName(req.user, userToChange.newName);
 	}
 
 	@Post('endOfMatch')

@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user } from 'src/bdd/users.entity';
 import { Equal, Repository, UpdateResult } from 'typeorm';
+import { StatusGateway } from 'src/status/status.gateway';
 import * as argon from 'argon2';
 import { ArgUndefinedException, FailToFindAUniqNameException, FailToFindObjectFromanEntity, FailToFindObjectFromDBException, TwoFactorAuthAlreadyDisableException, TwoFactorAuthAlreadyEnableException, UserAreAlreadyFriends, UserAreNotBlocked, UserAreNotFriends, UserFriendRequestAlreadyPendingException, UserIsBlockedException, UserIsTheSameException, UserNameAlreadyExistException } from '../exceptions/user.exception';
 import { authenticator } from 'otplib';
+import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 
 @Injectable()
 export class UserService {
@@ -12,6 +14,9 @@ export class UserService {
     constructor(
         @InjectRepository(user) private UserRepository: Repository<user>
     ) { }
+
+    @Inject(StatusGateway)
+	private readonly StatusGateway: StatusGateway;
 
     async getAllUser(): Promise<user[]> {
         return await this.UserRepository.find({ relations: { friends: true, blocked: true } });
@@ -147,6 +152,11 @@ export class UserService {
         }
 
         await this.UserRepository.save([completeUser1, completeUser2]);
+        const sendAlert: SendAlertDto = {
+			userUuid: completeUser2.userUuid,
+			message: `${completeUser1.userName} removed you from his friend list`,
+		}
+		this.StatusGateway.sendAlert(sendAlert);
         return completeUser1.friends;
     }
 
@@ -275,6 +285,7 @@ export class UserService {
             throw new UserNameAlreadyExistException(newName)
         user.userName = newName;
         await this.UserRepository.save(user)
+		this.StatusGateway.refreshUserData(user);
         return user;
     }
 
@@ -296,6 +307,7 @@ export class UserService {
             throw new TwoFactorAuthAlreadyEnableException()
         user.twoFactorAuth = true;
         await this.UserRepository.save(user);
+		this.StatusGateway.refreshUserData(user);
         return user;
     }
 
