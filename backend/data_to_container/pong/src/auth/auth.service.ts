@@ -24,11 +24,10 @@ export class AuthService {
     }
 
     async login2fa(user: user, twoFactorAuthenticationCode: string): Promise<string> {
-        let cookie: string
             const isCodeValid = await this.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, user);
             if (!isCodeValid)
                 throw new TwoFaCodeNotValidException();
-            cookie = this.getCookieWithJwtAccessToken(user.userUuid, true);
+        const cookie: string = this.getCookieWithJwtAccessToken(user.userUuid, true);
         console.debug("[LOGIN2FA] - ", user.userName);
         return cookie;
     }
