@@ -81,7 +81,8 @@ export class AuthController {
     async login(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }) {
         const access_token: string = await this.authService.login(user);
         res.setHeader('Set-Cookie', [access_token]);
-        return res.redirect(process.env.HOME_PAGE);
+        return res.redirect('/tmp');
+        // return `user : #${user.userName} is logged-in`
     }
 
     @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
