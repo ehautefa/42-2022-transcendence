@@ -9,7 +9,7 @@ export async function getAllUuidWithUserNameWithoutMe(myUserUuid: string) {
 
 	let users = await (await fetch(url, requestOptions)).json();
 	if (users.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	for (let i = 0; i < users.length; i++) {
 		if (users[i].userUuid === myUserUuid) {
@@ -35,7 +35,7 @@ export async function addFriend(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await result;
 }
@@ -54,7 +54,7 @@ export async function removeFriend(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await result;
 }
@@ -68,7 +68,7 @@ export async function getMyBlocked() {
 
 	let users = await (await fetch(url, requestOptions)).json();
 	if (users.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await users;
 }
@@ -87,7 +87,7 @@ export async function addBlocked(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await result;
 }
@@ -106,7 +106,7 @@ export async function removeBlocked(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await result;
 }

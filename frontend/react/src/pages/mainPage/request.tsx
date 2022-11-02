@@ -13,7 +13,7 @@ export async function getMe() {
 
 	let user =  await (await fetch(url, requestOptions)).json();
 	if (user.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return user;
 }

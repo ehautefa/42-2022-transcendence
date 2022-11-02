@@ -13,7 +13,7 @@ export async function getFriends(userUuid: string) {
 
 	let friends = await (await fetch(url, requestOptions)).json();
 	if (friends.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await friends;
 }
@@ -31,7 +31,7 @@ export async function FetchUser(uid: string) {
 
 	let user = await (await fetch(url, requestOptions)).json();
 	if (user.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await user;
 }
@@ -50,7 +50,7 @@ export async function isMyFriends(userUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
 	}
 	return await result;
 }
