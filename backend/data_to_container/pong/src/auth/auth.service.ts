@@ -18,7 +18,7 @@ export class AuthService {
 
     async login(user: user): Promise<string> {
         let cookie: string
-        cookie = this.getCookieWithJwtAccessToken(user.userUuid, false);
+        cookie = this.getCookieWithJwtAccessToken(user.userUuid);
         console.debug("[LOGIN] - ", user.userName);
         return cookie;
     }
@@ -53,7 +53,7 @@ export class AuthService {
         });
     }
 
-    getCookieWithJwtAccessToken(userUuid: string, isTwoFactorAuthenticated: boolean) {
+    getCookieWithJwtAccessToken(userUuid: string, isTwoFactorAuthenticated?: boolean) {
         const payload: TokenPayload = { userUuid, isTwoFactorAuthenticated };
         const token = this.jwtService.sign(payload, {
             secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
