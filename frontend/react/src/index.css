@@ -21,7 +21,31 @@ a:hover {
 	text-shadow: 1px 1px 1px #fef45b;
 }
 
+.login a {
+	font-size: 3rem;
+	font-weight: bolder;
+	position: fixed;
+	bottom: 50%;
+	width: 100%;
+	color: #FA0197;
+	width: 100%;
+	text-align: center;
+}
 
+.login h1 {
+	font-size: 3rem;
+	font-weight: bolder;
+	position: fixed;
+	bottom: 50%;
+	width: 100%;
+	color: #FA0197;
+	width: 100%;
+	text-align: center;
+}
+
+.login a:hover {
+	text-shadow: 1px 1px 1px #fef45b;
+}
 
 .text {
 	position: fixed;

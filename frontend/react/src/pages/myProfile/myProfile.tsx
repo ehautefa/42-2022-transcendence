@@ -47,7 +47,7 @@ function MyProfile() {
 
 	function logOut() {
 		Cookies.remove('access_token', { path: "/" });
-		window.location.assign(process.env.REACT_APP_FRONT_URL + "/");
+		window.location.replace(process.env.REACT_APP_FRONT_URL + "/");
 	}
 
 	return (<>
