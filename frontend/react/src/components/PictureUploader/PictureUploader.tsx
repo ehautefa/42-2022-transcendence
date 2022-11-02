@@ -53,11 +53,14 @@ export default class PictureUploader extends React.Component<{}, MyState>{
             credentials: credentials
         };
 
-        let result = await (await fetch(url, requestOptions)).json();
-        if (result.statusCode === 401) {
+        let result = await fetch(url, requestOptions);
+        if (result.status === 401) {
             window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+        } else if (result.status !== 200) {
+            alert(result.status + " " + result.statusText);
+        } else {
+		    window.location.replace(process.env.REACT_APP_FRONT_URL + "/myProfile");
         }
-		window.location.replace(process.env.REACT_APP_FRONT_URL + "/myProfile");
     }
 
     render() {

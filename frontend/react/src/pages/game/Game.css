@@ -1,8 +1,8 @@
 .mainComposantGame {
 	position: relative;
-	width: 80%;
+	width: 70%;
 	height: auto;
-	margin: 4rem auto;
+	margin: 2rem auto;
 	left: 0;
 	right: 0;
 }
@@ -57,7 +57,7 @@
 
 .Paddle {
 	width: 2%;
-	height: 20%;
+	/* height: 20%; */
 	background-color: #fef45b;
 	border-radius: 5px;
 	position: absolute;
@@ -128,6 +128,37 @@
 .matchMakingButton:hover {
 	background-color: none;
 	text-shadow: 1px 1px 2px #DBACE3;
+}
+
+.containers-paddle-size-select {
+	display: flex;
+	margin: 0 30%;
+	padding: 0;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 40%;
+	font-size: 1rem;
+	vertical-align: baseline;
+}
+
+.containers-paddle-size-select p {
+	color: #DBACE3;
+	text-shadow: 0px 0px 10px #7C4D84;
+	margin: 0;
+	padding: 0 10px;
+}
+
+
+.containers-paddle-size-select .select-paddle-size-select {
+	padding: 3px 10px;
+	color: #DBACE3;
+	margin-bottom: 10px;
+	text-shadow: 0px 0px 10px #7C4D84;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 5px;
+	border: 1px solid #DBACE3;
+	box-shadow: 0px 0px 20px #7C4D84;
 }
 
 .ColorSelector

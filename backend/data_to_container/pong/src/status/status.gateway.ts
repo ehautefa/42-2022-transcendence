@@ -7,60 +7,63 @@ import { SendInviteDto } from './dto/sendInvite.dto';
 import { SendAlertDto } from './dto/sendAlert.dto';
 import { user } from 'src/bdd/users.entity';
 import { AllExceptionsFilter } from './status.exception.filter';
+import { StatusService } from './status.service';
 
 var inline = new Map<string, string>();
-			// Map<userUid, socketId>
+// Map<userUid, socketId>
 // Map of all users connected and their socketId
 
 @Injectable()
 @UseFilters(new AllExceptionsFilter())
-@WebSocketGateway({ cors: 
+@WebSocketGateway({
+	cors:
 	{
 		origin: process.env.REACT_APP_FRONT_URL,
 		methods: ["GET", "POST"],
 		credentials: true,
 	},
 	namespace: '/status',
- })
+})
 export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Server;
 	private logger: Logger = new Logger('StatusGateway')
 
+	constructor(private readonly StatusService: StatusService) { }
 
-	@SubscribeMessage('getUserUuid')
-	@UseGuards(JwtAuthGuard)
-	getUserUid(@Req() req): void {
-		inline.set(req.user.userUuid, req.id);
-	}
-
-	sendAlert(sendAlert : SendAlertDto) {
+	sendAlert(sendAlert: SendAlertDto) {
 		let socket = inline.get(sendAlert.userUuid);
 		if (!socket) {
 			console.log('Error player disconnected');
-			return ;
+			return;
 		}
 		this.server.to(socket).emit('sendAlert', sendAlert.message);
 		console.log("Alert sent to " + sendAlert.userUuid);
 	}
 
-
-
-	sendInvitation(sendInvite : SendInviteDto) {
+	sendInvitation(sendInvite: SendInviteDto) {
 		let socket = inline.get(sendInvite.invitedUserUuid);
 		if (!socket) {
 			console.log('Error player disconnected');
-			return ;
+			return;
 		}
-		let response: any = {type: 'receive', matchId: sendInvite.matchId, userName: sendInvite.invitedUserName};
+		let response: any = { type: 'receive', matchId: sendInvite.matchId, userName: sendInvite.invitedUserName };
 		this.server.to(socket).emit('sendInvite', response);
 		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
+	refreshUserData(user : user) {
+		let socket = inline.get(user.userUuid);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return;
+		}
+		this.server.to(socket).emit('refreshUserData', user);
+	}
+
 	@SubscribeMessage('getFriendsStatus')
 	@UseGuards(JwtAuthGuard)
-	getFriendsStatus(client: Socket, users: user[] ): user[] {
-		console.log("getFriendsStatus", users);
+	getFriendsStatus(client: Socket, users: user[]): user[] {
 		for (let i = 0; i < users.length; i++) {
 			if (inline.has(users[i].userUuid)) {
 				users[i].online = true;
@@ -71,12 +74,17 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return users;
 	}
 
-	handleConnection(client: any) {
+	async handleConnection(client: any) {
 		this.logger.log(`Client status connected: ${client.id}`);
-		if (client.handshake.headers.cookie) {
-			client.emit('getUserUuid');
+		var cookie: string = client.handshake.headers.cookie;
+		if (cookie !== undefined &&
+			cookie !== null
+			&& cookie !== ""
+			&& cookie.includes('access_token=')) {
+			console.log("cookie in socket", client.handshake.headers.cookie);
+			const userUuid: string = await this.StatusService.handleConnection(cookie);
+			inline.set(userUuid, client.id);
 		}
-	
 	}
 
 	handleDisconnect(client: any) {
@@ -84,7 +92,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		for (const [key, value] of inline.entries()) {
 			if (value === client.id) {
 				inline.delete(key);
-				return ;
+				return;
 			}
 		}
 	}

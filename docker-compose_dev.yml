@@ -1,8 +1,28 @@
 
 #https://dev.to/erezhod/setting-up-a-nestjs-project-with-docker-for-back-end-development-30lg
+# https://www.grottedubarbu.fr/docker-nginx-reverse-proxy/
 
 version: '3.8'
 services:
+  reverse_proxy:
+    depends_on:
+      - backend
+      - frontend
+      - postgres
+    build:
+      context: ./reverse_proxy
+      dockerfile: ./Dockerfile
+    container_name: reverse_proxy
+    # command: /bin/sh -c "envsubst '$${APP_HOST} $${REACT_APP_RP_BACK_URL} $${REACT_APP_RP_FRONT_URL} '< /etc/nginx/nginx.temp > /etc/nginx/nginx.conf && openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/pong.key -out /etc/ssl/.pong.csr -days 365 -nodes -subj '/CN=nginx.csejault' && exec nginx -g 'daemon off;'"
+    # command: /bin/sh /home/nginx/start.sh
+    command: /bin/sh /home/nginx/entrypoint.sh
+    restart: unless-stopped
+    env_file:
+    - env/.env
+    - env/urls.env
+    ports:
+       - 4443:443
+
   frontend:
     depends_on:
       - backend
@@ -19,7 +39,6 @@ services:
     env_file:
     - env/.env
     - env/urls.env
-    - env/api.env
     - env/pong.env
     - env/frontend.env
     ports:
@@ -42,7 +61,6 @@ services:
     - env/.env
     - env/.secret.env
     - env/urls.env
-    - env/api.env
     - env/backend.env
     - env/pong.env
     - env/postgres.env

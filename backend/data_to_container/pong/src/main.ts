@@ -1,27 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { readFileSync } from "fs";
 import * as cookieParser from 'cookie-parser';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
+import * as fs from 'fs';
 
-
-const httpsOptions: HttpsOptions = {
-	key: readFileSync('/usr/src/app/ssl/selfsigned.key'),
-	cert: readFileSync('/usr/src/app/ssl/selfsigned.csr'),
-};
+var HttpsOptions : HttpsOptions = {
+	key: fs.readFileSync('.pong.key'),
+	cert: fs.readFileSync('pong.csr')
+}
 
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		cors: {
-			origin: [process.env.REACT_APP_FRONT_URL],
+			origin: [process.env.REACT_APP_FRONT_URL,
+				"https://signin.intra.42.fr/",
+				"https://api.intra.42.fr/"
+			],
 			methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
 			allowedHeaders: ['Content-Type', 'Authorization'],
 			exposedHeaders: ['Authorization'],
 			credentials: true,
 		},
-		httpsOptions
+		httpsOptions: HttpsOptions
 	});
 
 	const config = new DocumentBuilder()

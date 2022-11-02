@@ -6,7 +6,7 @@ import { useState } from 'react'
 
 // Create my socket
 let socketOptions = {
-	withCredentials: true,
+	// withCredentials: true,
 	transportOptions: {
 		polling: {
 			extraHeaders: {
@@ -14,14 +14,18 @@ let socketOptions = {
 			}
 		}
 	},
-	forceNew: true
+	forceNew: true,
+	// transports: ["polling"],
+	secure: true
 };
 
-const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
+const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;
 const socketPong =  io(URL_BACK + "/pong", socketOptions);
 const socketStatus = io(URL_BACK + "/status", socketOptions);
 const socketChat =  io(URL_BACK + "/chat", socketOptions);
-
+// const socketChat = socketPong;
+// const socketStatus = socketPong;
+// 
 async function createUser(username: string) {
 	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
 	var credentials: RequestCredentials = "include";

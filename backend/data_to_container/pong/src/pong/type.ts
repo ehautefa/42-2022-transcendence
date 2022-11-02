@@ -8,6 +8,7 @@ export interface GameWindowState {
 	scoreRight: number,
 	paddleLeftY: number,
 	paddleRightY: number,
+	paddleSize: number,
 	
 	playerLeftUid: string,
 	playerRightUid: string,

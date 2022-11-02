@@ -3,7 +3,7 @@ import { Socket, Server } from 'socket.io';
 import { Logger, UseGuards, Inject, Req, Body } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
-import { StatusGateway  } from "src/status/status.gateway";
+import { StatusGateway } from "src/status/status.gateway";
 import { GameWindowState } from "./type";
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 import { playerDto } from './dto/player.dto';
@@ -11,14 +11,16 @@ import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { handlePaddleDto } from "./dto/handlePaddle.dto";
 import { SendAlertDto } from "src/status/dto/sendAlert.dto";
+import { editPaddleSizeDto } from "./dto/editPaddleSize.dto";
 
 
-@WebSocketGateway({ cors: 
+@WebSocketGateway({
+	cors:
 	{
 		origin: process.env.REACT_APP_FRONT_URL,
 		methods: ["GET", "POST"],
 		credentials: true,
-	}, 
+	},
 	namespace: '/pong',
 }) // enable CORS everywhere
 export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -29,16 +31,16 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	games: Map<string, GameWindowState>;
 	players: playerDto[];
 	launch_game: boolean;
-	
+
 	@Inject(StatusGateway)
-	private readonly StatusGateway : StatusGateway;
+	private readonly StatusGateway: StatusGateway;
 
 	constructor(private readonly PongService: PongService) {
 		this.games = new Map<string, GameWindowState>();
 		this.players = new Array<playerDto>();
 		this.launch_game = true;
 	}
-	
+
 	@Interval(parseInt(process.env.PONG_INTERVAL_TIME))
 	GameLoop() {
 		for (let [key, value] of this.games) {
@@ -47,7 +49,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		}
 	}
-	
+
 	@SubscribeMessage('joinGame') // For spectator
 	@UseGuards(JwtAuthGuard)
 	joinGame(@Req() req, @Body() matchId: string): void {
@@ -81,9 +83,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		let game: GameWindowState;
 		game = await this.PongService.initGame(player1, player2);
 		this.games.set(game.matchId, game);
-		let response: SendInviteDto = { matchId: game.matchId,
+		let response: SendInviteDto = {
+			matchId: game.matchId,
 			invitedUserName: invitePlayer.invitedUserName,
-			invitedUserUuid: invitePlayer.invitedUserUuid };
+			invitedUserUuid: invitePlayer.invitedUserUuid
+		};
 		this.StatusGateway.sendInvitation(response);
 		console.log("GAME: ", game.matchId, "/n", game);
 		return game.matchId;
@@ -159,7 +163,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getGames')
 	@UseGuards(JwtAuthGuard)
-	getGames() : GameWindowState[] {
+	getGames(): GameWindowState[] {
 		return Array.from(this.games.values());
 	}
 
@@ -183,26 +187,42 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('editPaddleSize')
+	@UseGuards(JwtAuthGuard)
+	editPaddleSize(@Req() req, @Body() size: string): void {
+		for (let game of this.games.values()) {
+			if (game.isGameOver == false &&
+				game.matchMaking == true &&
+				game.begin == true &&
+				(game.playerLeftUid == req.user.userUuid ||
+					game.playerRightUid == req.user.userUuid)) {
+				game = this.PongService.editPaddleSize(game, size);
+				console.log("EDIT PADDLE SIZE", game.matchId, game.paddleSize);
+				break;
+			}
+		}
+	}
+
 	@SubscribeMessage('handlePaddle')
 	@UseGuards(JwtAuthGuard)
 	handlePaddle(@Req() req, @Body() handlePaddle: handlePaddleDto): void {
 		this.games[handlePaddle.matchId] = this.PongService.handlePaddle(this.games.get(handlePaddle.matchId),
-																	handlePaddle.deltaPaddle,
-																	req.user.userUuid);
+			handlePaddle.deltaPaddle,
+			req.user.userUuid);
 	}
 
 	@SubscribeMessage('leaveGame')
 	@UseGuards(JwtAuthGuard)
 	leaveGame(@Req() req): void {
 		console.log("LEAVE GAME");
-		this.PongService.leaveGame(req.id, this.server,  this.games, this.players);
+		this.PongService.leaveGame(req.id, this.server, this.games, this.players);
 	}
 
 
 	handleDisconnect(client: Socket) {
-        this.logger.log(`Client disconnected: ${client.id}`);
-		this.PongService.leaveGame(client.id, this.server,  this.games, this.players);
-		
+		this.logger.log(`Client disconnected: ${client.id}`);
+		this.PongService.leaveGame(client.id, this.server, this.games, this.players);
+
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
