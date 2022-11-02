@@ -8,13 +8,9 @@ function TwoFa() {
         var credentials: RequestCredentials = "include";
         var url: string = process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code;
 
-        // var urlencoded = new URLSearchParams();
-        // urlencoded.append("twoFactorAuthenticationCode", code);
-
         var requestOptions = {
-            method: 'GET',
+            method: 'POST',
             credentials: credentials,
-            // body: urlencoded
         };
 
         let result = await fetch(url, requestOptions);
@@ -39,7 +35,7 @@ function TwoFa() {
                     size={6} />
             </div>
             <a href={process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code} >login</a>
-            <button type="submit" onClick={() => login()}>Send Code</button>
+            {/* <button type="submit" onClick={() => login()}>Send Code</button> */}
         </div>
     )
 }

@@ -51,18 +51,18 @@ export function getSocketChat() {
 	return socketChat;
 }
 
-async function login() {
-	var url: string = process.env.REACT_APP_BACK_URL + "/auth/login/" + username;
-	var credentials: RequestCredentials = "include";
+// async function login() {
+// 	var url: string = process.env.REACT_APP_BACK_URL + "/auth/login";
+// 	var credentials: RequestCredentials = "include";
 	
-	var requestOptions = {
-		method: 'GET',
-		credentials: credentials
-	};
+// 	var requestOptions = {
+// 		method: 'GET',
+// 		credentials: credentials
+// 	};
 	
-	let result = await fetch(url, requestOptions);
-	console.log(result);
-}
+// 	let result = await fetch(url, requestOptions);
+// 	console.log(result);
+// }
 
 export default function App() {
 	// Connect my socket to server
@@ -79,8 +79,8 @@ export default function App() {
 	});
 	return (<>
 		<div className='login'>
-			<button onClick={login}>try to login</button>
-			{/* <a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a> */}
+			{/* <button onClick={login}>try to login</button> */}
+			<a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a>
 			<div className='createUser'>
 				<h5>Or use a local profile : </h5>
 				<div>

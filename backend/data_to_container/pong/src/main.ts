@@ -5,11 +5,10 @@ import * as cookieParser from 'cookie-parser';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 import * as fs from 'fs';
 
-var HttpsOptions : HttpsOptions = {
+var HttpsOptions: HttpsOptions = {
 	key: fs.readFileSync('.pong.key'),
 	cert: fs.readFileSync('pong.csr')
 }
-
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
@@ -19,10 +18,12 @@ async function bootstrap() {
 				"https://signin.intra.42.fr",
 				"https://api.intra.42.fr"
 			],
-			methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
-			allowedHeaders: ['Content-Type', 'Authorization'],
-			exposedHeaders: ['Authorization'],
+			// methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
 			credentials: true,
+			methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+			preflightContinue: true,
+			optionsSuccessStatus: 204,
+
 		},
 		httpsOptions: HttpsOptions
 	});
