@@ -85,7 +85,7 @@ export class AuthController {
         else {
             const access_token: string = await this.authService.login(user);
             res.setHeader('Set-Cookie', [access_token]);
-            res.redirect('/');
+            res.redirect('/mainPage');
         }
     }
 
@@ -93,8 +93,8 @@ export class AuthController {
     @UseFilters(TwoFaExceptionFilter)
     @UseGuards(FortyTwoAuthGuard)
     @UsePipes(LoginDto)
-    @Get('login2fa')
-    async login2fa(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }, @Body() tfaCode: LoginDto) {
+    @Get('login2fa/:tfacode')
+    async login2fa(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }, @Param() tfaCode: LoginDto) {
         const access_token: string = await this.authService.login2fa(user, tfaCode.twoFactorAuthenticationCode);
         res.setHeader('Set-Cookie', [access_token]);
         res.redirect(process.env.HOME_PAGE);

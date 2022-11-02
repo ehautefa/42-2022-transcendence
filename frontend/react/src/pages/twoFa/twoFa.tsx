@@ -6,15 +6,15 @@ function TwoFa() {
 
     async function login() {
         var credentials: RequestCredentials = "include";
-			var url: string = process.env.REACT_APP_BACK_URL + "/auth/login/twoFactorAuthentication";
+			var url: string = process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code;
 			
-            var urlencoded = new URLSearchParams();
-			urlencoded.append("twoFactorAuthenticationCode", code);
+            // var urlencoded = new URLSearchParams();
+			// urlencoded.append("twoFactorAuthenticationCode", code);
 
 			var requestOptions = {
-				method: 'POST',
+				method: 'GET',
 				credentials: credentials,
-				body: urlencoded
+				// body: urlencoded
 			};
 		
 			let result = await fetch(url, requestOptions);

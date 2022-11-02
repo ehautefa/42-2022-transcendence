@@ -15,10 +15,11 @@ let socketOptions = {
 		}
 	},
 	forceNew: true,
+	// transports: ["polling"],
 	secure: true
 };
 
-const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;;
+const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;
 const socketPong =  io(URL_BACK + "/pong", socketOptions);
 const socketStatus = io(URL_BACK + "/status", socketOptions);
 const socketChat =  io(URL_BACK + "/chat", socketOptions);
