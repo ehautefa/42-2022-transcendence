@@ -5,10 +5,10 @@
 version: '3.8'
 services:
   reverse_proxy:
-    # depends_on:
-      # - backend
-      # - frontend
-      # - postgres
+    depends_on:
+      - backend
+      - frontend
+      - postgres
     build:
       context: ./reverse_proxy
       dockerfile: ./Dockerfile
