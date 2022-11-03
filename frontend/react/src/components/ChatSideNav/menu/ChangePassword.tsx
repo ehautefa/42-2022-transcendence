@@ -12,9 +12,7 @@ function ChangePassword({ room }: any) {
 
 
 	const SendPassword = (e: any) => {
-		e.preventDefault();
 		console.log('set password ', password);
-		// TO DO : send password to backend
 		let param = {
 			roomId: room.id,
 			password: password,
