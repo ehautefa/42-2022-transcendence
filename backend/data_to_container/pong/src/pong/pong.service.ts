@@ -52,9 +52,9 @@ export class PongService {
                 && game.begin === true) {
                 if (game.isGameOver === false) {
                     if (game.playerLeft === clientId) {
-                        server.to(game.playerRight).emit('leaveGame', game.playerLeftName);
+                        server.to(game.matchId).emit('leaveGame', game.playerLeftName);
                     } else {
-                        server.to(game.playerLeft).emit('leaveGame', game.playerRightName);
+                        server.to(game.matchId).emit('leaveGame', game.playerRightName);
                     }
                 }
                 console.log("DELETING GAME", game.matchId);
