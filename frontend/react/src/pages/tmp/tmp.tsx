@@ -15,7 +15,7 @@ function Tmp() {
             window.location.replace(process.env.REACT_APP_FRONT_URL + "/twoFa");
         } else {
             console.log("no redirect");
-            // window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
+            window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
         }
     }
     
