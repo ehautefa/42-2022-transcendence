@@ -7,6 +7,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -328,14 +329,15 @@ export class ChatGateway
   async respondToInvitation(
     @MessageBody() respondToInvitationDto: RespondToInvitationDto,
     @Req() { user }: { user: user },
+    @ConnectedSocket() client: Socket,
   ) {
-    // console.table(respondToInvitationDto);
     const usr: user = await this.chatService.respondToInvitation(
       respondToInvitationDto,
       user,
     );
     if (respondToInvitationDto.acceptInvitation === true)
       this.server.socketsJoin(respondToInvitationDto.roomId);
+    this.server.to(client.id).emit('updatePending');
     return usr;
   }
 

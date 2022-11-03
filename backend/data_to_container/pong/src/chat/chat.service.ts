@@ -197,6 +197,7 @@ export class ChatService {
     if (chatMember.mutedTime && chatMember.mutedTime < new Date())
       throw new WsException('You cannot leave a room you are muted in');
     this.chatMembersRepository.delete(chatMember.id);
+    this.logger.debug('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
     return chatMember;
   }
 
@@ -243,10 +244,11 @@ export class ChatService {
     respondToInvitationDto: RespondToInvitationDto,
     user: user,
   ): Promise<user> {
-    // console.table(user.invitationPending);
+    this.logger.debug('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
     const room: Room = await this.findRoomById(respondToInvitationDto.roomId);
     if (respondToInvitationDto.acceptInvitation === true)
       this.createChatMember(user, room);
+    console.table(user);
     return await this.userService.removeInvitation(user.userUuid, room);
   }
 
@@ -352,7 +354,14 @@ export class ChatService {
   }
 
   async amIAdmin(userId: string, roomId: string): Promise<boolean> {
-    const chatMember: ChatMember = await this.findChatMember(userId, roomId);
+    this.logger.debug('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW');
+    const chatMember: ChatMember =
+      await this.chatMembersRepository.findOneOrFail({
+        relations: { room: true, user: true },
+        where: { room: { id: roomId }, user: { userUuid: userId } },
+        // select: { isAdmin: true },
+      });
+    console.log(chatMember);
     return chatMember.isAdmin;
   }
 
