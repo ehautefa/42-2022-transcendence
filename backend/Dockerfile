@@ -15,8 +15,11 @@ WORKDIR     ${DST_APP_DIR}
 # Copying this first prevents re-running npm install on every code change.
 COPY 		${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 
+RUN         apk update
+RUN         apk add openssl
+RUN         openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=backend"
+
 # Install app dependencies using the `npm ci` command instead of `npm install`
-# RUN         npm install
 RUN         npm ci
 
 # Bundle app source
@@ -73,10 +76,13 @@ ARG 		USER=node
 
 WORKDIR     ${DST_APP_DIR}
 # Copy the bundled code from the build stage to the production image
-COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/node_modules ${DST_APP_DIR}/node_modules
-COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/dist ${DST_APP_DIR}/dist
-COPY    ./prod_entrypoint.sh /home/node/
-# COPY --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/ssl ${DST_APP_DIR}/ssl
+COPY        --chown=${USER}:${USER} ./prod_entrypoint.sh /home/node/
+COPY        --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/node_modules ${DST_APP_DIR}/node_modules
+COPY        --chown=${USER}:${USER} --from=build ${DST_APP_DIR}/dist ${DST_APP_DIR}/dist
+COPY        --chown=${USER}:${USER} --from=development /etc/ssl/certs/pong.csr /etc/ssl/certs/
+COPY        --chown=${USER}:${USER} --from=development /etc/ssl/private/.pong.key /etc/ssl/private/
+
+# USER        ${USER}
 
 # Start the server using the production build
 CMD [ "node", "dist/src/main.js" ]

@@ -9,17 +9,19 @@ services:
       - frontend
     volumes:
       - sslVolume:/etc/ssl/pong/
+    networks:
+      - pong_prod_frontend
+      - pong_prod_backend
     build:
       context: ./reverse_proxy
       dockerfile: ./Dockerfile
     container_name: reverse_proxy
     command: /bin/sh /home/nginx/entrypoint.sh
     restart: unless-stopped
-    env_file:
-    - env/.env
-    - env/urls.env
     ports:
        - 4443:443
+    env_file:
+    - .env
 
   frontend:
     depends_on:
@@ -32,12 +34,11 @@ services:
     command: /bin/sh /home/nginx/prod_entrypoint.sh
     volumes:
       - sslVolume:/etc/ssl/pong/
+    networks:
+      - pong_prod_frontend
     restart: unless-stopped
     env_file:
-    - env/.env
-    - env/urls.env
-    - env/pong.env
-    - env/frontend.env
+    - .env
     
   backend:
     depends_on:
@@ -50,26 +51,29 @@ services:
     volumes:
       - sslVolume:/etc/ssl/pong/
       - ./backend/data_to_container/pong/uploads/:/usr/src/app/uploads/
+    networks:
+      - pong_prod_database
+      - pong_prod_backend
     command: /bin/sh /home/node/prod_entrypoint.sh
     restart: unless-stopped
     env_file:
-    - env/.env
-    - env/.secret.env
-    - env/urls.env
-    - env/backend.env
-    - env/pong.env
-    - env/postgres.env
+    - .env
 
   postgres:
     container_name: postgres
     image: postgres:latest
     volumes:
       - pgVolume:/var/lib/postgresql/data
+    networks:
+      - pong_prod_database
     restart: always
     env_file:
-    - env/.env
-    - env/postgres.env
+    - .env
 
 volumes:
   pgVolume:
-  sslVolume:
+
+networks:
+  pong_prod_frontend:
+  pong_prod_backend:
+  pong_prod_database:
