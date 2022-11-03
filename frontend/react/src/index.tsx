@@ -16,7 +16,6 @@ import AllPlayers from './pages/allPlayers/allPlayers';
 import Request from './pages/request/Request';
 import EditProfilePicture from './pages/myProfile/editProfilePicture';
 import NotFound from './pages/notFound/notFound';
-import Tmp from './pages/tmp/tmp';
 import { ModalProvider } from './context/modal-context';
 import TwoFa from './pages/twoFa/twoFa';
 
@@ -41,7 +40,6 @@ root.render(<>
 				<Route path="/allPlayers" element={<AllPlayers />} />
 				<Route path="/endGame/gameOver" element={<GameOver />} />
 				<Route path="/request" element={<Request />} />
-				<Route path="/tmp" element={<Tmp />} />
 				<Route path="/myProfile/editProfilePicture" element={<EditProfilePicture />} />
 				<Route path="*" element={<NotFound />} />
 			</Routes>

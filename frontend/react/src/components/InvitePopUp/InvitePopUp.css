@@ -10,6 +10,11 @@
     align-items: center;
 }
 
+li .Popup-mother button {
+    width: 100%;
+    padding: 5px;
+}
+
 .invitePlayer a {
     width: fit-content;
     color: #DBACE3;

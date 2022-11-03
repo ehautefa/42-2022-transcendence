@@ -52,9 +52,9 @@ export class PongService {
                 && game.begin === true) {
                 if (game.isGameOver === false) {
                     if (game.playerLeft === clientId) {
-                        server.to(game.playerRight).emit('leaveGame', game.playerLeftName);
+                        server.to(game.matchId).emit('leaveGame', game.playerLeftName);
                     } else {
-                        server.to(game.playerLeft).emit('leaveGame', game.playerRightName);
+                        server.to(game.matchId).emit('leaveGame', game.playerRightName);
                     }
                 }
                 console.log("DELETING GAME", game.matchId);
@@ -112,16 +112,16 @@ export class PongService {
 
     hitLeftPaddle(game: GameWindowState): boolean {
         if (game.ballX <= parseInt(process.env.PONG_PADDLE_LEFT_X)
-            && game.ballY >= game.paddleLeftY - (game.paddleSize / 2)  //- BALL_DIAM
-            && game.ballY <= game.paddleLeftY + (game.paddleSize / 2))
+            && game.ballY >= game.paddleLeftY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
+            && game.ballY <= game.paddleLeftY + parseInt(process.env.PONG_PADDLE_SIZE))
             return true;
         return false;
     }
 
     hitRightPaddle(game: GameWindowState): boolean {
         if (game.ballX >= parseInt(process.env.PONG_PADDLE_RIGHT_X)
-        && game.ballY >= game.paddleRightY - (game.paddleSize / 2)  //- BALL_DIAM
-        && game.ballY <= game.paddleRightY + (game.paddleSize / 2))
+        && game.ballY >= game.paddleRightY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
+        && game.ballY <= game.paddleRightY + parseInt(process.env.PONG_PADDLE_SIZE))
             return true;
         return false;
     }

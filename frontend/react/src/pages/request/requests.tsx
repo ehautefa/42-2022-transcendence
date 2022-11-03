@@ -1,7 +1,7 @@
 var credentials: RequestCredentials = "include";
 
 export async function acceptFriendRequest(friendUuid: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/acceptFriendRequest";
+	var url: string = "/user/acceptFriendRequest";
 
 	console.log("acceptFriendRequest", friendUuid);
 	var urlencoded = new URLSearchParams();
@@ -15,13 +15,13 @@ export async function acceptFriendRequest(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign("/auth/login");
 	}
 	return await result;
 }
 
 export async function refuseFriendRequest(friendUuid: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/refuseFriendRequest";
+	var url: string = "/user/refuseFriendRequest";
 
 	console.log("refuseFriendRequest", friendUuid);
 	var urlencoded = new URLSearchParams();
@@ -35,13 +35,13 @@ export async function refuseFriendRequest(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign("/auth/login");
 	}
 	return await result;
 }
 
 export async function getMyRequests() {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/getMyRequests";
+	var url: string = "/user/getMyRequests";
 
 	var requestOptions = {
 		method: 'GET',
@@ -50,7 +50,7 @@ export async function getMyRequests() {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign("/auth/login");
 	}
 	return result;
 }

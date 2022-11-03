@@ -14,12 +14,15 @@ let socketOptions = {
 			}
 		}
 	},
+	// reconnectionDelayMax: 10000,
+	// port: 4443,
 	forceNew: true,
 	// transports: ["polling"],
 	secure: true
 };
 
-const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;
+// const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;
+const URL_BACK = "wss://e1r3p3.clusters.42paris.fr:4443";
 const socketPong =  io(URL_BACK + "/pong", socketOptions);
 const socketStatus = io(URL_BACK + "/status", socketOptions);
 const socketChat =  io(URL_BACK + "/chat", socketOptions);
@@ -27,7 +30,7 @@ const socketChat =  io(URL_BACK + "/chat", socketOptions);
 // const socketStatus = socketPong;
 // 
 async function createUser(username: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
+	var url: string = "/auth/localLogin/" + username;
 	var credentials: RequestCredentials = "include";
 	
 	var requestOptions = {
@@ -36,7 +39,7 @@ async function createUser(username: string) {
 	};
 	
 	await fetch(url, requestOptions);
-	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
+	window.location.assign("/mainPage");
 }
 
 export function getSocketPong() {
@@ -52,7 +55,7 @@ export function getSocketChat() {
 }
 
 // async function login() {
-// 	var url: string = process.env.REACT_APP_BACK_URL + "/auth/login";
+// 	var url: string = "/auth/login";
 // 	var credentials: RequestCredentials = "include";
 	
 // 	var requestOptions = {
@@ -80,7 +83,7 @@ export default function App() {
 	return (<>
 		<div className='login'>
 			{/* <button onClick={login}>try to login</button> */}
-			<a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a>
+			<a href={"/auth/login"}>Log in</a>
 			<div className='createUser'>
 				<h5>Or use a local profile : </h5>
 				<div>

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Req, Res, UploadedFile, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Req, Res, UploadedFile, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user } from 'src/bdd/users.entity';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
@@ -201,20 +201,24 @@ export class UserController {
 	@Post('uploadPicture')
 	@ApiOperation({ summary: 'Upload picture' })
 	@UseGuards(JwtAuthGuard)
-	// @UseInterceptors(FileInterceptor('file',
-	// 	{
-	// 		storage: diskStorage({
-	// 			destination: './uploads/pp',
-	// 			filename: (req, file, cb) => {
-	// 				const filename: string = req.user.userUuid;
-	// 				cb(null, `${filename}.jpeg`);
-	// 			}
-	// 		})
-	// 	}))
-	uploadPicture(@UploadedFile(
-		new ParseFilePipe({ validators: [new MaxFileSizeValidator({ maxSize: 1000 }), new FileTypeValidator({ fileType: 'jpeg' }),], }),
-	) file: any, @Req() req) {
-		console.log("uploadPicture", file);
+	@UseInterceptors(FileInterceptor('file',
+		{
+			storage: diskStorage({
+				destination: './uploads/pp',
+				filename: (req, file, cb) => {
+					console.log("file", file);
+					if (file.mimetype !== 'image/jpeg'
+						&& file.mimetype !== 'image/png'
+						&&  file.mimetype !== 'image/jpg') {
+						return cb(new HttpException('Only image files are allowed!', 403), null);
+					}
+					const filename: string = req.user.userUuid;
+					cb(null, `${filename}.jpeg`);
+				}
+			})
+		}))
+	uploadPicture(@Req() req) {
+		console.log("uploadPicture");
 	}
 
 	@Get('myPicture')
@@ -229,7 +233,7 @@ export class UserController {
 			res.sendFile(join(process.cwd(), `uploads/default_avatar.png`));
 		}
 	}
-	
+
 	@Get('picture/:userUid')
 	@ApiOperation({ summary: 'Get picture of user' })
 	@UseGuards(JwtAuthGuard)

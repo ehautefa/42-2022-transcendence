@@ -99,7 +99,7 @@ function AllPlayers() {
 							return (<></>);
 						return (<tr key={user.userUuid}>
 							<td className="pp">
-								<img src={process.env.REACT_APP_BACK_URL + "/user/picture/" + user.userUuid} alt={"Avatar of " + user.userName} />
+								<img src={"/user/picture/" + user.userUuid} alt={"Avatar of " + user.userName} />
 							</td>
 							<td>
 								<Link

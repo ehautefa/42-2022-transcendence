@@ -9,7 +9,7 @@ function Active2FAPopUp() {
 	async function generateQrCode() {
 		setOpen(true);
 		var credentials: RequestCredentials = "include";
-		var url: string = process.env.REACT_APP_BACK_URL + "/auth/2fa/generateQrCode";
+		var url: string = "/auth/2fa/generateQrCode";
 		var requestOptions = {
 			method: 'POST',
 			credentials: credentials
@@ -17,14 +17,14 @@ function Active2FAPopUp() {
 	
 		let result = await (await fetch(url, requestOptions)).text();
 		// if (result.statusCode === 401) {
-		// 	window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		// 	window.location.assign("/auth/login");
 		// }
 		setQrCode(result);
 	}
 
     async function SendCode() {
         var credentials: RequestCredentials = "include";
-		var url: string = process.env.REACT_APP_BACK_URL + "/auth/2fa/verify2FA";
+		var url: string = "/auth/2fa/verify2FA";
 		var urlencoded = new URLSearchParams();
 		urlencoded.append("twoFactorAuthenticationCode", code);
 		var requestOptions = {
@@ -38,7 +38,7 @@ function Active2FAPopUp() {
 		if (result.status === 201) {
 			setOpen(false);
 		} else if (result.status === 401) {
-			window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+			window.location.assign("/auth/login");
 		} else if (result.status === 403) {
 			alert(result.statusText);
 		}

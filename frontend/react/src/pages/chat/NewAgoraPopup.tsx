@@ -30,7 +30,7 @@ function NewAgoraPopup() {
 			<button type="submit" onClick={() => setOpen(true)}> Create New Room </button>
 			<Popup open={open} closeOnDocumentClick onClose={() => {
 				setOpen(false);
-				window.location.reload();
+				//window.location.reload();
 			}}>
 				<div className='messagePopup'>
 					<label htmlFor="messagePopup">Make new room :</label>

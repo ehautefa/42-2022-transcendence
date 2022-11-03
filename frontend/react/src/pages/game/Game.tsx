@@ -8,22 +8,9 @@ import { PaddleSizeSelector } from "./element";
 
 function Game() {
 	const socket = getSocketPong();
-	const location = useLocation();
-	var index = new URLSearchParams(location.search).get('id');
+	var index = new URLSearchParams(useLocation().search).get('id');
 	const initialLayer = index === null ? 0 : 1;
 	const [layer, setLayer] = useState(initialLayer); // 0 - matchMaking button, 1 - waiting for opponent, 2 - game 
-
-	// window.history.pushState = function () {
-	// 	socket.emit("leaveGame");
-	// };
-
-	// detect if user is leaving the page
-	
-	useEffect(() => {
-		console.log("leaveGame");
-		socket.emit("leaveGame");
-		// TO DO FIX
-	}, [socket, location]);
 
 	if (index !== null) {
 		socket.emit('joinGame', index);
@@ -44,8 +31,13 @@ function Game() {
 		socket.on('beginGame', () => {
 			setLayer(2);
 		});
+		socket.on("leaveGame", (userName: string) => {
+			alert(userName + " left the game");
+		})
 		return () => {
+			socket.off("leaveGame");	
 			socket.off('beginGame');
+			socket.emit("leaveGame");	
 		}
 	}, [socket])
 

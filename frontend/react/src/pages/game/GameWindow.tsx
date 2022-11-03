@@ -6,8 +6,8 @@ import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
 const socket = getSocketPong();
 
-const PADDLE_GAP = process.env.REACT_APP_PADDLE_GAP === undefined ? 0 : parseInt(process.env.REACT_APP_PADDLE_GAP);
-const PADDLE_DEP = process.env.REACT_APP_PADDLE_DEP === undefined ? 0 : parseInt(process.env.REACT_APP_PADDLE_DEP);
+const PADDLE_GAP = 3;
+const PADDLE_DEP = 2;
 // TO DO : understand why env variable is not working
 
 export class GameWindow extends React.Component<{ id: string }, GameWindowState> {
@@ -60,10 +60,6 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 				playerLeftName: data.playerLeftName,
 				playerRightName: data.playerRightName,
 			});
-		})
-		socket.on('leaveGame', (playerName: string) => {
-			console.log("leaveGame", this.state);
-			alert(`${playerName} has left the game`);
 		})
 	}
 
