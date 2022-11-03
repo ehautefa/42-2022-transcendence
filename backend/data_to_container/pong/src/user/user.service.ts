@@ -344,15 +344,13 @@ export class UserService {
         return user;
     }
 
-    async removeInvitation(userId: string, room: Room): Promise<user> {
-        const user: user = await this.getCompleteUser(userId);
-        console.table(user.invitationPending)
-        console.table(room)
-        if (user.invitationPending.find((r) => (r.id === room.id))) {
-            user.invitationPending.splice(user.invitationPending.indexOf(room));
-            await this.UserRepository.save(user)
-        }
-        return user;
-    }
+	  async removeInvitation(userId: string, room: Room): Promise<user> {
+		  const user: user = await this.getCompleteUser(userId);
+		  if (user.invitationPending.find((r)=>(r.id === room.id))) {
+		    user.invitationPending.splice(user.invitationPending.indexOf(room));
+		    await this.UserRepository.save(user)
+		  }
+		  return user;
+	  }
 
 }
