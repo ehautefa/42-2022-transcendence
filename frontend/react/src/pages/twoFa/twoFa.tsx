@@ -6,7 +6,7 @@ function TwoFa() {
 
     async function login() {
         var credentials: RequestCredentials = "include";
-        var url: string = process.env.REACT_APP_BACK_URL + "/auth/2fa/login/" + code;
+        var url: string = "/auth/2fa/login/" + code;
 
         var requestOptions = {
             method: 'GET',

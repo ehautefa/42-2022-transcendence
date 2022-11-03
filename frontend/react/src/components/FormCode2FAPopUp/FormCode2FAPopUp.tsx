@@ -7,7 +7,7 @@ function FormCode2FAPopUp() {
 
 	async function login(new_code: string) {
 			var credentials: RequestCredentials = "include";
-			var url: string = process.env.REACT_APP_BACK_URL + "/auth/login";
+			var url: string = "/auth/login";
 			
 			var redirect : RequestRedirect = "follow";
             var urlencoded = new URLSearchParams();

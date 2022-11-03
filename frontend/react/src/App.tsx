@@ -30,7 +30,7 @@ const socketChat =  io(URL_BACK + "/chat", socketOptions);
 // const socketStatus = socketPong;
 // 
 async function createUser(username: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
+	var url: string = "/auth/localLogin/" + username;
 	var credentials: RequestCredentials = "include";
 	
 	var requestOptions = {
@@ -39,7 +39,7 @@ async function createUser(username: string) {
 	};
 	
 	await fetch(url, requestOptions);
-	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
+	window.location.assign("/mainPage");
 }
 
 export function getSocketPong() {
@@ -55,7 +55,7 @@ export function getSocketChat() {
 }
 
 // async function login() {
-// 	var url: string = process.env.REACT_APP_BACK_URL + "/auth/login";
+// 	var url: string = "/auth/login";
 // 	var credentials: RequestCredentials = "include";
 	
 // 	var requestOptions = {
@@ -83,7 +83,7 @@ export default function App() {
 	return (<>
 		<div className='login'>
 			{/* <button onClick={login}>try to login</button> */}
-			<a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a>
+			<a href={"/auth/login"}>Log in</a>
 			<div className='createUser'>
 				<h5>Or use a local profile : </h5>
 				<div>

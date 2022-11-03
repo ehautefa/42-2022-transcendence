@@ -47,7 +47,7 @@ function MyProfile() {
 
 	function logOut() {
 		Cookies.remove('access_token', { path: "/" });
-		window.location.replace(process.env.REACT_APP_FRONT_URL + "/");
+		window.location.assign("/");
 	}
 
 	return (<>
@@ -75,7 +75,7 @@ function MyProfile() {
 				</div>
 				<Link className="pp-containers" to="./editProfilePicture">
 					<div className="pp">
-						<img src={process.env.REACT_APP_BACK_URL + "/user/myPicture"} alt={"Avatar of " + user.userName} />
+						<img src={"/user/myPicture"} alt={"Avatar of " + user.userName} />
 					</div>
 					<div className="pphover">
 						<p>Edit</p>
