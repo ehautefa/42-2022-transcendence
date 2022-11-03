@@ -17,6 +17,7 @@ import {
   JoinRoomDto,
   PunishUserDto,
   RemovePunishmentDto,
+  RespondToInvitationDto,
   SetAdminDto,
   UuidDto,
 } from './dto';
@@ -238,13 +239,19 @@ export class ChatService {
     return await this.userService.addInvitation(userId, room);
   }
 
-  async respondToInvitation(userId: string, roomId: string): Promise<user> {
-    const room: Room = await this.findRoomById(roomId);
-    return await this.userService.removeInvitation(userId, room);
+  async respondToInvitation(
+    respondToInvitationDto: RespondToInvitationDto,
+    user: user,
+  ): Promise<user> {
+    // console.table(user.invitationPending);
+    const room: Room = await this.findRoomById(respondToInvitationDto.roomId);
+    if (respondToInvitationDto.acceptInvitation === true)
+      this.createChatMember(user, room);
+    return await this.userService.removeInvitation(user.userUuid, room);
   }
 
   async getPendingInvitations(userId: string): Promise<Room[]> {
-    const user: user = await this.userService.getUser(userId);
+    const user: user = await this.userService.getCompleteUser(userId);
     return user.invitationPending;
   }
 

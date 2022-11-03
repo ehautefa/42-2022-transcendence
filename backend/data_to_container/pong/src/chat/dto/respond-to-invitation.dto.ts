@@ -1,9 +1,9 @@
 import { IsBoolean, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class RespondToInvitationDto {
-  @IsUUID()
-  @IsNotEmpty()
-  userId: string;
+  // @IsUUID()
+  // @IsNotEmpty()
+  // userId: string;
 
   @IsUUID()
   @IsNotEmpty()
