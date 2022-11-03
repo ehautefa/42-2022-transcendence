@@ -6,7 +6,7 @@ function TwoFa() {
 
     async function login() {
         var credentials: RequestCredentials = "include";
-        var url: string = process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code;
+        var url: string = process.env.REACT_APP_BACK_URL + "/auth/2fa/login/" + code;
 
         var requestOptions = {
             method: 'GET',
@@ -34,7 +34,7 @@ function TwoFa() {
                     maxLength={6}
                     size={6} />
             </div>
-            <a href={process.env.REACT_APP_BACK_URL + "/auth/login2fa/" + code} >login</a>
+            <a href={process.env.REACT_APP_BACK_URL + "/auth/2fa/login/" + code} >login</a>
             <button type="submit" onClick={() => login()}>Send Code</button>
         </div>
     )
