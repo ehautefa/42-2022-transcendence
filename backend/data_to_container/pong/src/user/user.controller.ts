@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Req, Res, UploadedFile, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Req, Res, UploadedFile, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user } from 'src/bdd/users.entity';
 import { ChangeUserNameDto } from './dto/changeUserName.dto';
 import { EndOfMatchDto } from './dto/endOfMatch.dto';
@@ -207,8 +207,10 @@ export class UserController {
 				destination: './uploads/pp',
 				filename: (req, file, cb) => {
 					console.log("file", file);
-					if (file.mimetype !== 'image') {
-						console.log("not an image");
+					if (file.mimetype !== 'image/jpeg'
+						&& file.mimetype !== 'image/png'
+						&&  file.mimetype !== 'image/jpg') {
+						return cb(new HttpException('Only image files are allowed!', 403), null);
 					}
 					const filename: string = req.user.userUuid;
 					cb(null, `${filename}.jpeg`);

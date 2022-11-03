@@ -56,6 +56,8 @@ export default class PictureUploader extends React.Component<{}, MyState>{
         let result = await fetch(url, requestOptions);
         if (result.status === 401) {
             window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+        } else if (result.status === 403) {
+            alert("Wrong format : format must be png, jpg or jpeg");
         } else if (result.status !== 201) {
             alert(result.status + " " + result.statusText);
         } else {
@@ -66,6 +68,7 @@ export default class PictureUploader extends React.Component<{}, MyState>{
     render() {
         return (
             <div className="pictureUploader">
+                <h1>Upload your avatar</h1>
                 <input type="file" name="file" id="file" className="inputfile" onChange={this.handlePictureSelected.bind(this)} />
                 {this.renderPreview()}
                 <button onClick={this.upload.bind(this)}>Upload</button>
