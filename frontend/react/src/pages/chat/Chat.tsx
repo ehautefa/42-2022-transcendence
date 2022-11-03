@@ -83,6 +83,10 @@ function Chat() {
 
 		socket.on('refreshSelectedRoom', () => {
 			setSelectedRoom({} as Room);
+			socket.emit('findAllJoinedRooms', (rooms: any) => {
+				console.log("findAllJoined", rooms);
+				setChannels(rooms)
+			});
 		} )
 
 		socket.on('updateThisRoom', (thisRoom: any) => {

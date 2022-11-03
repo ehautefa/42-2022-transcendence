@@ -253,13 +253,14 @@ export class ChatGateway
   async leaveRoom(
     @MessageBody() roomId: UuidDto,
     @Req() { user }: { user: user },
+    @ConnectedSocket() client: Socket,
   ): Promise<ChatMember> {
     console.log('leaving ', roomId);
     const chatMember: ChatMember = await this.chatService.leaveRoom(
       user.userUuid,
       roomId.uuid,
     );
-    this.server.to(chatMember.room.id).emit('refreshSelectedRoom');
+    this.server.to(client.id).emit('refreshSelectedRoom');
     return chatMember;
   }
 
