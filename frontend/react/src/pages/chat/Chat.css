@@ -1,5 +1,5 @@
 .mainComposant {
-    width: 80%;
+    width: 100%;
     height: 80vh;
     margin: 60px auto;
     display: flex;
@@ -69,10 +69,10 @@
 }
 
 .rooms {
-    margin: 20px;
+    margin: 2%;
     display: flex;
     flex-direction: column;
-    width: 35%;
+    width: 25%;
     /* background-color: #fef45b; */
 }
 
@@ -102,8 +102,8 @@
 .chat {
     display: flex;
     flex-direction: column;
-    width: 90%;
-    margin: 20px;
+    width: 67%;
+    margin: 20px 2%;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.5);
     border: 2px solid #DBACE3;
