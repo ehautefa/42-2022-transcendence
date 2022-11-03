@@ -46,7 +46,6 @@ services:
     depends_on:
     - postgres
     container_name: backend
-    image: nestjs-api-dev:1.0.0
     build:
       context: ./backend
       target: development

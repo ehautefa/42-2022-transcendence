@@ -7,8 +7,6 @@ services:
   reverse_proxy:
     depends_on:
       - frontend
-    volumes:
-      - sslVolume:/etc/ssl/pong/
     networks:
       - pong_prod_frontend
       - pong_prod_backend
@@ -32,8 +30,6 @@ services:
       target: production
       dockerfile: ./Dockerfile
     command: /bin/sh /home/nginx/prod_entrypoint.sh
-    volumes:
-      - sslVolume:/etc/ssl/pong/
     networks:
       - pong_prod_frontend
     restart: unless-stopped
@@ -49,7 +45,6 @@ services:
       target: production
       dockerfile: ./Dockerfile
     volumes:
-      - sslVolume:/etc/ssl/pong/
       - ./backend/data_to_container/pong/uploads/:/usr/src/app/uploads/
     networks:
       - pong_prod_database
