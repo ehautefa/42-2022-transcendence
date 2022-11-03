@@ -243,6 +243,11 @@ export class ChatService {
     return await this.userService.removeInvitation(userId, room);
   }
 
+  async getPendingInvitations(userId: string): Promise<Room[]> {
+    const user: user = await this.userService.getUser(userId);
+    return user.invitationPending;
+  }
+
   /*
    * dm room functions
    */
