@@ -43,8 +43,9 @@ import { ProtectedRoomGuard } from './guard/protected-room.guard';
   namespace: 'chat',
 })
 export class ChatGateway
-  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly chatService: ChatService) { }
+  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
+{
+  constructor(private readonly chatService: ChatService) {}
 
   // The socket.io server responsible for handling (receiviing and emitting) events
   @WebSocketServer()
@@ -239,6 +240,7 @@ export class ChatGateway
     @MessageBody() roomId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<ChatMember> {
+    console.log('leaving ', roomId);
     const chatMember: ChatMember = await this.chatService.leaveRoom(
       user.userUuid,
       roomId.uuid,
@@ -296,11 +298,13 @@ export class ChatGateway
   async handleConnection(client: Socket): Promise<void> {
     this.logger.debug(`client connected: ${client.id}`);
     const cookie: string = client.handshake.headers.cookie;
-    if (cookie !== undefined &&
-			cookie !== null
-			&& cookie !== ""
-			&& cookie.includes('access_token=')) {
-			console.log("cookie", client.handshake.headers.cookie);
+    if (
+      cookie !== undefined &&
+      cookie !== null &&
+      cookie !== '' &&
+      cookie.includes('access_token=')
+    ) {
+      console.log('cookie', client.handshake.headers.cookie);
       const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
         client.handshake.headers.cookie,
       );

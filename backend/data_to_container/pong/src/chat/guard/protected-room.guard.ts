@@ -18,11 +18,9 @@ export class ProtectedRoomGuard implements CanActivate {
       select: { hash: true },
       where: { id: dto.roomId },
     });
-    if (
-      room.type === RoomType.PROTECTED &&
-      (await argon.verify(room.hash, dto.password))
-    )
-      return true;
+    if (room.type !== RoomType.PROTECTED) return true;
+    console.log('XXXXXXXXXXXXXXXXXXXXXXXXXX');
+    if (await argon.verify(room.hash, dto.password)) return true;
     throw new WsException('Invalid password');
   }
 }
