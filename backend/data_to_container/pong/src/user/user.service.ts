@@ -2,10 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user, Room } from 'src/bdd/';
 import { Equal, Repository, UpdateResult } from 'typeorm';
-import { StatusGateway } from 'src/status/status.gateway';
-import * as argon from 'argon2';
 import { ArgUndefinedException, FailToFindAUniqNameException, FailToFindObjectFromanEntity, FailToFindObjectFromDBException, TwoFactorAuthAlreadyDisableException, TwoFactorAuthAlreadyEnableException, UserAreAlreadyFriends, UserAreNotBlocked, UserAreNotFriends, UserFriendRequestAlreadyPendingException, UserIsBlockedException, UserIsTheSameException, UserNameAlreadyExistException } from '../exceptions/user.exception';
-import { authenticator } from 'otplib';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 

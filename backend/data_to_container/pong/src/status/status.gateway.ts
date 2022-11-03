@@ -43,6 +43,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("Alert sent to " + sendAlert.userUuid);
 	}
 
+	@OnEvent('game.invite')
 	sendInvitation(sendInvite: SendInviteDto) {
 		let socket = inline.get(sendInvite.invitedUserUuid);
 		if (!socket) {
