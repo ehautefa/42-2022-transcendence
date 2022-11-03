@@ -43,8 +43,8 @@ services:
     - env/urls.env
     - env/pong.env
     - env/frontend.env
-    # ports:
-      #  - 3000:3000
+    ports:
+       - 3000:3000
     
   backend:
     depends_on:
