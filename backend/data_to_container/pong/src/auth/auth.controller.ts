@@ -9,6 +9,7 @@ import { user } from 'src/bdd/users.entity';
 import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
 import { TwoFaExceptionFilter } from 'src/exceptions/user2fa.exception.filter';
+import { TwoFaAuthGuard } from './guards/2fa.guards';
 
 @ApiBearerAuth()
 @ApiTags('auth')
@@ -19,49 +20,6 @@ export class AuthController {
         private readonly authService: AuthService,
     ) { }
 
-
-    // @Get('localLogin/:userName')
-    // @ApiOperation({ summary: 'Create a new user' })
-    // @UsePipes(ValidationPipe)
-    // async localLogin(@Req() req, @Res() res, @Param('userName') userName: string) {
-    // const user = await this.userService.FindOrCreateUserLocal(userName);
-    // res.cookie('access_token', this.jwtService.sign({ userUuid: user.userUuid }))
-    // console.log("Local username connected with Uuid", user);
-    // res.redirect(process.env.REACT_APP_HOME_PAGE);
-    // }
-
-    // @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
-    // @UseGuards(FortyTwoAuthGuard)
-    // @Get('login')
-    // login(@Req() req, @Res() res) {
-    // console.log("username connected with Uuid", req.user);
-    // res.cookie('access_token', this.jwtService.sign({ userUuid: req.user.userUuid }))
-    // if (req.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !req.headers.referer)
-    // res.redirect(process.env.REACT_APP_HOME_PAGE);
-    // else
-    // res.redirect(req.headers.referer);
-    // }
-    // 
-
-    // @Post('2fa/login')
-    // @HttpCode(200)
-    // @UseGuards(JwtAuthGuard)
-    // async TwoFauthenticate(@Request() request, @Response() res, @Body() body) {
-    // const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-    // body.twoFactorAuthenticationCode,
-    // request.user,
-    // );
-    // 
-    // if (!isCodeValid) {
-    // throw new UnauthorizedException('Wrong authentication code');
-    // }
-    // res.cookie('access_token', this.authService.loginWith2fa(request.user));
-    // if (request.headers.referer === process.env.REACT_APP_FRONT_URL + "/" || !request.headers.referer)
-    // res.redirect(process.env.REACT_APP_HOME_PAGE);
-    // else
-    // res.redirect(request.headers.referer);
-    // }
-    // 
     @Get('localLogin/:userName')
     @ApiOperation({ summary: 'Create a new user' })
     @UsePipes(ValidationPipe)
@@ -81,23 +39,17 @@ export class AuthController {
     async login(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }) {
         const access_token: string = await this.authService.login(user);
         res.setHeader('Set-Cookie', [access_token]);
-        return res.redirect('/tmp');
-        // return `user : #${user.userName} is logged-in`
+        if (user.twoFactorAuth)
+            return res.redirect('/twoFa');
+        else
+            return res.redirect(process.env.HOME_PAGE);
     }
 
     @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
     // @UseFilters(TwoFaExceptionFilter)
-    @UseGuards(FortyTwoAuthGuard)
-    @Get('login2fa/:tfacode')
+    @UseGuards(TwoFaAuthGuard)
+    @Get('2fa/login/:tfacode')
     async login2fa(@Res({ passthrough: true }) res: Response, @Req() { user }: { user: user }, @Param('tfacode') tfaCode: string) {
-        console.log("2FA")
-        console.log("2FA")
-        console.log("2FA")
-        console.log("2FA")
-        console.log("2FA")
-        console.log("2FA")
-        console.log("2FA")
-        console.log("2FA")
         const access_token: string = await this.authService.login2fa(user, tfaCode);
         res.setHeader('Set-Cookie', [access_token]);
         if(user.twoFactorAuth)
