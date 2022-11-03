@@ -44,10 +44,12 @@ async function handleRequest(userUuid: string, accept: boolean) {
 	setRequests(newRequest);
 }
 
-async function handleInvitation(roomId: string, accept: boolean) {
+async function handleInvitation(this: any,roomId: string, accept: boolean) {
 	respondToInvitation(roomId, accept);
 	if (accept === true && chatInvitations.length <= 1 && requests.length === 0) {
-		window.location.assign("/chat?room=" + roomId);
+		// window.location.assign("/chat?room=" + roomId);
+		// window.location.href = "/chat?room=" + roomId;
+		this.props.history.push("/chat?room=" + roomId);
 	}
 
 }

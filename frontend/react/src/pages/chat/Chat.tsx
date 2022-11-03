@@ -37,6 +37,7 @@ function Chat() {
 				if (tofindRoom !== undefined) {
 					setSelectedRoom(tofindRoom);
 				}
+				window.history.replaceState({}, document.title, "/chat");
 			}
 		});
 	}, [socket, roomId]);
