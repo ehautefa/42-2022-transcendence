@@ -1,6 +1,7 @@
 
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany, JoinTable, ManyToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Room } from './'
 
 @Entity('users')
 export class user extends BaseEntity {
@@ -38,6 +39,11 @@ export class user extends BaseEntity {
     @ManyToMany(() => user, usr => usr.userUuid)
     @JoinTable()
     requestPending: user[];
+
+    @ApiProperty({ description: 'The list of rooms who are in pending invitation'})
+    @ManyToMany(() => Room, room => room.id)
+    @JoinTable()
+    invitationPending: Room[];
 
     @ApiProperty({ description: 'The list of user who are blocked by the user'})
     @ManyToMany(() => user, usr => usr.userUuid)
