@@ -131,7 +131,6 @@ export class ChatService {
     chatMember.isAdmin = true;
     await this.chatMembersRepository.save(chatMember);
     newRoom.owner = chatMember;
-    console.log(newRoom);
     return await this.roomsRepository.save(newRoom);
   }
 
@@ -186,7 +185,6 @@ export class ChatService {
           room: { id: roomId },
         },
       });
-    console.log(chatMember);
     if (chatMember.room.owner.user.userUuid === chatMember.user.userUuid)
       throw new WsException('You cannot leave a room you own');
     if (chatMember.bannedTime && chatMember.bannedTime < new Date())
@@ -331,24 +329,6 @@ export class ChatService {
     return await this.chatMembersRepository.save(chatMember);
   }
 
-  // async filterUsersInRoom(
-  //   filterUsersDto: FilterUsersDto,
-  // ): Promise<ChatMember[]> {
-  //   let timeNow: Date;
-  //   if (filterUsersDto.banned || filterUsersDto.muted) timeNow = new Date();
-  //   return await this.chatMembersRepository.find({
-  //     relations: { user: true, room: true },
-  //     select: {
-  //       user: { userName: true, userUuid: true },
-  //     },
-  //     where: {
-  //       room: { id: filterUsersDto.roomId },
-  //       isAdmin: filterUsersDto.admin,
-  //       bannedTime: filterUsersDto.banned && Not(IsNull) && LessThan(timeNow),
-  //       mutedTime: filterUsersDto.muted && Not(IsNull) && LessThan(timeNow),
-  //     },
-  //   });
-  // }
   async amIAdmin(userId: string, roomId: string): Promise<boolean> {
     const chatMember: ChatMember = await this.findChatMember(userId, roomId);
     return chatMember.isAdmin;
@@ -403,7 +383,6 @@ export class ChatService {
       .addSelect('user.userName', 'userName')
       .getRawMany();
   }
-
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,
     userId: string,
@@ -457,14 +436,6 @@ export class ChatService {
         .split('; ')
         .find((cookie: string) => cookie.startsWith('access_token='))
         .split('=')[1];
-      // const cookies: string[] = cookiesStr.split('; ');
-      // const authCookie: string = cookies.filter((s) =>
-      //   s.includes('access_token='),
-      // )[0];
-      // const accessToken = authCookie.substring(
-      //   'access_token'.length + 1,
-      //   authCookie.length,
-      // );
       const jwtOptions: JwtVerifyOptions = {
         secret: JwtConfig.secret,
       };
