@@ -36,8 +36,13 @@
     justify-content: space-around;
 }
 
-.members p {
+.members a {
     margin: 10px 0;
+}
+
+.members a:hover {
+    color: #fef45b;
+    text-shadow: none;
 }
 
 .channel .selectedRoom {

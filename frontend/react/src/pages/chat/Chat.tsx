@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getSocketChat } from "../../App";
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import InvitePopUp from '../../components/InvitePopUp/InvitePopUp';
@@ -116,7 +116,7 @@ function Chat() {
 				<div className="channel members">
 					{members.map((member: User) => (
 							<li key={member.userUuid}>
-								<p>{member.userName}</p>
+								<Link to={"/profile?uid=" + member.userUuid}>{member.userName}</Link>
 								<InvitePopUp userName={member.userName} userUuid={member.userUuid} user={user} />
 							</li>
 					))}
