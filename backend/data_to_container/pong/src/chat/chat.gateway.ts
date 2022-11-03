@@ -201,7 +201,7 @@ export class ChatGateway
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
     const chatMember = await this.chatService.punishUser(punishUserDto);
-    this.server.to(chatMember.room.id).emit('updateThisRoom');
+    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
     return chatMember;
   }
 
@@ -211,7 +211,9 @@ export class ChatGateway
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
     console.log('removePunishmentDto = ', removePunishmentDto);
-    return await this.chatService.removePunishment(removePunishmentDto);
+    const chatMember = await this.chatService.removePunishment(removePunishmentDto);
+    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
+    return chatMember;
   }
 
   @SubscribeMessage('findAllJoinedRooms')
