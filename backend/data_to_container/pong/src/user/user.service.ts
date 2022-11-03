@@ -6,29 +6,28 @@ import { StatusGateway } from 'src/status/status.gateway';
 import * as argon from 'argon2';
 import { ArgUndefinedException, FailToFindAUniqNameException, FailToFindObjectFromanEntity, FailToFindObjectFromDBException, TwoFactorAuthAlreadyDisableException, TwoFactorAuthAlreadyEnableException, UserAreAlreadyFriends, UserAreNotBlocked, UserAreNotFriends, UserFriendRequestAlreadyPendingException, UserIsBlockedException, UserIsTheSameException, UserNameAlreadyExistException } from '../exceptions/user.exception';
 import { authenticator } from 'otplib';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 
 @Injectable()
 export class UserService {
 
     constructor(
-        @InjectRepository(user) private UserRepository: Repository<user>
+        @InjectRepository(user) private UserRepository: Repository<user>,
+        private eventEmitter: EventEmitter2
     ) { }
-
-    @Inject(StatusGateway)
-	private readonly StatusGateway: StatusGateway;
 
     async getAllUser(): Promise<user[]> {
         return await this.UserRepository.find({ relations: { friends: true, blocked: true } });
     }
-        
+
     async getAllUserUuidWithUserName(): Promise<user[]> {
         return await this.UserRepository.find({ select: { userUuid: true, userName: true } });
     }
 
     async getUserTwoFactorAuthenticationSecret(user: user): Promise<string> {
-        
-        const ret =  await this.UserRepository.findOne({ where : {userUuid: user.userUuid}, select: { twoFactorAuthenticationSecret: true} });
+
+        const ret = await this.UserRepository.findOne({ where: { userUuid: user.userUuid }, select: { twoFactorAuthenticationSecret: true } });
         return ret.twoFactorAuthenticationSecret;
     }
 
@@ -42,7 +41,7 @@ export class UserService {
         this.checkUsers(completeMe, completeUser2);
         if (0 <= completeMe.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid })) {
             return true;
-		}
+        }
         return false;
     }
 
@@ -57,11 +56,11 @@ export class UserService {
         this.checkUsers(completeMe, completeUser2);
         const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0)
-        completeMe.requestPending.splice(idx1);
-        else{
+            completeMe.requestPending.splice(idx1);
+        else {
             throw new FailToFindObjectFromanEntity(completeUser2.userUuid, "requestPending", 'users')
         }
-        
+
         await this.becomeFriend(completeMe, completeUser2);
         console.log("cant find request");
         return completeMe.requestPending;
@@ -102,6 +101,7 @@ export class UserService {
         else if (idx2 < 0) {
             completeUser2.requestPending.push(completeMe);
             await this.UserRepository.save(completeUser2);
+            this.eventEmitter.emit('room.invite', completeUser2.userUuid);
             return completeMe.friends;
         }
         //already in pending
@@ -153,10 +153,10 @@ export class UserService {
 
         await this.UserRepository.save([completeUser1, completeUser2]);
         const sendAlert: SendAlertDto = {
-			userUuid: completeUser2.userUuid,
-			message: `${completeUser1.userName} removed you from his friend list`,
-		}
-		this.StatusGateway.sendAlert(sendAlert);
+            userUuid: completeUser2.userUuid,
+            message: `${completeUser1.userName} removed you from his friend list`,
+        }
+        this.eventEmitter.emit('alert.send', sendAlert);
         return completeUser1.friends;
     }
 
@@ -285,7 +285,7 @@ export class UserService {
             throw new UserNameAlreadyExistException(newName)
         user.userName = newName;
         await this.UserRepository.save(user)
-		this.StatusGateway.refreshUserData(user);
+        this.eventEmitter.emit('user.refresh', user);
         return user;
     }
 
@@ -307,7 +307,7 @@ export class UserService {
             throw new TwoFactorAuthAlreadyEnableException()
         user.twoFactorAuth = true;
         await this.UserRepository.save(user);
-		this.StatusGateway.refreshUserData(user);
+        this.eventEmitter.emit('user.refresh', user);
         return user;
     }
 
@@ -329,42 +329,33 @@ export class UserService {
             throw new UserIsTheSameException();
     }
 
-    async setTwoFactorAuthenticationSecret(user: user, secret: string) : Promise<user>{
+    async setTwoFactorAuthenticationSecret(user: user, secret: string): Promise<user> {
         if (!user)
             throw new ArgUndefinedException('user')
         if (!secret)
             throw new ArgUndefinedException('secret')
         user.twoFactorAuthenticationSecret = secret;
         return await this.UserRepository.save(user);
-      }
+    }
 
-	  async addInvitation(userId: string, room: Room): Promise<user> {
-		  const user: user = await this.getCompleteUser(userId);
-		  console.log('XXXXXXXXXXXX', user.invitationPending);
-		  console.log('XXXXXXXXXXXX', user);
-		  if (!user.invitationPending.includes(room)) {
-			user.invitationPending.push(room);
-			await this.UserRepository.save(user)
-		  }
-		  return user;
-	  }
+    async addInvitation(userId: string, room: Room): Promise<user> {
+        const user: user = await this.getCompleteUser(userId);
+        if (!user.invitationPending.find((r) => (r.id === room.id))) {
+            user.invitationPending.push(room);
+            await this.UserRepository.save(user)
+        }
+        return user;
+    }
 
-	  async removeInvitation(userId: string, room: Room): Promise<user> {
-		  const user: user = await this.getUser(userId);
-		  if (user.invitationPending.includes(room)) {
-		    user.invitationPending.splice(user.invitationPending.indexOf(room));
-		    await this.UserRepository.save(user)
-		  }
-		  return user;
-	  }
-
-	  async findAllInvitations(userId: string): Promise<Room[]> {
-		  return await this.UserRepository
-		  .createQueryBuilder('user')
-		  .innerJoin('invitationPending.id', 'id')
-		  .select('user.invitationPending', 'invitationPending')
-		  .where('userUuid = :userId', { userId: userId })
-		  .getRawMany();
-	  }
+    async removeInvitation(userId: string, room: Room): Promise<user> {
+        const user: user = await this.getCompleteUser(userId);
+        console.table(user.invitationPending)
+        console.table(room)
+        if (user.invitationPending.find((r) => (r.id === room.id))) {
+            user.invitationPending.splice(user.invitationPending.indexOf(room));
+            await this.UserRepository.save(user)
+        }
+        return user;
+    }
 
 }

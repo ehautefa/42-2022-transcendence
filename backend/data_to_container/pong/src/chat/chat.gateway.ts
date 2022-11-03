@@ -318,8 +318,10 @@ export class ChatGateway
   }
 
   @SubscribeMessage('getPendingInvitations')
-  async getPendingInvitations(@MessageBody() userId: UuidDto): Promise<Room[]> {
-    return await this.chatService.getPendingInvitations(userId.uuid);
+  async getPendingInvitations(
+    @Req() { user }: { user: user },
+  ): Promise<Room[]> {
+    return await this.chatService.getPendingInvitations(user.userUuid);
   }
 
   @SubscribeMessage('respondToInvitation')
@@ -327,9 +329,10 @@ export class ChatGateway
     @MessageBody() respondToInvitationDto: RespondToInvitationDto,
     @Req() { user }: { user: user },
   ) {
+    // console.table(respondToInvitationDto);
     const usr: user = await this.chatService.respondToInvitation(
-      respondToInvitationDto.roomId,
-      user.userUuid,
+      respondToInvitationDto,
+      user,
     );
     if (respondToInvitationDto.acceptInvitation === true)
       this.server.socketsJoin(respondToInvitationDto.roomId);

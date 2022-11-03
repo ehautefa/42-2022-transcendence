@@ -4,7 +4,7 @@ import bell from "../../assets/bell.png"
 import { getMyRequests } from "../../pages/request/requests"
 import { NavLink } from "react-router-dom"
 import { Room } from '../../type'
-import { getSocketChat } from '../../App'
+import { getSocketChat, getSocketStatus } from '../../App'
 
 
 
@@ -12,18 +12,23 @@ function NavBar() {
 	const [isNavExpanded, setIsNavExpanded] = useState(false)
 	const [isBellExpanded, setIsBellExpanded] = useState(false)
 	const socketChat = getSocketChat();
+	const socketStatus = getSocketStatus();
 
 
 	useEffect(() => {
-		getMyRequests().then(
-			(response) => {
-				setIsBellExpanded(response.length > 0)
-			}
-		)
-		socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
-			setIsBellExpanded(invitation.length > 0)
-		});
-	}, [socketChat])
+		socketStatus.on('refreshRequest', () => {
+
+			getMyRequests().then(
+				(response) => {
+					
+					socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
+						setIsBellExpanded(invitation.length > 0 || response.length > 0)
+						console.log("GET PENDING INCITE", invitation.length > 0 || response.length > 0);
+					});
+				}
+			)
+		})
+	}, [socketChat, socketStatus])
 
 	return (
 		<nav className="nav">
