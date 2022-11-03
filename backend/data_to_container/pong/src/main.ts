@@ -6,8 +6,8 @@ import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.i
 import * as fs from 'fs';
 
 var HttpsOptions: HttpsOptions = {
-	key: fs.readFileSync('.pong.key'),
-	cert: fs.readFileSync('pong.csr')
+	key: fs.readFileSync('/etc/ssl/pong/.pong.key'),
+	cert: fs.readFileSync('/etc/ssl/pong/pong.csr')
 }
 
 async function bootstrap() {

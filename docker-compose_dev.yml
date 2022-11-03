@@ -11,6 +11,7 @@ services:
       - postgres
     volumes:
       - ./reverse_proxy/data_to_container/nginx.temp:/etc/nginx/nginx.temp
+      - sslVolume:/etc/ssl/pong/
     build:
       context: ./reverse_proxy
       dockerfile: ./Dockerfile
@@ -37,6 +38,7 @@ services:
     volumes:
       - ./frontend/react:/usr/src/app/
       - ./frontend/scripts/:/home/node/scripts/
+      - sslVolume:/etc/ssl/pong/
     restart: unless-stopped
     env_file:
     - env/.env
@@ -57,6 +59,7 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ./backend/data_to_container/pong/:/usr/src/app/
+      - sslVolume:/etc/ssl/pong/
     command: sh /home/node/dev_entrypoint.sh
     restart: unless-stopped
     env_file:
@@ -66,9 +69,6 @@ services:
     - env/backend.env
     - env/pong.env
     - env/postgres.env
-    ports:
-      - 3010:3010
-      - 3011:3011
 
   postgres:
     container_name: postgres
@@ -96,3 +96,4 @@ services:
 
 volumes:
   pgVolume:
+  sslVolume:
