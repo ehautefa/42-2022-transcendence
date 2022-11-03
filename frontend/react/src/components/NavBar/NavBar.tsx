@@ -1,15 +1,18 @@
 import './NavBar.css'
 import { useEffect, useState } from 'react'
 import bell from "../../assets/bell.png"
-import { GetInvitationChat, getMyRequests } from "../../pages/request/requests"
-import {NavLink} from "react-router-dom"
+import { getMyRequests } from "../../pages/request/requests"
+import { NavLink } from "react-router-dom"
 import { Room } from '../../type'
+import { getSocketChat } from '../../App'
 
 
 
 function NavBar() {
 	const [isNavExpanded, setIsNavExpanded] = useState(false)
 	const [isBellExpanded, setIsBellExpanded] = useState(false)
+	const socketChat = getSocketChat();
+
 
 	useEffect(() => {
 		getMyRequests().then(
@@ -17,11 +20,10 @@ function NavBar() {
 				setIsBellExpanded(response.length > 0)
 			}
 		)
-		// let room : Room[] = GetInvitationChat();
-		// if (room.length > 0) {
-		// 	setIsBellExpanded(true);
-		// }
-	}, [])
+		socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
+			setIsBellExpanded(invitation.length > 0)
+		});
+	}, [socketChat])
 
 	return (
 		<nav className="nav">
