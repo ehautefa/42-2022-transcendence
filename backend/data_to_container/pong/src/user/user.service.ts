@@ -359,8 +359,8 @@ export class UserService {
 	  async findAllInvitations(userId: string): Promise<Room[]> {
 		  return await this.UserRepository
 		  .createQueryBuilder('user')
-		  // .innerJoin('invitationPending.id', 'id')
-		  // .select('user.invitationPending', 'invitationPending')
+		  .innerJoin('invitationPending.id', 'id')
+		  .select('user.invitationPending', 'invitationPending')
 		  .where('userUuid = :userId', { userId: userId })
 		  .getRawMany();
 	  }

@@ -8,14 +8,18 @@ import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
-import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { DoubleUuidDto } from './dto/double-uuid';
-import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
-import { JoinRoomDto } from './dto/join-room.dto';
-import { PunishUserDto } from './dto/punish-user.dto';
-import { RemovePunishmentDto } from './dto/remove-punishment.dto';
-import { SetAdminDto } from './dto/set-admin.dto';
+import {
+  ChangePasswordDto,
+  CreateMessageDto,
+  CreateRoomDto,
+  DoubleUuidDto,
+  FilterByAdminRightsDto,
+  JoinRoomDto,
+  PunishUserDto,
+  RemovePunishmentDto,
+  SetAdminDto,
+  UuidDto,
+} from './dto';
 
 @Injectable()
 export class ChatService {
@@ -229,6 +233,16 @@ export class ChatService {
     );
   }
 
+  async inviteUser(userId: string, roomId: string): Promise<user> {
+    const room: Room = await this.findRoomById(roomId);
+    return await this.userService.addInvitation(userId, room);
+  }
+
+  async respondToInvitation(userId: string, roomId: string): Promise<user> {
+    const room: Room = await this.findRoomById(roomId);
+    return await this.userService.removeInvitation(userId, room);
+  }
+
   /*
    * dm room functions
    */
@@ -285,10 +299,6 @@ export class ChatService {
       });
     return otherChatMember.user;
   }
-
-  // async leaveRoom(userId: string, roomId: string): Promise<ChatMember> {
-  // this.ch
-  // }
 
   /*
    * admin functions
