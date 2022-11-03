@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { Socket } from "socket.io-client";
 import { getSocketChat } from "../../App";
-import { Room } from "../../type";
 
 var credentials: RequestCredentials = "include";
 
@@ -53,16 +51,6 @@ export function respondToInvitation(roomId: string, acceptInvitaion: boolean) {
   		acceptInvitation: acceptInvitaion
 	}
 	socket.emit('respondToInvitation', param);
-}
-
-export function GetInvitationChat() {
-	const [invitations, setInvitations] = useState([] as Room[]);
-	const socketChat = getSocketChat();
-
-	socketChat.emit('findAllInvitation', (invitation: Room[]) => {
-		setInvitations(invitation);
-	});
-	return invitations;
 }
 
 export async function getMyRequests() {

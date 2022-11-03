@@ -33,19 +33,19 @@ function ChatSideNav({ Room }: any) {
     }, [Room, socket]);
 
     useEffect(() => {
-		socket.on('updateRooms', () => {
-			console.log("USE EFFECT UPDATE ROOMS", Room.id);
+        socket.on('updateRooms', () => {
+            console.log("USE EFFECT UPDATE ROOMS", Room.id);
             socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
                 setAmIAdmin(Admin);
             })
             socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
                 setAmIOwner(Owner);
             })
-		});
-		return () => {
-			socket.off('updateRooms');
-		}
-	}, [socket, Room]);
+        });
+        return () => {
+            socket.off('updateRooms');
+        }
+    }, [socket, Room]);
 
     function openNav() {
         if (sidenav !== null) {
@@ -65,7 +65,10 @@ function ChatSideNav({ Room }: any) {
                 <button id="closeBtn" className="close" onClick={closeNav}>×</button>
                 <ul>
                     {/* All User */}
-                    <li><InviteUser room={Room}/></li>
+                    {
+                        Room.type === "private" &&
+                        <li><InviteUser room={Room} /></li>
+                    }
                     <li><LeaveRoom room={Room} /></li>
                     {/* Admin */}
                     {amIAdmin &&
