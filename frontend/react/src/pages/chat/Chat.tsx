@@ -33,7 +33,10 @@ function Chat() {
 			console.log("findAllJoined", rooms);
 			setChannels(rooms)
 			if (roomId) {
-				setSelectedRoom(rooms.find((room: any) => room.roomId === roomId));
+				let tofindRoom : Room = rooms.find((room: Room) => room.id === roomId);
+				if (tofindRoom !== undefined) {
+					setSelectedRoom(tofindRoom);
+				}
 			}
 		});
 	}, [socket, roomId]);
