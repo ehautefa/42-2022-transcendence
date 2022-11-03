@@ -8,14 +8,18 @@ import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
-import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { DoubleUuidDto } from './dto/double-uuid';
-import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
-import { JoinRoomDto } from './dto/join-room.dto';
-import { PunishUserDto } from './dto/punish-user.dto';
-import { RemovePunishmentDto } from './dto/remove-punishment.dto';
-import { SetAdminDto } from './dto/set-admin.dto';
+import {
+  ChangePasswordDto,
+  CreateMessageDto,
+  CreateRoomDto,
+  DoubleUuidDto,
+  FilterByAdminRightsDto,
+  JoinRoomDto,
+  PunishUserDto,
+  RemovePunishmentDto,
+  SetAdminDto,
+  UuidDto,
+} from './dto';
 
 @Injectable()
 export class ChatService {
@@ -131,7 +135,6 @@ export class ChatService {
     chatMember.isAdmin = true;
     await this.chatMembersRepository.save(chatMember);
     newRoom.owner = chatMember;
-    console.log(newRoom);
     return await this.roomsRepository.save(newRoom);
   }
 
@@ -186,7 +189,6 @@ export class ChatService {
           room: { id: roomId },
         },
       });
-    console.log(chatMember);
     if (chatMember.room.owner.user.userUuid === chatMember.user.userUuid)
       throw new WsException('You cannot leave a room you own');
     if (chatMember.bannedTime && chatMember.bannedTime < new Date())
@@ -229,6 +231,16 @@ export class ChatService {
       (user) =>
         !chatMembers.find((member) => user.userUuid === member.user.userUuid),
     );
+  }
+
+  async inviteUser(userId: string, roomId: string): Promise<user> {
+    const room: Room = await this.findRoomById(roomId);
+    return await this.userService.addInvitation(userId, room);
+  }
+
+  async respondToInvitation(userId: string, roomId: string): Promise<user> {
+    const room: Room = await this.findRoomById(roomId);
+    return await this.userService.removeInvitation(userId, room);
   }
 
   /*
@@ -288,10 +300,6 @@ export class ChatService {
     return otherChatMember.user;
   }
 
-  // async leaveRoom(userId: string, roomId: string): Promise<ChatMember> {
-  // this.ch
-  // }
-
   /*
    * admin functions
    */
@@ -331,24 +339,6 @@ export class ChatService {
     return await this.chatMembersRepository.save(chatMember);
   }
 
-  // async filterUsersInRoom(
-  //   filterUsersDto: FilterUsersDto,
-  // ): Promise<ChatMember[]> {
-  //   let timeNow: Date;
-  //   if (filterUsersDto.banned || filterUsersDto.muted) timeNow = new Date();
-  //   return await this.chatMembersRepository.find({
-  //     relations: { user: true, room: true },
-  //     select: {
-  //       user: { userName: true, userUuid: true },
-  //     },
-  //     where: {
-  //       room: { id: filterUsersDto.roomId },
-  //       isAdmin: filterUsersDto.admin,
-  //       bannedTime: filterUsersDto.banned && Not(IsNull) && LessThan(timeNow),
-  //       mutedTime: filterUsersDto.muted && Not(IsNull) && LessThan(timeNow),
-  //     },
-  //   });
-  // }
   async amIAdmin(userId: string, roomId: string): Promise<boolean> {
     const chatMember: ChatMember = await this.findChatMember(userId, roomId);
     return chatMember.isAdmin;
@@ -403,7 +393,6 @@ export class ChatService {
       .addSelect('user.userName', 'userName')
       .getRawMany();
   }
-
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,
     userId: string,
@@ -457,14 +446,6 @@ export class ChatService {
         .split('; ')
         .find((cookie: string) => cookie.startsWith('access_token='))
         .split('=')[1];
-      // const cookies: string[] = cookiesStr.split('; ');
-      // const authCookie: string = cookies.filter((s) =>
-      //   s.includes('access_token='),
-      // )[0];
-      // const accessToken = authCookie.substring(
-      //   'access_token'.length + 1,
-      //   authCookie.length,
-      // );
       const jwtOptions: JwtVerifyOptions = {
         secret: JwtConfig.secret,
       };

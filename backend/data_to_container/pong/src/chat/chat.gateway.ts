@@ -19,14 +19,19 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { DoubleUuidDto } from './dto/double-uuid';
-import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
-import { JoinRoomDto } from './dto/join-room.dto';
-import { PunishUserDto } from './dto/punish-user.dto';
-import { RemovePunishmentDto } from './dto/remove-punishment.dto';
-import { SetAdminDto } from './dto/set-admin.dto';
+import {
+  CreateMessageDto,
+  CreateRoomDto,
+  DoubleUuidDto,
+  FilterByAdminRightsDto,
+  JoinRoomDto,
+  PunishUserDto,
+  RemovePunishmentDto,
+  RespondToInvitationDto,
+  SetAdminDto,
+  UuidDto,
+} from './dto';
+import { ChangePasswordDto } from './dto/';
 import { ProtectedRoomGuard } from './guard/protected-room.guard';
 
 @UseGuards(JwtAuthGuard)
@@ -211,7 +216,9 @@ export class ChatGateway
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
     console.log('removePunishmentDto = ', removePunishmentDto);
-    const chatMember = await this.chatService.removePunishment(removePunishmentDto);
+    const chatMember = await this.chatService.removePunishment(
+      removePunishmentDto,
+    );
     this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
     return chatMember;
   }
@@ -299,6 +306,31 @@ export class ChatGateway
     @MessageBody() roomId: UuidDto,
   ): Promise<ChatMember[]> {
     return await this.chatService.findMutedUsersInRoom(roomId.uuid);
+  }
+
+  @SubscribeMessage('inviteUser')
+  async inviteUser(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<user> {
+    const usr: user = await this.chatService.inviteUser(
+      user.userUuid,
+      roomId.uuid,
+    );
+    return usr;
+  }
+  @SubscribeMessage('respondToInvitation')
+  async respondToInvitation(
+    @MessageBody() respondToInvitationDto: RespondToInvitationDto,
+    @Req() { user }: { user: user },
+  ) {
+    const usr: user = await this.chatService.respondToInvitation(
+      respondToInvitationDto.roomId,
+      user.userUuid,
+    );
+    if (respondToInvitationDto.acceptInvitation === true)
+      this.server.socketsJoin(respondToInvitationDto.roomId);
+    return usr;
   }
 
   async handleConnection(client: Socket): Promise<void> {

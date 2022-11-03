@@ -19,7 +19,21 @@ export class ChatExceptionFilter extends BaseWsExceptionFilter {
       console.error(exception.getResponse());
     }
     if (exception instanceof QueryFailedError) {
-      const error: WsException = new WsException(exception.message);
+      let error: WsException;
+      console.log(
+        typeof exception.driverError.code,
+        exception.driverError.code,
+      );
+      const code = exception.driverError.code;
+      switch (code) {
+        case '23505': {
+          error = new WsException('Name already taken');
+          break;
+        }
+        default: {
+          error = new WsException(exception.message);
+        }
+      }
       super.catch(error, host);
       console.error(host.getArgByIndex(1));
       console.error(exception.message);

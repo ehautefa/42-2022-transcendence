@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { user } from 'src/bdd/users.entity';
+import { user, Room } from 'src/bdd/';
 import { Equal, Repository, UpdateResult } from 'typeorm';
 import { StatusGateway } from 'src/status/status.gateway';
 import * as argon from 'argon2';
@@ -337,5 +337,32 @@ export class UserService {
         user.twoFactorAuthenticationSecret = secret;
         return await this.UserRepository.save(user);
       }
+
+	  async addInvitation(userId: string, room: Room): Promise<user> {
+		  const user: user = await this.getUser(userId);
+		  if (!user.invitationPending.includes(room)) {
+		    user.invitationPending.push(room);
+		    await this.UserRepository.save(user)
+		  }
+		  return user;
+	  }
+
+	  async removeInvitation(userId: string, room: Room): Promise<user> {
+		  const user: user = await this.getUser(userId);
+		  if (user.invitationPending.includes(room)) {
+		    user.invitationPending.splice(user.invitationPending.indexOf(room));
+		    await this.UserRepository.save(user)
+		  }
+		  return user;
+	  }
+
+	  async findAllInvitations(userId: string): Promise<Room[]> {
+		  return await this.UserRepository
+		  .createQueryBuilder('user')
+		  .innerJoin('invitationPending.id', 'id')
+		  .select('user.invitationPending', 'invitationPending')
+		  .where('userUuid = :userId', { userId: userId })
+		  .getRawMany();
+	  }
 
 }
