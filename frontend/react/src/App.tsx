@@ -14,12 +14,15 @@ let socketOptions = {
 			}
 		}
 	},
+	// reconnectionDelayMax: 10000,
+	// port: 4443,
 	forceNew: true,
 	// transports: ["polling"],
 	secure: true
 };
 
-const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;
+// const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;
+const URL_BACK = "wss://e1r3p3.clusters.42paris.fr:4443";
 const socketPong =  io(URL_BACK + "/pong", socketOptions);
 const socketStatus = io(URL_BACK + "/status", socketOptions);
 const socketChat =  io(URL_BACK + "/chat", socketOptions);
