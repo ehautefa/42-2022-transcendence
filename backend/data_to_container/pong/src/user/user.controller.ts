@@ -201,20 +201,22 @@ export class UserController {
 	@Post('uploadPicture')
 	@ApiOperation({ summary: 'Upload picture' })
 	@UseGuards(JwtAuthGuard)
-	// @UseInterceptors(FileInterceptor('file',
-	// 	{
-	// 		storage: diskStorage({
-	// 			destination: './uploads/pp',
-	// 			filename: (req, file, cb) => {
-	// 				const filename: string = req.user.userUuid;
-	// 				cb(null, `${filename}.jpeg`);
-	// 			}
-	// 		})
-	// 	}))
-	uploadPicture(@UploadedFile(
-		new ParseFilePipe({ validators: [new MaxFileSizeValidator({ maxSize: 1000 }), new FileTypeValidator({ fileType: 'jpeg' }),], }),
-	) file: any, @Req() req) {
-		console.log("uploadPicture", file);
+	@UseInterceptors(FileInterceptor('file',
+		{
+			storage: diskStorage({
+				destination: './uploads/pp',
+				filename: (req, file, cb) => {
+					console.log("file", file);
+					if (file.mimetype !== 'image') {
+						console.log("not an image");
+					}
+					const filename: string = req.user.userUuid;
+					cb(null, `${filename}.jpeg`);
+				}
+			})
+		}))
+	uploadPicture(@Req() req) {
+		console.log("uploadPicture");
 	}
 
 	@Get('myPicture')
@@ -229,7 +231,7 @@ export class UserController {
 			res.sendFile(join(process.cwd(), `uploads/default_avatar.png`));
 		}
 	}
-	
+
 	@Get('picture/:userUid')
 	@ApiOperation({ summary: 'Get picture of user' })
 	@UseGuards(JwtAuthGuard)
