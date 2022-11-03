@@ -1,8 +1,26 @@
 
 #https://dev.to/erezhod/setting-up-a-nestjs-project-with-docker-for-back-end-development-30lg
+# https://www.grottedubarbu.fr/docker-nginx-reverse-proxy/
 
 version: '3.8'
 services:
+  reverse_proxy:
+    depends_on:
+      - frontend
+    volumes:
+      - sslVolume:/etc/ssl/pong/
+    build:
+      context: ./reverse_proxy
+      dockerfile: ./Dockerfile
+    container_name: reverse_proxy
+    command: /bin/sh /home/nginx/entrypoint.sh
+    restart: unless-stopped
+    env_file:
+    - env/.env
+    - env/urls.env
+    ports:
+       - 4443:443
+
   frontend:
     depends_on:
       - backend
@@ -11,13 +29,15 @@ services:
       context: ./frontend
       target: production
       dockerfile: ./Dockerfile
-    # command: sh /home/node/scripts/dev_entrypoint.sh
+    command: /bin/sh /home/nginx/prod_entrypoint.sh
+    volumes:
+      - sslVolume:/etc/ssl/pong/
     restart: unless-stopped
     env_file:
-    - ./api.env
-    - ./frontend/frontend.env
-    ports:
-       - 3000:3000
+    - env/.env
+    - env/urls.env
+    - env/pong.env
+    - env/frontend.env
     
   backend:
     depends_on:
@@ -27,15 +47,18 @@ services:
       context: ./backend
       target: production
       dockerfile: ./Dockerfile
-    # command: sh /home/node/dev_entrypoint.sh
+    volumes:
+      - sslVolume:/etc/ssl/pong/
+      - ./backend/data_to_container/pong/uploads/:/usr/src/app/uploads/
+    command: /bin/sh /home/node/prod_entrypoint.sh
     restart: unless-stopped
     env_file:
-    - ./.secret.env
-    - ./api.env
-    - ./backend/backend.env
-    ports:
-      - 3010:3010
-      - 3011:3011
+    - env/.env
+    - env/.secret.env
+    - env/urls.env
+    - env/backend.env
+    - env/pong.env
+    - env/postgres.env
 
   postgres:
     container_name: postgres
@@ -44,9 +67,9 @@ services:
       - pgVolume:/var/lib/postgresql/data
     restart: always
     env_file:
-    - ./postgres/postgres.env
-    ports:
-      - "3020:3020"
+    - env/.env
+    - env/postgres.env
 
 volumes:
   pgVolume:
+  sslVolume:

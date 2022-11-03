@@ -22,7 +22,7 @@ let socketOptions = {
 };
 
 // const URL_BACK: string = process.env.REACT_APP_BACK_URL === undefined ? "" : process.env.REACT_APP_BACK_URL;
-// const URL_BACK = "wss://e2r13p3.clusters.42paris.fr:4443";
+// const URL_BACK = "wss://e1r3p3.clusters.42paris.fr:4443";
 const socketPong =  io("/pong", socketOptions);
 const socketStatus = io("/status", socketOptions);
 const socketChat =  io("/chat", socketOptions);

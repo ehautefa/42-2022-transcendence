@@ -1,0 +1,16 @@
+        server {
+
+                server_name ${APP_HOST};
+                root /var/www/html/pong;
+
+                listen 3000 ssl;
+                ssl_certificate /etc/ssl/pong/pong.csr;
+                ssl_certificate_key /etc/ssl/pong/.pong.key;
+
+                index index.html index.htm;
+                try_files $uri /index.html;
+                location / {
+                    try_files $uri $uri/ = 404;
+                }
+
+        }

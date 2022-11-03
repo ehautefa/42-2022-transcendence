@@ -40,7 +40,6 @@ async function handleInvitation(roomId: string, accept: boolean) {
 	});
 }
 
-
 return (<>
 	<NavBar />
 	<div className="allPlayers">

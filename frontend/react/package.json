@@ -27,7 +27,7 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
-    "start": "export HTTPS=true&&SSL_CRT_FILE=/etc/ssl/pong.csr&&SSL_KEY_FILE=/etc/ssl/.pong.key react-scripts start",
+    "start": "export HTTPS=true&&SSL_CRT_FILE=/etc/ssl/pong/pong.csr&&SSL_KEY_FILE=/etc/ssl/pong/.pong.key react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
