@@ -10,6 +10,7 @@ function LeaveRoom({ room }: any) {
 
     function Yes() {
         socket.emit('leaveRoom', {uuid: room.id})
+        room = {};
         setOpen(false);
     }
 
