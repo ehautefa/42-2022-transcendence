@@ -6,6 +6,7 @@ export class SelectClass {
 	label: string;
 
 	constructor(obj: Room | User) {
+        // console.log("SELECT CLASS", obj);
         if (obj.hasOwnProperty('userUuid')) {
             this.value = (obj as User).userUuid;
             this.label = (obj as User).userName;

@@ -18,8 +18,9 @@ function InviteUser(param: any) {
 
     useEffect( () => {
         socket.emit('findAllInvitableUsers', {uuid: room.id}, (users:any) => {
-          let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
-          setUsers(selectTab);  
+            // console.log("INVITE USER", users);
+          let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user));
+          setUsers(users);  
         });
     }, [room, socket]);
 
