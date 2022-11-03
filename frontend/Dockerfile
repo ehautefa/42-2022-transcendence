@@ -24,7 +24,6 @@ COPY 		--chown=${USER}:${USER} ${SRC_APP_DIR}/package*.json ${DST_APP_DIR}/
 RUN npm install
 COPY 		${SRC_APP_DIR} ${DST_APP_DIR}
 # Run the build command which creates the production bundle
-COPY    ./.env .
 RUN         npm run build
 
 # Set NODE_ENV environment variable
