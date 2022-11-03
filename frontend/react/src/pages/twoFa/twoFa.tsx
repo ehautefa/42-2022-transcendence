@@ -15,7 +15,12 @@ function TwoFa() {
 
         let result = await fetch(url, requestOptions);
         console.log(result);
-        // TO DO = redirect if ok, print error message otherwise
+        if (result.status == 401) {
+            alert("Wrong code");
+        } else if (result.status == 200) {
+            window.location.assign("/mainPage");
+        }
+    }
     }
 
     return (
