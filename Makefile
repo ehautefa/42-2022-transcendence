@@ -28,7 +28,7 @@ down:
 re: down build
 
 setup:
-	sed -Ei "s/^APP_HOST=.*/APP_HOST='$(shell hostname)'/" env/urls.env
+	sed -Ei "s/^APP_HOST=.*/APP_HOST='$(shell hostname)'/" .env
 # @if [ "$(HTTPS)" = 1 ]; then \
 	# sed -Ei "s/^PRT=.*/PRT='https'/" env/urls.env ; \
 		# sed -Ei "s/listen 443.*/listen 443 ssl;/" reverse_proxy/data_to_container/nginx.temp ; \

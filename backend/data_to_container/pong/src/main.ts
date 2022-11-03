@@ -6,8 +6,8 @@ import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.i
 import * as fs from 'fs';
 
 var HttpsOptions: HttpsOptions = {
-	key: fs.readFileSync('/etc/ssl/pong/.pong.key'),
-	cert: fs.readFileSync('/etc/ssl/pong/pong.csr')
+	key: fs.readFileSync('/etc/ssl/private/.pong.key'),
+	cert: fs.readFileSync('/etc/ssl/certs/pong.csr')
 }
 
 async function bootstrap() {
@@ -15,8 +15,6 @@ async function bootstrap() {
 		cors: {
 			// origin: "*",
 			origin: [process.env.REACT_APP_FRONT_URL,
-				"https://signin.intra.42.fr",
-				"https://api.intra.42.fr"
 			],
 			// methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
 			credentials: true,
