@@ -309,16 +309,19 @@ export class ChatGateway
   }
 
   @SubscribeMessage('inviteUser')
-  async inviteUser(
-    @MessageBody() roomId: UuidDto,
-    @Req() { user }: { user: user },
-  ): Promise<user> {
+  async inviteUser(@MessageBody() inviteUserDto: DoubleUuidDto): Promise<user> {
     const usr: user = await this.chatService.inviteUser(
-      user.userUuid,
-      roomId.uuid,
+      inviteUserDto.userId,
+      inviteUserDto.roomId,
     );
     return usr;
   }
+
+  @SubscribeMessage('getPendingInvitations')
+  async getPendingInvitations(@MessageBody() userId: UuidDto): Promise<Room[]> {
+    return await this.chatService.getPendingInvitations(userId.uuid);
+  }
+
   @SubscribeMessage('respondToInvitation')
   async respondToInvitation(
     @MessageBody() respondToInvitationDto: RespondToInvitationDto,
