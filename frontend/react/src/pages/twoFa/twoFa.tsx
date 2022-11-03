@@ -15,12 +15,11 @@ function TwoFa() {
 
         let result = await fetch(url, requestOptions);
         console.log(result);
-        if (result.status == 401) {
+        if (result.status === 401) {
             alert("Wrong code");
-        } else if (result.status == 200) {
+        } else if (result.status === 200) {
             window.location.assign("/mainPage");
         }
-    }
     }
 
     return (
@@ -39,7 +38,6 @@ function TwoFa() {
                     maxLength={6}
                     size={6} />
             </div>
-            <a href={process.env.REACT_APP_BACK_URL + "/auth/2fa/login/" + code} >login</a>
             <button type="submit" onClick={() => login()}>Send Code</button>
         </div>
     )
