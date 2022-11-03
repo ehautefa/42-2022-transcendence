@@ -183,13 +183,12 @@ export class ChatGateway
   }
 
   // @Roles('owner')
-  // @UseGuards(ProtectedRoom)
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('changePassword')
   async changePassword(
     @MessageBody() changePasswordDto: ChangePasswordDto,
   ): Promise<Room> {
-    this.logger.debug('Change Password');
-    console.log(changePasswordDto);
+    this.server.emit('updateRooms');
     return await this.chatService.changePassword(changePasswordDto);
   }
 
@@ -198,7 +197,9 @@ export class ChatGateway
   async punishUser(
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
-    return await this.chatService.punishUser(punishUserDto);
+    const chatMember = await this.chatService.punishUser(punishUserDto);
+    this.server.to(chatMember.room.id).emit('updateThisRoom');
+    return chatMember;
   }
 
   // @Roles('admin')
