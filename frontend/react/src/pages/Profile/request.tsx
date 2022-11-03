@@ -4,7 +4,7 @@ export async function getFriends(userUuid: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/friends/" + userUuid;
+	var url: string = "/user/friends/" + userUuid;
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
@@ -13,7 +13,7 @@ export async function getFriends(userUuid: string) {
 
 	let friends = await (await fetch(url, requestOptions)).json();
 	if (friends.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign("/auth/login");
 	}
 	return await friends;
 }
@@ -22,7 +22,7 @@ export async function FetchUser(uid: string) {
 	var myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/" + uid;
+	var url: string = "/user/" + uid;
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
@@ -31,13 +31,13 @@ export async function FetchUser(uid: string) {
 
 	let user = await (await fetch(url, requestOptions)).json();
 	if (user.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign("/auth/login");
 	}
 	return await user;
 }
 
 export async function isMyFriends(userUuid: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/isMyFriends";
+	var url: string = "/user/isMyFriends";
 
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("userUuid", userUuid);
@@ -50,13 +50,13 @@ export async function isMyFriends(userUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (result.statusCode === 401) {
-		window.location.replace(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign("/auth/login");
 	}
 	return await result;
 }
 
 export async function getPicture(uid: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/picture/" + uid;
+	var url: string = "/user/picture/" + uid;
 	var requestOptions = {
 		method: 'GET',
         credentials: credentials

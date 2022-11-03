@@ -4,7 +4,7 @@ export async function getMe() {
 	myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
     var credentials: RequestCredentials = "include";
-	var url: string = process.env.REACT_APP_BACK_URL + "/user/me"
+	var url: string = "/user/me"
 	var requestOptions = {
 		method: 'GET',
 		headers: myHeaders,
@@ -13,7 +13,7 @@ export async function getMe() {
 
 	let user =  await (await fetch(url, requestOptions)).json();
 	if (user.statusCode === 401) {
-		window.location.assign(process.env.REACT_APP_BACK_URL + "/auth/login");
+		window.location.assign("/auth/login");
 	}
 	return user;
 }
