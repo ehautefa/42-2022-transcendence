@@ -48,7 +48,7 @@ function NewAgoraPopup() {
 					<div className="RoomTypeSelector">
 						<p>Room Type :</p>
 						<div className='room-type-selector-flex'>
-							<input type="radio" value="public" name="roomType" onChange={handleChange} checked={true}/> Public
+							<input type="radio" value="public" name="roomType" onChange={handleChange}/> Public
 							<input type="radio" value="private" name="roomType"  onChange={handleChange} /> Private
 						</div>
 					</div>

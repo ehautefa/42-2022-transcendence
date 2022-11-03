@@ -81,6 +81,10 @@ function Chat() {
 			});
 		});
 
+		socket.on('refreshSelectedRoom', () => {
+			setSelectedRoom({} as Room);
+		} )
+
 		socket.on('updateThisRoom', (thisRoom: any) => {
 			setSelectedRoom(thisRoom);
 		});

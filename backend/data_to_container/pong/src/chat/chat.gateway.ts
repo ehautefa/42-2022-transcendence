@@ -259,7 +259,7 @@ export class ChatGateway
       user.userUuid,
       roomId.uuid,
     );
-    this.server.to(chatMember.room.id).emit('updateRooms');
+    this.server.to(chatMember.room.id).emit('refreshSelectedRoom');
     return chatMember;
   }
 
