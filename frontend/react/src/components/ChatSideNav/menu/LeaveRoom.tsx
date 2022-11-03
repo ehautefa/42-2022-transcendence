@@ -9,8 +9,8 @@ function LeaveRoom({ room }: any) {
     const [open, setOpen] = useState(false);
 
     function Yes() {
-        setOpen(false);
         socket.emit('leaveRoom', {uuid: room.id})
+        setOpen(false);
     }
 
     function No() {

@@ -49,10 +49,6 @@ function Chat() {
 
 	useEffect(() => {
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
-			socket.emit('findAllJoinedRooms', (rooms: any) => {
-				console.log("findAllJoined", rooms);
-				setChannels(rooms);
-			});
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
 			});
