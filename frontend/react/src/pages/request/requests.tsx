@@ -1,3 +1,8 @@
+import { useState } from "react";
+import { Socket } from "socket.io-client";
+import { getSocketChat } from "../../App";
+import { Room } from "../../type";
+
 var credentials: RequestCredentials = "include";
 
 export async function acceptFriendRequest(friendUuid: string) {
@@ -38,6 +43,26 @@ export async function refuseFriendRequest(friendUuid: string) {
 		window.location.assign("/auth/login");
 	}
 	return await result;
+}
+
+export function respondToInvitation(roomId: string, acceptInvitaion: boolean) {
+	const socket : Socket = getSocketChat();
+
+	const param = {
+		roomId: roomId,
+  		acceptInvitation: acceptInvitaion
+	}
+	socket.emit('respondToInvitation', param);
+}
+
+export function GetInvitationChat() {
+	const [invitations, setInvitations] = useState([] as Room[]);
+	const socketChat = getSocketChat();
+
+	socketChat.emit('findAllInvitation', (invitation: Room[]) => {
+		setInvitations(invitation);
+	});
+	return invitations;
 }
 
 export async function getMyRequests() {

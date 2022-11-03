@@ -1,8 +1,9 @@
 import './NavBar.css'
 import { useEffect, useState } from 'react'
 import bell from "../../assets/bell.png"
-import { getMyRequests } from "../../pages/request/requests"
+import { GetInvitationChat, getMyRequests } from "../../pages/request/requests"
 import {NavLink} from "react-router-dom"
+import { Room } from '../../type'
 
 
 
@@ -16,6 +17,10 @@ function NavBar() {
 				setIsBellExpanded(response.length > 0)
 			}
 		)
+		// let room : Room[] = GetInvitationChat();
+		// if (room.length > 0) {
+		// 	setIsBellExpanded(true);
+		// }
 	}, [])
 
 	return (
