@@ -213,7 +213,7 @@ export class UserService {
     async getCompleteUser(userUuid: string): Promise<user> {
         if (!userUuid)
             throw new ArgUndefinedException('userUuid');
-        const completeUser: user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true }, where: { userUuid: Equal(userUuid) } });
+        const completeUser: user = await this.UserRepository.findOne({ relations: { friends: true, blocked: true, requestPending: true, invitationPending: true }, where: { userUuid: Equal(userUuid) } });
         //need to put it?
         // if (!completeUser)
         // throw new FailToFindObjectFromDBException(userUuid, 'user');
@@ -339,10 +339,12 @@ export class UserService {
       }
 
 	  async addInvitation(userId: string, room: Room): Promise<user> {
-		  const user: user = await this.getUser(userId);
+		  const user: user = await this.getCompleteUser(userId);
+		  console.log('XXXXXXXXXXXX', user.invitationPending);
+		  console.log('XXXXXXXXXXXX', user);
 		  if (!user.invitationPending.includes(room)) {
-		    user.invitationPending.push(room);
-		    await this.UserRepository.save(user)
+			user.invitationPending.push(room);
+			await this.UserRepository.save(user)
 		  }
 		  return user;
 	  }
