@@ -33,7 +33,7 @@ services:
     build:
       context: ./frontend
       target: development
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile_dev
     command: sh /home/node/scripts/dev_entrypoint.sh
     volumes:
       - ./frontend/react:/usr/src/app/

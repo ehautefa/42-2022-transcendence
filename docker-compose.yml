@@ -27,9 +27,9 @@ services:
     container_name: frontend
     build:
       context: ./frontend
-      target: development
+      target: production
       dockerfile: ./Dockerfile
-    command: sh /home/node/dev_entrypoint.sh
+    command: /bin/sh /home/nginx/prod_entrypoint.sh
     volumes:
       - sslVolume:/etc/ssl/pong/
     restart: unless-stopped
@@ -43,14 +43,14 @@ services:
     depends_on:
     - postgres
     container_name: backend
-    image: nestjs-api-dev:1.0.0
     build:
       context: ./backend
-      target: development
+      target: production
       dockerfile: ./Dockerfile
     volumes:
       - sslVolume:/etc/ssl/pong/
-    command: sh /home/node/dev_entrypoint.sh
+      - ./backend/data_to_container/pong/uploads/:/usr/src/app/uploads/
+    command: /bin/sh /home/node/prod_entrypoint.sh
     restart: unless-stopped
     env_file:
     - env/.env
