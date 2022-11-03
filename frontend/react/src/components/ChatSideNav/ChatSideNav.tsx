@@ -32,6 +32,23 @@ function ChatSideNav({ Room }: any) {
         }
     }, [Room, socket]);
 
+    useEffect(() => {
+		socket.on('updateRooms', () => {
+			console.log("USE EFFECT UPDATE ROOMS", Room.id);
+            socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
+                console.log("AM I ADMIN ?", Admin);
+                setAmIAdmin(Admin);
+            })
+            socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
+                setAmIOwner(Owner);
+                console.log("AM I OWNER ?", Owner);
+            })
+		});
+		return () => {
+			socket.off('updateRooms');
+		}
+	}, [socket]);
+
     function openNav() {
         if (sidenav !== null) {
             sidenav.classList.add("active");
@@ -50,7 +67,7 @@ function ChatSideNav({ Room }: any) {
                 <button id="closeBtn" className="close" onClick={closeNav}>×</button>
                 <ul>
                     {/* All User */}
-                    <li><InviteUser /></li>
+                    <li><InviteUser room={Room}/></li>
                     <li><LeaveRoom room={Room} /></li>
                     {/* Admin */}
                     {amIAdmin &&

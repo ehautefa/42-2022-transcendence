@@ -13,16 +13,16 @@ export class ChatExceptionFilter extends BaseWsExceptionFilter {
   catch(exception: Error, host: ArgumentsHost) {
     this.logger.error(exception);
     if (exception instanceof BadRequestException) {
+      // const error: WsException = new WsException(exception.message);
+      // super.catch(exception, host);
       console.error(host.getArgByIndex(1));
       console.error(exception.getResponse());
-      // const error: WsException = new WsException({});
-      // super.catch(error, host);
     }
     if (exception instanceof QueryFailedError) {
+      const error: WsException = new WsException(exception.message);
+      super.catch(error, host);
       console.error(host.getArgByIndex(1));
       console.error(exception.message);
-      // const error: WsException = new WsException(exception.message);
-      // super.catch(error, host);
     }
     if (exception instanceof WsException) {
       super.catch(exception, host);

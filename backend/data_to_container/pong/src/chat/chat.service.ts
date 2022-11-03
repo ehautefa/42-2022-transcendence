@@ -163,22 +163,38 @@ export class ChatService {
     return room;
   }
 
-  async joinRoom(joinRoomDto: JoinRoomDto, user: user): Promise<ChatMember> {
-    const room: Room = await this.roomsRepository.findOneOrFail({
-      where: { id: joinRoomDto.roomId },
-      select: { hash: true, id: true, type: true },
-    });
-    if (room.type === RoomType.PROTECTED) {
-      if (!(await argon.verify(room.hash, joinRoomDto.password)))
-        throw new WsException('Invalid password');
-    }
-    return await this.createChatMember(user, room);
-  }
-
   async findRoomByName(roomName: string): Promise<Room> {
     return await this.roomsRepository.findOneOrFail({
       where: { name: roomName },
     });
+  }
+
+  async joinRoom(joinRoomDto: JoinRoomDto, user: user): Promise<ChatMember> {
+    const room: Room = await this.findRoomById(joinRoomDto.roomId);
+    return await this.createChatMember(user, room);
+  }
+
+  async leaveRoom(userId: string, roomId: string): Promise<ChatMember> {
+    const chatMember: ChatMember =
+      await this.chatMembersRepository.findOneOrFail({
+        relations: {
+          room: { owner: { user: true } },
+          user: true,
+        },
+        where: {
+          user: { userUuid: userId },
+          room: { id: roomId },
+        },
+      });
+    console.log(chatMember);
+    if (chatMember.room.owner.user.userUuid === chatMember.user.userUuid)
+      throw new WsException('You cannot leave a room you own');
+    if (chatMember.bannedTime && chatMember.bannedTime < new Date())
+      throw new WsException('You cannot leave a room you are banned from');
+    if (chatMember.mutedTime && chatMember.mutedTime < new Date())
+      throw new WsException('You cannot leave a room you are muted in');
+    this.chatMembersRepository.delete(chatMember.id);
+    return chatMember;
   }
 
   async findAllJoinedRooms(userId: string): Promise<ChatMember[]> {
@@ -366,17 +382,6 @@ export class ChatService {
     const room: Room = await this.findRoomById(roomId.uuid);
     return await this.roomsRepository.remove(room);
   }
-
-  // async findAllRoomsToJoin(userId: string): Promise<ChatMember[]> {
-  //   const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
-  //     relations: { room: true, user: true },
-  //     select: { room: { id: true } },
-  //     where: { user: { userUuid: userId } },
-  //   });
-  //   this.logger.debug('Getting all rooms to join');
-  //   console.log(chatMembers);
-  //   return chatMembers;
-  // }
 
   async amIOwner(userId: string, roomId: string): Promise<boolean> {
     const room: Room = await this.roomsRepository.findOneOrFail({

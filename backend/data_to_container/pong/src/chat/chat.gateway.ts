@@ -7,7 +7,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -28,10 +27,11 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { PunishUserDto } from './dto/punish-user.dto';
 import { RemovePunishmentDto } from './dto/remove-punishment.dto';
 import { SetAdminDto } from './dto/set-admin.dto';
+import { ProtectedRoomGuard } from './guard/protected-room.guard';
 
 @UseGuards(JwtAuthGuard)
 // @UseGuards(RolesGuard)
-// @UseFilters(ChatExceptionFilter)
+@UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
     whitelist: true,
@@ -43,8 +43,9 @@ import { SetAdminDto } from './dto/set-admin.dto';
   namespace: 'chat',
 })
 export class ChatGateway
-  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly chatService: ChatService) { }
+  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
+{
+  constructor(private readonly chatService: ChatService) {}
 
   // The socket.io server responsible for handling (receiviing and emitting) events
   @WebSocketServer()
@@ -58,7 +59,6 @@ export class ChatGateway
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
     @Req() { user }: { user: user },
-    @ConnectedSocket() client: Socket,
   ): Promise<Message> {
     const message: Message = await this.chatService.createMessage(
       createMessageDto,
@@ -66,7 +66,10 @@ export class ChatGateway
     );
     this.logger.debug('Creating a message');
     this.logger.debug(message.sender.room.id);
-    client.to(message.sender.room.id).emit('updateMessages');
+    console.log(message.sender.room.id);
+    this.server
+      .in(message.sender.room.id)
+      .emit('updateMessages', message.sender.room.id);
     // this.server.emit('updateRooms');
     return message;
   }
@@ -85,8 +88,7 @@ export class ChatGateway
     return newRoom;
   }
 
-  // @UseGuards(ProtectedRoomGuard)
-  @UseFilters(ChatExceptionFilter)
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('joinRoom')
   async joinRoom(
     @MessageBody() joinRoomDto: JoinRoomDto,
@@ -97,6 +99,7 @@ export class ChatGateway
       user,
     );
     this.server.socketsJoin(chatMember.room.id);
+    this.server.emit('updateRooms');
     this.logger.log(
       `User ${user.userUuid} is joining room ${joinRoomDto.roomId}`,
     );
@@ -154,34 +157,41 @@ export class ChatGateway
   // }
 
   // @Roles('owner', 'admin')
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
-    console.log('setAdminDto = ', setAdminDto);
-    return await this.chatService.setAdmin(setAdminDto);
+    const chatMember = await this.chatService.setAdmin(setAdminDto);
+    this.server.emit('updateRooms');
+    return chatMember;
   }
 
   // @Roles('owner')
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('giveOwnership')
-  async changeOwnership(
+  async giveOwnership(
     @MessageBody() giveOwnershipDto: DoubleUuidDto,
   ): Promise<Room> {
-    return await this.chatService.giveOwnership(giveOwnershipDto);
+    const room: Room = await this.chatService.giveOwnership(giveOwnershipDto);
+    this.server.emit('updateRooms');
+    return room;
   }
 
   // @Roles('owner')
+  // @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
-    return await this.chatService.deleteRoom(deleteRoomDto);
+    const room: Room = await this.chatService.deleteRoom(deleteRoomDto);
+    this.server.emit('updateRooms');
+    return room;
   }
 
   // @Roles('owner')
-  // @UseGuards(ProtectedRoom)
+  @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('changePassword')
   async changePassword(
     @MessageBody() changePasswordDto: ChangePasswordDto,
   ): Promise<Room> {
-    this.logger.debug('Change Password');
-    console.log(changePasswordDto);
+    this.server.emit('updateRooms');
     return await this.chatService.changePassword(changePasswordDto);
   }
 
@@ -190,7 +200,9 @@ export class ChatGateway
   async punishUser(
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
-    return await this.chatService.punishUser(punishUserDto);
+    const chatMember = await this.chatService.punishUser(punishUserDto);
+    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
+    return chatMember;
   }
 
   // @Roles('admin')
@@ -199,7 +211,9 @@ export class ChatGateway
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
     console.log('removePunishmentDto = ', removePunishmentDto);
-    return await this.chatService.removePunishment(removePunishmentDto);
+    const chatMember = await this.chatService.removePunishment(removePunishmentDto);
+    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
+    return chatMember;
   }
 
   @SubscribeMessage('findAllJoinedRooms')
@@ -225,6 +239,20 @@ export class ChatGateway
     @Req() { user }: { user: user },
   ): Promise<Room[]> {
     return await this.chatService.findAllJoinableRooms(user.userUuid);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  async leaveRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<ChatMember> {
+    console.log('leaving ', roomId);
+    const chatMember: ChatMember = await this.chatService.leaveRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
+    this.server.to(chatMember.room.id).emit('updateRooms');
+    return chatMember;
   }
 
   @SubscribeMessage('findAllInvitableUsers')
@@ -276,11 +304,13 @@ export class ChatGateway
   async handleConnection(client: Socket): Promise<void> {
     this.logger.debug(`client connected: ${client.id}`);
     const cookie: string = client.handshake.headers.cookie;
-    if (cookie !== undefined &&
-			cookie !== null
-			&& cookie !== ""
-			&& cookie.includes('access_token=')) {
-			console.log("cookie", client.handshake.headers.cookie);
+    if (
+      cookie !== undefined &&
+      cookie !== null &&
+      cookie !== '' &&
+      cookie.includes('access_token=')
+    ) {
+      console.log('cookie', client.handshake.headers.cookie);
       const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
         client.handshake.headers.cookie,
       );

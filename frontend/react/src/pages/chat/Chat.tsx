@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { User } from "../../type";
+import { useLocation } from 'react-router-dom';
 import { getSocketChat } from "../../App";
+import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import NavBar from "../../components/NavBar/NavBar";
+import { Room, User } from "../../type";
+import { getMe } from "../myProfile/request";
+import "./Chat.css";
 import JoinAgoraPopup from "./JoinAgoraPopup";
 import NewAgoraPopup from "./NewAgoraPopup";
-import { getMe } from "../myProfile/request"
-import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
-import "./Chat.css";
-import { Room } from "../../type";
-import { useLocation } from 'react-router-dom';
 
 function Chat() {
 	const socket = getSocketChat();
@@ -38,47 +37,61 @@ function Chat() {
 		});
 	}, [socket, roomId]);
 
-
-	socket.on('updateMessages', () => {
-		if (selectedRoom.id !== "") {
-			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
-				setMessages(msgs);
-				var message = document.getElementById('messages');
-				if (message)
-					message.scrollTop = message.scrollHeight;
-			});
-		}
-	});
+	useEffect(() => {
+		var message = document.getElementById('messages');
+			if (message)
+				message.scroll({
+					top: message.scrollHeight,
+					left: 0,
+					behavior: "smooth"
+				})
+	}, [messages]);
 
 	useEffect(() => {
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
-				var message = document.getElementById('messages');
-				if (message)
-					message.scrollTop = message.scrollHeight;
 			});
 			socket.emit("findAllUsersInRoom", {uuid: selectedRoom.id}, (users: any) => {
                 setMembers(users);
             });
 		}
-	}, [socket, selectedRoom]);
-
-
-	socket.on('updateRooms', (rooms: any) => {
-		console.log('getting information');
-		socket.emit('findAllJoinedRooms', (rooms: any) => {
-			console.log("findAllJoined", rooms);
-			setChannels(rooms)
+		socket.on('updateMessages', (updatedRoom: any) => {
+			if (selectedRoom && selectedRoom.id !== undefined 
+				&& selectedRoom.id !== "" && selectedRoom.id === updatedRoom) {
+				socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
+					setMessages(msgs);
+				});
+			}
 		});
-	});
+	
+		socket.on('updateRooms', () => {
+			console.log('getting information');
+			socket.emit('findAllJoinedRooms', (rooms: any) => {
+				console.log("findAllJoined", rooms);
+				setChannels(rooms)
+			});
+			socket.emit("findAllUsersInRoom", {uuid: selectedRoom.id}, (users: any) => {
+                setMembers(users);
+            });
+		});
+
+		socket.on('updateThisRoom', (thisRoom: any) => {
+			setSelectedRoom(thisRoom);
+		});
+
+		return () => {
+			socket.off('updateRooms');
+			socket.off('updateMessages');
+		}
+	}, [socket, selectedRoom]);
 
 	async function chooseRoom(thisRoom: Room) {
 		console.log("You chose room ", thisRoom);
 		setSelectedRoom(thisRoom);
 	}
 
-	function sendMessage() {
+	async function sendMessage() {
 		if (selectedRoom.id !== "" && newMessage !== "") {
 			console.log('sending message: ', newMessage);
 			socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.id });
@@ -150,10 +163,10 @@ function Chat() {
 								onChange={(e: { target: { value: any; }; }) => setNewMessage(e.target.value)}
 								autoFocus
 								onKeyPress={event => {
-									if (event.key === 'Enter') { sendMessage() }
+									if (event.key === 'Enter') {}
 								}}
 								minLength={1} />
-							<button type="submit" className="mutedButton" onClick={sendMessage}>Send</button>
+							<button type="submit" className="mutedButton">Send</button>
 						</> : <>
 							<input type="text" id="message" name="username"
 								value={newMessage}
