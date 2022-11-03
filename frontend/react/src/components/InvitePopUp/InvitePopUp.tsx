@@ -28,7 +28,7 @@ function InvitePopUp(arg: any) {
     return (
         <>
             <div className="Popup-mother">
-                <button className="invite" onClick={invitePlayer}>invite</button>
+                <button className="invite" onClick={invitePlayer}>Pong invite</button>
                 <Popup open={open} closeOnDocumentClick onClose={() => { setOpen(false); }}>
                     <div className='invitePlayer'>
                         <h2>Your invitation has been sent</h2>

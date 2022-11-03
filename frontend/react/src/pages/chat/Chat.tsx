@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getSocketChat } from "../../App";
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
+import InvitePopUp from '../../components/InvitePopUp/InvitePopUp';
 import NavBar from "../../components/NavBar/NavBar";
 import { Room, User } from "../../type";
 import { getMe } from "../myProfile/request";
@@ -112,11 +113,11 @@ function Chat() {
 					))}
 				</div>
 				<h3>Members</h3>
-				<div className="channel">
+				<div className="channel members">
 					{members.map((member: User) => (
 							<li key={member.userUuid}>
-								{member.userName}
-								<button className='gameInvite'>Invite in Game</button>
+								<p>{member.userName}</p>
+								<InvitePopUp userName={member.userName} userUuid={member.userUuid} user={user} />
 							</li>
 					))}
 				</div>
