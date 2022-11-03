@@ -9,7 +9,7 @@ FROM        node:current-alpine As development
 # Create app directory
 WORKDIR     /usr/src/app
 
-COPY 		--chown=node:node ./react/package*.json /usr/src/app/
+COPY 		--chown=node:node .react/package*.json /usr/src/app/
 
 RUN         apk update && \
             apk add openssl && \
