@@ -160,17 +160,20 @@ export class ChatGateway
   @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
-    console.log('setAdminDto = ', setAdminDto);
-    return await this.chatService.setAdmin(setAdminDto);
+    const chatMember = await this.chatService.setAdmin(setAdminDto);
+    this.server.emit('updateRooms');
+    return chatMember;
   }
 
   // @Roles('owner')
   @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('giveOwnership')
-  async changeOwnership(
+  async giveOwnership(
     @MessageBody() giveOwnershipDto: DoubleUuidDto,
   ): Promise<Room> {
-    return await this.chatService.giveOwnership(giveOwnershipDto);
+    const room: Room = await this.chatService.giveOwnership(giveOwnershipDto);
+    this.server.emit('updateRooms');
+    return room;
   }
 
   // @Roles('owner')
