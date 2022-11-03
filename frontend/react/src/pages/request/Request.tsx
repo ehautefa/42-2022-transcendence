@@ -17,6 +17,17 @@ function Request() {
 	}
 
 	useEffect(() => {
+		socketChat.on('updatePending', () => {
+			socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
+				setChatInvitations(invitation);
+			});
+		})
+		return () => {
+			socketChat.off('updatePending');
+		}
+	})
+
+	useEffect(() => {
 		fetchRequest();
 		socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
 			setChatInvitations(invitation);
@@ -35,9 +46,10 @@ async function handleRequest(userUuid: string, accept: boolean) {
 
 async function handleInvitation(roomId: string, accept: boolean) {
 	respondToInvitation(roomId, accept);
-	socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
-		setChatInvitations(invitation);
-	});
+	if (accept === true && chatInvitations.length <= 1 && requests.length === 0) {
+		window.location.assign("/chat?room=" + roomId);
+	}
+
 }
 
 return (<>
