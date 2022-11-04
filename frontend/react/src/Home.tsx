@@ -2,8 +2,7 @@ import './index.css';
 import './App.css';
 import { io } from 'socket.io-client'
 import Cookies from 'js-cookie'
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
 
 // Create my socket
 let socketOptions = {
