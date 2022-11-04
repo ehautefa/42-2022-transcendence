@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 async function createUser(username: string) {
-	var url: string = process.env.REACT_APP_BACK_URL + "/auth/localLogin/" + username;
+	var url: string = "/auth/localLogin/" + username;
 	var credentials: RequestCredentials = "include";
 	
 	var requestOptions = {
@@ -10,7 +10,7 @@ async function createUser(username: string) {
 	};
 	
 	await fetch(url, requestOptions);
-	window.location.replace(process.env.REACT_APP_FRONT_URL + "/mainPage");
+	window.location.replace("/mainPage");
 }
 
 function Login() {
@@ -18,7 +18,7 @@ function Login() {
 
     return (
         <div className='login'>
-            <a href={process.env.REACT_APP_BACK_URL + "/auth/login"}>Log in</a>
+            <a href={"/auth/login"}>Log in</a>
             <div className='createUser'>
                 <h5>Or use a local profile : </h5>
                 <div>
