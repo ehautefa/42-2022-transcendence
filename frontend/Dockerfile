@@ -42,7 +42,8 @@ COPY 		--chown=node:node ./react/package*.json /usr/src/app/
 # RUN         npm ci --only=production && npm cache clean --force
 
 # ENV         NODE_ENV production
-RUN         npm install
+RUN         npm install -g npm@latest && \
+            npm install
 
 COPY 		--chown=node:node ./react /usr/src/app
 # Run the build command which creates the production bundle

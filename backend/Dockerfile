@@ -35,6 +35,7 @@ WORKDIR     /usr/src/app
 COPY        --chown=node:node --from=development /usr/src/app /usr/src/app
 
 # Run the build command which creates the production bundle
+RUN         echo "AUDIT PROD :" && npm audit --production
 RUN         npm run build
 
 # Set NODE_ENV environment variable
