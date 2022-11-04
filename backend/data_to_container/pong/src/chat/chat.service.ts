@@ -79,11 +79,6 @@ export class ChatService {
     return messages;
   }
 
-  // async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
-  //   const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
-  //   return messages[messages.length - 1];
-  // }
-
   /*
    * chatMember functions
    */
@@ -302,18 +297,13 @@ export class ChatService {
     return await this.createDMRoom(sender, recipientId);
   }
 
-  // async joinDMRoom(sender: user, recipientId: string): Promise<Room> {
-  //   try {
-  //     return await this.getDMRoom(sender.userUuid, recipientId);
-  //   } catch (error) {
-  //     return await this.createDMRoom(sender, recipientId);
-  //   }
-  // }
-
   async getOtherDMUser(userId: string, roomId: string): Promise<user> {
     const otherChatMember: ChatMember =
       await this.chatMembersRepository.findOneOrFail({
-        relations: { user: true, room: true },
+        relations: {
+          user: { blocked: true },
+          room: true,
+        },
         where: {
           room: { id: roomId },
           user: { userUuid: Not(userId) },
@@ -366,7 +356,6 @@ export class ChatService {
       await this.chatMembersRepository.findOneOrFail({
         relations: { room: true, user: true },
         where: { room: { id: roomId }, user: { userUuid: userId } },
-        // select: { isAdmin: true },
       });
     if (chatMember.room.type === RoomType.DM) return false;
     return chatMember.isAdmin;
@@ -435,16 +424,6 @@ export class ChatService {
     }
     return rooms;
   }
-
-  // async updatePunishment(roomId: string): Promise<ChatMember> {
-  //   const chatMember: ChatMember =
-  //     await this.chatMembersRepository.findOneOrFail({
-  //       relations: { room: true },
-  //       where: { room: { id: roomId } },
-  //       select: { bannedTime: true, mutedTime: true },
-  //     });
-  //   if ()
-  // }
 
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,

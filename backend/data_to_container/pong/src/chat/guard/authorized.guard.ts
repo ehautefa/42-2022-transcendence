@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { WsException } from '@nestjs/websockets';
 import { ChatMember, user } from 'src/bdd';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from '../chat.service';
@@ -15,7 +16,7 @@ export class AuthorizedGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const authorization: Authorization[] = this.reflector.get<Authorization[]>(
-      'roles',
+      'authorization',
       context.getHandler(),
     );
 
@@ -27,7 +28,8 @@ export class AuthorizedGuard implements CanActivate {
         user.userUuid,
         roomId,
       );
-      if (this.userService.isBlocked(user, otherUser)) return false;
+      if (this.userService.isBlocked(otherUser, user))
+        throw new WsException(`You have been blocked by ${otherUser.userName}`);
     }
     const chatMember: ChatMember = await this.chatService.findChatMember(
       user.userUuid,

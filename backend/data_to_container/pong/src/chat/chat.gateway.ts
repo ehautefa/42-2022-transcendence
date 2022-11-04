@@ -20,6 +20,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
+import { Authorized } from './decorator/authorized.decorator';
+import { Roles } from './decorator/roles.decorator';
 import {
   CreateMessageDto,
   CreateRoomDto,
@@ -33,10 +35,13 @@ import {
   UuidDto,
 } from './dto';
 import { ChangePasswordDto } from './dto/';
+import { AuthorizedGuard } from './guard/authorized.guard';
 import { ProtectedRoomGuard } from './guard/protected-room.guard';
+import { RolesGuard } from './guard/roles.guard';
 
 @UseGuards(JwtAuthGuard)
-// @UseGuards(RolesGuard)
+@UseGuards(RolesGuard)
+@UseGuards(AuthorizedGuard)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
@@ -60,7 +65,7 @@ export class ChatGateway
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatGateway');
 
-  // @Authorized('notBanned', 'notBlocked', 'notMuted')
+  @Authorized('notBanned', 'notBlocked', 'notMuted')
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
@@ -169,7 +174,7 @@ export class ChatGateway
     return chatMember;
   }
 
-  // @Roles('owner')
+  @Roles('owner')
   @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('giveOwnership')
   async giveOwnership(
