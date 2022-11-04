@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WsException } from '@nestjs/websockets';
@@ -8,7 +9,6 @@ import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   ChangePasswordDto,
   CreateMessageDto,
@@ -20,7 +20,6 @@ import {
   RemovePunishmentDto,
   RespondToInvitationDto,
   SetAdminDto,
-  UuidDto,
 } from './dto';
 
 @Injectable()
@@ -34,7 +33,7 @@ export class ChatService {
     private chatMembersRepository: Repository<ChatMember>,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
   ) {}
 
   // A logger for debugging purposes
@@ -397,9 +396,12 @@ export class ChatService {
     return await this.roomsRepository.save(room);
   }
 
-  async deleteRoom(roomId: UuidDto): Promise<Room> {
-    const room: Room = await this.findRoomById(roomId.uuid);
-    return await this.roomsRepository.remove(room);
+  async deleteRoom(roomId: string): Promise<Room> {
+    const room: Room = await this.findRoomById(roomId);
+    console.log('room = ', room);
+    await this.roomsRepository.remove(room);
+    this.logger.debug('ROOM DELETED');
+    return room;
   }
 
   async amIOwner(userId: string, roomId: string): Promise<boolean> {

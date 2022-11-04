@@ -9,8 +9,7 @@ export class Message {
   @Column('varchar')
   message: string;
 
-  @ManyToOne(() => ChatMember, (chatConnection) => chatConnection.id, {
-    onDelete: 'CASCADE',
+  @ManyToOne(() => ChatMember, (chatMember) => chatMember.id, {
     nullable: true,
   })
   sender: ChatMember;
