@@ -361,7 +361,6 @@ export class ChatService {
   }
 
   async amIAdmin(userId: string, roomId: string): Promise<boolean> {
-    this.logger.debug('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW');
     const chatMember: ChatMember =
       await this.chatMembersRepository.findOneOrFail({
         relations: { room: true, user: true },
@@ -397,11 +396,11 @@ export class ChatService {
   }
 
   async deleteRoom(roomId: string): Promise<Room> {
-    const room: Room = await this.findRoomById(roomId);
-    console.log('room = ', room);
-    await this.roomsRepository.remove(room);
-    this.logger.debug('ROOM DELETED');
-    return room;
+    const room: Room = await this.roomsRepository.findOneOrFail({
+      where: { id: roomId },
+      select: { id: true },
+    });
+    return await this.roomsRepository.remove(room);
   }
 
   async amIOwner(userId: string, roomId: string): Promise<boolean> {

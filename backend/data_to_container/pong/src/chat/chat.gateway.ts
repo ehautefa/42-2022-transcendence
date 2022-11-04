@@ -188,9 +188,9 @@ export class ChatGateway
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
     const room: Room = await this.chatService.deleteRoom(deleteRoomDto.uuid);
-    this.server.to(room.id).emit('refreshSelectedRoom');
-    this.server.to(room.id).emit('updateRooms');
-    this.server.to(room.id).socketsLeave(room.id);
+    console.table(room);
+    this.server.to(deleteRoomDto.uuid).emit('refreshSelectedRoom');
+    this.server.to(room.id).socketsLeave(deleteRoomDto.uuid);
     return room;
   }
 
