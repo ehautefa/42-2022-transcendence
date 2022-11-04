@@ -146,7 +146,10 @@ function Chat() {
 			</div>
 			{selectedRoom.id !== undefined && selectedRoom.id !== "" &&
 				<div className="chat">
-					<ChatSideNav Room={selectedRoom} />
+					{
+						selectedRoom.type !== "dm" &&
+						<ChatSideNav Room={selectedRoom} />
+					}
 					{
 						selectedRoom.bannedTime ?
 							<div id="messages">
