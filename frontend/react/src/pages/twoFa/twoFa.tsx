@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./twoFa.css";
-// import { redirect } from "react-router-dom"
 
 function TwoFa() {
     const [code, setCode] = useState("");
@@ -18,9 +17,7 @@ function TwoFa() {
         if (result.status === 401) {
             alert("Wrong code");
         } else if (result.status === 200) {
-            // navigate("/mainPage");
             window.location.assign("/mainPage");
-            // redirect("/mainPage");
         }
     }
 
