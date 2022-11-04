@@ -1,6 +1,6 @@
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 import "./sideMenu.css";
 
 function SetPassword({ room }: any) {
@@ -12,7 +12,6 @@ function SetPassword({ room }: any) {
 	const SendPassword = (e: any) => {
 		e.preventDefault();
 		console.log('set password ', password);
-		// TO DO : send password to backend
 		let param = {
 			roomId: room.id,
 			password: "",

@@ -1,7 +1,7 @@
 import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
-import { getSocketPong } from "../../App";
+import { getSocketPong } from "../../Home";
 
 const socket = getSocketPong();
 
@@ -14,7 +14,6 @@ function ReceivePopUp(modal: any) {
 
     function joinGame() {
         socket.emit("acceptInvite", modal.modal.matchId);
-        console.log("accept invite", modal.modal);
         document.getElementById("ReceivePopupBackground")!.style.display = "none";
         window.location.href = "/game?id=" + modal.modal.matchId;
     }

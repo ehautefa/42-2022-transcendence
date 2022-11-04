@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Popup from "reactjs-popup";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 import "./sideMenu.css";
 
 function DeleteRoom({ room }: any) {
@@ -9,7 +9,9 @@ function DeleteRoom({ room }: any) {
 
     function Yes() {
         setOpen(false);
-        socket.emit('deleteRoom', {uuid: room.id});
+        if (room && room !== undefined && room.id !== undefined) {
+            socket.emit('deleteRoom', {uuid: room.id});
+        }
     }
 
     function No() {

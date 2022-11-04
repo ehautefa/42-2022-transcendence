@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Game.css"
-import { getSocketPong } from "../../App"
+import { getSocketPong } from "../../Home"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"

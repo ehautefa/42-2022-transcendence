@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Link, useLocation } from 'react-router-dom';
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import InvitePopUp from '../../components/InvitePopUp/InvitePopUp';
 import NavBar from "../../components/NavBar/NavBar";
@@ -33,7 +33,11 @@ function Chat() {
 			console.log("findAllJoined", rooms);
 			setChannels(rooms)
 			if (roomId) {
-				setSelectedRoom(rooms.find((room: any) => room.roomId === roomId));
+				let tofindRoom: Room = rooms.find((room: Room) => room.id === roomId);
+				if (tofindRoom !== undefined) {
+					setSelectedRoom(tofindRoom);
+				}
+				window.history.replaceState({}, document.title, "/chat");
 			}
 		});
 	}, [socket, roomId]);
@@ -66,23 +70,38 @@ function Chat() {
 			}
 		});
 
-		socket.on('updateRooms', () => {
+		function updateRooms()
+		{
 			console.log('getting information');
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
-			socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
-				setMembers(users);
+			if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
+				socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
+					setMembers(users);
+				});
+			}
+		};
+
+		function refreshOneRoom()
+		{
+			setSelectedRoom({} as Room);
+			socket.emit('findAllJoinedRooms', (rooms: any) => {
+				console.log("findAllJoined", rooms);
+				setChannels(rooms)
 			});
-		});
+		}
+		socket.on('refreshSelectedRoom', refreshOneRoom);
 
 		socket.on('updateThisRoom', (thisRoom: any) => {
 			setSelectedRoom(thisRoom);
 		});
 
 		return () => {
-			socket.off('updateRooms');
+			socket.off('updateThisRoom');
+			socket.removeListener('updateRooms', updateRooms);
+			socket.removeListener('refreshSelectedRoom', refreshOneRoom);
 			socket.off('updateMessages');
 		}
 	}, [socket, selectedRoom]);

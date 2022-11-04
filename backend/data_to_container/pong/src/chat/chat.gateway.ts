@@ -7,6 +7,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -19,14 +20,19 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
-import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { DoubleUuidDto } from './dto/double-uuid';
-import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
-import { JoinRoomDto } from './dto/join-room.dto';
-import { PunishUserDto } from './dto/punish-user.dto';
-import { RemovePunishmentDto } from './dto/remove-punishment.dto';
-import { SetAdminDto } from './dto/set-admin.dto';
+import {
+  CreateMessageDto,
+  CreateRoomDto,
+  DoubleUuidDto,
+  FilterByAdminRightsDto,
+  JoinRoomDto,
+  PunishUserDto,
+  RemovePunishmentDto,
+  RespondToInvitationDto,
+  SetAdminDto,
+  UuidDto,
+} from './dto';
+import { ChangePasswordDto } from './dto/';
 import { ProtectedRoomGuard } from './guard/protected-room.guard';
 
 @UseGuards(JwtAuthGuard)
@@ -126,11 +132,11 @@ export class ChatGateway
     @MessageBody() recipiendId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<string> {
-    const room: Room = await this.chatService.joinDMRoom(
-      user,
-      recipiendId.uuid,
-    );
-    this.server.socketsJoin(room.id);
+    this.logger.debug('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+    const room: Room = await this.chatService.getDMRoom(user, recipiendId.uuid);
+    this.logger.debug('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqw');
+    // console.log(room);
+    // this.server.socketsJoin(room.id);
     return room.id;
   }
 
@@ -180,8 +186,10 @@ export class ChatGateway
   // @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
-    const room: Room = await this.chatService.deleteRoom(deleteRoomDto);
-    this.server.emit('updateRooms');
+    const room: Room = await this.chatService.deleteRoom(deleteRoomDto.uuid);
+    console.table(room);
+    this.server.to(deleteRoomDto.uuid).emit('refreshSelectedRoom');
+    this.server.to(room.id).socketsLeave(deleteRoomDto.uuid);
     return room;
   }
 
@@ -191,8 +199,9 @@ export class ChatGateway
   async changePassword(
     @MessageBody() changePasswordDto: ChangePasswordDto,
   ): Promise<Room> {
+    const room: Room = await this.chatService.changePassword(changePasswordDto);
     this.server.emit('updateRooms');
-    return await this.chatService.changePassword(changePasswordDto);
+    return room;
   }
 
   // @Roles('admin')
@@ -201,7 +210,7 @@ export class ChatGateway
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
     const chatMember = await this.chatService.punishUser(punishUserDto);
-    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
+    this.server.to(chatMember.room.id).emit('updateRooms');
     return chatMember;
   }
 
@@ -211,8 +220,10 @@ export class ChatGateway
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
     console.log('removePunishmentDto = ', removePunishmentDto);
-    const chatMember = await this.chatService.removePunishment(removePunishmentDto);
-    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
+    const chatMember = await this.chatService.removePunishment(
+      removePunishmentDto,
+    );
+    this.server.to(chatMember.room.id).emit('updateRooms');
     return chatMember;
   }
 
@@ -245,13 +256,14 @@ export class ChatGateway
   async leaveRoom(
     @MessageBody() roomId: UuidDto,
     @Req() { user }: { user: user },
+    @ConnectedSocket() client: Socket,
   ): Promise<ChatMember> {
     console.log('leaving ', roomId);
     const chatMember: ChatMember = await this.chatService.leaveRoom(
       user.userUuid,
       roomId.uuid,
     );
-    this.server.to(chatMember.room.id).emit('updateRooms');
+    this.server.to(client.id).emit('refreshSelectedRoom');
     return chatMember;
   }
 
@@ -299,6 +311,38 @@ export class ChatGateway
     @MessageBody() roomId: UuidDto,
   ): Promise<ChatMember[]> {
     return await this.chatService.findMutedUsersInRoom(roomId.uuid);
+  }
+
+  @SubscribeMessage('inviteUser')
+  async inviteUser(@MessageBody() inviteUserDto: DoubleUuidDto): Promise<user> {
+    const usr: user = await this.chatService.inviteUser(
+      inviteUserDto.userId,
+      inviteUserDto.roomId,
+    );
+    return usr;
+  }
+
+  @SubscribeMessage('getPendingInvitations')
+  async getPendingInvitations(
+    @Req() { user }: { user: user },
+  ): Promise<Room[]> {
+    return await this.chatService.getPendingInvitations(user.userUuid);
+  }
+
+  @SubscribeMessage('respondToInvitation')
+  async respondToInvitation(
+    @MessageBody() respondToInvitationDto: RespondToInvitationDto,
+    @Req() { user }: { user: user },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const usr: user = await this.chatService.respondToInvitation(
+      respondToInvitationDto,
+      user,
+    );
+    if (respondToInvitationDto.acceptInvitation === true)
+      this.server.socketsJoin(respondToInvitationDto.roomId);
+    this.server.to(client.id).emit('updatePending');
+    return usr;
   }
 
   async handleConnection(client: Socket): Promise<void> {

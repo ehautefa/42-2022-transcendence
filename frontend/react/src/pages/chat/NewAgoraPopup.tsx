@@ -1,6 +1,6 @@
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 import "./Chat.css";
 import "./ChatPopup.css";
 
@@ -30,7 +30,6 @@ function NewAgoraPopup() {
 			<button type="submit" onClick={() => setOpen(true)}> Create New Room </button>
 			<Popup open={open} closeOnDocumentClick onClose={() => {
 				setOpen(false);
-				//window.location.reload();
 			}}>
 				<div className='messagePopup'>
 					<label htmlFor="messagePopup">Make new room :</label>
@@ -49,8 +48,8 @@ function NewAgoraPopup() {
 					<div className="RoomTypeSelector">
 						<p>Room Type :</p>
 						<div className='room-type-selector-flex'>
-							<input type="radio" value="public" name="roomType" onChange={handleChange}/> Public
-							<input type="radio" value="private" name="roomType"  onChange={handleChange} /> Private
+							<input type="radio" value="public" name="roomType" onChange={handleChange} checked={roomType === "public"}/> Public
+							<input type="radio" value="private" name="roomType"  onChange={handleChange} checked={roomType === "private"}/> Private
 						</div>
 					</div>
 

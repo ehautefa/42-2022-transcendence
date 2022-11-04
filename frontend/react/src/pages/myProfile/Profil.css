@@ -25,6 +25,18 @@
     box-shadow: 0px 0px 20px #7C4D84;
 }
 
+.stats .achievements {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 40%;
+}
+
+.stats .achievements img {
+	width: 30%;
+}
+
+
 .mainComposantProfile .container {
 	background-color: rgba(0, 0, 0, 0.5);
 	box-shadow: 5px 5px 10px #000;

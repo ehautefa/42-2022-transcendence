@@ -2,7 +2,7 @@ import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "./InvitePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocketPong } from "../../App"
+import { getSocketPong } from "../../Home"
 import { Link } from "react-router-dom";
 
 const socket = getSocketPong();
@@ -13,14 +13,12 @@ function InvitePopUp(arg: any) {
 
     function invitePlayer() {
         setOpen(true);
-        console.log("invitePlayer", arg.userName);
         socket.emit("invitePlayer", {
             userName: arg.user.userName,
             userUuid: arg.user.userUuid,
             invitedUserName: arg.userName,
 			invitedUserUuid: arg.userUuid
         }, (matchId: string) => {
-            console.log("MATCH ID", matchId);
             setId(matchId);
         });
     }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 
 
 function DeletePassword({ room }: any) {

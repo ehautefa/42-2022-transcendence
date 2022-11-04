@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WsException } from '@nestjs/websockets';
@@ -8,14 +9,18 @@ import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
-import { CreateMessageDto, CreateRoomDto, UuidDto } from './dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { DoubleUuidDto } from './dto/double-uuid';
-import { FilterByAdminRightsDto } from './dto/filter-by-admin-rights.dto';
-import { JoinRoomDto } from './dto/join-room.dto';
-import { PunishUserDto } from './dto/punish-user.dto';
-import { RemovePunishmentDto } from './dto/remove-punishment.dto';
-import { SetAdminDto } from './dto/set-admin.dto';
+import {
+  ChangePasswordDto,
+  CreateMessageDto,
+  CreateRoomDto,
+  DoubleUuidDto,
+  FilterByAdminRightsDto,
+  JoinRoomDto,
+  PunishUserDto,
+  RemovePunishmentDto,
+  RespondToInvitationDto,
+  SetAdminDto,
+} from './dto';
 
 @Injectable()
 export class ChatService {
@@ -28,6 +33,7 @@ export class ChatService {
     private chatMembersRepository: Repository<ChatMember>,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   // A logger for debugging purposes
@@ -58,7 +64,7 @@ export class ChatService {
   }: {
     uuid: string;
   }): Promise<any[]> {
-    console.log('roomId = ', roomId);
+    // console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository
       .createQueryBuilder('msg')
       .innerJoin('msg.sender', 'sender')
@@ -131,7 +137,6 @@ export class ChatService {
     chatMember.isAdmin = true;
     await this.chatMembersRepository.save(chatMember);
     newRoom.owner = chatMember;
-    console.log(newRoom);
     return await this.roomsRepository.save(newRoom);
   }
 
@@ -186,7 +191,6 @@ export class ChatService {
           room: { id: roomId },
         },
       });
-    console.log(chatMember);
     if (chatMember.room.owner.user.userUuid === chatMember.user.userUuid)
       throw new WsException('You cannot leave a room you own');
     if (chatMember.bannedTime && chatMember.bannedTime < new Date())
@@ -231,50 +235,77 @@ export class ChatService {
     );
   }
 
+  async inviteUser(userId: string, roomId: string): Promise<user> {
+    const room: Room = await this.findRoomById(roomId);
+    this.eventEmitter.emit('room.invite', userId);
+    return await this.userService.addInvitation(userId, room);
+  }
+
+  async respondToInvitation(
+    respondToInvitationDto: RespondToInvitationDto,
+    user: user,
+  ): Promise<user> {
+    const room: Room = await this.findRoomById(respondToInvitationDto.roomId);
+    if (respondToInvitationDto.acceptInvitation === true)
+      this.createChatMember(user, room);
+    console.table(user);
+    return await this.userService.removeInvitation(user.userUuid, room);
+  }
+
+  async getPendingInvitations(userId: string): Promise<Room[]> {
+    const user: user = await this.userService.getCompleteUser(userId);
+    return user.invitationPending;
+  }
+
   /*
    * dm room functions
    */
 
   async createDMRoom(sender: user, recipientId: string): Promise<Room> {
-    const newDMRoom: Room = this.roomsRepository.create({
+    let newDMRoom: Room = this.roomsRepository.create({
       type: RoomType.DM,
     });
+    newDMRoom = await this.roomsRepository.save(newDMRoom);
     const recipient: user = await this.userService.getUser(recipientId);
-    const recipientMember: Promise<ChatMember> = this.getChatMember(
+    const recipientMember: Promise<ChatMember> = this.createChatMember(
       recipient,
       newDMRoom,
     );
-    const senderMember: Promise<ChatMember> = this.getChatMember(
+    const senderMember: Promise<ChatMember> = this.createChatMember(
       sender,
       newDMRoom,
     );
-    newDMRoom.members.push(await senderMember, await recipientMember);
-    this.roomsRepository.save(newDMRoom);
+    Promise.all([senderMember, recipientMember]);
     return newDMRoom;
   }
 
-  async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
-    const room: Room = await this.roomsRepository
-      .createQueryBuilder('room')
-      .leftJoinAndSelect('room.members', 'members')
-      .leftJoinAndSelect('members.user', 'user')
-      .where('room.type = :type', { type: 'dm' })
-      .andWhere('user.id in (:...userId)', {
-        userId: [senderId, recipientId],
-      })
-      .groupBy('room.id')
-      .having('count(users.id) = 2')
-      .getOneOrFail();
-    return room;
+  async getDMRoom(sender: user, recipientId: string): Promise<Room> {
+    const members: ChatMember[] = await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      where: {
+        room: { type: RoomType.DM },
+        user: [{ userUuid: sender.userUuid }, { userUuid: recipientId }],
+      },
+    });
+    for (const member1 of members) {
+      for (const member2 of members) {
+        if (
+          member1.user.userUuid !== member2.user.userUuid &&
+          member1.room.id === member2.room.id
+        )
+          return member1.room;
+      }
+    }
+    return await this.createDMRoom(sender, recipientId);
   }
 
-  async joinDMRoom(sender: user, recipientId: string): Promise<Room> {
-    try {
-      return await this.getDMRoom(sender.userUuid, recipientId);
-    } catch (error) {
-      return await this.createDMRoom(sender, recipientId);
-    }
-  }
+  // async joinDMRoom(sender: user, recipientId: string): Promise<Room> {
+  //   try {
+  //     return await this.getDMRoom(sender.userUuid, recipientId);
+  //   } catch (error) {
+  //     return await this.createDMRoom(sender, recipientId);
+  //   }
+  // }
 
   async getOtherDMUser(userId: string, roomId: string): Promise<user> {
     const otherChatMember: ChatMember =
@@ -287,10 +318,6 @@ export class ChatService {
       });
     return otherChatMember.user;
   }
-
-  // async leaveRoom(userId: string, roomId: string): Promise<ChatMember> {
-  // this.ch
-  // }
 
   /*
    * admin functions
@@ -331,26 +358,14 @@ export class ChatService {
     return await this.chatMembersRepository.save(chatMember);
   }
 
-  // async filterUsersInRoom(
-  //   filterUsersDto: FilterUsersDto,
-  // ): Promise<ChatMember[]> {
-  //   let timeNow: Date;
-  //   if (filterUsersDto.banned || filterUsersDto.muted) timeNow = new Date();
-  //   return await this.chatMembersRepository.find({
-  //     relations: { user: true, room: true },
-  //     select: {
-  //       user: { userName: true, userUuid: true },
-  //     },
-  //     where: {
-  //       room: { id: filterUsersDto.roomId },
-  //       isAdmin: filterUsersDto.admin,
-  //       bannedTime: filterUsersDto.banned && Not(IsNull) && LessThan(timeNow),
-  //       mutedTime: filterUsersDto.muted && Not(IsNull) && LessThan(timeNow),
-  //     },
-  //   });
-  // }
   async amIAdmin(userId: string, roomId: string): Promise<boolean> {
-    const chatMember: ChatMember = await this.findChatMember(userId, roomId);
+    const chatMember: ChatMember =
+      await this.chatMembersRepository.findOneOrFail({
+        relations: { room: true, user: true },
+        where: { room: { id: roomId }, user: { userUuid: userId } },
+        // select: { isAdmin: true },
+      });
+    console.log(chatMember);
     return chatMember.isAdmin;
   }
 
@@ -378,8 +393,11 @@ export class ChatService {
     return await this.roomsRepository.save(room);
   }
 
-  async deleteRoom(roomId: UuidDto): Promise<Room> {
-    const room: Room = await this.findRoomById(roomId.uuid);
+  async deleteRoom(roomId: string): Promise<Room> {
+    const room: Room = await this.roomsRepository.findOneOrFail({
+      where: { id: roomId },
+      select: { id: true },
+    });
     return await this.roomsRepository.remove(room);
   }
 
@@ -392,8 +410,8 @@ export class ChatService {
     return room.owner.user.userUuid === userId;
   }
 
-  async findAllUsersInRoom(userId: string, roomId: string) {
-    return await this.roomsRepository
+  async findAllUsersInRoom(userId: string, roomId: string): Promise<Room[]> {
+    const rooms = await this.roomsRepository
       .createQueryBuilder('room')
       .innerJoin('room.members', 'members')
       .innerJoin('members.user', 'user')
@@ -401,8 +419,28 @@ export class ChatService {
       .andWhere('user.userUuid != :userId', { userId: userId })
       .select('user.userUuid', 'userUuid')
       .addSelect('user.userName', 'userName')
+      .addSelect('user.userName', 'userName')
+      .addSelect('members.bannedTime', 'bannedTime')
+      .addSelect('members.mutedTime', 'mutedTime')
       .getRawMany();
+    for (const room of rooms) {
+      room.bannedTime =
+        !room.bannedTime || room.bannedTime > Date() ? false : true;
+      room.mutedTime =
+        !room.mutedTime || room.mutedTime > Date() ? false : true;
+    }
+    return rooms;
   }
+
+  // async updatePunishment(roomId: string): Promise<ChatMember> {
+  //   const chatMember: ChatMember =
+  //     await this.chatMembersRepository.findOneOrFail({
+  //       relations: { room: true },
+  //       where: { room: { id: roomId } },
+  //       select: { bannedTime: true, mutedTime: true },
+  //     });
+  //   if ()
+  // }
 
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,
@@ -457,14 +495,6 @@ export class ChatService {
         .split('; ')
         .find((cookie: string) => cookie.startsWith('access_token='))
         .split('=')[1];
-      // const cookies: string[] = cookiesStr.split('; ');
-      // const authCookie: string = cookies.filter((s) =>
-      //   s.includes('access_token='),
-      // )[0];
-      // const accessToken = authCookie.substring(
-      //   'access_token'.length + 1,
-      //   authCookie.length,
-      // );
       const jwtOptions: JwtVerifyOptions = {
         secret: JwtConfig.secret,
       };

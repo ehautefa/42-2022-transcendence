@@ -3,6 +3,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnectio
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { UserService } from 'src/user/user.service';
+import { OnEvent } from '@nestjs/event-emitter';
 import { SendInviteDto } from './dto/sendInvite.dto';
 import { SendAlertDto } from './dto/sendAlert.dto';
 import { user } from 'src/bdd/users.entity';
@@ -31,6 +32,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	constructor(private readonly StatusService: StatusService) { }
 
+	@OnEvent('alert.send')
 	sendAlert(sendAlert: SendAlertDto) {
 		let socket = inline.get(sendAlert.userUuid);
 		if (!socket) {
@@ -41,6 +43,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("Alert sent to " + sendAlert.userUuid);
 	}
 
+	@OnEvent('game.invite')
 	sendInvitation(sendInvite: SendInviteDto) {
 		let socket = inline.get(sendInvite.invitedUserUuid);
 		if (!socket) {
@@ -52,6 +55,17 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
+	@OnEvent('room.invite')
+	handleInviteEvent(userUuid: string) {
+		let socket = inline.get(userUuid);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return;
+		}
+		this.server.to(socket).emit('refreshRequest');
+	}
+
+	@OnEvent('user.refresh')
 	refreshUserData(user : user) {
 		let socket = inline.get(user.userUuid);
 		if (!socket) {

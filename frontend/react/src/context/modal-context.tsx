@@ -1,16 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Context } from 'vm';
-import { getSocketChat, getSocketStatus } from "../App";
+import { getSocketChat, getSocketStatus } from "../Home";
 import ReceivePopUp from '../components/ReceivePopUp/ReceivePopUp';
 
 const ModalContext = React.createContext({});
 const socket = getSocketStatus();
 
 const Modal = (({ modal, unSetModal }: any) => {
-	console.log("MODAL", modal);
 	useEffect(() => {
 		const bind = (event: any) => {
-			console.log(event.keyCode);
 			unSetModal();
 		}
 
@@ -39,11 +37,9 @@ const ModalProvider = (props: any) => {
 	const socketChat = getSocketChat();
 
 	socket.on('sendInvite', (data: any) => {
-		console.log("INVITE PLAYER ON", data);
 		setModal(data);
 	})
 	socket.on('addFriend', (inviter: any) => {
-		console.log("ADD FRIEND ON", inviter);
 		setModal(inviter);
 	})
 	socket.on('sendAlert', (message: string) => {
@@ -51,10 +47,9 @@ const ModalProvider = (props: any) => {
 	})
 	socket.on('unauthorized', () => {
 		console.log("UNAUTHORIZED");
-		// window.location.assign("/auth/login");
+		window.location.assign("/auth/login");
 	})
 	socketChat.on('exception', (msg: any) => {
-		console.log("EXCEPTION");
 		alert(msg.message);
 	})
 	const unSetModal = useCallback(() => {

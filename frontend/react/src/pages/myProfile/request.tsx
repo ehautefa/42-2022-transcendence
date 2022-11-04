@@ -21,6 +21,7 @@ export async function getMe() {
 
 export async function GetMatchHistory(userName: string) {
 	var url: string = "/match/user/" + userName;
+
 	var requestOptions = {
 		method: 'GET',
 		credentials: credentials
@@ -49,9 +50,7 @@ export async function ChangeUsername(newName: string) {
 
 	const URL :string = "/user/changeUsername";
 	let result = await fetch(URL, requestOptions);
-	console.log(result);
 	if (result.status === 403) {
-		console.log("Username already taken");
 		alert("Username already taken");
 		return null;
 	}

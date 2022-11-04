@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 
 
 function LeaveRoom({ room }: any) {
@@ -9,7 +9,10 @@ function LeaveRoom({ room }: any) {
     const [open, setOpen] = useState(false);
 
     function Yes() {
-        socket.emit('leaveRoom', {uuid: room.id})
+        if (room && room !== undefined && room.id !== undefined) {
+            socket.emit('leaveRoom', { uuid: room.id })
+        }
+        room = {};
         setOpen(false);
     }
 

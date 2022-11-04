@@ -2,17 +2,19 @@ import NavBar from "../../components/NavBar/NavBar"
 import "../myProfile/Profil.css";
 import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
+import star from "../../assets/star.jpg";
+import starEmpty from "../../assets/starEmpty.jpg";
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 
 function Profile() {
 
 	// get user uid in url
 	// to do a link to the profile of the user 
-	// use <Link to={"./profile?uid=" + useruid}>profile</Link>
+	// use <Link to={"/profile?uid=" + useruid}>profile</Link>
 
 	const uid = new URLSearchParams(useLocation().search).get('uid');
 	const emptyUser: User = { userUuid: "", userName: "" };
@@ -23,7 +25,8 @@ function Profile() {
 	const [isBlocked, setIsBlocked] = useState(false);
 	const [invitationSent, setInvitationSent] = useState(false);
 	const [picture, setPicture] = useState("");
-	
+	let navigate = useNavigate();
+
 	async function fetchUser(uid: string) {
 		const user = await FetchUser(uid);
 		setUser(user);
@@ -36,12 +39,12 @@ function Profile() {
 		const isFriend = await isMyFriends(user.userUuid);
 		setIsMyFriend(isFriend);
 	}
-	
+
 	useEffect(() => {
 		if (uid) {
 			fetchUser(uid);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	async function handleBlock(userUuid: string, block: boolean) {
@@ -66,9 +69,9 @@ function Profile() {
 
 	function writeDM() {
 		const socketChat = getSocketChat();
-		socketChat.emit("joinDMRoom", {uuid: user.userUuid}, (roomId: string) => {
+		socketChat.emit("joinDMRoom", { uuid: user.userUuid }, (roomId: string) => {
 			console.log("roomId", roomId);
-			window.location.href = "/chat?room=" + roomId;
+			navigate("/chat?room=" + roomId);
 		});
 	}
 
@@ -92,16 +95,16 @@ function Profile() {
 					<button className="enable" onClick={writeDM}>Write message</button>
 					{
 						isMyFriend ?
-						<button className="enable"  onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
-						: ( invitationSent ?
-							<button className="enable unclickable">Invitation sent</button>
-							: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
+							<button className="enable" onClick={() => handleFriend(user.userUuid, false)}>Remove from friends</button>
+							: (invitationSent ?
+								<button className="enable unclickable">Invitation sent</button>
+								: <button className="enable" onClick={() => handleFriend(user.userUuid, true)}>Add Friend</button>
 							)
-						}
+					}
 					{
 						isBlocked ?
-						<button className="enable" onClick={() => handleBlock(user.userUuid, false)}>Unblock</button>
-						: <button className="enable" onClick={() => handleBlock(user.userUuid, true)}>Block</button>
+							<button className="enable" onClick={() => handleBlock(user.userUuid, false)}>Unblock</button>
+							: <button className="enable" onClick={() => handleBlock(user.userUuid, true)}>Block</button>
 					}
 				</div>
 				<div className="ppFriends">
@@ -130,6 +133,17 @@ function Profile() {
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
+					<div className="achievements">
+						{user.wins !== undefined && user.wins >= 5 ?
+						<img src={star} alt="achievements" /> :
+						<img src={starEmpty} alt="achievements" />}
+						{user.wins !== undefined && user.wins >= 10 ?
+						<img src={star} alt="achievements" /> :
+						<img src={starEmpty} alt="achievements" />}
+						{user.wins !== undefined && user.wins >= 15 ?
+						<img src={star} alt="achievements" /> :
+						<img src={starEmpty} alt="achievements" />}
+					</div>
 					<table>
 						<thead>
 							<tr>

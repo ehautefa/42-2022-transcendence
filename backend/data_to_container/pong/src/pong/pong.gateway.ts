@@ -3,15 +3,14 @@ import { Socket, Server } from 'socket.io';
 import { Logger, UseGuards, Inject, Req, Body } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
-import { StatusGateway } from "src/status/status.gateway";
 import { GameWindowState } from "./type";
 import { invitePlayerDto } from './dto/invitePlayer.dto';
 import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { handlePaddleDto } from "./dto/handlePaddle.dto";
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SendAlertDto } from "src/status/dto/sendAlert.dto";
-import { editPaddleSizeDto } from "./dto/editPaddleSize.dto";
 
 
 @WebSocketGateway({
@@ -32,10 +31,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	players: playerDto[];
 	launch_game: boolean;
 
-	@Inject(StatusGateway)
-	private readonly StatusGateway: StatusGateway;
-
-	constructor(private readonly PongService: PongService) {
+	constructor(private readonly PongService: PongService,
+		private eventEmitter: EventEmitter2) {
 		this.games = new Map<string, GameWindowState>();
 		this.players = new Array<playerDto>();
 		this.launch_game = true;
@@ -88,7 +85,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			invitedUserName: invitePlayer.invitedUserName,
 			invitedUserUuid: invitePlayer.invitedUserUuid
 		};
-		this.StatusGateway.sendInvitation(response);
+		this.eventEmitter.emit('game.invite', response);
 		console.log("GAME: ", game.matchId, "/n", game);
 		return game.matchId;
 	}
@@ -108,7 +105,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userUuid: this.games.get(matchId).playerLeftUid,
 				message: "Your opponent refused your invitation"
 			}
-			this.StatusGateway.sendAlert(param);
+			this.eventEmitter.emit('alert.send', param);
 			this.games.delete(matchId);
 		}
 		this.PongService.refuseInvite(matchId);

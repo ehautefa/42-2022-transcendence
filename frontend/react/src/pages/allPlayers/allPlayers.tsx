@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import "./allPlayers.css";
 import { addFriend, removeFriend, getMyBlocked, addBlocked, removeBlocked } from "./request";
 import NavBar from "../../components/NavBar/NavBar";
-import { getSocketStatus } from "../../App";
+import { getSocketStatus } from "../../Home";
 import { Players } from "../../type"
 import { getMyFriends } from "../myProfile/request";
 import { getMe } from "../myProfile/request";
@@ -26,11 +26,9 @@ function AllPlayers() {
 		const response = await getAllUuidWithUserNameWithoutMe(me.userUuid);
 		try {
 			socketStatus.emit('getFriendsStatus', response, (data: any) => {
-				console.log("data", data);
 				setUsers(data);
 			});
 		} catch (error) {
-			console.log(error);
 		}
 		const myFriends = await getMyFriends();
 		setFriends(myFriends);
@@ -85,6 +83,7 @@ function AllPlayers() {
 			newFriends = await removeFriend(userUuid);
 		}
 		setFriends(newFriends);
+		console.log("newFriends", newFriends);
 		const myBlocked = await getMyBlocked();
 		setBlocked(myBlocked);
 	}

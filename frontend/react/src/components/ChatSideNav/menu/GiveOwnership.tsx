@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 import Select from "react-select";
 import { SelectClass } from "./SelectClass"
 
@@ -12,7 +12,7 @@ function GiveOwnership({room}: any) {
     const [users, setUsers] = useState([] as SelectClass[]);
 
     useEffect(() => {
-        if (room.id !== "") {
+        if (room && room !== undefined && room.id !== undefined) {
             socket.emit("findAllUsersInRoom", {uuid: room.id}, (users: any) => {
                 // console.log("GIVE OWNERSHIP", users);
                 let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user));

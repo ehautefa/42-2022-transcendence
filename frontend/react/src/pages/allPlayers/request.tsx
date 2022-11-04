@@ -17,7 +17,6 @@ export async function getAllUuidWithUserNameWithoutMe(myUserUuid: string) {
 			break;
 		}
 	}
-	console.log("users", users);
 	return await users;
 }
 
@@ -52,11 +51,12 @@ export async function removeFriend(friendUuid: string) {
 		credentials: credentials
 	};
 
-	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	let result = await fetch(url, requestOptions);
+	console.log("result", result);
+	if (result.status === 401) {
 		window.location.assign("/auth/login");
 	}
-	return await result;
+	return result.json();
 }
 
 export async function getMyBlocked() {

@@ -16,9 +16,6 @@ function Active2FAPopUp() {
 		};
 	
 		let result = await (await fetch(url, requestOptions)).text();
-		// if (result.statusCode === 401) {
-		// 	window.location.assign("/auth/login");
-		// }
 		setQrCode(result);
 	}
 
@@ -34,11 +31,10 @@ function Active2FAPopUp() {
 		};
 	
 		let result = await fetch(url, requestOptions);
-		console.log(result);
 		if (result.status === 201) {
 			setOpen(false);
 		} else if (result.status === 401) {
-			window.location.assign("/auth/login");
+			alert("Wrong code");
 		} else if (result.status === 403) {
 			alert(result.statusText);
 		}

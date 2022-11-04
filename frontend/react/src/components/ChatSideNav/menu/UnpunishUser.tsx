@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 import Select from "react-select";
 import { SelectClass } from "./SelectClass"
 import { Room } from "../../../type";
@@ -16,7 +16,7 @@ function UnpunishUser(param: any) {
     let ban: boolean = param.ban;
 
     useEffect(() => {
-        if (room.id !== "") {
+        if (room && room !== undefined && room.id !== undefined) {
             if (ban) {
                 socket.emit("findMutedUsersInRoom", { uuid: room.id }, (users: any) => {
                     let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));

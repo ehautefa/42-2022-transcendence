@@ -1,5 +1,5 @@
 import React from "react"
-import { getSocketPong } from "../../App";
+import { getSocketPong } from "../../Home";
 
 export class Ball extends React.Component<{ x: number, y: number }> {
     render() {
@@ -32,7 +32,6 @@ export class PaddleSizeSelector extends React.Component {
 
     onChangeValue(event: any) {
         const socket = getSocketPong();
-        console.log("editPaddleSize", event.target.value);
         socket.emit("editPaddleSize", event.target.value);
     }
 
