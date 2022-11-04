@@ -20,13 +20,14 @@ import Login from './pages/login/login';
 export default function App() {
     return (<>
         <Routes>
-            <Route path="/" element={<Home />}>
-                <Route path="login" element={<Login />} />
+            <Route element={<Home />}>
+                <Route path="/" element={<Login />} />
                 <Route path="twoFa" element={<TwoFa />} />
                 <Route path="mainPage" element={<MainPage />} />
                 <Route path="game" element={<Game />} />
                 <Route path="chat" element={<Chat />} />
                 <Route path="myProfile" element={<MyProfile />} />
+                <Route path="editProfilePicture" element={<EditProfilePicture />} />
                 <Route path="match" element={<Match />} />
                 <Route path="endGame/lose" element={<Lose />} />
                 <Route path="endGame/win" element={<Win />} />
@@ -34,7 +35,6 @@ export default function App() {
                 <Route path="allPlayers" element={<AllPlayers />} />
                 <Route path="endGame/gameOver" element={<GameOver />} />
                 <Route path="request" element={<Request />} />
-                <Route path="myProfile/editProfilePicture" element={<EditProfilePicture />} />
                 <Route path="*" element={<NotFound />} />
             </Route>
         </Routes>

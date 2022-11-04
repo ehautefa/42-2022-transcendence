@@ -8,7 +8,7 @@ import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePo
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 import Cookies from "js-cookie";
 import Active2FAPopUp from "../../components/Active2FAPopUp/Active2FAPopUp";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const socketStatus = getSocketStatus();
 
@@ -16,6 +16,7 @@ function MyProfile() {
 	const [user, setUser] = useState({} as User);
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
+	let navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -46,7 +47,7 @@ function MyProfile() {
 
 	function logOut() {
 		Cookies.remove('access_token', { path: "/" });
-		window.location.assign("/");
+		navigate("/");
 	}
 
 	return (<>
@@ -72,7 +73,7 @@ function MyProfile() {
 							<button className="enable" onClick={disable2FA}>Disable two-factor authentication</button>
 					}
 				</div>
-				<Link className="pp-containers" to="./editProfilePicture">
+				<Link className="pp-containers" to="/EditProfilePicture">
 					<div className="pp">
 						<img src={"/user/myPicture"} alt={"Avatar of " + user.userName} />
 					</div>

@@ -3,7 +3,7 @@ import "../myProfile/Profil.css";
 import { GetMatchHistory } from "../myProfile/request"
 import { User } from "../../type";
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
 import { getSocketChat } from "../../Home";
@@ -12,7 +12,7 @@ function Profile() {
 
 	// get user uid in url
 	// to do a link to the profile of the user 
-	// use <Link to={"./profile?uid=" + useruid}>profile</Link>
+	// use <Link to={"/profile?uid=" + useruid}>profile</Link>
 
 	const uid = new URLSearchParams(useLocation().search).get('uid');
 	const emptyUser: User = { userUuid: "", userName: "" };
@@ -23,6 +23,7 @@ function Profile() {
 	const [isBlocked, setIsBlocked] = useState(false);
 	const [invitationSent, setInvitationSent] = useState(false);
 	const [picture, setPicture] = useState("");
+	let navigate = useNavigate();
 	
 	async function fetchUser(uid: string) {
 		const user = await FetchUser(uid);
@@ -68,7 +69,7 @@ function Profile() {
 		const socketChat = getSocketChat();
 		socketChat.emit("joinDMRoom", {uuid: user.userUuid}, (roomId: string) => {
 			console.log("roomId", roomId);
-			window.location.href = "/chat?room=" + roomId;
+			navigate("/chat?room=" + roomId);
 		});
 	}
 

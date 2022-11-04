@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./twoFa.css";
 
 function TwoFa() {
     const [code, setCode] = useState("");
+    let navigate = useNavigate();
 
     async function login() {
         var credentials: RequestCredentials = "include";
@@ -17,7 +19,7 @@ function TwoFa() {
         if (result.status === 401) {
             alert("Wrong code");
         } else if (result.status === 200) {
-            window.location.assign("/mainPage");
+            navigate("/mainPage");
         }
     }
 
