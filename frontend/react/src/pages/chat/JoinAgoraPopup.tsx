@@ -32,8 +32,17 @@ function JoinAgoraPopup() {
 				console.log("find room", rooms);
 			})
 		});
+		socket.on('refreshSelectedRoom', () => {
+			socket.emit('findAllJoinableRooms', (rooms: Room[]) => {
+				let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
+				setRooms(selectTab);
+				setCompleteRooms(rooms);
+				console.log("find room", rooms);
+			})
+		});
 		return () => {
 			socket.off('updateRooms');
+			socket.off('refreshSelectedRoom');
 		}
 	}, [socket]);
 

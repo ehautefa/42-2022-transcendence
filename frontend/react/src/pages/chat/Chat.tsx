@@ -95,6 +95,8 @@ function Chat() {
 
 		return () => {
 			socket.off('updateRooms');
+			socket.off('refreshSelectedRoom');
+			socket.off('updateThisRoom');
 			socket.off('updateMessages');
 		}
 	}, [socket, selectedRoom]);
