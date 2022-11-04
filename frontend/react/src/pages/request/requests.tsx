@@ -6,7 +6,6 @@ var credentials: RequestCredentials = "include";
 export async function acceptFriendRequest(friendUuid: string) {
 	var url: string = "/user/acceptFriendRequest";
 
-	console.log("acceptFriendRequest", friendUuid);
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("userUuid", friendUuid);
 
@@ -26,7 +25,6 @@ export async function acceptFriendRequest(friendUuid: string) {
 export async function refuseFriendRequest(friendUuid: string) {
 	var url: string = "/user/refuseFriendRequest";
 
-	console.log("refuseFriendRequest", friendUuid);
 	var urlencoded = new URLSearchParams();
 	urlencoded.append("userUuid", friendUuid);
 

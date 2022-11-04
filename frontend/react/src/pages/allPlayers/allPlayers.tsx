@@ -26,11 +26,9 @@ function AllPlayers() {
 		const response = await getAllUuidWithUserNameWithoutMe(me.userUuid);
 		try {
 			socketStatus.emit('getFriendsStatus', response, (data: any) => {
-				console.log("data", data);
 				setUsers(data);
 			});
 		} catch (error) {
-			console.log(error);
 		}
 		const myFriends = await getMyFriends();
 		setFriends(myFriends);

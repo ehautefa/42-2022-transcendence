@@ -17,7 +17,6 @@ export async function getAllUuidWithUserNameWithoutMe(myUserUuid: string) {
 			break;
 		}
 	}
-	console.log("users", users);
 	return await users;
 }
 

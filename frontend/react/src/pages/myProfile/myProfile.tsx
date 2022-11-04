@@ -34,7 +34,6 @@ function MyProfile() {
 
 	useEffect(() => {
 		socketStatus.on('refreshUserData', (updatedUser: User) => {
-			console.log("refreshUserData");
 			setUser(updatedUser);
 		})
 	}, []);

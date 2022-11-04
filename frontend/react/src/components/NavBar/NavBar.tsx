@@ -23,7 +23,6 @@ function NavBar() {
 					
 					socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
 						setIsBellExpanded(invitation.length > 0 || response.length > 0)
-						console.log("GET PENDING INCITE", invitation.length > 0 || response.length > 0);
 					});
 				}
 			)

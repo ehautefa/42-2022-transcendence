@@ -32,7 +32,6 @@ export class PaddleSizeSelector extends React.Component {
 
     onChangeValue(event: any) {
         const socket = getSocketPong();
-        console.log("editPaddleSize", event.target.value);
         socket.emit("editPaddleSize", event.target.value);
     }
 

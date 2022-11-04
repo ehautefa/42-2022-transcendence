@@ -14,7 +14,6 @@ function TwoFa() {
         };
 
         let result = await fetch(url, requestOptions);
-        console.log(result);
         if (result.status === 401) {
             alert("Wrong code");
         } else if (result.status === 200) {

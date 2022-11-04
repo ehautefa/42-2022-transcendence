@@ -14,7 +14,6 @@ function ReceivePopUp(modal: any) {
 
     function joinGame() {
         socket.emit("acceptInvite", modal.modal.matchId);
-        console.log("accept invite", modal.modal);
         document.getElementById("ReceivePopupBackground")!.style.display = "none";
         window.location.href = "/game?id=" + modal.modal.matchId;
     }

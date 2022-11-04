@@ -49,9 +49,7 @@ export async function ChangeUsername(newName: string) {
 
 	const URL :string = "/user/changeUsername";
 	let result = await fetch(URL, requestOptions);
-	console.log(result);
 	if (result.status === 403) {
-		console.log("Username already taken");
 		alert("Username already taken");
 		return null;
 	}

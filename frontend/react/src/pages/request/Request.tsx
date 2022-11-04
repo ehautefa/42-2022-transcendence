@@ -14,7 +14,6 @@ function Request() {
 	async function fetchRequest() {
 		const response = await getMyRequests();
 		setRequests(response);
-		console.log("Request", response);
 	}
 
 	useEffect(() => {
