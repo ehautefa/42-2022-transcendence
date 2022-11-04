@@ -33,7 +33,7 @@ function Chat() {
 			console.log("findAllJoined", rooms);
 			setChannels(rooms)
 			if (roomId) {
-				let tofindRoom : Room = rooms.find((room: Room) => room.id === roomId);
+				let tofindRoom: Room = rooms.find((room: Room) => room.id === roomId);
 				if (tofindRoom !== undefined) {
 					setSelectedRoom(tofindRoom);
 				}
@@ -76,9 +76,11 @@ function Chat() {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
-			socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
-				setMembers(users);
-			});
+			if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
+				socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
+					setMembers(users);
+				});
+			}
 		});
 
 		socket.on('refreshSelectedRoom', () => {
@@ -87,7 +89,7 @@ function Chat() {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
-		} )
+		})
 
 		socket.on('updateThisRoom', (thisRoom: any) => {
 			setSelectedRoom(thisRoom);

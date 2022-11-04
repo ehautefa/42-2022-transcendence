@@ -35,12 +35,14 @@ function ChatSideNav({ Room }: any) {
     useEffect(() => {
         socket.on('updateRooms', () => {
             console.log("USE EFFECT UPDATE ROOMS", Room.id);
-            socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
-                setAmIAdmin(Admin);
-            })
-            socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
-                setAmIOwner(Owner);
-            })
+            if (Room && Room !== undefined && Room.id !== undefined) {
+                socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
+                    setAmIAdmin(Admin);
+                })
+                socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
+                    setAmIOwner(Owner);
+                })
+            }
         });
         return () => {
             socket.off('updateRooms');

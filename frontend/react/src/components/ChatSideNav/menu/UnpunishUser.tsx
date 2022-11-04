@@ -16,7 +16,7 @@ function UnpunishUser(param: any) {
     let ban: boolean = param.ban;
 
     useEffect(() => {
-        if (room.id !== "") {
+        if (room && room !== undefined && room.id !== undefined) {
             if (ban) {
                 socket.emit("findMutedUsersInRoom", { uuid: room.id }, (users: any) => {
                     let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
