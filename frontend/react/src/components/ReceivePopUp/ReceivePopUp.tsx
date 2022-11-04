@@ -2,10 +2,12 @@ import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
 import { getSocketPong } from "../../Home";
+import { useNavigate } from "react-router-dom";
 
 const socket = getSocketPong();
 
 function ReceivePopUp(modal: any) {
+    let navigate = useNavigate();
 
     function close() {
         socket.emit("refuseInvite", modal.modal.matchId);
@@ -15,7 +17,8 @@ function ReceivePopUp(modal: any) {
     function joinGame() {
         socket.emit("acceptInvite", modal.modal.matchId);
         document.getElementById("ReceivePopupBackground")!.style.display = "none";
-        window.location.href = "/game?id=" + modal.modal.matchId;
+        // window.location.href = "/game?id=" + modal.modal.matchId;
+        navigate("/game?id=" + modal.modal.matchId);
     }
 
     return (<>

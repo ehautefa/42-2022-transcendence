@@ -34,7 +34,7 @@ function Active2FAPopUp() {
 		if (result.status === 201) {
 			setOpen(false);
 		} else if (result.status === 401) {
-			window.location.assign("/auth/login");
+			alert("Wrong code");
 		} else if (result.status === 403) {
 			alert(result.statusText);
 		}

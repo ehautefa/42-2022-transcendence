@@ -103,7 +103,6 @@ function JoinAgoraPopup() {
 			<button type="submit" onClick={() => setOpen(true)}> Join Room </button>
 			<Popup open={open} closeOnDocumentClick onClose={() => {
 				setOpen(false);
-				// window.location.reload();
 			}}>
 				<div className='side-menu-popup'>
 					<h3>Select a Room :</h3>

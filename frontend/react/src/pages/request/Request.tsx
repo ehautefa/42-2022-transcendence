@@ -48,10 +48,6 @@ function Request() {
 	async function HandleInvitation(this: any, roomId: string, accept: boolean) {
 		respondToInvitation(roomId, accept);
 		if (accept === true && chatInvitations.length <= 1 && requests.length === 0) {
-			// window.location.assign("/chat?room=" + roomId);
-			// window.location.href = "/chat?room=" + roomId;
-			// this.props.history.push("/chat?room=" + roomId);
-			// window.history.replaceState("", "", "/chat?room=" + roomId);
 			navigate("/chat?room=" + roomId);
 		}
 

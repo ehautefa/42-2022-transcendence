@@ -35,11 +35,6 @@ export function getSocketChat() {
 }
 
 function Home() {
-	// let navigate = useNavigate();
-	// useEffect(() => {
-	// 	navigate('login');
-	// }, []);
-
 	socketPong.on("connect", () => {
 		console.log("SOCKET PONG:", socketPong.id, " : ", socketPong.connected);
 	});
@@ -51,7 +46,6 @@ function Home() {
 	});
 	return (
 		<>
-			<h1>Login</h1>
 			<Outlet />
 		</>
 	)
