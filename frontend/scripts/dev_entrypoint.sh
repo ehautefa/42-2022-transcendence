@@ -1,5 +1,5 @@
 #!/bin/sh
-npm ci
+npm install
 
 npm audit fix
 npm run start
