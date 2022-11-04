@@ -2,7 +2,7 @@ import NavBar from "../../components/NavBar/NavBar"
 import "./Match.css"
 import { useEffect, useState } from "react"
 import { GameWindowState } from "../../type";
-import { getSocketPong } from "../../App"
+import { getSocketPong } from "../../Home"
 import { Link } from "react-router-dom";
 
 

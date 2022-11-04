@@ -4,7 +4,7 @@ import "./sideMenu.css";
 import Select from "react-select";
 import { SelectClass } from "./SelectClass"
 import { Room } from "../../../type";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 
 
 

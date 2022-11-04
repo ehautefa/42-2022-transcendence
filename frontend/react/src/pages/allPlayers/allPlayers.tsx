@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import "./allPlayers.css";
 import { addFriend, removeFriend, getMyBlocked, addBlocked, removeBlocked } from "./request";
 import NavBar from "../../components/NavBar/NavBar";
-import { getSocketStatus } from "../../App";
+import { getSocketStatus } from "../../Home";
 import { Players } from "../../type"
 import { getMyFriends } from "../myProfile/request";
 import { getMe } from "../myProfile/request";

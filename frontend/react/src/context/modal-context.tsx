@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Context } from 'vm';
-import { getSocketChat, getSocketStatus } from "../App";
+import { getSocketChat, getSocketStatus } from "../Home";
 import ReceivePopUp from '../components/ReceivePopUp/ReceivePopUp';
 
 const ModalContext = React.createContext({});

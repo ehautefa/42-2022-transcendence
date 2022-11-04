@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Popup from "reactjs-popup";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 import "./sideMenu.css";
 
 function DeleteRoom({ room }: any) {

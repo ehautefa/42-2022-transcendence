@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
 import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 
 function Profile() {
 

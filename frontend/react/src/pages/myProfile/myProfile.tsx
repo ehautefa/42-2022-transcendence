@@ -3,7 +3,7 @@ import "./Profil.css"
 import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth } from "./request"
 import { User } from "../../type";
 import { useEffect, useState } from "react";
-import { getSocketStatus } from "../../App";
+import { getSocketStatus } from "../../Home";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 import Cookies from "js-cookie";

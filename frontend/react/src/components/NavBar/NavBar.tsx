@@ -4,7 +4,7 @@ import bell from "../../assets/bell.png"
 import { getMyRequests } from "../../pages/request/requests"
 import { NavLink } from "react-router-dom"
 import { Room } from '../../type'
-import { getSocketChat, getSocketStatus } from '../../App'
+import { getSocketChat, getSocketStatus } from "../../Home"
 
 
 

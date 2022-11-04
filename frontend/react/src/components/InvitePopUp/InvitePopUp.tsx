@@ -2,7 +2,7 @@ import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "./InvitePopUp.css";
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocketPong } from "../../App"
+import { getSocketPong } from "../../Home"
 import { Link } from "react-router-dom";
 
 const socket = getSocketPong();

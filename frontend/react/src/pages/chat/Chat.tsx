@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Link, useLocation } from 'react-router-dom';
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import InvitePopUp from '../../components/InvitePopUp/InvitePopUp';
 import NavBar from "../../components/NavBar/NavBar";
