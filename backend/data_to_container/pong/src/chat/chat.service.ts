@@ -64,7 +64,7 @@ export class ChatService {
   }: {
     uuid: string;
   }): Promise<any[]> {
-    console.log('roomId = ', roomId);
+    // console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository
       .createQueryBuilder('msg')
       .innerJoin('msg.sender', 'sender')
@@ -262,43 +262,41 @@ export class ChatService {
    */
 
   async createDMRoom(sender: user, recipientId: string): Promise<Room> {
-    const newDMRoom: Room = this.roomsRepository.create({
+    let newDMRoom: Room = this.roomsRepository.create({
       type: RoomType.DM,
     });
+    newDMRoom = await this.roomsRepository.save(newDMRoom);
     const recipient: user = await this.userService.getUser(recipientId);
-    const recipientMember: Promise<ChatMember> = this.getChatMember(
+    const recipientMember: Promise<ChatMember> = this.createChatMember(
       recipient,
       newDMRoom,
     );
-    const senderMember: Promise<ChatMember> = this.getChatMember(
+    const senderMember: Promise<ChatMember> = this.createChatMember(
       sender,
       newDMRoom,
     );
-    newDMRoom.members.push(await senderMember, await recipientMember);
-    this.roomsRepository.save(newDMRoom);
+    Promise.all([senderMember, recipientMember]);
     return newDMRoom;
   }
 
-  async getDMRoom(senderId: string, recipientId: string): Promise<ChatMember> {
-    const member: ChatMember[] = await this.chatMembersRepository.find({
+  async getDMRoom(sender: user, recipientId: string): Promise<Room> {
+    const members: ChatMember[] = await this.chatMembersRepository.find({
       relations: { room: true, user: true },
       where: {
         room: { type: RoomType.DM },
-        user: [{ userUuid: senderId }, { userUuid: recipientId }],
+        user: [{ userUuid: sender.userUuid }, { userUuid: recipientId }],
       },
     });
-    // chatMembersRepository
-    //   .createQueryBuilder('members')
-    //   .innerJoin('members.room', 'room')
-    //   .select('room.id', 'id')
-    // .innerJoin('members.user', 'user')
-    // .where('room.type = :type', { type: 'dm' })
-    // .andWhere('user.id in (:...userId)', { userId: [senderId, recipientId] })
-    // .groupBy('room.id')
-    // .having('count(users.id) = 2')
-    // .getRawOne();
-    console.log(member);
-    return member[0];
+    for (const member1 of members) {
+      for (const member2 of members) {
+        if (
+          member1.user.userUuid !== member2.user.userUuid &&
+          member1.room.id === member2.room.id
+        )
+          return member1.room;
+      }
+    }
+    return await this.createDMRoom(sender, recipientId);
   }
 
   // async joinDMRoom(sender: user, recipientId: string): Promise<Room> {

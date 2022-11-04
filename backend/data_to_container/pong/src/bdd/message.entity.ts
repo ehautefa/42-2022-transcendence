@@ -11,6 +11,7 @@ export class Message {
 
   @ManyToOne(() => ChatMember, (chatMember) => chatMember.id, {
     nullable: true,
+    onDelete: 'NO ACTION',
   })
   sender: ChatMember;
 
