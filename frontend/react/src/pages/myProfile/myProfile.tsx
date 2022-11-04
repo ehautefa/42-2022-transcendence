@@ -4,6 +4,8 @@ import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth } from "./re
 import { User } from "../../type";
 import { useEffect, useState } from "react";
 import { getSocketStatus } from "../../Home";
+import star from "../../assets/star.jpg";
+import starEmpty from "../../assets/starEmpty.jpg";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
 import Cookies from "js-cookie";
@@ -111,6 +113,17 @@ function MyProfile() {
 				</div>
 				<div className="stats container">
 					<h3>Match History</h3>
+					<div className="achievements">
+						{user.wins !== undefined && user.wins >= 5 ?
+							<img src={star} alt="achievements" /> :
+							<img src={starEmpty} alt="achievements" />}
+						{user.wins !== undefined && user.wins >= 10 ?
+							<img src={star} alt="achievements" /> :
+							<img src={starEmpty} alt="achievements" />}
+						{user.wins !== undefined && user.wins >= 15 ?
+							<img src={star} alt="achievements" /> :
+							<img src={starEmpty} alt="achievements" />}
+					</div>
 					<table>
 						<thead>
 							<tr>

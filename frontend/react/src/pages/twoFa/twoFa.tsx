@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./twoFa.css";
-import { redirect } from "react-router-dom"
+// import { redirect } from "react-router-dom"
 
 function TwoFa() {
     const [code, setCode] = useState("");
-    let navigate = useNavigate();
 
     async function login() {
         var credentials: RequestCredentials = "include";

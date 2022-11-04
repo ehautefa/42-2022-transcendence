@@ -1,5 +1,4 @@
 var credentials: RequestCredentials = "include";
-import { useNavigate } from "react-router-dom";
 
 export async function getMe() {
 
