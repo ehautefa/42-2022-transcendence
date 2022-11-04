@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 
 var credentials: RequestCredentials = "include";
 

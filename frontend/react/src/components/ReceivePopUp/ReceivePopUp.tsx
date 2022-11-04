@@ -1,7 +1,7 @@
 import "../EditUsernamePopUp/EditUsernamePopUp.css";
 import "../InvitePopUp/InvitePopUp.css";
 import "../ReceivePopUp/ReceivePopUp.css";
-import { getSocketPong } from "../../App";
+import { getSocketPong } from "../../Home";
 
 const socket = getSocketPong();
 

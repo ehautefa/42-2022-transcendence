@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { acceptFriendRequest, getMyRequests, refuseFriendRequest, respondToInvitation } from "./requests";
 import NavBar from "../../components/NavBar/NavBar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Room } from "../../type";
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 
 function Request() {
 	const [requests, setRequests] = useState([]);
 	const [chatInvitations, setChatInvitations] = useState([] as Room[]);
 	const socketChat = getSocketChat();
+	let navigate = useNavigate();
 
 
 	async function fetchRequest() {
@@ -47,11 +48,11 @@ function Request() {
 	async function HandleInvitation(this: any, roomId: string, accept: boolean) {
 		respondToInvitation(roomId, accept);
 		if (accept === true && chatInvitations.length <= 1 && requests.length === 0) {
-			window.location.assign("/chat?room=" + roomId);
+			// window.location.assign("/chat?room=" + roomId);
 			// window.location.href = "/chat?room=" + roomId;
 			// this.props.history.push("/chat?room=" + roomId);
 			// window.history.replaceState("", "", "/chat?room=" + roomId);
-			// this.navigate("/chat?room=" + roomId);
+			navigate("/chat?room=" + roomId);
 		}
 
 	}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import "./sideMenu.css";
-import { getSocketChat } from "../../../App";
+import { getSocketChat } from "../../../Home";
 import Select from "react-select";
 import { SelectClass } from "./SelectClass"
 

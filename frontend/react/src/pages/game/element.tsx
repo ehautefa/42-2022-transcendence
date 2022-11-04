@@ -1,5 +1,5 @@
 import React from "react"
-import { getSocketPong } from "../../App";
+import { getSocketPong } from "../../Home";
 
 export class Ball extends React.Component<{ x: number, y: number }> {
     render() {

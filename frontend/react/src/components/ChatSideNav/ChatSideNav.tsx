@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 import "./ChatSideNav.css";
 import AddOrRemoveAdmin from "./menu/AddOrRemoveAdmin";
 import ChangePassword from "./menu/ChangePassword";

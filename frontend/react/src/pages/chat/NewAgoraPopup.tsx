@@ -1,6 +1,6 @@
 import Popup from 'reactjs-popup';
 import { useState } from "react";
-import { getSocketChat } from "../../App";
+import { getSocketChat } from "../../Home";
 import "./Chat.css";
 import "./ChatPopup.css";
 

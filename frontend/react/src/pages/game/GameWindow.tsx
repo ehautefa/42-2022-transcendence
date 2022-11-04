@@ -1,6 +1,6 @@
 import "./Game.css"
 import React from 'react'
-import { getSocketPong } from "../../App"
+import { getSocketPong } from "../../Home"
 import { Navigate } from "react-router-dom";
 import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
 
