@@ -9,7 +9,9 @@ function DeleteRoom({ room }: any) {
 
     function Yes() {
         setOpen(false);
-        socket.emit('deleteRoom', {uuid: room.id});
+        if (room && room !== undefined && room.id !== undefined) {
+            socket.emit('deleteRoom', {uuid: room.id});
+        }
     }
 
     function No() {

@@ -9,7 +9,9 @@ function LeaveRoom({ room }: any) {
     const [open, setOpen] = useState(false);
 
     function Yes() {
-        socket.emit('leaveRoom', {uuid: room.id})
+        if (room && room !== undefined && room.id !== undefined) {
+            socket.emit('leaveRoom', { uuid: room.id })
+        }
         room = {};
         setOpen(false);
     }
