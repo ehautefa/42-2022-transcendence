@@ -28,7 +28,7 @@ down:
 re: down build
 
 setup:
-	sed -Ei "s/^APP_HOST=.*/APP_HOST='$(shell hostname)'/" env/urls.env
+	sed -Ei "s/^APP_HOST=.*/APP_HOST='$(shell hostname)'/" .env
 # @if [ "$(HTTPS)" = 1 ]; then \
 	# sed -Ei "s/^PRT=.*/PRT='https'/" env/urls.env ; \
 		# sed -Ei "s/listen 443.*/listen 443 ssl;/" reverse_proxy/data_to_container/nginx.temp ; \
@@ -42,7 +42,6 @@ prune: down
 
 deep_clean: prune
 	docker volume rm -f 42-2022-transcendence_pgVolume
-	docker volume rm -f 42-2022-transcendence_sslVolume
 	rm -rf backend/data_to_container/pong/node_modules
 	rm -rf backend/data_to_container/pong/dist
 	rm -rf frontend/react/node_modules
