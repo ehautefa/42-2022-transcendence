@@ -365,7 +365,7 @@ export class ChatService {
         where: { room: { id: roomId }, user: { userUuid: userId } },
         // select: { isAdmin: true },
       });
-    console.log(chatMember);
+    if (chatMember.room.type === RoomType.DM) return false;
     return chatMember.isAdmin;
   }
 
@@ -407,6 +407,7 @@ export class ChatService {
       select: { owner: { id: true } },
       where: { id: roomId },
     });
+    if (room.type === RoomType.DM) return false;
     return room.owner.user.userUuid === userId;
   }
 
