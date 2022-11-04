@@ -13,10 +13,12 @@ COPY 		--chown=node:node ./react/package*.json /usr/src/app/
 
 RUN         apk update && \
             apk add openssl && \
-            openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=frontend"
+            openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=frontend" && \
+            npm install -g npm@latest
+
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN         npm ci
+RUN         npm install
 
 # Bundle app source
 COPY 		./react /usr/src/app

@@ -45,7 +45,7 @@ services:
       target: production
       dockerfile: ./Dockerfile
     volumes:
-      - ./backend/data_to_container/pong/uploads/:/usr/src/app/uploads/
+      - PPVolume:/usr/src/app/uploads/
     networks:
       - pong_prod_database
       - pong_prod_backend
@@ -67,6 +67,7 @@ services:
 
 volumes:
   pgVolume:
+  PPVolume:
 
 networks:
   pong_prod_frontend:
