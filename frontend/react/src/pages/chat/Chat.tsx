@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 // import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Link, useLocation } from 'react-router-dom';
-import { getSocketChat } from "../../Home";
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
 import InvitePopUp from '../../components/InvitePopUp/InvitePopUp';
 import NavBar from "../../components/NavBar/NavBar";
+import { getSocketChat } from "../../Home";
 import { Room, User } from "../../type";
 import { getMe } from "../myProfile/request";
 import "./Chat.css";
@@ -82,12 +82,8 @@ function Chat() {
 					setMembers(users);
 				});
 			}
-<<<<<<< HEAD
 		};
 		socket.on('updateRooms', updateRooms);
-=======
-		});
->>>>>>> f0f629b ([FIX] uuid exception when we create room)
 
 		function refreshOneRoom()
 		{
@@ -96,12 +92,8 @@ function Chat() {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
-<<<<<<< HEAD
 		}
 		socket.on('refreshSelectedRoom', refreshOneRoom);
-=======
-		})
->>>>>>> f0f629b ([FIX] uuid exception when we create room)
 
 		socket.on('updateThisRoom', (thisRoom: any) => {
 			setSelectedRoom(thisRoom);

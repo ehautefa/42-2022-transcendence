@@ -191,6 +191,9 @@ export class ChatService {
           room: { id: roomId },
         },
       });
+
+    if (chatMember.room.type === RoomType.DM)
+      throw new WsException('You cannot leave a Direct Message');
     if (chatMember.room.owner.user.userUuid === chatMember.user.userUuid)
       throw new WsException('You cannot leave a room you own');
     if (chatMember.bannedTime && chatMember.bannedTime < new Date())

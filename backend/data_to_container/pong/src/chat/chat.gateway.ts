@@ -132,11 +132,9 @@ export class ChatGateway
     @MessageBody() recipiendId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<string> {
-    this.logger.debug('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     const room: Room = await this.chatService.getDMRoom(user, recipiendId.uuid);
-    this.logger.debug('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqw');
     // console.log(room);
-    // this.server.socketsJoin(room.id);
+    this.server.socketsJoin(room.id);
     return room.id;
   }
 
