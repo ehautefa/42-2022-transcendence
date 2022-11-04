@@ -1,4 +1,5 @@
 var credentials: RequestCredentials = "include";
+import { useNavigate } from "react-router-dom";
 
 export async function getMe() {
 
@@ -21,6 +22,7 @@ export async function getMe() {
 
 export async function GetMatchHistory(userName: string) {
 	var url: string = "/match/user/" + userName;
+
 	var requestOptions = {
 		method: 'GET',
 		credentials: credentials
