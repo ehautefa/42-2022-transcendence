@@ -42,15 +42,17 @@ COPY 		--chown=node:node ./react/package*.json /usr/src/app/
 # RUN         npm ci --only=production && npm cache clean --force
 
 # ENV         NODE_ENV production
+COPY        --chown=node:node --from=development /usr/src/app /usr/src/app
+
 RUN         npm install -g npm@latest && \
-            npm install
+            echo -n "AUDIT PROD :" && npm audit --omit=dev
 
 COPY 		--chown=node:node ./react /usr/src/app
 # Run the build command which creates the production bundle
 RUN         npm run build
 
 # Set NODE_ENV environment variable
-RUN         npm ci --omit=dev && npm cache clean --force
+RUN         npm install --omit=dev && npm cache clean --force
 
 # Running `npm ci` removes the existing node_modules directory.
 # Passing in --only=production ensures that only the production dependencies are installed.

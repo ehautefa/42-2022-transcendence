@@ -32,10 +32,11 @@ WORKDIR     /usr/src/app
 # The Nest CLI is a dev dependency,
 # In the previous development stage we ran `npm ci` which installed all dependencies.
 # So we can copy over the node_modules directory from the development image into this build image.
+RUN          npm install -g npm@latest
 COPY        --chown=node:node --from=development /usr/src/app /usr/src/app
 
 # Run the build command which creates the production bundle
-RUN         echo "AUDIT PROD :" && npm audit --production
+RUN         echo -n "AUDIT PROD :" && npm audit --omit=dev
 RUN         npm run build
 
 # Set NODE_ENV environment variable

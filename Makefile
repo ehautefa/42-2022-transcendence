@@ -42,6 +42,7 @@ prune: down
 
 deep_clean: prune
 	docker volume rm -f 42-2022-transcendence_pgVolume
+	docker volume rm -f 42-2022-transcendence_PPVolume
 	rm -rf backend/data_to_container/pong/node_modules
 	rm -rf backend/data_to_container/pong/dist
 	rm -rf frontend/react/node_modules
