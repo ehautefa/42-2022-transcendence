@@ -199,7 +199,6 @@ export class ChatService {
     if (chatMember.mutedTime && chatMember.mutedTime < new Date())
       throw new WsException('You cannot leave a room you are muted in');
     this.chatMembersRepository.delete(chatMember.id);
-    this.logger.debug('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
     return chatMember;
   }
 
@@ -247,7 +246,6 @@ export class ChatService {
     respondToInvitationDto: RespondToInvitationDto,
     user: user,
   ): Promise<user> {
-    this.logger.debug('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
     const room: Room = await this.findRoomById(respondToInvitationDto.roomId);
     if (respondToInvitationDto.acceptInvitation === true)
       this.createChatMember(user, room);
@@ -282,28 +280,35 @@ export class ChatService {
     return newDMRoom;
   }
 
-  async getDMRoom(senderId: string, recipientId: string): Promise<Room> {
-    const room: Room = await this.roomsRepository
-      .createQueryBuilder('room')
-      .leftJoinAndSelect('room.members', 'members')
-      .leftJoinAndSelect('members.user', 'user')
-      .where('room.type = :type', { type: 'dm' })
-      .andWhere('user.id in (:...userId)', {
-        userId: [senderId, recipientId],
-      })
-      .groupBy('room.id')
-      .having('count(users.id) = 2')
-      .getOneOrFail();
-    return room;
+  async getDMRoom(senderId: string, recipientId: string): Promise<ChatMember> {
+    const member: ChatMember[] = await this.chatMembersRepository.find({
+      relations: { room: true, user: true },
+      where: {
+        room: { type: RoomType.DM },
+        user: [{ userUuid: senderId }, { userUuid: recipientId }],
+      },
+    });
+    // chatMembersRepository
+    //   .createQueryBuilder('members')
+    //   .innerJoin('members.room', 'room')
+    //   .select('room.id', 'id')
+    // .innerJoin('members.user', 'user')
+    // .where('room.type = :type', { type: 'dm' })
+    // .andWhere('user.id in (:...userId)', { userId: [senderId, recipientId] })
+    // .groupBy('room.id')
+    // .having('count(users.id) = 2')
+    // .getRawOne();
+    console.log(member);
+    return member[0];
   }
 
-  async joinDMRoom(sender: user, recipientId: string): Promise<Room> {
-    try {
-      return await this.getDMRoom(sender.userUuid, recipientId);
-    } catch (error) {
-      return await this.createDMRoom(sender, recipientId);
-    }
-  }
+  // async joinDMRoom(sender: user, recipientId: string): Promise<Room> {
+  //   try {
+  //     return await this.getDMRoom(sender.userUuid, recipientId);
+  //   } catch (error) {
+  //     return await this.createDMRoom(sender, recipientId);
+  //   }
+  // }
 
   async getOtherDMUser(userId: string, roomId: string): Promise<user> {
     const otherChatMember: ChatMember =
@@ -406,8 +411,8 @@ export class ChatService {
     return room.owner.user.userUuid === userId;
   }
 
-  async findAllUsersInRoom(userId: string, roomId: string) {
-    return await this.roomsRepository
+  async findAllUsersInRoom(userId: string, roomId: string): Promise<Room[]> {
+    const rooms = await this.roomsRepository
       .createQueryBuilder('room')
       .innerJoin('room.members', 'members')
       .innerJoin('members.user', 'user')
@@ -415,8 +420,29 @@ export class ChatService {
       .andWhere('user.userUuid != :userId', { userId: userId })
       .select('user.userUuid', 'userUuid')
       .addSelect('user.userName', 'userName')
+      .addSelect('user.userName', 'userName')
+      .addSelect('members.bannedTime', 'bannedTime')
+      .addSelect('members.mutedTime', 'mutedTime')
       .getRawMany();
+    for (const room of rooms) {
+      room.bannedTime =
+        !room.bannedTime || room.bannedTime > Date() ? false : true;
+      room.mutedTime =
+        !room.mutedTime || room.mutedTime > Date() ? false : true;
+    }
+    return rooms;
   }
+
+  // async updatePunishment(roomId: string): Promise<ChatMember> {
+  //   const chatMember: ChatMember =
+  //     await this.chatMembersRepository.findOneOrFail({
+  //       relations: { room: true },
+  //       where: { room: { id: roomId } },
+  //       select: { bannedTime: true, mutedTime: true },
+  //     });
+  //   if ()
+  // }
+
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,
     userId: string,

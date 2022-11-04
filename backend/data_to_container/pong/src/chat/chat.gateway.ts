@@ -132,11 +132,12 @@ export class ChatGateway
     @MessageBody() recipiendId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<string> {
-    const room: Room = await this.chatService.joinDMRoom(
-      user,
+    const room: ChatMember = await this.chatService.getDMRoom(
+      user.userUuid,
       recipiendId.uuid,
     );
-    this.server.socketsJoin(room.id);
+    console.log(room);
+    // this.server.socketsJoin(room.id);
     return room.id;
   }
 
@@ -197,8 +198,9 @@ export class ChatGateway
   async changePassword(
     @MessageBody() changePasswordDto: ChangePasswordDto,
   ): Promise<Room> {
+    const room: Room = await this.chatService.changePassword(changePasswordDto);
     this.server.emit('updateRooms');
-    return await this.chatService.changePassword(changePasswordDto);
+    return room;
   }
 
   // @Roles('admin')
@@ -207,7 +209,7 @@ export class ChatGateway
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
     const chatMember = await this.chatService.punishUser(punishUserDto);
-    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
+    this.server.to(chatMember.room.id).emit('updateRooms', chatMember.room);
     return chatMember;
   }
 
@@ -220,7 +222,7 @@ export class ChatGateway
     const chatMember = await this.chatService.removePunishment(
       removePunishmentDto,
     );
-    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
+    this.server.to(chatMember.room.id).emit('updateRooms', chatMember.room);
     return chatMember;
   }
 
