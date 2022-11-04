@@ -113,11 +113,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async removeFriend(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-		const ret: user[] = await this.UserService.removeFriend(req.user, await this.getCompleteUser(userToHandle.userUuid))
-		// return res.status(404).send("User not found");
-		//same??
-		res.send(req.user.friend);
-		//same??
+		const ret : user[] = await this.UserService.removeFriend(req.user, await this.getCompleteUser(userToHandle.userUuid))
 		res.send(ret);
 	}
 
