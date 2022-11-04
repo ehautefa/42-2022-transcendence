@@ -15,7 +15,18 @@ function JoinAgoraPopup() {
 	const [isProtected, setIsProtected] = useState(false);
 	const [password, setPassword] = useState("");
 
+
+	
 	useEffect(() => {
+		function findRooms ()
+		{
+			socket.emit('findAllJoinableRooms', (rooms: Room[]) => {
+				let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
+				setRooms(selectTab);
+				setCompleteRooms(rooms);
+				console.log("find room//update", rooms);
+			});
+		}
 		
 		socket.emit('findAllJoinableRooms', (rooms: Room[]) => {
 			let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
@@ -24,16 +35,11 @@ function JoinAgoraPopup() {
 			console.log("find room", rooms);
 		})
 
-		socket.on('updateRooms', () => {
-			socket.emit('findAllJoinableRooms', (rooms: Room[]) => {
-				let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
-				setRooms(selectTab);
-				setCompleteRooms(rooms);
-				console.log("find room", rooms);
-			})
-		});
+		socket.on('updateRooms', findRooms);
+		socket.on('refreshSelectedRoom', findRooms);
 		return () => {
-			socket.off('updateRooms');
+			socket.removeListener('updateRooms', findRooms);
+			socket.removeListener('refreshSelectedRoom', findRooms);
 		}
 	}, [socket]);
 

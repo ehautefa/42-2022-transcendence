@@ -70,7 +70,8 @@ function Chat() {
 			}
 		});
 
-		socket.on('updateRooms', () => {
+		function updateRooms()
+		{
 			console.log('getting information');
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
@@ -81,22 +82,26 @@ function Chat() {
 					setMembers(users);
 				});
 			}
-		});
+		};
 
-		socket.on('refreshSelectedRoom', () => {
+		function refreshOneRoom()
+		{
 			setSelectedRoom({} as Room);
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
-		})
+		}
+		socket.on('refreshSelectedRoom', refreshOneRoom);
 
 		socket.on('updateThisRoom', (thisRoom: any) => {
 			setSelectedRoom(thisRoom);
 		});
 
 		return () => {
-			socket.off('updateRooms');
+			socket.off('updateThisRoom');
+			socket.removeListener('updateRooms', updateRooms);
+			socket.removeListener('refreshSelectedRoom', refreshOneRoom);
 			socket.off('updateMessages');
 		}
 	}, [socket, selectedRoom]);

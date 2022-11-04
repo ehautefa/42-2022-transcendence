@@ -12,7 +12,11 @@ function ChangePassword({ room }: any) {
 
 
 	const SendPassword = (e: any) => {
+		e.preventDefault();
 		console.log('set password ', password);
+		console.log('new password ', newPassword);
+		console.log('room ', room.id);
+
 		let param = {
 			roomId: room.id,
 			password: password,

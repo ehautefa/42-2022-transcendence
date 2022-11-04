@@ -132,11 +132,10 @@ export class ChatGateway
     @MessageBody() recipiendId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<string> {
-    const room: ChatMember = await this.chatService.getDMRoom(
-      user.userUuid,
-      recipiendId.uuid,
-    );
-    console.log(room);
+    this.logger.debug('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+    const room: Room = await this.chatService.getDMRoom(user, recipiendId.uuid);
+    this.logger.debug('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqw');
+    // console.log(room);
     // this.server.socketsJoin(room.id);
     return room.id;
   }
@@ -187,8 +186,10 @@ export class ChatGateway
   // @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
-    const room: Room = await this.chatService.deleteRoom(deleteRoomDto);
-    this.server.emit('updateRooms');
+    const room: Room = await this.chatService.deleteRoom(deleteRoomDto.uuid);
+    console.table(room);
+    this.server.to(deleteRoomDto.uuid).emit('refreshSelectedRoom');
+    this.server.to(room.id).socketsLeave(deleteRoomDto.uuid);
     return room;
   }
 
@@ -209,7 +210,7 @@ export class ChatGateway
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
     const chatMember = await this.chatService.punishUser(punishUserDto);
-    this.server.to(chatMember.room.id).emit('updateRooms', chatMember.room);
+    this.server.to(chatMember.room.id).emit('updateRooms');
     return chatMember;
   }
 
@@ -222,7 +223,7 @@ export class ChatGateway
     const chatMember = await this.chatService.removePunishment(
       removePunishmentDto,
     );
-    this.server.to(chatMember.room.id).emit('updateRooms', chatMember.room);
+    this.server.to(chatMember.room.id).emit('updateRooms');
     return chatMember;
   }
 
