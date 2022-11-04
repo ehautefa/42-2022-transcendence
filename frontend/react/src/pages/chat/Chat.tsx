@@ -82,8 +82,12 @@ function Chat() {
 					setMembers(users);
 				});
 			}
+<<<<<<< HEAD
 		};
 		socket.on('updateRooms', updateRooms);
+=======
+		});
+>>>>>>> f0f629b ([FIX] uuid exception when we create room)
 
 		function refreshOneRoom()
 		{
@@ -92,8 +96,12 @@ function Chat() {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
+<<<<<<< HEAD
 		}
 		socket.on('refreshSelectedRoom', refreshOneRoom);
+=======
+		})
+>>>>>>> f0f629b ([FIX] uuid exception when we create room)
 
 		socket.on('updateThisRoom', (thisRoom: any) => {
 			setSelectedRoom(thisRoom);
