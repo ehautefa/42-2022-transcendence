@@ -83,6 +83,7 @@ function Chat() {
 				});
 			}
 		};
+		socket.on('updateRooms', updateRooms);
 
 		function refreshOneRoom()
 		{
