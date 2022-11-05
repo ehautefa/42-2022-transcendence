@@ -3,6 +3,7 @@ import React from 'react'
 import { getSocketPong } from "../../Home"
 import { Navigate } from "react-router-dom";
 import { Ball, Paddle, GameWindowState, ColorSelector } from "./element"
+import Canvas from "./Canvas"
 
 const socket = getSocketPong();
 
@@ -108,13 +109,14 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 			<>
 				<h2 className="PlayerName Left">{this.state.playerLeftName}</h2>
 				<h2 className="PlayerName Right">{this.state.playerRightName}</h2>
-				<Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} size={this.state.paddleSize} />
-				<Paddle x={70 - PADDLE_GAP} y={this.state.paddleRightY} size={this.state.paddleSize} />
+				{/* <Paddle x={PADDLE_GAP} y={this.state.paddleLeftY} size={this.state.paddleSize} /> */}
+				{/* <Paddle x={70 - PADDLE_GAP} y={this.state.paddleRightY} size={this.state.paddleSize} /> */}
 				<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 				<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
-				<Ball x={this.state.ballX} y={this.state.ballY} />
+				{/* <Ball x={this.state.ballX} y={this.state.ballY} /> */}
 				<ColorSelector />
 			</>
+			<Canvas ballX={this.state.ballX} ballY={this.state.ballY} paddleLeftY={this.state.paddleLeftY} paddleRightY={this.state.paddleRightY} paddleSize={this.state.paddleSize} playerLeftName={this.state.playerLeftName} playerRightName={this.state.playerRightName} scoreLeft={this.state.scoreLeft} scoreRight={this.state.scoreRight} />
 		</div>
 	}
 }

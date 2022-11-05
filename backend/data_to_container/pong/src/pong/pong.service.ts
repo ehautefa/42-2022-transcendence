@@ -13,12 +13,22 @@ export class PongService {
             return game;
         }
         if (userUuid == game.playerLeftUid) {
-            if (game.paddleLeftY + deltaPaddleY >= (game.paddleSize / 2) && game.paddleLeftY + deltaPaddleY <= 100 - (game.paddleSize / 2))
+            if (game.paddleLeftY + deltaPaddleY >= 0
+                && game.paddleLeftY + deltaPaddleY <= 150 - game.paddleSize)
                 game.paddleLeftY += deltaPaddleY;
+            else if (game.paddleLeftY < 0)
+                game.paddleLeftY = 0;
+            else if (game.paddleLeftY > 150 - game.paddleSize)
+                game.paddleLeftY = 150 - game.paddleSize;
         }
         else if (userUuid == game.playerRightUid) {
-            if (game.paddleRightY + deltaPaddleY >= (game.paddleSize / 2) && game.paddleRightY + deltaPaddleY <= 100 - (game.paddleSize / 2))
+            if (game.paddleRightY + deltaPaddleY >= 0
+                && game.paddleRightY + deltaPaddleY <= 150 - game.paddleSize)
                 game.paddleRightY += deltaPaddleY;
+            else if (game.paddleRightY  < 0)
+                game.paddleRightY = 0;
+            else if (game.paddleRightY > 150 - game.paddleSize)
+                game.paddleRightY = 150 - game.paddleSize;
         }
         return game;
     }
@@ -111,17 +121,19 @@ export class PongService {
     }
 
     hitLeftPaddle(game: GameWindowState): boolean {
-        if (game.ballX <= parseInt(process.env.PONG_PADDLE_LEFT_X)
-            && game.ballY >= game.paddleLeftY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
-            && game.ballY <= game.paddleLeftY + parseInt(process.env.PONG_PADDLE_SIZE))
+        if (game.ballX < parseInt(process.env.PONG_PADDLE_LEFT_X)
+            && game.ballX > parseInt(process.env.PONG_PADDLE_LEFT_X) - 7
+            && game.ballY >= game.paddleLeftY  
+            && game.ballY + parseInt(process.env.PONG_BALL_RAY) <= game.paddleLeftY + game.paddleSize)
             return true;
         return false;
     }
 
     hitRightPaddle(game: GameWindowState): boolean {
-        if (game.ballX >= parseInt(process.env.PONG_PADDLE_RIGHT_X)
-        && game.ballY >= game.paddleRightY - parseInt(process.env.PONG_PADDLE_SIZE)  //- BALL_DIAM
-        && game.ballY <= game.paddleRightY + parseInt(process.env.PONG_PADDLE_SIZE))
+        if (game.ballX + parseInt(process.env.PONG_BALL_RAY) > parseInt(process.env.PONG_PADDLE_RIGHT_X)
+            && game.ballX < parseInt(process.env.PONG_PADDLE_LEFT_X) + 7
+            && game.ballY >= game.paddleRightY 
+            && game.ballY + parseInt(process.env.PONG_BALL_RAY) <= game.paddleRightY + game.paddleSize)
             return true;
         return false;
     }
@@ -149,34 +161,14 @@ export class PongService {
         game.ballY = game.ballY + game.ballSpeedY;
 
         if (this.hitLeftPaddle(game)) {
-            if (game.ballSpeedX < 0
-                && game.ballY >= game.paddleLeftY - ((game.paddleSize / 2) - 1)  //- BALL_DIAM
-                && game.ballY <= game.paddleLeftY + ((game.paddleSize / 2) - 1))
+            if (game.ballSpeedX < 0)
                 // check if we have already hit the paddle
                 game.ballSpeedX = -game.ballSpeedX;
-            else if ((game.ballSpeedY > 0
-                && game.ballY <= game.paddleLeftY) // check if we are above the paddle
-                || (game.ballSpeedY < 0
-                    && game.ballY >= game.paddleLeftY)) { // check if we are below the paddle
-                game.ballSpeedY = -game.ballSpeedY;
-                if (game.ballSpeedX < 0) // check if we have already hit the paddle
-                    game.ballSpeedX = -game.ballSpeedX;
-            }
         }
         else if (this.hitRightPaddle(game)) {
-            if (game.ballSpeedX > 0
-                && game.ballY >= game.paddleRightY - ((game.paddleSize / 2) - 1)  //- BALL_DIAM
-                && game.ballY <= game.paddleRightY + ((game.paddleSize / 2) - 1))
+            if (game.ballSpeedX > 0)
                 // check if we have already hit the paddle
                 game.ballSpeedX = -game.ballSpeedX;
-            else if ((game.ballSpeedY > 0
-                && game.ballY <= game.paddleRightY) // check if we are above the paddle
-                || (game.ballSpeedY < 0
-                    && game.ballY >= game.paddleRightY)) { // check if we are below the paddle
-                game.ballSpeedY = -game.ballSpeedY;
-                if (game.ballSpeedX > 0) // chck if we have already hit the paddle
-                    game.ballSpeedX = -game.ballSpeedX;
-            }
         } else {
             game = this.hitBorder(game);
         }

@@ -56,6 +56,7 @@ function Chat() {
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
+				console.log("findAllMessagesInRoom", msgs);
 			});
 			socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 				setMembers(users);
@@ -70,8 +71,7 @@ function Chat() {
 			}
 		});
 
-		function updateRooms()
-		{
+		function updateRooms() {
 			console.log('getting information');
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
@@ -85,8 +85,7 @@ function Chat() {
 		};
 		socket.on('updateRooms', updateRooms);
 
-		function refreshOneRoom()
-		{
+		function refreshOneRoom() {
 			setSelectedRoom({} as Room);
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
@@ -160,8 +159,14 @@ function Chat() {
 								{messages.map((message: any) => (
 									<div key={message.id}>
 										{message.userName === user.userName ?
-											<div className="message_mine">{message.message}</div> :
-											<div className="message_other">{message.userName} : {message.message}</div>
+											<div className="message_mine">
+												<div className="msg">{message.message}</div>
+												<p>time</p>
+											</div> :
+											<div className="message_other">
+												<div className='msg'>{message.userName} : {message.message}</div>
+												<p>time</p>
+											</div>
 										}
 									</div>
 								))}
