@@ -8,7 +8,7 @@ import { JwtConfig } from 'src/auth/config/Jwt.config';
 import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
-import { IsNull, LessThan, Not, Repository } from 'typeorm';
+import { IsNull, LessThan, MoreThan, Not, Repository } from 'typeorm';
 import {
   ChangePasswordDto,
   CreateMessageDto,
@@ -330,9 +330,15 @@ export class ChatService {
       punishUserDto.userId,
       punishUserDto.roomId,
     );
-    const endPunishment: Date = new Date(
-      Date() + punishUserDto.duration * 1000,
+    const endPunishment: Date = new Date();
+    endPunishment.setTime(
+      endPunishment.getTime() + punishUserDto.duration * 1000,
     );
+    // const endPunishment: Date = new Date(
+    //   Date() + punishUserDto.duration * 1000,
+    // );
+    console.log(new Date());
+    console.log(endPunishment);
     chatMember.mutedTime = endPunishment;
     if (punishUserDto.isBanned === true) chatMember.bannedTime = endPunishment;
     return await this.chatMembersRepository.save(chatMember);
@@ -448,7 +454,7 @@ export class ChatService {
         user: { userName: true, userUuid: true },
       },
       where: {
-        bannedTime: Not(IsNull()) && LessThan(new Date()),
+        bannedTime: Not(IsNull()) && MoreThan(new Date()),
         room: { id: roomId },
       },
     });
