@@ -260,11 +260,14 @@ export class ChatService {
    */
 
   async createDMRoom(sender: user, recipientId: string): Promise<Room> {
+    var combinedNames : string;
+    const recipient: user = await this.userService.getUser(recipientId);
+    combinedNames = recipient.userName + sender.userName;
     let newDMRoom: Room = this.roomsRepository.create({
+      name: combinedNames,
       type: RoomType.DM,
     });
     newDMRoom = await this.roomsRepository.save(newDMRoom);
-    const recipient: user = await this.userService.getUser(recipientId);
     const recipientMember: Promise<ChatMember> = this.createChatMember(
       recipient,
       newDMRoom,
