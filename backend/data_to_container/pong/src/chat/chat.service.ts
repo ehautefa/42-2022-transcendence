@@ -64,7 +64,6 @@ export class ChatService {
   }: {
     uuid: string;
   }): Promise<any[]> {
-    // console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository
       .createQueryBuilder('msg')
       .innerJoin('msg.sender', 'sender')
@@ -73,16 +72,12 @@ export class ChatService {
       .where('room.id = :id', { id: roomId })
       .select('message')
       .addSelect('user.userName', 'userName')
-      .addSelect('msg.id', 'id')
+      .addSelect('id')
+      .addSelect('time')
       .orderBy('msg.time')
       .getRawMany();
     return messages;
   }
-
-  // async findLastMessageInRoom(roomIdDto: UuidDto): Promise<Message> {
-  //   const messages: Message[] = await this.findAllMessagesInRoom(roomIdDto);
-  //   return messages[messages.length - 1];
-  // }
 
   /*
    * chatMember functions
@@ -191,6 +186,9 @@ export class ChatService {
           room: { id: roomId },
         },
       });
+
+    if (chatMember.room.type === RoomType.DM)
+      throw new WsException('You cannot leave a Direct Message');
     if (chatMember.room.owner.user.userUuid === chatMember.user.userUuid)
       throw new WsException('You cannot leave a room you own');
     if (chatMember.bannedTime && chatMember.bannedTime < new Date())
@@ -248,7 +246,6 @@ export class ChatService {
     const room: Room = await this.findRoomById(respondToInvitationDto.roomId);
     if (respondToInvitationDto.acceptInvitation === true)
       this.createChatMember(user, room);
-    console.table(user);
     return await this.userService.removeInvitation(user.userUuid, room);
   }
 
@@ -262,11 +259,12 @@ export class ChatService {
    */
 
   async createDMRoom(sender: user, recipientId: string): Promise<Room> {
+    const recipient: user = await this.userService.getUser(recipientId);
     let newDMRoom: Room = this.roomsRepository.create({
+      name: recipient.userName + sender.userName,
       type: RoomType.DM,
     });
     newDMRoom = await this.roomsRepository.save(newDMRoom);
-    const recipient: user = await this.userService.getUser(recipientId);
     const recipientMember: Promise<ChatMember> = this.createChatMember(
       recipient,
       newDMRoom,
@@ -299,18 +297,13 @@ export class ChatService {
     return await this.createDMRoom(sender, recipientId);
   }
 
-  // async joinDMRoom(sender: user, recipientId: string): Promise<Room> {
-  //   try {
-  //     return await this.getDMRoom(sender.userUuid, recipientId);
-  //   } catch (error) {
-  //     return await this.createDMRoom(sender, recipientId);
-  //   }
-  // }
-
   async getOtherDMUser(userId: string, roomId: string): Promise<user> {
     const otherChatMember: ChatMember =
       await this.chatMembersRepository.findOneOrFail({
-        relations: { user: true, room: true },
+        relations: {
+          user: { blocked: true },
+          room: true,
+        },
         where: {
           room: { id: roomId },
           user: { userUuid: Not(userId) },
@@ -324,7 +317,6 @@ export class ChatService {
    */
 
   async setAdmin(setAdminDto: SetAdminDto): Promise<ChatMember> {
-    console.log('setAdminDto = ', setAdminDto);
     const chatMember: ChatMember = await this.findChatMember(
       setAdminDto.userId,
       setAdminDto.roomId,
@@ -363,9 +355,8 @@ export class ChatService {
       await this.chatMembersRepository.findOneOrFail({
         relations: { room: true, user: true },
         where: { room: { id: roomId }, user: { userUuid: userId } },
-        // select: { isAdmin: true },
       });
-    console.log(chatMember);
+    if (chatMember.room.type === RoomType.DM) return false;
     return chatMember.isAdmin;
   }
 
@@ -407,6 +398,7 @@ export class ChatService {
       select: { owner: { id: true } },
       where: { id: roomId },
     });
+    if (room.type === RoomType.DM) return false;
     return room.owner.user.userUuid === userId;
   }
 
@@ -431,16 +423,6 @@ export class ChatService {
     }
     return rooms;
   }
-
-  // async updatePunishment(roomId: string): Promise<ChatMember> {
-  //   const chatMember: ChatMember =
-  //     await this.chatMembersRepository.findOneOrFail({
-  //       relations: { room: true },
-  //       where: { room: { id: roomId } },
-  //       select: { bannedTime: true, mutedTime: true },
-  //     });
-  //   if ()
-  // }
 
   async filterByAdminRightsInRoom(
     filterByAdminRightsDto: FilterByAdminRightsDto,

@@ -119,6 +119,26 @@ function Chat() {
 			setNewMessage("");
 		}
 	}
+	function rightName(room: Room){
+		if (room.type === "dm")
+		{
+			if (room.name === null)
+				room.name = "olozano-ehautefa";
+			var start = room.name.indexOf(user.userName);
+			var end = start + user.userName.length;
+			return room.name.substring(0, start) + room.name.substring(end);
+		}
+		return room.name;
+	}
+
+	// var start = a.indexOf(b);
+	// var end = start + b.length;
+	
+	// Now put it together.
+	
+	// return a.substring(0, start - 1) + a.substring(end);
+	
+
 
 	return (<div>
 		<NavBar />
@@ -127,9 +147,9 @@ function Chat() {
 				<h3>My Rooms</h3>
 				<div className="channel">
 					{channels.map((room: Room) => (
-						room.name === selectedRoom.name ?
-							<li key={room.id} className="selectedRoom" onClick={() => chooseRoom(room)}>{room.name}</li> :
-							<li key={room.id} onClick={() => chooseRoom(room)}>{room.name}</li>
+						room.id === selectedRoom.id ?
+							<li key={room.id} className="selectedRoom" onClick={() => chooseRoom(room)}>{rightName(room)}</li> :
+							<li key={room.id} onClick={() => chooseRoom(room)}>{rightName(room)}</li>
 					))}
 				</div>
 				<h3>Members</h3>

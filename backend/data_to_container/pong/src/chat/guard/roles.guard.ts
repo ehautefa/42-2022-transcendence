@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { WsException } from '@nestjs/websockets';
 import { ChatMember, Room, user } from 'src/bdd';
 import { ChatService } from '../chat.service';
 import { Role } from '../decorator/roles.decorator';
@@ -11,23 +12,29 @@ export class RolesGuard implements CanActivate {
     private readonly chatService: ChatService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const role: Role[] = this.reflector.get<Role[]>(
+    const roles: Role[] = this.reflector.get<Role[]>(
       'roles',
       context.getHandler(),
     );
 
-    if (!role) return true;
+    console.table(roles);
+    if (!roles) return true;
     const user: user = context.switchToWs().getClient().user;
     const roomId: string = context.switchToWs().getData()['roomId'];
-    if (role.includes('admin')) {
+    if (roles.includes('admin')) {
       const chatMember: ChatMember = await this.chatService.findChatMember(
         user.userUuid,
         roomId,
       );
-      return chatMember.isAdmin === true;
-    } else if (role.includes('owner')) {
+      if (chatMember.isAdmin !== true)
+        throw new WsException('You must be admin to perform this action');
+    } else if (roles.includes('owner')) {
       const room: Room = await this.chatService.findRoomById(roomId);
-      return room.owner.id === user.userUuid;
+      if (room.owner.id !== user.userUuid)
+        throw new WsException(
+          'You must be the owner of the room to perform this action',
+        );
     }
+    return true;
   }
 }
