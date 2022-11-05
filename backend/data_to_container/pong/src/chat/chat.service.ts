@@ -73,7 +73,7 @@ export class ChatService {
       .select('message')
       .addSelect('user.userName', 'userName')
       .addSelect('msg.id', 'id')
-      .addSelect('msg.time', 'msg.time')
+      .addSelect('msg.time', 'time')
       .orderBy('msg.time')
       .getRawMany();
     return messages;
