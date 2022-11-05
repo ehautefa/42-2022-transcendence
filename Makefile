@@ -22,6 +22,9 @@ ps:
 stop:
 	$(DC) -f $(DC_FILE) down
 
+dev_down:
+	$(DC) -f docker-compose_dev.yml down
+
 down:
 	$(DC) -f $(DC_FILE) down
 

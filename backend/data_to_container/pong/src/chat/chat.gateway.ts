@@ -80,7 +80,7 @@ export class ChatGateway
     this.server
       .in(message.sender.room.id)
       .emit('updateMessages', message.sender.room.id);
-    // this.server.emit('updateRooms');
+    this.server.to(message.sender.room.id).emit('updateRooms');
     return message;
   }
 
@@ -157,6 +157,7 @@ export class ChatGateway
     @MessageBody() roomId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<user[]> {
+    this.logger.debug('DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
     return await this.chatService.findBannableUsersInRoom(
       user.userUuid,
       roomId.uuid,
