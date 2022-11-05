@@ -142,6 +142,7 @@
     padding: 0;
     padding-top: 5px;
     margin: 0;
+    font-size: 0.8rem;
 }
 
 #messages .message_mine {
@@ -180,6 +181,7 @@
 
 #messages .message_other .message-box p {
     color: #DBACE3;
+    font-size: 1rem;
     padding:0;
     margin: 0;
 }

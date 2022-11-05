@@ -56,7 +56,6 @@ function Chat() {
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
-				console.log("findAllMessagesInRoom", msgs);
 			});
 			socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 				setMembers(users);
@@ -71,8 +70,7 @@ function Chat() {
 			}
 		});
 
-		function updateRooms()
-		{
+		function updateRooms() {
 			console.log('getting information');
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
@@ -86,8 +84,7 @@ function Chat() {
 		};
 		socket.on('updateRooms', updateRooms);
 
-		function refreshOneRoom()
-		{
+		function refreshOneRoom() {
 			setSelectedRoom({} as Room);
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
 				console.log("findAllJoined", rooms);
@@ -120,9 +117,8 @@ function Chat() {
 			setNewMessage("");
 		}
 	}
-	function rightName(room: Room){
-		if (room.type === "dm")
-		{
+	function rightName(room: Room) {
+		if (room.type === "dm") {
 			if (room.name === null)
 				room.name = "olozano-ehautefa";
 			var start = room.name.indexOf(user.userName);
@@ -134,11 +130,11 @@ function Chat() {
 
 	// var start = a.indexOf(b);
 	// var end = start + b.length;
-	
+
 	// Now put it together.
-	
+
 	// return a.substring(0, start - 1) + a.substring(end);
-	
+
 
 
 	return (<div>
@@ -183,14 +179,14 @@ function Chat() {
 										{message.userName === user.userName ?
 											<div className="message_mine">
 												<div className="message-box">{message.message}</div>
-												<p>time</p>
+												<p>{new Date(message.time).getHours() + ":" + new Date(message.time).getMinutes()}</p>
 											</div> :
 											<div className="message_other">
 												<div className='message-box'>
 													<h5>{message.userName}</h5>
 													<p>{message.message}</p>
 												</div>
-												<p>time</p>
+												<p>{new Date(message.time).getHours() + ":" + new Date(message.time).getMinutes()}</p>
 											</div>
 										}
 									</div>
