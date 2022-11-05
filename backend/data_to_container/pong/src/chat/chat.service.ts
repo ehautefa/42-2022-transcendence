@@ -72,7 +72,8 @@ export class ChatService {
       .where('room.id = :id', { id: roomId })
       .select('message')
       .addSelect('user.userName', 'userName')
-      .addSelect('msg.id', 'id')
+      .addSelect('id')
+      .addSelect('time')
       .orderBy('msg.time')
       .getRawMany();
     return messages;
