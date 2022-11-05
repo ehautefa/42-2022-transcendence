@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { WsException } from '@nestjs/websockets';
-import { ChatMember, user } from 'src/bdd';
+import { ChatMember, RoomType, user } from 'src/bdd';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from '../chat.service';
 import { Authorization } from '../decorator/authorized.decorator';
@@ -23,7 +23,14 @@ export class AuthorizedGuard implements CanActivate {
     if (!authorization) return true;
     const user: user = context.switchToWs().getClient().user;
     const roomId: string = context.switchToWs().getData()['roomId'];
-    if (authorization.includes('notBlocked')) {
+    const chatMember: ChatMember = await this.chatService.findChatMember(
+      user.userUuid,
+      roomId,
+    );
+    if (
+      authorization.includes('notBlocked') &&
+      chatMember.room.type === RoomType.DM
+    ) {
       const otherUser: user = await this.chatService.getOtherDMUser(
         user.userUuid,
         roomId,
@@ -31,10 +38,6 @@ export class AuthorizedGuard implements CanActivate {
       if (this.userService.isBlocked(otherUser, user))
         throw new WsException(`You have been blocked by ${otherUser.userName}`);
     }
-    const chatMember: ChatMember = await this.chatService.findChatMember(
-      user.userUuid,
-      roomId,
-    );
     const unBan: boolean =
       chatMember.bannedTime && new Date() > chatMember.bannedTime
         ? true

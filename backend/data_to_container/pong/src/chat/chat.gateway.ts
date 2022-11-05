@@ -77,7 +77,6 @@ export class ChatGateway
     );
     this.logger.debug('Creating a message');
     this.logger.debug(message.sender.room.id);
-    console.log(message.sender.room.id);
     this.server
       .in(message.sender.room.id)
       .emit('updateMessages', message.sender.room.id);
@@ -138,7 +137,6 @@ export class ChatGateway
     @Req() { user }: { user: user },
   ): Promise<string> {
     const room: Room = await this.chatService.getDMRoom(user, recipiendId.uuid);
-    // console.log(room);
     this.server.socketsJoin(room.id);
     return room.id;
   }
@@ -148,7 +146,6 @@ export class ChatGateway
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
-    console.log('bonjour');
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
@@ -190,7 +187,6 @@ export class ChatGateway
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
     const room: Room = await this.chatService.deleteRoom(deleteRoomDto.uuid);
-    console.table(room);
     this.server.to(deleteRoomDto.uuid).emit('refreshSelectedRoom');
     this.server.to(room.id).socketsLeave(deleteRoomDto.uuid);
     return room;
@@ -222,7 +218,6 @@ export class ChatGateway
   async removePunishment(
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
-    console.log('removePunishmentDto = ', removePunishmentDto);
     const chatMember = await this.chatService.removePunishment(
       removePunishmentDto,
     );
@@ -261,7 +256,6 @@ export class ChatGateway
     @Req() { user }: { user: user },
     @ConnectedSocket() client: Socket,
   ): Promise<ChatMember> {
-    console.log('leaving ', roomId);
     const chatMember: ChatMember = await this.chatService.leaveRoom(
       user.userUuid,
       roomId.uuid,
@@ -357,7 +351,6 @@ export class ChatGateway
       cookie !== '' &&
       cookie.includes('access_token=')
     ) {
-      console.log('cookie', client.handshake.headers.cookie);
       const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
         client.handshake.headers.cookie,
       );

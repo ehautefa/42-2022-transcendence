@@ -64,7 +64,6 @@ export class ChatService {
   }: {
     uuid: string;
   }): Promise<any[]> {
-    // console.log('roomId = ', roomId);
     const messages: Message[] = await this.messagesRepository
       .createQueryBuilder('msg')
       .innerJoin('msg.sender', 'sender')
@@ -246,7 +245,6 @@ export class ChatService {
     const room: Room = await this.findRoomById(respondToInvitationDto.roomId);
     if (respondToInvitationDto.acceptInvitation === true)
       this.createChatMember(user, room);
-    console.table(user);
     return await this.userService.removeInvitation(user.userUuid, room);
   }
 
@@ -260,11 +258,9 @@ export class ChatService {
    */
 
   async createDMRoom(sender: user, recipientId: string): Promise<Room> {
-    var combinedNames : string;
     const recipient: user = await this.userService.getUser(recipientId);
-    combinedNames = recipient.userName + sender.userName;
     let newDMRoom: Room = this.roomsRepository.create({
-      name: combinedNames,
+      name: recipient.userName + sender.userName,
       type: RoomType.DM,
     });
     newDMRoom = await this.roomsRepository.save(newDMRoom);
@@ -320,7 +316,6 @@ export class ChatService {
    */
 
   async setAdmin(setAdminDto: SetAdminDto): Promise<ChatMember> {
-    console.log('setAdminDto = ', setAdminDto);
     const chatMember: ChatMember = await this.findChatMember(
       setAdminDto.userId,
       setAdminDto.roomId,
