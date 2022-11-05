@@ -160,8 +160,17 @@ function Chat() {
 								{messages.map((message: any) => (
 									<div key={message.id}>
 										{message.userName === user.userName ?
-											<div className="message_mine">{message.message}</div> :
-											<div className="message_other">{message.userName} : {message.message}</div>
+											<div className="message_mine">
+												<div className="message-box">{message.message}</div>
+												<p>time</p>
+											</div> :
+											<div className="message_other">
+												<div className='message-box'>
+													<h5>{message.userName}</h5>
+													<p>{message.message}</p>
+												</div>
+												<p>time</p>
+											</div>
 										}
 									</div>
 								))}
