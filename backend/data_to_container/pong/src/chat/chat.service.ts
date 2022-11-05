@@ -72,8 +72,8 @@ export class ChatService {
       .where('room.id = :id', { id: roomId })
       .select('message')
       .addSelect('user.userName', 'userName')
-      .addSelect('id')
-      .addSelect('time')
+      .addSelect('msg.id', 'id')
+      .addSelect('msg.time', 'msg.time')
       .orderBy('msg.time')
       .getRawMany();
     return messages;
@@ -452,6 +452,49 @@ export class ChatService {
         room: { id: roomId },
       },
     });
+  }
+
+  async findMutableUsersInRoom(
+    userId: string,
+    roomId: string,
+  ): Promise<user[]> {
+    const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
+      relations: { user: true, room: true },
+      where: {
+        room: { id: roomId },
+        user: { userUuid: Not(userId) },
+        isAdmin: false,
+      },
+    });
+    chatMembers.forEach((member) => {
+      if (member.mutedTime && member.mutedTime < new Date()) {
+        member.mutedTime = null;
+        this.roomsRepository.save(member);
+      } else chatMembers.splice(chatMembers.indexOf(member));
+    });
+    console.log();
+    return chatMembers.map((member) => member.user);
+  }
+
+  async findBannableUsersInRoom(
+    userId: string,
+    roomId: string,
+  ): Promise<user[]> {
+    const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
+      relations: { user: true, room: true },
+      where: {
+        room: { id: roomId },
+        user: { userUuid: Not(userId) },
+        isAdmin: false,
+      },
+    });
+    chatMembers.forEach((member) => {
+      if (member.bannedTime && member.bannedTime < new Date()) {
+        member.bannedTime = null;
+        this.roomsRepository.save(member);
+      } else chatMembers.splice(chatMembers.indexOf(member));
+    });
+    return chatMembers.map((member) => member.user);
   }
 
   async findMutedUsersInRoom(roomId: string): Promise<ChatMember[]> {

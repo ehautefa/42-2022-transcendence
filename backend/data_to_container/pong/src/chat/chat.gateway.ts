@@ -152,6 +152,28 @@ export class ChatGateway
     return messages;
   }
 
+  @SubscribeMessage('findBannableUsersInRoom')
+  async findBannableUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<user[]> {
+    return await this.chatService.findBannableUsersInRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
+  }
+
+  @SubscribeMessage('findMutableUsersInRoom')
+  async findMutableUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<user[]> {
+    return await this.chatService.findBannableUsersInRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
+  }
+
   // @Authorized('notBanned')
   // @SubscribeMessage('findLastMessageInRoom')
   // async findLastMessageInRoom(

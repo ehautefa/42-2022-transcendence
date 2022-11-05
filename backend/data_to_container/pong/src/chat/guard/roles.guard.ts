@@ -17,7 +17,6 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
     );
 
-    console.table(roles);
     if (!roles) return true;
     const user: user = context.switchToWs().getClient().user;
     const roomId: string = context.switchToWs().getData()['roomId'];
