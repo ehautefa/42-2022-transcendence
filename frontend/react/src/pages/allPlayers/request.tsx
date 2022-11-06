@@ -39,7 +39,7 @@ export async function addFriend(friendUuid: string) {
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
 	} else {
-		return await result.json();
+		return result;
 	}
 	return [];
 }
