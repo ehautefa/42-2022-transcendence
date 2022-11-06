@@ -1,7 +1,7 @@
 import React from "react"
 import { getSocketPong } from "../../Home";
 
-export class PaddleSizeSelector extends React.Component {
+export class PaddleSizeSelector extends React.Component<{paddleSize : number}, {}> {
     constructor(props: any) {
         super(props);
         this.onChangeValue = this.onChangeValue.bind(this);
@@ -12,36 +12,37 @@ export class PaddleSizeSelector extends React.Component {
         socket.emit("editPaddleSize", event.target.value);
     }
 
-
     render() {
         return (
-            <div className="ColorSelector" onChange={this.onChangeValue}>
+            <div className="ColorSelector">
                 <p>Size Paddle :</p>
-                <input type="radio" name="size" value="small" /> Small
-                <input type="radio" name="size" value="medium" /> Medium
-                <input type="radio" name="size" value="large" /> Large
+                <div className="input"><input type="radio" name="size" value="small" onChange={this.onChangeValue} checked={this.props.paddleSize === 10} />Small</div>
+                <div className="input"><input type="radio" name="size" value="medium" onChange={this.onChangeValue} checked={this.props.paddleSize === 20} />Medium</div>
+                <div className="input"><input type="radio" name="size" value="large" onChange={this.onChangeValue} checked={this.props.paddleSize === 30} />Large</div>
             </div>
         )
     }
 }
 
-export class ColorSelector extends React.Component {
+export class ColorSelector extends React.Component<{ballColor : string}, {}> {
     constructor(props: any) {
         super(props);
         this.onChangeValue = this.onChangeValue.bind(this);
+        console.log("BALL COLOR : " + this.props.ballColor);
     }
 
     onChangeValue(event: any) {
-        document.getElementById("ball")!.style.backgroundColor = event.target.value;
+        const socket = getSocketPong();
+        socket.emit("editBallColor", event.target.value);
     }
 
     render() {
         return (
-            <div className="ColorSelector" onChange={this.onChangeValue}>
+            <div className="ColorSelector">
                 <p>Ball color :</p>
-                <input type="radio" value="#FA0197" name="color" /> Pink
-                <input type="radio" value="#fef45b" name="color" /> Yellow
-                <input type="radio" value="#DBACE3" name="color" /> Purple
+                <div className="input"><input type="radio" value="#FA0197" name="color" onChange={this.onChangeValue} checked={this.props.ballColor === "#FA0197"} />Pink</div>
+                <div className="input"><input type="radio" value="#fef45b" name="color" onChange={this.onChangeValue} checked={this.props.ballColor === "#fef45b"} />Yellow</div>
+                <div className="input"><input type="radio" value="#DBACE3" name="color" onChange={this.onChangeValue} checked={this.props.ballColor === "#DBACE3"} />Purple</div>
             </div>
 
         );
@@ -54,6 +55,7 @@ export interface GameWindowState {
     matchId: string,
     ballX: number,
     ballY: number,
+    ballColor: string,
     timeoutId: any,
     scoreLeft: number,
     scoreRight: number,

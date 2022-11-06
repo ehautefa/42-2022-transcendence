@@ -2,6 +2,7 @@ export interface GameWindowState {
 	matchId: string,
 	ballX: number,
 	ballY: number,
+	ballColor: string,
 	ballSpeedX: number,
 	ballSpeedY: number,
 	scoreLeft: number,

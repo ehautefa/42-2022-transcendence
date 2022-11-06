@@ -4,7 +4,6 @@ import { getSocketPong } from "../../Home"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
-import { ColorSelector, PaddleSizeSelector } from "./element";
 
 function Game() {
 	const socket = getSocketPong();
@@ -43,10 +42,6 @@ function Game() {
 
 	return (<>
 		<NavBar />
-		<div className="game-selector">
-			<PaddleSizeSelector />
-			<ColorSelector />
-		</div>
 		<div className="mainComposantGame">
 			<GameWindow id={index} />
 			{layer === 0 &&

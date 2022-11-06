@@ -136,13 +136,16 @@
 }
 
 .game-selector {
+	position: absolute;
+	bottom: -7rem;
+	left: 10%;
 	display: flex;
 	margin: 0 auto;
-	padding: 10px 20px 0;
+	padding: 10px 0 0;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	width: max-content;
+	width: 80%;
 	font-size: 1rem;
 	vertical-align: baseline;
 	border-radius: 5px;
@@ -168,9 +171,6 @@
 	padding: 0;
 }
 
-
-
-
 input[type="radio"] {
 	box-sizing: border-box;
 	width: 1.2rem;
@@ -183,4 +183,21 @@ input[type="radio"] {
 
 input[type="radio"]:checked {
 	background-color: #fef45b;
+}
+
+@media screen and (max-width: 600px) {
+	.ColorSelector {
+		flex-direction: column;
+	}
+
+	.game-selector {
+		bottom: -25rem;
+	}
+
+	.ColorSelector .input {
+		display: flex;
+		flex-direction: row;
+		padding: 5px 0;
+		margin: 0;
+	}
 }

@@ -3,13 +3,10 @@ import React from "react";
 interface CanvasProps {
     ballX: number;
     ballY: number;
+    ballColor: string;
     paddleLeftY: number;
     paddleRightY: number;
     paddleSize: number;
-    playerLeftName: string;
-    playerRightName: string;
-    scoreLeft: number;
-    scoreRight: number;
 }
 
 function paddle(context: CanvasRenderingContext2D, paddleX: number, paddleY: number, paddleSize: number) {
@@ -33,16 +30,12 @@ const Canvas = ({
                 paddleLeftY,
                 paddleRightY,
                 paddleSize,
-                playerLeftName,
-                playerRightName,
-                scoreLeft,
-                scoreRight }: CanvasProps) => {
+                ballColor}: CanvasProps) => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const context = canvasRef.current?.getContext("2d");
     if (context) {
-        // find ballX min and ballX max
         context.clearRect(0, 0, 1000, 1000);
-        ball(context, ballX, ballY, "#FA0197");
+        ball(context, ballX, ballY, ballColor);
         paddle(context, 10, paddleLeftY, paddleSize);
         paddle(context, 285, paddleRightY, paddleSize);
     }

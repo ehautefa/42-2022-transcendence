@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Logger, UseGuards, Inject, Req, Body } from '@nestjs/common';
+import { Logger, UseGuards, Req, Body } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
 import { GameWindowState } from "./type";
@@ -194,7 +194,22 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				(game.playerLeftUid == req.user.userUuid ||
 					game.playerRightUid == req.user.userUuid)) {
 				game = this.PongService.editPaddleSize(game, size);
-				console.log("EDIT PADDLE SIZE", game.matchId, game.paddleSize);
+				break;
+			}
+		}
+	}
+
+	@SubscribeMessage('editBallColor')
+	@UseGuards(JwtAuthGuard)
+	editBallColor(@Req() req, @Body() color: string): void 
+	{	
+		for (let game of this.games.values()) {
+			if (game.isGameOver == false &&
+				game.matchMaking == true &&
+				game.begin == true &&
+				(game.playerLeftUid == req.user.userUuid ||
+					game.playerRightUid == req.user.userUuid)) {
+				game = this.PongService.editBallColor(game, color);
 				break;
 			}
 		}

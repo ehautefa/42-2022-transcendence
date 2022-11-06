@@ -55,6 +55,13 @@ export class PongService {
         return game;
     }
 
+    editBallColor(game: GameWindowState, color: string): GameWindowState {
+        if (game === null || game === undefined)
+            return game;
+        game.ballColor = color;
+        return game;
+    }
+
     leaveGame(clientId: string, server: any, games: Map<string, GameWindowState>, players: playerDto[]) {
         for (let game of games.values()) {
             if ((game.playerLeft === clientId
@@ -95,6 +102,7 @@ export class PongService {
             playerRight: client2_socket,
             ballY: parseInt(process.env.PONG_POS_BALL_Y),
             ballX: parseInt(process.env.PONG_POS_BALL_X),
+            ballColor: "#FA0197",
             // randomly choose the direction
             ballSpeedX: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
             ballSpeedY: parseInt(process.env.PONG_BALL_SPEED) * (Math.random() < 0.5 ? 1 : -1),
