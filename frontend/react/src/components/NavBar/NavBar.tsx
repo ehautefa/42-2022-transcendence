@@ -17,16 +17,25 @@ function NavBar() {
 
 	useEffect(() => {
 		socketStatus.on('refreshRequest', () => {
-
 			getMyRequests().then(
 				(response) => {
-					
 					socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
 						setIsBellExpanded(invitation.length > 0 || response.length > 0)
 					});
 				}
 			)
 		})
+		getMyRequests().then(
+			(response) => {
+				if (response.length > 0) {
+					setIsBellExpanded(true);
+				}
+			});
+		socketChat.emit('getPendingInvitations', (invitation: Room[]) => {
+			if (invitation.length > 0) {
+				setIsBellExpanded(true);
+			}
+		});
 	}, [socketChat, socketStatus])
 
 	return (

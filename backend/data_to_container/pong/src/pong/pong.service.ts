@@ -132,16 +132,16 @@ export class PongService {
         if (game.ballX < parseInt(process.env.PONG_PADDLE_LEFT_X)
             && game.ballX > parseInt(process.env.PONG_PADDLE_LEFT_X) - 7
             && game.ballY >= game.paddleLeftY  
-            && game.ballY + parseInt(process.env.PONG_BALL_RAY) <= game.paddleLeftY + game.paddleSize)
+            && game.ballY + parseInt(process.env.PONG_BALL_DIAM) <= game.paddleLeftY + game.paddleSize)
             return true;
         return false;
     }
 
     hitRightPaddle(game: GameWindowState): boolean {
-        if (game.ballX + parseInt(process.env.PONG_BALL_RAY) > parseInt(process.env.PONG_PADDLE_RIGHT_X)
+        if (game.ballX + parseInt(process.env.PONG_BALL_DIAM) > parseInt(process.env.PONG_PADDLE_RIGHT_X)
             && game.ballX < parseInt(process.env.PONG_PADDLE_RIGHT_X) + 7
             && game.ballY >= game.paddleRightY 
-            && game.ballY + parseInt(process.env.PONG_BALL_RAY) <= game.paddleRightY + game.paddleSize)
+            && game.ballY + parseInt(process.env.PONG_BALL_DIAM) <= game.paddleRightY + game.paddleSize)
             return true;
         return false;
     }

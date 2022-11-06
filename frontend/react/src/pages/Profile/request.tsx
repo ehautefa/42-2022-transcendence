@@ -12,8 +12,9 @@ export async function getFriends(userUuid: string) {
 	};
 
 	let friends = await (await fetch(url, requestOptions)).json();
-	if (friends.statusCode === 401) {
+	if (await friends.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await friends;
 }
@@ -30,10 +31,31 @@ export async function FetchUser(uid: string) {
 	};
 
 	let user = await (await fetch(url, requestOptions)).json();
-	if (user.statusCode === 401) {
+	if (await user.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await user;
+}
+
+export async function isMyBlocked(userUuid: string) {
+	var url: string = "/user/isBlocked";
+
+	var urlencoded = new URLSearchParams();
+	urlencoded.append("userUuid", userUuid);
+
+	var requestOptions = {
+		method: 'POST',
+		body: urlencoded,
+		credentials: credentials
+	};
+
+	let result = await (await fetch(url, requestOptions)).json();
+	if (await result.statusCode === 401) {
+		window.location.assign("/auth/login");
+		return ;
+	}
+	return await result;
 }
 
 export async function isMyFriends(userUuid: string) {
@@ -49,8 +71,9 @@ export async function isMyFriends(userUuid: string) {
 	};
 
 	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await result;
 }

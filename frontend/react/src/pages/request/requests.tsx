@@ -16,10 +16,13 @@ export async function acceptFriendRequest(friendUuid: string) {
 	};
 
 	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
-	}
-	return await result;
+	} else if (await result.statusCode === 403) {
+		alert(await result.message);
+		return [];
+	} else
+		return await result;
 }
 
 export async function refuseFriendRequest(friendUuid: string) {
@@ -35,18 +38,21 @@ export async function refuseFriendRequest(friendUuid: string) {
 	};
 
 	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
-	}
-	return await result;
+	} else if (await result.statusCode === 403) {
+		alert(await result.message);
+		return [];
+	} else
+		return await result;
 }
 
 export function respondToInvitation(roomId: string, acceptInvitaion: boolean) {
-	const socket : Socket = getSocketChat();
+	const socket: Socket = getSocketChat();
 
 	const param = {
 		roomId: roomId,
-  		acceptInvitation: acceptInvitaion
+		acceptInvitation: acceptInvitaion
 	}
 	socket.emit('respondToInvitation', param);
 }
@@ -60,8 +66,9 @@ export async function getMyRequests() {
 	};
 
 	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return;
 	}
 	return result;
 }
