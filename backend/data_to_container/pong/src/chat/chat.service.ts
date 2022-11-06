@@ -494,11 +494,6 @@ export class ChatService {
       },
     });
     chatMembers.forEach((member) => {
-      if (member.bannedTime !== null)
-        console.log("INFO! ", member.user.userName, "\n\t\t", member.bannedTime, "\n\t\t",  
-          (member.bannedTime as Date).getTime(), "\n\t\t", new Date().getTime());
-      else
-        console.log("INFO! ", member.user.userName, "\n\t\t", member.bannedTime);
       if (member.bannedTime !== null && 
         (member.bannedTime as Date).getTime() < new Date().getTime()) {
         member.bannedTime = null;
@@ -506,8 +501,6 @@ export class ChatService {
       } 
       else if (member.bannedTime !== null)
         chatMembers.splice(chatMembers.indexOf(member));
-      else
-        console.log(member.user.userName, "is Bannable!\n\n");
     });
     return chatMembers.map((member) => member.user);
   }

@@ -69,6 +69,15 @@ function Chat() {
 				});
 			}
 		});
+		
+		function updateButtons(thisRoom: any){
+			console.log("Update buttons of room: ", thisRoom);
+			if (selectedRoom && selectedRoom !== undefined && selectedRoom.id !== undefined &&
+				thisRoom.id === selectedRoom.id)
+				setSelectedRoom(thisRoom);
+			console.log("so the room is now like this: ", selectedRoom);
+		}
+		socket.on('updateThisRoom', (thisRoom : any) => updateButtons(thisRoom));
 
 		function updateRooms() {
 			console.log('getting information');
@@ -76,11 +85,6 @@ function Chat() {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
-			var newRoom = channels.find(obj => {
-				return obj.id === selectedRoom.id;
-			})
-			if (newRoom !== undefined)
-				setSelectedRoom(newRoom);
 			if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 				socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 					setMembers(users);
@@ -98,15 +102,12 @@ function Chat() {
 		}
 		socket.on('refreshSelectedRoom', refreshOneRoom);
 
-		socket.on('updateThisRoom', (thisRoom: any) => {
-			setSelectedRoom(thisRoom);
-		});
-
 		return () => {
 			socket.off('updateThisRoom');
 			socket.removeListener('updateRooms', updateRooms);
 			socket.removeListener('refreshSelectedRoom', refreshOneRoom);
 			socket.off('updateMessages');
+			socket.off('updateRooms', updateButtons);
 		}
 	}, [socket, selectedRoom]);
 
