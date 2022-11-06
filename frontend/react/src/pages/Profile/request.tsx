@@ -14,6 +14,7 @@ export async function getFriends(userUuid: string) {
 	let friends = await (await fetch(url, requestOptions)).json();
 	if (await friends.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await friends;
 }
@@ -32,6 +33,7 @@ export async function FetchUser(uid: string) {
 	let user = await (await fetch(url, requestOptions)).json();
 	if (await user.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await user;
 }
@@ -51,6 +53,7 @@ export async function isMyBlocked(userUuid: string) {
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await result;
 }
@@ -70,6 +73,7 @@ export async function isMyFriends(userUuid: string) {
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await result;
 }

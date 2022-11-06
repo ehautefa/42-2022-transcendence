@@ -15,6 +15,7 @@ export async function getMe() {
 	let user = await (await fetch(url, requestOptions)).json()
 	if (await user.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await user;
 }
@@ -30,6 +31,7 @@ export async function GetMatchHistory(userName: string) {
 	let match = await (await fetch(url, requestOptions)).json();
 	if (await match.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await match;
 }
@@ -53,8 +55,7 @@ export async function ChangeUsername(newName: string) {
 	if (await result.statusCode === 403) {
 		alert(await result.message);
 		return null;
-	}
-	if (await result.statusCode === 401) {
+	} else if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
 	}
 }
@@ -71,8 +72,8 @@ export async function disableTwoFactorAuth() {
 		window.location.assign("/auth/login");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
-	}
-	return await result;
+	} else
+		return await result;
 }
 
 export async function getMyFriends() {
@@ -85,6 +86,7 @@ export async function getMyFriends() {
 	let friends = await (await fetch(url, requestOptions)).json();
 	if (await friends.statusCode === 401) {
 		window.location.assign("/auth/login");
+		return ;
 	}
 	return await friends;
 }
