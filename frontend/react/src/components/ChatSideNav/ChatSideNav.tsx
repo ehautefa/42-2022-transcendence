@@ -32,18 +32,6 @@ function ChatSideNav({ Room }: any) {
         }
     }, [Room, socket]);
 
-    useEffect(() => {
-        function updateMenu(thisRoom: any){
-            if (Room && Room !== undefined && Room.id !== undefined &&
-                thisRoom.id === Room.id)
-                Room = thisRoom;
-        }
-        socket.on('updateThisRoom', (thisRoom : any) => updateMenu(thisRoom));
-        return () => {
-            socket.off('updateRooms', updateMenu);
-        }
-    }, [socket, Room]);
-
     function openNav() {
         if (sidenav !== null) {
             sidenav.classList.add("active");
@@ -79,11 +67,19 @@ function ChatSideNav({ Room }: any) {
                         </>
                     }
                     {/* Owner */}
-                    {amIOwner &&
+                    {amIOwner && Room.type === "public" &&
                         <>
                             <li><SetPassword room={Room} /></li>
-                            <li><ChangePassword romm={Room} /></li>
+                        </>
+                    }
+                    {amIOwner && Room.type === "protected" &&
+                        <>
+                            <li><ChangePassword room={Room} /></li>
                             <li><DeletePassword room={Room} /></li>
+                        </>
+                    }
+                    {amIOwner &&
+                        <>
                             <li><GiveOwnership room={Room} /></li>
                             <li><DeleteRoom room={Room} /></li>
                         </>
