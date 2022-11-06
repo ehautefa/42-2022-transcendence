@@ -70,28 +70,14 @@ function Chat() {
 			}
 		});
 		
-		function updateButtons(thisRoom: any){
-			console.log("Update buttons of room: ", thisRoom);
-			if (selectedRoom && selectedRoom !== undefined && selectedRoom.id !== undefined &&
-				thisRoom.id === selectedRoom.id)
-				setSelectedRoom(thisRoom);
-			console.log("so the room is now like this: ", selectedRoom);
-		}
-		socket.on('updateThisRoom', (thisRoom : any) => updateButtons(thisRoom));
-
-		function updateRooms() {
-			console.log('getting information');
-			socket.emit('findAllJoinedRooms', (rooms: any) => {
-				console.log("findAllJoined", rooms);
-				setChannels(rooms)
-			});
-			if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
-				socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
-					setMembers(users);
-				});
-			}
-		};
-		socket.on('updateRooms', updateRooms);
+		// function updateButtons(thisRoom: any){
+		// 	console.log("Update buttons of room: ", thisRoom);
+		// 	if (selectedRoom && selectedRoom !== undefined && selectedRoom.id !== undefined &&
+		// 		thisRoom.id === selectedRoom.id)
+		// 		setSelectedRoom(thisRoom);
+		// 	console.log("so the room is now like this: ", selectedRoom);
+		// }
+		// socket.on('updateThisRoom', (thisRoom : any) => updateButtons(thisRoom));
 
 		function refreshOneRoom() {
 			setSelectedRoom({} as Room);
@@ -104,12 +90,37 @@ function Chat() {
 
 		return () => {
 			socket.off('updateThisRoom');
-			socket.removeListener('updateRooms', updateRooms);
 			socket.removeListener('refreshSelectedRoom', refreshOneRoom);
 			socket.off('updateMessages');
-			socket.off('updateRooms', updateButtons);
+			// socket.off('updateRooms', updateButtons);
 		}
 	}, [socket, selectedRoom]);
+
+	useEffect(() => {
+		function updateRooms() {
+			console.log('getting information');
+			socket.emit('findAllJoinedRooms', (rooms: Room[]) => {
+				console.log("findAllJoined", rooms);
+				setChannels(rooms);
+				if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
+					console.log("room before: ", selectedRoom);
+					let aux = rooms.find(obj => { return obj.id === selectedRoom.id});
+					if (aux !== undefined && aux !== null){
+						setSelectedRoom(aux);
+						console.log("got in");
+					}
+					console.log("room after: ", selectedRoom);
+					socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
+						setMembers(users);
+					});
+				}
+			});
+		};
+		socket.on('updateRooms', updateRooms);
+		return() => {
+			socket.removeListener('updateRooms', updateRooms);
+		}
+	}, [socket, selectedRoom, channels]);
 
 	async function chooseRoom(thisRoom: Room) {
 		console.log("You chose room ", thisRoom);
