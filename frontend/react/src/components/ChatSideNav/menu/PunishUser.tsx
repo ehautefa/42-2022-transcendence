@@ -20,12 +20,12 @@ function PunishUser(param: any) {
         if (room.id !== "") {
             if (ban) {
                 socket.emit("findBannableUsersInRoom", {uuid : room.id}, (users: any) => {
-                    let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
+                    let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user));
                     setUsers(selectTab);
                 });
             } else {
                 socket.emit("findMutableUsersInRoom", {uuid : room.id}, (users: any) => {
-                    let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
+                    let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user));
                     setUsers(selectTab);
                 });
 

@@ -18,12 +18,13 @@ function UnpunishUser(param: any) {
     useEffect(() => {
         if (room && room !== undefined && room.id !== undefined) {
             if (ban) {
-                socket.emit("findMutedUsersInRoom", { uuid: room.id }, (users: any) => {
+                socket.emit("findBannedUsersInRoom", { uuid: room.id }, (users: any) => {
                     let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
                     setUsers(selectTab);
                 });
+                
             } else {
-                socket.emit("findBannedUsersInRoom", { uuid: room.id }, (users: any) => {
+                socket.emit("findMutedUsersInRoom", { uuid: room.id }, (users: any) => {
                     let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
                     setUsers(selectTab);
                 });

@@ -39,20 +39,20 @@ export class AuthorizedGuard implements CanActivate {
         throw new WsException(`You have been blocked by ${otherUser.userName}`);
     }
     const unBan: boolean =
-      chatMember.bannedTime && new Date() > chatMember.bannedTime
+      chatMember.bannedTime !== null && (chatMember.bannedTime as Date).getTime() > new Date().getTime()
         ? true
         : false;
     const unMute: boolean =
-      chatMember.mutedTime && new Date() > chatMember.mutedTime ? true : false;
+      chatMember.mutedTime !== null && (chatMember.mutedTime as Date).getTime() > new Date().getTime() ? true : false;
     if (unBan)
       this.chatService.removePunishment({
         userId: chatMember.user.userUuid,
         roomId: chatMember.room.id,
         unMute: unMute,
       });
-    if (authorization.includes('notBanned') && chatMember.bannedTime)
+    if (authorization.includes('notBanned') && chatMember.bannedTime !== null)
       return false;
-    if (authorization.includes('notMuted') && chatMember.mutedTime)
+    if (authorization.includes('notMuted') && chatMember.mutedTime !== null)
       return false;
     return true;
   }

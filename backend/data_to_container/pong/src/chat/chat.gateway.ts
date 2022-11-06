@@ -174,16 +174,6 @@ export class ChatGateway
     );
   }
 
-  // @Authorized('notBanned')
-  // @SubscribeMessage('findLastMessageInRoom')
-  // async findLastMessageInRoom(
-  //   @MessageBody() findLastMessageInRoomDto: UuidDto,
-  // ): Promise<Message> {
-  //   return await this.chatService.findLastMessageInRoom(
-  //     findLastMessageInRoomDto,
-  //   );
-  // }
-
   // @Roles('owner', 'admin')
   @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('setAdmin')
@@ -231,7 +221,12 @@ export class ChatGateway
     @MessageBody() punishUserDto: PunishUserDto,
   ): Promise<ChatMember> {
     const chatMember = await this.chatService.punishUser(punishUserDto);
-    this.server.to(chatMember.room.id).emit('updateRooms');
+    chatMember.bannedTime =
+      (chatMember.bannedTime !== null && (chatMember.bannedTime as Date).getTime() > new Date().getTime()) ? true : false;
+    chatMember.mutedTime =
+      (chatMember.mutedTime !== null && (chatMember.mutedTime as Date).getTime() > new Date().getTime()) ? true : false;
+    chatMember.id = chatMember.room.id;
+    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember);
     return chatMember;
   }
 
@@ -243,7 +238,12 @@ export class ChatGateway
     const chatMember = await this.chatService.removePunishment(
       removePunishmentDto,
     );
-    this.server.to(chatMember.room.id).emit('updateRooms');
+    chatMember.bannedTime =
+      (chatMember.bannedTime !== null && (chatMember.bannedTime as Date).getTime() > new Date().getTime()) ? true : false;
+    chatMember.mutedTime =
+      (chatMember.mutedTime !== null && (chatMember.mutedTime as Date).getTime() > new Date().getTime()) ? true : false;
+    chatMember.id = chatMember.room.id;
+    this.server.to(chatMember.room.id).emit('updateThisRoom', chatMember.room);
     return chatMember;
   }
 
