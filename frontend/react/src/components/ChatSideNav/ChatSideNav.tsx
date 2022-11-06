@@ -70,7 +70,7 @@ function ChatSideNav({ Room }: any) {
                     {amIOwner &&
                         <>
                             <li><SetPassword room={Room} /></li>
-                            <li><ChangePassword romm={Room} /></li>
+                            <li><ChangePassword room={Room} /></li>
                             <li><DeletePassword room={Room} /></li>
                             <li><GiveOwnership room={Room} /></li>
                             <li><DeleteRoom room={Room} /></li>

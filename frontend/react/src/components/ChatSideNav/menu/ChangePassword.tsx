@@ -34,7 +34,7 @@ function ChangePassword({ room }: any) {
 			}}>
 				<div className='side-menu-popup'>
 					<h3>Edit password :</h3>
-					<input type="password" id="messagePopup" name="password"
+					<input type="password" className="messagePopup" name="password"
 						onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
 						autoFocus
 						autoCorrect="off"
@@ -42,7 +42,7 @@ function ChangePassword({ room }: any) {
 						minLength={1}
 						maxLength={30}
 						size={30} />
-					<input type="password" id="messagePopup" name="password"
+					<input type="password" className="messagePopup" name="password"
 						onChange={(e: { target: { value: any; }; }) => setNewPassword(e.target.value)}
 						autoFocus
 						autoCorrect="off"
