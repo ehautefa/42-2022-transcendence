@@ -119,7 +119,7 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 						<div className="Score Right">{String(this.state.scoreRight).padStart(2, '0')}</div>
 						<div className="Score Left">{String(this.state.scoreLeft).padStart(2, '0')}</div>
 					</>
-					<Canvas ballX={this.state.ballX} ballY={this.state.ballY} ballColor={this.state.ballColor} paddleLeftY={this.state.paddleLeftY} paddleRightY={this.state.paddleRightY} paddleSize={this.state.paddleSize} playerLeftName={this.state.playerLeftName} playerRightName={this.state.playerRightName} scoreLeft={this.state.scoreLeft} scoreRight={this.state.scoreRight} />
+					<Canvas ballX={this.state.ballX} ballY={this.state.ballY} ballColor={this.state.ballColor} paddleLeftY={this.state.paddleLeftY} paddleRightY={this.state.paddleRightY} paddleSize={this.state.paddleSize} />
 				</div>
 			</>)
 	}
