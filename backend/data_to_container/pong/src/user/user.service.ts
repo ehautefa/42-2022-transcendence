@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { user, Room } from 'src/bdd/';
-import { Equal, Repository, UpdateResult } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { ArgUndefinedException, FailToFindAUniqNameException, FailToFindObjectFromanEntity, FailToFindObjectFromDBException, TwoFactorAuthAlreadyDisableException, TwoFactorAuthAlreadyEnableException, UserAreAlreadyFriends, UserAreNotBlocked, UserAreNotFriends, UserFriendRequestAlreadyPendingException, UserIsBlockedException, UserIsTheSameException, UserNameAlreadyExistException } from '../exceptions/user.exception';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
@@ -59,7 +59,6 @@ export class UserService {
         }
 
         await this.becomeFriend(completeMe, completeUser2);
-        console.log("cant find request");
         return completeMe.requestPending;
     }
 
@@ -119,12 +118,9 @@ export class UserService {
 
 
         completeMe.friends.push(completeUser2);
-        console.log("become friend");
         completeUser2.friends.push(completeMe);
-        console.log("become friend");
         await this.UserRepository.save([completeMe, completeUser2]);
-        console.log("become friend");
-        return completeMe.friends;
+        return await (await this.getCompleteUser(completeMe.userUuid)).friends;
     }
 
     async removeFriend(completeUser1: user, completeUser2: user): Promise<user[]> {

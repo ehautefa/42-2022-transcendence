@@ -6,10 +6,8 @@ import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { HandleFriendDto } from './dto/handleFriend.dto';
-import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { join } from 'path';
 
 //import fs
@@ -85,9 +83,9 @@ export class UserController {
 	@ApiOperation({ summary: 'Make Friend Request' })
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
-	async makeFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
+	async makeFriendRequest(@Req() { user } : {user : user}, @Body() userToHandle: HandleFriendDto) {
 		console.log("makeFriendRequest");
-		res.send(await this.UserService.makeFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid)))
+		return await this.UserService.makeFriendRequest(user, await this.UserService.getCompleteUser(userToHandle.userUuid));
 	}
 
 	@Post('acceptFriendRequest')
