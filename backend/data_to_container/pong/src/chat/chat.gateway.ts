@@ -175,7 +175,7 @@ export class ChatGateway
   }
 
   // @Roles('owner', 'admin')
-  @UseGuards(ProtectedRoomGuard)
+  // @UseGuards(ProtectedRoomGuard) // je suis vraiment désolé Romain 
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
     const chatMember = await this.chatService.setAdmin(setAdminDto);

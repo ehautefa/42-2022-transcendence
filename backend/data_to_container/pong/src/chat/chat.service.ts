@@ -22,6 +22,7 @@ import {
   RespondToInvitationDto,
   SetAdminDto,
 } from './dto';
+import { SendAlertDto } from 'src/status/dto/sendAlert.dto';
 
 @Injectable()
 export class ChatService {
@@ -322,8 +323,16 @@ export class ChatService {
       setAdminDto.userId,
       setAdminDto.roomId,
     );
-    chatMember.isAdmin = setAdminDto.isAdmin;
-    return await this.chatMembersRepository.save(chatMember);
+    if (await this.amIOwner(setAdminDto.userId, setAdminDto.roomId) === false) {
+      chatMember.isAdmin = setAdminDto.isAdmin;
+      var param: SendAlertDto = {
+        userUuid: setAdminDto.userId,
+        message: setAdminDto.isAdmin ? 'You are now an admin of ' + chatMember.room.name : 'You are no longer an admin of ' + chatMember.room.name,
+      }
+      this.eventEmitter.emit('alert.send', param);
+      return await this.chatMembersRepository.save(chatMember);
+    }
+
   }
 
   async punishUser(punishUserDto: PunishUserDto): Promise<ChatMember> {
@@ -432,6 +441,7 @@ export class ChatService {
     filterByAdminRightsDto: FilterByAdminRightsDto,
     userId: string,
   ): Promise<ChatMember[]> {
+    // TO DO : remove owner from the list
     return await this.chatMembersRepository.find({
       relations: { room: true, user: true },
       select: {
