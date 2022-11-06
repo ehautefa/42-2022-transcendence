@@ -8,7 +8,7 @@ export async function getAllUuidWithUserNameWithoutMe(myUserUuid: string) {
 	};
 
 	let users = await (await fetch(url, requestOptions)).json();
-	if (users.statusCode === 401) {
+	if (await users.statusCode === 401) {
 		window.location.assign("/auth/login");
 	}
 	for (let i = 0; i < users.length; i++) {
@@ -33,10 +33,12 @@ export async function addFriend(friendUuid: string) {
 	};
 
 	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+	} else if (await result.statusCode === 403) {
+		alert(await result.message);
 	}
-	return await result;
+	return await result.json();
 }
 
 export async function removeFriend(friendUuid: string) {
@@ -51,12 +53,13 @@ export async function removeFriend(friendUuid: string) {
 		credentials: credentials
 	};
 
-	let result = await fetch(url, requestOptions);
-	console.log("result", result);
-	if (result.status === 401) {
+	let result = await (await fetch(url, requestOptions)).json();
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+	} else if (await result.statusCode === 403) {
+		alert(await result.message);
 	}
-	return result.json();
+	return result;
 }
 
 export async function getMyBlocked() {
@@ -67,9 +70,9 @@ export async function getMyBlocked() {
 	};
 
 	let users = await (await fetch(url, requestOptions)).json();
-	if (users.statusCode === 401) {
+	if (await users.statusCode === 401) {
 		window.location.assign("/auth/login");
-	}
+	} 
 	return await users;
 }
 
@@ -86,8 +89,10 @@ export async function addBlocked(friendUuid: string) {
 	};
 
 	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+	} else if (await result.statusCode === 403) {
+		alert(await result.message);
 	}
 	return await result;
 }
@@ -105,8 +110,10 @@ export async function removeBlocked(friendUuid: string) {
 	};
 
 	let result = await (await fetch(url, requestOptions)).json();
-	if (result.statusCode === 401) {
+	if (await result.statusCode === 401) {
 		window.location.assign("/auth/login");
+	} else if (await result.statusCode === 403) {
+		alert(await result.message);
 	}
 	return await result;
 }

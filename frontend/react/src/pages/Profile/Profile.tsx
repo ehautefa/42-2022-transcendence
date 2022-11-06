@@ -7,7 +7,7 @@ import starEmpty from "../../assets/starEmpty.jpg";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { addFriend, removeFriend, addBlocked, removeBlocked } from "../allPlayers/request";
-import { getFriends, FetchUser, isMyFriends, getPicture } from "./request";
+import { getFriends, FetchUser, isMyFriends, isMyBlocked,  getPicture } from "./request";
 import { getSocketChat } from "../../Home";
 
 function Profile() {
@@ -38,6 +38,8 @@ function Profile() {
 		setFriends(friends);
 		const isFriend = await isMyFriends(user.userUuid);
 		setIsMyFriend(isFriend);
+		const isBlocked = await isMyBlocked(user.userUuid);
+		setIsBlocked(isBlocked);
 	}
 
 	useEffect(() => {
