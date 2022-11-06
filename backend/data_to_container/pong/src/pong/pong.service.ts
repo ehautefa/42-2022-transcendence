@@ -65,8 +65,7 @@ export class PongService {
     leaveGame(clientId: string, server: any, games: Map<string, GameWindowState>, players: playerDto[]) {
         for (let game of games.values()) {
             if ((game.playerLeft === clientId
-                || game.playerRight === clientId)
-                && game.begin === true) {
+                || game.playerRight === clientId)) {
                 if (game.isGameOver === false) {
                     if (game.playerLeft === clientId) {
                         server.to(game.matchId).emit('leaveGame', game.playerLeftName);

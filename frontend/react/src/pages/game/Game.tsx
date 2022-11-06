@@ -34,6 +34,7 @@ function Game() {
 			alert(userName + " left the game");
 		})
 		return () => {
+			console.log("unmounting");
 			socket.off("leaveGame");
 			socket.off('beginGame');
 			socket.emit("leaveGame");
