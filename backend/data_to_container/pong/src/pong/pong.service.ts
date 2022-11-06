@@ -131,7 +131,7 @@ export class PongService {
 
     hitRightPaddle(game: GameWindowState): boolean {
         if (game.ballX + parseInt(process.env.PONG_BALL_RAY) > parseInt(process.env.PONG_PADDLE_RIGHT_X)
-            && game.ballX < parseInt(process.env.PONG_PADDLE_LEFT_X) + 7
+            && game.ballX < parseInt(process.env.PONG_PADDLE_RIGHT_X) + 7
             && game.ballY >= game.paddleRightY 
             && game.ballY + parseInt(process.env.PONG_BALL_RAY) <= game.paddleRightY + game.paddleSize)
             return true;

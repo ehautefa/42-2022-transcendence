@@ -4,7 +4,7 @@ import { getSocketPong } from "../../Home"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import { GameWindow } from "./GameWindow"
-import { PaddleSizeSelector } from "./element";
+import { ColorSelector, PaddleSizeSelector } from "./element";
 
 function Game() {
 	const socket = getSocketPong();
@@ -35,15 +35,18 @@ function Game() {
 			alert(userName + " left the game");
 		})
 		return () => {
-			socket.off("leaveGame");	
+			socket.off("leaveGame");
 			socket.off('beginGame');
-			socket.emit("leaveGame");	
+			socket.emit("leaveGame");
 		}
 	}, [socket])
 
 	return (<>
 		<NavBar />
-		<PaddleSizeSelector />
+		<div className="game-selector">
+			<PaddleSizeSelector />
+			<ColorSelector />
+		</div>
 		<div className="mainComposantGame">
 			<GameWindow id={index} />
 			{layer === 0 &&

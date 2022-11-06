@@ -1,29 +1,6 @@
 import React from "react"
 import { getSocketPong } from "../../Home";
 
-export class Ball extends React.Component<{ x: number, y: number }> {
-    render() {
-        return <div
-            style={{
-                top: `${this.props.y}%`,
-                left: `${this.props.x}%`,
-            }}
-            className="Ball" id="ball" />
-    }
-}
-
-export class Paddle extends React.Component<{ x: number, y: number, size: number }> {
-    render() {
-        return <div
-            style={{
-                top: `${this.props.y}%`,
-                left: `${this.props.x}vw`,
-                height: `${this.props.size}%`,
-            }}
-            className="Paddle" />
-    }
-}
-
 export class PaddleSizeSelector extends React.Component {
     constructor(props: any) {
         super(props);
@@ -38,13 +15,11 @@ export class PaddleSizeSelector extends React.Component {
 
     render() {
         return (
-            <div className="containers-paddle-size-select">
+            <div className="ColorSelector" onChange={this.onChangeValue}>
                 <p>Size Paddle :</p>
-                <select className="select-paddle-size-select" onChange={this.onChangeValue}>
-                    <option className="option-paddle-size-select" value="small">Small</option>
-                    <option className="option-paddle-size-select" value="medium">Medium</option>
-                    <option className="option-paddle-size-select" value="large">Large</option>
-                </select>
+                <input type="radio" name="size" value="small" /> Small
+                <input type="radio" name="size" value="medium" /> Medium
+                <input type="radio" name="size" value="large" /> Large
             </div>
         )
     }
