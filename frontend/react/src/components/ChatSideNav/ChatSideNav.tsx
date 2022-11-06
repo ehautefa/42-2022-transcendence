@@ -32,18 +32,6 @@ function ChatSideNav({ Room }: any) {
         }
     }, [Room, socket]);
 
-    useEffect(() => {
-        function updateMenu(thisRoom: any){
-            if (Room && Room !== undefined && Room.id !== undefined &&
-                thisRoom.id === Room.id)
-                Room = thisRoom;
-        }
-        socket.on('updateThisRoom', (thisRoom : any) => updateMenu(thisRoom));
-        return () => {
-            socket.off('updateRooms', updateMenu);
-        }
-    }, [socket, Room]);
-
     function openNav() {
         if (sidenav !== null) {
             sidenav.classList.add("active");
