@@ -61,7 +61,6 @@ function JoinAgoraPopup() {
 			borderRadius: '5px',
 			backgroundColor: 'rgba(0, 0, 0, 1)',
 			padding: 5,
-			margin: 40
 		}),
 		input: (styles: any) => ({
 			...styles,
