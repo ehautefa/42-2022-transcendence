@@ -13,10 +13,12 @@ COPY 		--chown=node:node ./react/package*.json /usr/src/app/
 
 RUN         apk update && \
             apk add openssl && \
-            openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=frontend"
+            openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=frontend" && \
+            npm install -g npm@latest
+
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN         npm ci
+RUN         npm install
 
 # Bundle app source
 COPY 		./react /usr/src/app
@@ -40,14 +42,17 @@ COPY 		--chown=node:node ./react/package*.json /usr/src/app/
 # RUN         npm ci --only=production && npm cache clean --force
 
 # ENV         NODE_ENV production
-RUN         npm install
+COPY        --chown=node:node --from=development /usr/src/app /usr/src/app
+
+RUN         npm install -g npm@latest && \
+            echo -n "AUDIT PROD :" && npm audit --omit=dev
 
 COPY 		--chown=node:node ./react /usr/src/app
 # Run the build command which creates the production bundle
 RUN         npm run build
 
 # Set NODE_ENV environment variable
-RUN         npm ci --omit=dev && npm cache clean --force
+RUN         npm install --omit=dev && npm cache clean --force
 
 # Running `npm ci` removes the existing node_modules directory.
 # Passing in --only=production ensures that only the production dependencies are installed.

@@ -9,6 +9,8 @@ http {
     ssl_certificate /etc/ssl/certs/pong.csr;
     ssl_certificate_key /etc/ssl/private/.pong.key;
 
+    access_log off;
+
     location /socket.io/ {
       proxy_pass ${REACT_APP_RP_BACK_URL};
 
