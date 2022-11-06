@@ -41,6 +41,7 @@ export async function addFriend(friendUuid: string) {
 	} else {
 		return await result.json();
 	}
+	return [];
 }
 
 export async function removeFriend(friendUuid: string) {
@@ -62,6 +63,7 @@ export async function removeFriend(friendUuid: string) {
 		alert(await result.message);
 	} else 
 		return result;
+	return [];
 }
 
 export async function getMyBlocked() {
@@ -96,6 +98,7 @@ export async function addBlocked(friendUuid: string) {
 		window.location.assign("/auth/login");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
+		return [];
 	} else {
 		return await result;
 	}
@@ -118,6 +121,7 @@ export async function removeBlocked(friendUuid: string) {
 		window.location.assign("/auth/login");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
+		return [];
 	} else {
 		return await result;
 	}

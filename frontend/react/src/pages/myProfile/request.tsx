@@ -72,6 +72,7 @@ export async function disableTwoFactorAuth() {
 		window.location.assign("/auth/login");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
+		return {};
 	} else
 		return await result;
 }
