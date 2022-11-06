@@ -8,6 +8,7 @@ import { JwtConfig } from 'src/auth/config/Jwt.config';
 import TokenPayload from 'src/auth/tokenPayload.interface';
 import { ChatMember, Message, Room, RoomType, user } from 'src/bdd/';
 import { UserService } from 'src/user/user.service';
+import { DateUtils } from 'typeorm/util/DateUtils';
 import { IsNull, LessThan, MoreThan, Not, Repository } from 'typeorm';
 import {
   ChangePasswordDto,
@@ -191,9 +192,9 @@ export class ChatService {
       throw new WsException('You cannot leave a Direct Message');
     if (chatMember.room.owner.user.userUuid === chatMember.user.userUuid)
       throw new WsException('You cannot leave a room you own');
-    if (chatMember.bannedTime && chatMember.bannedTime < new Date())
+    if (chatMember.bannedTime !== null && (chatMember.bannedTime as Date).getTime() > new Date().getTime())
       throw new WsException('You cannot leave a room you are banned from');
-    if (chatMember.mutedTime && chatMember.mutedTime < new Date())
+    if (chatMember.mutedTime !== null && (chatMember.mutedTime as Date).getTime() > new Date().getTime())
       throw new WsException('You cannot leave a room you are muted in');
     this.chatMembersRepository.delete(chatMember.id);
     return chatMember;
@@ -213,9 +214,9 @@ export class ChatService {
       .getRawMany();
     chatMember.map((mbr) => {
       mbr.bannedTime =
-        mbr.bannedTime && mbr.bannedTime < new Date() ? true : false;
+        (mbr.bannedTime !== null && (mbr.bannedTime as Date).getTime() > new Date().getTime()) ? true : false;
       mbr.mutedTime =
-        mbr.mutedTime && mbr.mutedTime < new Date() ? true : false;
+        (mbr.mutedTime !== null && (mbr.mutedTime as Date).getTime() > new Date().getTime()) ? true : false;
     });
     return chatMember;
   }
@@ -334,9 +335,6 @@ export class ChatService {
     endPunishment.setTime(
       endPunishment.getTime() + punishUserDto.duration * 1000,
     );
-    // const endPunishment: Date = new Date(
-    //   Date() + punishUserDto.duration * 1000,
-    // );
     console.log(new Date());
     console.log(endPunishment);
     chatMember.mutedTime = endPunishment;
@@ -423,9 +421,9 @@ export class ChatService {
       .getRawMany();
     for (const room of rooms) {
       room.bannedTime =
-        !room.bannedTime || room.bannedTime > Date() ? false : true;
+        (room.bannedTime !== null && (room.bannedTime as Date).getTime() > new Date().getTime()) ? true : false;
       room.mutedTime =
-        !room.mutedTime || room.mutedTime > Date() ? false : true;
+        (room.mutedTime !== null && (room.mutedTime as Date).getTime() > new Date().getTime()) ? true : false;
     }
     return rooms;
   }
@@ -454,7 +452,7 @@ export class ChatService {
         user: { userName: true, userUuid: true },
       },
       where: {
-        bannedTime: Not(IsNull()) && MoreThan(new Date()),
+        bannedTime: Not(IsNull()) && MoreThan(DateUtils.mixedDateToUtcDatetimeString(new Date())),
         room: { id: roomId },
       },
     });
@@ -468,15 +466,17 @@ export class ChatService {
       relations: { user: true, room: true },
       where: {
         room: { id: roomId },
-        user: { userUuid: Not(userId) },
         isAdmin: false,
       },
     });
     chatMembers.forEach((member) => {
-      if (member.mutedTime && member.mutedTime < new Date()) {
+      if (member.mutedTime !== null && 
+        (member.mutedTime as Date).getTime() < new Date().getTime()) {
         member.mutedTime = null;
         this.roomsRepository.save(member);
-      } else chatMembers.splice(chatMembers.indexOf(member));
+      } 
+      else if (member.mutedTime !== null)
+        chatMembers.splice(chatMembers.indexOf(member));
     });
     console.log();
     return chatMembers.map((member) => member.user);
@@ -490,15 +490,24 @@ export class ChatService {
       relations: { user: true, room: true },
       where: {
         room: { id: roomId },
-        user: { userUuid: Not(userId) },
         isAdmin: false,
       },
     });
     chatMembers.forEach((member) => {
-      if (member.bannedTime && member.bannedTime < new Date()) {
+      if (member.bannedTime !== null)
+        console.log("INFO! ", member.user.userName, "\n\t\t", member.bannedTime, "\n\t\t",  
+          (member.bannedTime as Date).getTime(), "\n\t\t", new Date().getTime());
+      else
+        console.log("INFO! ", member.user.userName, "\n\t\t", member.bannedTime);
+      if (member.bannedTime !== null && 
+        (member.bannedTime as Date).getTime() < new Date().getTime()) {
         member.bannedTime = null;
         this.roomsRepository.save(member);
-      } else chatMembers.splice(chatMembers.indexOf(member));
+      } 
+      else if (member.bannedTime !== null)
+        chatMembers.splice(chatMembers.indexOf(member));
+      else
+        console.log(member.user.userName, "is Bannable!\n\n");
     });
     return chatMembers.map((member) => member.user);
   }
@@ -510,7 +519,7 @@ export class ChatService {
         user: { userName: true, userUuid: true },
       },
       where: {
-        mutedTime: Not(IsNull()) && LessThan(new Date()),
+        mutedTime: Not(IsNull()) && MoreThan(DateUtils.mixedDateToUtcDatetimeString(new Date())),
         room: { id: roomId },
       },
     });

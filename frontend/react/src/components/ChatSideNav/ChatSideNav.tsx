@@ -32,22 +32,23 @@ function ChatSideNav({ Room }: any) {
         }
     }, [Room, socket]);
 
-    useEffect(() => {
-        socket.on('updateRooms', () => {
-            console.log("USE EFFECT UPDATE ROOMS", Room.id);
-            if (Room && Room !== undefined && Room.id !== undefined) {
-                socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
-                    setAmIAdmin(Admin);
-                })
-                socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
-                    setAmIOwner(Owner);
-                })
-            }
-        });
-        return () => {
-            socket.off('updateRooms');
-        }
-    }, [socket, Room]);
+    // useEffect(() => {
+    //     socket.on('updateRooms', () => {
+    //         console.log("USE EFFECT UPDATE ROOMS", Room.id);
+            
+    //         if (Room && Room !== undefined && Room.id !== undefined) {
+    //             socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
+    //                 setAmIAdmin(Admin);
+    //             })
+    //             socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
+    //                 setAmIOwner(Owner);
+    //             })
+    //         }
+    //     });
+    //     return () => {
+    //         socket.off('updateRooms');
+    //     }
+    // }, [socket, Room]);
 
     function openNav() {
         if (sidenav !== null) {

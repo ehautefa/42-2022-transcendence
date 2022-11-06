@@ -76,6 +76,11 @@ function Chat() {
 				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
+			var newRoom = channels.find(obj => {
+				return obj.id === selectedRoom.id;
+			})
+			if (newRoom !== undefined)
+				setSelectedRoom(newRoom);
 			if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 				socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 					setMembers(users);

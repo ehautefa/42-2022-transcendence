@@ -174,16 +174,6 @@ export class ChatGateway
     );
   }
 
-  // @Authorized('notBanned')
-  // @SubscribeMessage('findLastMessageInRoom')
-  // async findLastMessageInRoom(
-  //   @MessageBody() findLastMessageInRoomDto: UuidDto,
-  // ): Promise<Message> {
-  //   return await this.chatService.findLastMessageInRoom(
-  //     findLastMessageInRoomDto,
-  //   );
-  // }
-
   // @Roles('owner', 'admin')
   @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('setAdmin')
