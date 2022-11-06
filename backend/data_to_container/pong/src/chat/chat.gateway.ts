@@ -283,6 +283,7 @@ export class ChatGateway
       roomId.uuid,
     );
     this.server.to(client.id).emit('refreshSelectedRoom');
+    this.server.to(roomId.uuid).emit('updateRooms');
     return chatMember;
   }
 
