@@ -1,0 +1,19 @@
+FROM        node:current-alpine As development
+
+# Create app directory
+WORKDIR     /usr/src/app
+
+# Copy application dependency manifests to the container image.
+# A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
+# Copying this first prevents re-running npm install on every code change.
+COPY 		--chown=node:node ./data_to_container/pong/package*.json /usr/src/app/
+
+RUN         apk update &&\
+            apk add openssl &&\
+            openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=backend" && \
+            npm install -g npm@latest &&\
+            npm install
+
+# Bundle app source
+COPY 		--chown=node:node ./data_to_container/pong /usr/src/app
+COPY 		--chown=node:node ./dev_entrypoint.sh /home/node
