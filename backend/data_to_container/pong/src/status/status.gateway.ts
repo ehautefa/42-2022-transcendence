@@ -1,4 +1,4 @@
-import { Logger, UseGuards, UseFilters } from '@nestjs/common';
+import { Logger, UseGuards, UseFilters, Req } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, BaseWsExceptionFilter } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
@@ -71,6 +71,16 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return;
 		}
 		this.server.to(socket).emit('refreshUserData', user);
+	}
+
+	@SubscribeMessage('userRefresh')
+	refreshUserData2(@Req() req : any) {
+		let socket = inline.get(req.user.userUuid);
+		if (!socket) {
+			console.log('Error player disconnected');
+			return;
+		}
+		this.server.to(socket).emit('refreshUserData2');
 	}
 
 	@SubscribeMessage('getFriendsStatus')

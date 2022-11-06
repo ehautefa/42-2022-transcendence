@@ -1,10 +1,12 @@
 import Popup from 'reactjs-popup';
 import { useState } from "react";
+import { getSocketStatus } from '../../Home';
 
 function Active2FAPopUp() {
     const [open, setOpen] = useState(false);
     const [code, setCode] = useState("");
 	const [qrCode, setQrCode] = useState("");
+	const socketStatus = getSocketStatus();
 
 	async function generateQrCode() {
 		setOpen(true);
@@ -33,6 +35,7 @@ function Active2FAPopUp() {
 		let result = await fetch(url, requestOptions);
 		if (result.status === 201) {
 			setOpen(false);
+			socketStatus.emit('userRefresh');
 		} else if (result.status === 401) {
 			alert("Wrong code");
 		} else if (result.status === 403) {

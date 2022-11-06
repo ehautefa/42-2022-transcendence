@@ -18,6 +18,7 @@ function MyProfile() {
 	const [user, setUser] = useState({} as User);
 	const [matchHistory, setMatchHistory] = useState([]);
 	const [friends, setFriends] = useState([]);
+	const [update, setUpdate] = useState(false);
 	let navigate = useNavigate();
 
 	useEffect(() => {
@@ -33,11 +34,14 @@ function MyProfile() {
 			setUser(user);
 		}
 		fetchData().catch(console.error);
-	}, []);
+	}, [update]);
 
 	useEffect(() => {
 		socketStatus.on('refreshUserData', (updatedUser: User) => {
 			setUser(updatedUser);
+		})
+		socketStatus.on('refreshUserData2', () => {
+			setUpdate(!update);
 		})
 	}, []);
 
@@ -48,7 +52,7 @@ function MyProfile() {
 	}
 
 	function logOut() {
-		Cookies.remove('access_token', { path: "/" });
+		Cookies.remove('access_token');
 		navigate("/");
 	}
 
