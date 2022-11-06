@@ -359,7 +359,10 @@ export class ChatGateway
       user,
     );
     if (respondToInvitationDto.acceptInvitation === true)
+    {
       this.server.socketsJoin(respondToInvitationDto.roomId);
+      this.server.to(respondToInvitationDto.roomId).emit('updateRooms');
+    }
     this.server.to(client.id).emit('updatePending');
     return usr;
   }

@@ -67,11 +67,19 @@ function ChatSideNav({ Room }: any) {
                         </>
                     }
                     {/* Owner */}
-                    {amIOwner &&
+                    {amIOwner && Room.type === "public" &&
                         <>
                             <li><SetPassword room={Room} /></li>
+                        </>
+                    }
+                    {amIOwner && Room.type === "protected" &&
+                        <>
                             <li><ChangePassword room={Room} /></li>
                             <li><DeletePassword room={Room} /></li>
+                        </>
+                    }
+                    {amIOwner &&
+                        <>
                             <li><GiveOwnership room={Room} /></li>
                             <li><DeleteRoom room={Room} /></li>
                         </>
