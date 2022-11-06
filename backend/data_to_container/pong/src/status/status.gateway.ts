@@ -1,8 +1,7 @@
-import { Logger, Injectable, UseGuards, Req, Body, UseFilters } from '@nestjs/common';
+import { Logger, UseGuards, UseFilters } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, BaseWsExceptionFilter } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
-import { UserService } from 'src/user/user.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { SendInviteDto } from './dto/sendInvite.dto';
 import { SendAlertDto } from './dto/sendAlert.dto';
@@ -14,7 +13,6 @@ var inline = new Map<string, string>();
 // Map<userUid, socketId>
 // Map of all users connected and their socketId
 
-@Injectable()
 @UseFilters(new AllExceptionsFilter())
 @WebSocketGateway({
 	cors:

@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket, Server } from 'socket.io';
-import { Logger, UseGuards, Req, Body } from '@nestjs/common';
+import { Logger, UseGuards, UseFilters, Req, Body } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { PongService } from "./pong.service";
 import { GameWindowState } from "./type";
@@ -9,10 +9,11 @@ import { playerDto } from './dto/player.dto';
 import { SendInviteDto } from "src/status/dto/sendInvite.dto";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guards";
 import { handlePaddleDto } from "./dto/handlePaddle.dto";
+import { AllExceptionsFilter } from './pong.exception.filter';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SendAlertDto } from "src/status/dto/sendAlert.dto";
 
-
+@UseFilters(new AllExceptionsFilter())
 @WebSocketGateway({
 	cors:
 	{
