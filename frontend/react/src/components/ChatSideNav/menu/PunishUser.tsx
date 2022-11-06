@@ -18,15 +18,18 @@ function PunishUser(param: any) {
 
     useEffect(() => {
         if (room.id !== "") {
+            if (ban) {
+                socket.emit("findBannableUsersInRoom", {uuid : room.id}, (users: any) => {
+                    let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
+                    setUsers(selectTab);
+                });
+            } else {
+                socket.emit("findMutableUsersInRoom", {uuid : room.id}, (users: any) => {
+                    let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
+                    setUsers(selectTab);
+                });
 
-            let param = {
-                roomId: room.id,
-                isAdmin: false
             }
-            socket.emit("filterByAdminRightsInRoom", param, (users: any) => {
-                let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user.user));
-                setUsers(selectTab);
-            });
         }
     }, [room, ban, socket]);
 
@@ -52,7 +55,7 @@ function PunishUser(param: any) {
             borderRadius: '5px',
             backgroundColor: 'rgba(0, 0, 0, 1)',
             padding: 5,
-            margin: 40
+
         }),
         input: (styles: any) => ({
             ...styles,

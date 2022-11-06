@@ -73,7 +73,6 @@
     display: flex;
     flex-direction: column;
     width: 25%;
-    /* background-color: #fef45b; */
 }
 
 .rooms h3 {
@@ -124,36 +123,73 @@
     text-align: center;
 }
 
-#messages .message_mine {
+#messages .message-box {
     font-family: Monaco, Arial, sans-serif;
-    text-align:right;
     width: max-content;
     word-break: break-all;
     word-wrap: normal;
     max-width: 50%;
-    margin-left: auto;
     margin-top: 15px;
-    margin-right: 5px;
     border-radius: 5px;
-    color: #fae3fa;
-    background-color: #FA0197;
-    box-shadow: -2px 2px 3px rgb(80, 80, 80), inset 0px 0px 3px 1px  #6d0041;
     padding: 5px;
+    font-weight: 500 ;
+    color: #DBACE3;
+    background-color: #250021;
+}
+
+#messages  p {
+    color: #FAE3E3;
+    padding: 0;
+    padding-top: 5px;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+#messages .message_mine {
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: 5px;
+}
+
+#messages .message_mine .message-box {
+    margin-left: auto;
+    box-shadow: -1px 1px 2px #7C4D84;
+}
+
+#messages .message_mine p {
+    text-align: right;
 }
 
 #messages .message_other {
-    font-family: Monaco, Arial, sans-serif;
-    width: max-content;
-    max-width: 50%;
-    list-style: none;
-    border-radius: 5px;
-    margin-top: 15px;
+    padding-left: 0;
     margin-left: 5px;
+    margin-right: auto;
+}
+
+#messages .message_other .message-box {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+#messages .message_other .message-box h5 {
     color: #FA0197;
-    padding: 0.5rem;
-    background-color:  #fae3fa;
-    box-shadow: -2px 2px 3px gray, inset 0px 0px 3px 1px   gray;
-    padding: 5px;
+    font-weight: 600;
+    padding:0;
+    margin: 0;
+}
+
+#messages .message_other .message-box p {
+    color: #DBACE3;
+    font-size: 1rem;
+    padding:0;
+    margin: 0;
+}
+
+#messages .message_other .message-box {
+    margin-right: auto;
+    box-shadow: 1px 1px 2px #7C4D84;
+
 }
 
 .chat form {
@@ -250,33 +286,22 @@
 
 @media screen and (max-width: 600px) {
     .mainComposant {
-        width: 100%;
-        margin: 0;
-        height: 90vh;
-        padding: 0;
+        flex-direction: column;
     }
 
     .rooms {
-        width: 35%;
+        width: 90%;
+        margin: 0 auto;
+    }
 
+    .rooms .channel{
+        min-height: 200px;
     }
 
     .chat {
-
-        overflow-y: scroll;
-    }
-
-    .chat button {
-        width: 20%;
-    }
-
-    .chat li {
-        margin: 0;
-    }
-
-    .chat ul {
-        margin: 0;
-        padding: 2px;
+        width: 90%;
+        margin: 0 auto;
+        max-height: 400px;
     }
 }
 

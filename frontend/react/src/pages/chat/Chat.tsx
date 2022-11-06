@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-// import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Link, useLocation } from 'react-router-dom';
 import { getSocketChat } from "../../Home";
 import ChatSideNav from "../../components/ChatSideNav/ChatSideNav";
@@ -118,6 +117,16 @@ function Chat() {
 			setNewMessage("");
 		}
 	}
+	function rightName(room: Room) {
+		if (room.type === "dm") {
+			if (room.name === null)
+				room.name = "olozano-ehautefa";
+			var start = room.name.indexOf(user.userName);
+			var end = start + user.userName.length;
+			return room.name.substring(0, start) + room.name.substring(end);
+		}
+		return room.name;
+	}
 
 	return (<div>
 		<NavBar />
@@ -126,9 +135,9 @@ function Chat() {
 				<h3>My Rooms</h3>
 				<div className="channel">
 					{channels.map((room: Room) => (
-						room.name === selectedRoom.name ?
-							<li key={room.id} className="selectedRoom" onClick={() => chooseRoom(room)}>{room.name}</li> :
-							<li key={room.id} onClick={() => chooseRoom(room)}>{room.name}</li>
+						room.id === selectedRoom.id ?
+							<li key={room.id} className="selectedRoom" onClick={() => chooseRoom(room)}>{rightName(room)}</li> :
+							<li key={room.id} onClick={() => chooseRoom(room)}>{rightName(room)}</li>
 					))}
 				</div>
 				<h3>Members</h3>
@@ -160,12 +169,15 @@ function Chat() {
 									<div key={message.id}>
 										{message.userName === user.userName ?
 											<div className="message_mine">
-												<div className="msg">{message.message}</div>
-												<p>time</p>
+												<div className="message-box">{message.message}</div>
+												<p>{new Date(message.time).getHours() + ":" + new Date(message.time).getMinutes()}</p>
 											</div> :
 											<div className="message_other">
-												<div className='msg'>{message.userName} : {message.message}</div>
-												<p>time</p>
+												<div className='message-box'>
+													<h5>{message.userName}</h5>
+													<p>{message.message}</p>
+												</div>
+												<p>{new Date(message.time).getHours() + ":" + new Date(message.time).getMinutes()}</p>
 											</div>
 										}
 									</div>

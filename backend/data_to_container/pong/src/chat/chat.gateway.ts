@@ -20,6 +20,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
+import { Authorized } from './decorator/authorized.decorator';
+import { Roles } from './decorator/roles.decorator';
 import {
   CreateMessageDto,
   CreateRoomDto,
@@ -33,10 +35,13 @@ import {
   UuidDto,
 } from './dto';
 import { ChangePasswordDto } from './dto/';
+import { AuthorizedGuard } from './guard/authorized.guard';
 import { ProtectedRoomGuard } from './guard/protected-room.guard';
+import { RolesGuard } from './guard/roles.guard';
 
 @UseGuards(JwtAuthGuard)
-// @UseGuards(RolesGuard)
+@UseGuards(RolesGuard)
+@UseGuards(AuthorizedGuard)
 @UseFilters(ChatExceptionFilter)
 @UsePipes(
   new ValidationPipe({
@@ -60,7 +65,7 @@ export class ChatGateway
   // A logger for debugging purposes
   private logger: Logger = new Logger('ChatGateway');
 
-  // @Authorized('notBanned', 'notBlocked', 'notMuted')
+  @Authorized('notBanned', 'notBlocked', 'notMuted')
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
@@ -72,7 +77,6 @@ export class ChatGateway
     );
     this.logger.debug('Creating a message');
     this.logger.debug(message.sender.room.id);
-    console.log(message.sender.room.id);
     this.server
       .in(message.sender.room.id)
       .emit('updateMessages', message.sender.room.id);
@@ -132,11 +136,8 @@ export class ChatGateway
     @MessageBody() recipiendId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<string> {
-    this.logger.debug('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     const room: Room = await this.chatService.getDMRoom(user, recipiendId.uuid);
-    this.logger.debug('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqw');
-    // console.log(room);
-    // this.server.socketsJoin(room.id);
+    this.server.socketsJoin(room.id);
     return room.id;
   }
 
@@ -145,11 +146,32 @@ export class ChatGateway
   async findAllMessagesInRoom(
     @MessageBody() findAllMessagesInRoomDto: UuidDto,
   ): Promise<Message[]> {
-    console.log('bonjour');
     const messages: Message[] = await this.chatService.findAllMessagesInRoom(
       findAllMessagesInRoomDto,
     );
     return messages;
+  }
+
+  @SubscribeMessage('findBannableUsersInRoom')
+  async findBannableUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<user[]> {
+    return await this.chatService.findBannableUsersInRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
+  }
+
+  @SubscribeMessage('findMutableUsersInRoom')
+  async findMutableUsersInRoom(
+    @MessageBody() roomId: UuidDto,
+    @Req() { user }: { user: user },
+  ): Promise<user[]> {
+    return await this.chatService.findBannableUsersInRoom(
+      user.userUuid,
+      roomId.uuid,
+    );
   }
 
   // @Authorized('notBanned')
@@ -171,7 +193,7 @@ export class ChatGateway
     return chatMember;
   }
 
-  // @Roles('owner')
+  @Roles('owner')
   @UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('giveOwnership')
   async giveOwnership(
@@ -187,7 +209,6 @@ export class ChatGateway
   @SubscribeMessage('deleteRoom')
   async deleteRoom(@MessageBody() deleteRoomDto: UuidDto): Promise<Room> {
     const room: Room = await this.chatService.deleteRoom(deleteRoomDto.uuid);
-    console.table(room);
     this.server.to(deleteRoomDto.uuid).emit('refreshSelectedRoom');
     this.server.to(room.id).socketsLeave(deleteRoomDto.uuid);
     return room;
@@ -219,7 +240,6 @@ export class ChatGateway
   async removePunishment(
     @MessageBody() removePunishmentDto: RemovePunishmentDto,
   ): Promise<ChatMember> {
-    console.log('removePunishmentDto = ', removePunishmentDto);
     const chatMember = await this.chatService.removePunishment(
       removePunishmentDto,
     );
@@ -258,7 +278,6 @@ export class ChatGateway
     @Req() { user }: { user: user },
     @ConnectedSocket() client: Socket,
   ): Promise<ChatMember> {
-    console.log('leaving ', roomId);
     const chatMember: ChatMember = await this.chatService.leaveRoom(
       user.userUuid,
       roomId.uuid,
@@ -354,7 +373,6 @@ export class ChatGateway
       cookie !== '' &&
       cookie.includes('access_token=')
     ) {
-      console.log('cookie', client.handshake.headers.cookie);
       const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
         client.handshake.headers.cookie,
       );
