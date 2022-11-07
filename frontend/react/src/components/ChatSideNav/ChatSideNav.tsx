@@ -20,14 +20,11 @@ function ChatSideNav({ Room }: any) {
 
     useEffect(() => {
         if (Room && Room !== undefined && Room.id !== undefined) {
-            console.log("USE EFFECT AM I", Room.id);
             socket.emit('amIAdmin', { uuid: Room.id }, (Admin: boolean) => {
-                console.log("AM I ADMIN ?", Admin);
                 setAmIAdmin(Admin);
             })
             socket.emit('amIOwner', { uuid: Room.id }, (Owner: boolean) => {
                 setAmIOwner(Owner);
-                console.log("AM I OWNER ?", Owner);
             })
         }
     }, [Room, socket]);

@@ -344,8 +344,6 @@ export class ChatService {
     endPunishment.setTime(
       endPunishment.getTime() + punishUserDto.duration * 1000,
     );
-    console.log(new Date());
-    console.log(endPunishment);
     chatMember.mutedTime = endPunishment;
     if (punishUserDto.isBanned === true) chatMember.bannedTime = endPunishment;
     return await this.chatMembersRepository.save(chatMember);
@@ -488,7 +486,6 @@ export class ChatService {
       else if (member.mutedTime !== null)
         chatMembers.splice(chatMembers.indexOf(member));
     });
-    console.log();
     return chatMembers.map((member) => member.user);
   }
 

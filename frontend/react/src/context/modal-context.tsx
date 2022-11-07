@@ -47,7 +47,7 @@ const ModalProvider = (props: any) => {
 	})
 	socket.on('unauthorized', () => {
 		console.log("UNAUTHORIZED");
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 	})
 	socketChat.on('exception', (msg: any) => {
 		alert(msg.message);

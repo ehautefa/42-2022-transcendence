@@ -72,7 +72,6 @@ function Profile() {
 	function writeDM() {
 		const socketChat = getSocketChat();
 		socketChat.emit("joinDMRoom", { uuid: user.userUuid }, (roomId: string) => {
-			console.log("roomId", roomId);
 			navigate("/chat?room=" + roomId);
 		});
 	}

@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth } from "./request"
+import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, logout } from "./request"
 import { User } from "../../type";
 import { useEffect, useState } from "react";
 import { getSocketStatus } from "../../Home";
@@ -54,8 +54,8 @@ function MyProfile() {
 		setUser(new_user);
 	}
 
-	function logOut() {
-		Cookies.remove('access_token');
+	async function logOut() {
+		await logout()
 		navigate("/");
 	}
 
