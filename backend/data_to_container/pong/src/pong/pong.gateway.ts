@@ -161,7 +161,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('getGames')
 	@UseGuards(JwtAuthGuard)
 	getGames(): GameWindowState[] {
-		return Array.from(this.games.values());
+		let tmp = Array.from(this.games.values());
+		for (let i = 0; i < tmp.length; i++) {
+			if (tmp[i].scoreLeft === 0 && tmp[i].scoreRight === 0) {
+				tmp.splice(i, 1);
+			}
+		}
+		return tmp;
 	}
 
 	sendGametoRoom(matchId: string) {
@@ -199,8 +205,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('editBallColor')
 	@UseGuards(JwtAuthGuard)
-	editBallColor(@Req() req, @Body() color: string): void 
-	{	
+	editBallColor(@Req() req, @Body() color: string): void {
 		for (let game of this.games.values()) {
 			if (game.isGameOver == false &&
 				game.matchMaking == true &&

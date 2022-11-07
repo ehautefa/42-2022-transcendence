@@ -23,17 +23,19 @@ function AllPlayers() {
 	async function fetchPlayers() {
 		const me = await getMe();
 		setMe(me);
-		const response = await getAllUuidWithUserNameWithoutMe(me.userUuid);
-		try {
-			socketStatus.emit('getFriendsStatus', response, (data: any) => {
-				setUsers(data);
-			});
-		} catch (error) {
+		if (me !== null && me !== undefined && me.userUuid !== undefined) {
+			const response = await getAllUuidWithUserNameWithoutMe(me.userUuid);
+			try {
+				socketStatus.emit('getFriendsStatus', response, (data: any) => {
+					setUsers(data);
+				});
+			} catch (error) {
+			}
+			const myFriends = await getMyFriends();
+			setFriends(myFriends);
+			const myBlocked = await getMyBlocked();
+			setBlocked(myBlocked);
 		}
-		const myFriends = await getMyFriends();
-		setFriends(myFriends);
-		const myBlocked = await getMyBlocked();
-		setBlocked(myBlocked);
 	}
 
 	useEffect(() => {
@@ -78,7 +80,7 @@ function AllPlayers() {
 		let newFriends = [];
 		if (friend) {
 			setInvitationSent([...invitationSent, userUuid]);
-				newFriends = await addFriend(userUuid);
+			newFriends = await addFriend(userUuid);
 		} else {
 			newFriends = await removeFriend(userUuid);
 		}

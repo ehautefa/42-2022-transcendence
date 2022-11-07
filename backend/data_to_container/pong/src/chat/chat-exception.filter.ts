@@ -11,7 +11,7 @@ import { QueryFailedError } from 'typeorm';
 export class ChatExceptionFilter extends BaseWsExceptionFilter {
   private logger: Logger = new Logger('ChatException');
   catch(exception: Error, host: ArgumentsHost) {
-    this.logger.error(exception);
+    // this.logger.error(exception);
     if (exception instanceof BadRequestException) {
       // const error: WsException = new WsException(exception.message);
       // super.catch(exception, host);

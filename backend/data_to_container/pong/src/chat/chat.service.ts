@@ -480,7 +480,6 @@ export class ChatService {
         chatMembers.splice(chatMembers.indexOf(member));
     });
     // const user: user {userName }
-    this.logger.debug('FILTER BY ADMIN RIGHTS');
     console.log(chatMembers);
     return chatMembers;
   }
