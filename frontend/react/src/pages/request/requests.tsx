@@ -65,10 +65,12 @@ export async function getMyRequests() {
 		credentials: credentials
 	};
 
-	let result = await (await fetch(url, requestOptions)).json();
-	if (await result.statusCode === 401) {
+	let result = await fetch(url, requestOptions);
+	if (result.status === 401) {
 		window.location.assign("/");
 		return;
 	}
-	return result;
+	if (result)
+		return result.json();
+	return [];
 }
