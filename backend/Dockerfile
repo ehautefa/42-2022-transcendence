@@ -12,13 +12,13 @@ WORKDIR     /usr/src/app
 # Copying this first prevents re-running npm install on every code change.
 COPY 		--chown=node:node ./data_to_container/pong/package*.json /usr/src/app/
 
+ENV         npm_config_loglevel=error
 RUN         apk update &&\
             apk add openssl &&\
             openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=backend" && \
             npm install -g npm@latest &&\
             echo -n "INSTALL NPM WITH DEV DEP FOR BUILD:" && \
-            export npm_config_loglevel=error  &&\
-            npm install
+            npm install --no-audit
 
 # Bundle app source
 COPY 		--chown=node:node ./data_to_container/pong /usr/src/app
