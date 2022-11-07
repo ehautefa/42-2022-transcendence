@@ -477,7 +477,7 @@ export class ChatService {
 
     chatMembers.forEach((member) => {
       if (member.room.owner.user.userUuid == member.user.userUuid)
-        chatMembers.splice(chatMembers.indexOf(member));
+        chatMembers.splice(chatMembers.indexOf(member), 1);
     });
     // const user: user {userName }
     return chatMembers;
@@ -517,7 +517,7 @@ export class ChatService {
         member.mutedTime = null;
         this.roomsRepository.save(member);
       } else if (member.mutedTime !== null)
-        chatMembers.splice(chatMembers.indexOf(member));
+        chatMembers.splice(chatMembers.indexOf(member), 1);
     });
     return chatMembers.map((member) => member.user);
   }
@@ -542,7 +542,7 @@ export class ChatService {
         this.chatMembersRepository.save(member);
       } 
       else if (member.bannedTime !== null)
-        chatMembers.splice(chatMembers.indexOf(member));
+        chatMembers.splice(chatMembers.indexOf(member), 1);
     });
     // this.logger.debug('BannableUsers');
     // console.log(chatMembers.map((member) => member.user));

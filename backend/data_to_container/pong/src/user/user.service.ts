@@ -53,7 +53,7 @@ export class UserService {
         this.checkUsers(completeMe, completeUser2);
         const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0)
-            completeMe.requestPending.splice(idx1);
+            completeMe.requestPending.splice(idx1, 1);
         else {
             throw new FailToFindObjectFromanEntity(completeUser2.userUuid, "requestPending", 'users')
         }
@@ -67,7 +67,7 @@ export class UserService {
         const idx1 = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 < 0)
             throw new FailToFindObjectFromanEntity(completeUser2.userName, "requestPending", 'users')
-        completeMe.requestPending.splice(idx1);
+        completeMe.requestPending.splice(idx1, 1);
         await this.UserRepository.save(completeMe);
         return completeMe.requestPending;
     }
@@ -88,9 +88,9 @@ export class UserService {
         const idx2 = completeUser2.requestPending.findIndex((object) => { return object.userUuid === completeMe.userUuid })
         //symeetrical request
         if (idx1 >= 0) {
-            completeMe.requestPending.splice(idx1);
+            completeMe.requestPending.splice(idx1, 1);
             if (idx2 >= 0)
-                completeUser2.requestPending.splice(idx2);
+                completeUser2.requestPending.splice(idx2, 1);
             return await this.becomeFriend(completeMe, completeUser2);
         }
         // not pending?
@@ -129,7 +129,7 @@ export class UserService {
         const idx1 = completeUser1.friends.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         //remove for User1
         if (idx1 >= 0)
-            completeUser1.friends.splice(idx1);
+            completeUser1.friends.splice(idx1, 1);
         //not friend
         else
             throw new UserAreNotFriends(completeUser1.userName, completeUser2.userName)
@@ -137,7 +137,7 @@ export class UserService {
         const idx2 = completeUser2.friends.findIndex((object) => { return object.userUuid === completeUser1.userUuid })
         //remove for User2
         if (idx2 >= 0)
-            completeUser2.friends.splice(idx2);
+            completeUser2.friends.splice(idx2, 1);
         //not friend
         else {
             await this.UserRepository.save(completeUser1);
@@ -164,11 +164,11 @@ export class UserService {
         //remove from pending request
         const idx1: number = completeMe.requestPending.findIndex((object) => { return object.userUuid === completeUser2.userUuid })
         if (idx1 >= 0)
-            completeMe.requestPending.splice(idx1);
+            completeMe.requestPending.splice(idx1, 1);
         //remove from me from his pending request
         const idx2: number = completeUser2.requestPending.findIndex((object) => { return object.userUuid === completeMe.userUuid })
         if (idx2 >= 0) {
-            completeUser2.requestPending.splice(idx2);
+            completeUser2.requestPending.splice(idx2, 1);
             await this.UserRepository.save(completeUser2);
         }
         //blocked user
@@ -185,12 +185,13 @@ export class UserService {
             return object.userUuid === completeUser2.userUuid;
         })
         if (idx >= 0) {
-            completeMe.blocked.splice(idx);
+            completeMe.blocked.splice(idx, 1);
             await this.UserRepository.save(completeMe);
-            return completeMe.blocked;
+            return await this.getCompleteUser(completeMe.userUuid).then((user) => { return user.blocked });
         }
-        else
+        else {
             throw new UserAreNotBlocked(completeMe.userName, completeUser2.userName)
+        }
     }
 
     async getUser(userUuid: string): Promise<user> {
@@ -342,7 +343,7 @@ export class UserService {
 	  async removeInvitation(userId: string, room: Room): Promise<user> {
 		  const user: user = await this.getCompleteUser(userId);
 		  if (user.invitationPending.find((r)=>(r.id === room.id))) {
-		    user.invitationPending.splice(user.invitationPending.indexOf(room));
+		    user.invitationPending.splice(user.invitationPending.indexOf(room), 1);
 		    await this.UserRepository.save(user)
 		  }
 		  return user;
