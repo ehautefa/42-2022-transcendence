@@ -78,4 +78,13 @@ export class AuthController {
         res.setHeader('Set-Cookie', [access_token]);
         return `2FA Ok for #${user.userName}.\n access_token=${access_token}`
     }
+    @Post('logout')
+    @UseGuards(JwtAuthGuard)
+    async logout(@Req() { user }: { user: user }, @Res({ passthrough: true }) res) {
+        // const cookie = 'access_token=none; SameSite=none; secure; HttpOnly; Path=/; Expires=0'
+		// res.setHeader('Set-Cookie', cookie);
+        res.clearCookie('access_token', {SameSite:'none', secure:true, HttpOnly:true, Path:'/', expires:0}); 
+        return ``
+    }
+
 }

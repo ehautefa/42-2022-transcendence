@@ -92,7 +92,14 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (cookie !== undefined &&
 			cookie !== null
 			&& cookie !== ""
-			&& cookie.includes('access_token=')) {
+			&& cookie.includes('access_token=')
+			) {
+				const accessToken: string = cookie
+                .split('; ')
+                .find((cookie: string) => cookie.startsWith('access_token='))
+                .split('=')[1];
+				if (accessToken === "" )
+					return
 			console.log("cookie in socket", client.handshake.headers.cookie);
 			const userUuid: string = await this.StatusService.handleConnection(cookie);
 			inline.set(userUuid, client.id);

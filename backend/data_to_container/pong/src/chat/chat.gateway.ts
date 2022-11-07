@@ -54,9 +54,8 @@ import { RolesGuard } from './guard/roles.guard';
   namespace: 'chat',
 })
 export class ChatGateway
-  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect
-{
-  constructor(private readonly chatService: ChatService) {}
+  implements /*OnGatewayInit,*/ OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly chatService: ChatService) { }
 
   // The socket.io server responsible for handling (receiviing and emitting) events
   @WebSocketServer()
@@ -373,6 +372,12 @@ export class ChatGateway
       cookie !== '' &&
       cookie.includes('access_token=')
     ) {
+      const accessToken: string = cookie
+        .split('; ')
+        .find((cookie: string) => cookie.startsWith('access_token='))
+        .split('=')[1];
+      if (accessToken === "")
+        return
       const roomsToJoin: ChatMember[] = await this.chatService.handleConnection(
         client.handshake.headers.cookie,
       );
