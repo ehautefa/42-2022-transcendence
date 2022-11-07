@@ -17,7 +17,7 @@ RUN         apk update &&\
             openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=backend" && \
             npm install -g npm@latest &&\
             echo -n "INSTALL NPM WITH DEV DEP FOR BUILD:" && \
-            npm install
+            npm install 2>/dev/null
 
 # Bundle app source
 COPY 		--chown=node:node ./data_to_container/pong /usr/src/app

@@ -91,3 +91,19 @@ export async function getMyFriends() {
 	}
 	return await friends;
 }
+
+
+export async function logout() {
+	var url: string = "/auth/logout";
+	var requestOptions = {
+		method: 'POST',
+		credentials: credentials
+	};
+
+	const result = await fetch(url, requestOptions);
+	if (await result.status === 401) {
+		window.location.assign("/auth/login");
+		return ;
+	}
+	return await result;
+}
