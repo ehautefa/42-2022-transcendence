@@ -42,9 +42,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       },
       async (jwt_paylod, done) => {
         const user = await userService.getCompleteUser(jwt_paylod.userUuid);
-        if (user && user.twoFactorAuth !== undefined && !user.twoFactorAuth)
+        if (user !== undefined
+          && user !== null
+          && user.twoFactorAuth !== undefined
+          && !user.twoFactorAuth)
           return done(null, user);
-        if (user.twoFactorAuth && jwt_paylod.isTwoFactorAuthenticated)
+        if (user !== undefined
+          && user !== null
+          && user.twoFactorAuth !== undefined
+          && user.twoFactorAuth && jwt_paylod.isTwoFactorAuthenticated)
           return done(null, user);
 
                 console.log("WARNING JWT - TwoFactorAuth ENABLE")
