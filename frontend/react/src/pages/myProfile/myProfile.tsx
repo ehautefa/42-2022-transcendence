@@ -8,7 +8,6 @@ import star from "../../assets/star.jpg";
 import starEmpty from "../../assets/starEmpty.jpg";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
-import Cookies from "js-cookie";
 import Active2FAPopUp from "../../components/Active2FAPopUp/Active2FAPopUp";
 import { Link, useNavigate } from "react-router-dom";
 
