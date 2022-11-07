@@ -140,7 +140,11 @@ function Chat() {
 			<div className="rooms">
 				<h3>My Rooms</h3>
 				<div className="channel">
-					{channels.map((room: Room) => (
+					{channels
+					.sort((a,b) => rightName(a).toLowerCase() > rightName(b).toLowerCase() ? 1 : -1)
+					.map((room: Room) => (
+
+						// .sort((a, b) => a.itemM > b.itemM ? 1 : -1)
 						room.id === selectedRoom.id ?
 							<li key={room.id} className="selectedRoom" onClick={() => chooseRoom(room)}>{rightName(room)}</li> :
 							<li key={room.id} onClick={() => chooseRoom(room)}>{rightName(room)}</li>
