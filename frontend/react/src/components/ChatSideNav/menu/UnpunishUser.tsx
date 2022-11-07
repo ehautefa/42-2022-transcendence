@@ -78,6 +78,8 @@ function UnpunishUser(param: any) {
     }
 
     function Submit() {
+        if (newPunish === "")
+            return;
         let param = {
             userId: newPunish,
             roomId: room.id,

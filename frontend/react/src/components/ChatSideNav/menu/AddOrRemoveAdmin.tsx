@@ -72,6 +72,8 @@ function AddOrRemoveAdmin(param: any) {
     }
 
     function Submit() {
+        if (newAdmin === "" || room.id === "")
+            return ;
         const param = {
             userId: newAdmin,
             roomId: room.id,

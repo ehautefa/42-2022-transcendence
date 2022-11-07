@@ -81,9 +81,8 @@ function PunishUser(param: any) {
     function isNumber(n : any) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
 
     function Submit() {
-        if (duration < 1)
+        if (duration < 1 || newPunish === "") 
             return;
-        console.log("Ban for this long:: ", duration);
         let param = {
             userId: newPunish,
             roomId: room.id,

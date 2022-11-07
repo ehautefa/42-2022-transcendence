@@ -93,7 +93,6 @@ function Chat() {
 					}
 					socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 						setMembers(users);
-						console.log (users);
 					});
 				}
 			});

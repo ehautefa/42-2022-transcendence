@@ -66,6 +66,8 @@ function GiveOwnership({room}: any) {
     }
 
     function Submit() {
+        if (newOwner === "" || room.id === "")
+            return ;
         const param = {
             userId: newOwner,
             roomId: room.id,
