@@ -11,9 +11,9 @@ WORKDIR     /usr/src/app
 COPY 		--chown=node:node ./react/package*.json /usr/src/app/
 
 ENV         npm_config_loglevel=error
-RUN         apk update && \
-            apk add openssl && \
+RUN         apk add --no-cache openssl && \
             openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/private/.pong.key -out /etc/ssl/certs/pong.csr -days 365 -nodes -subj "/CN=frontend" && \
+            apk del --quiet openssl && \
             npm install -g npm@latest && \
             echo -n "INSTALL NPM WITH DEV DEP FOR BUILD:" && \
             npm install --no-audit
