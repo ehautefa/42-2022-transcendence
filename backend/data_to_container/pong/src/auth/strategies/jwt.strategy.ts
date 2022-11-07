@@ -46,7 +46,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 return done(null, user);
 
                 console.log("WARNING JWT - TwoFactorAuth ENABLE")
-                console.log(jwt_paylod);
                 return done(null, false);
         });
     }

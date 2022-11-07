@@ -37,11 +37,11 @@ export async function addFriend(friendUuid: string) {
 	if (await result.statusCode === 401) {
 		window.location.assign("/");
 	} else if (await result.statusCode === 403) {
-		alert(await result.message);
+		alert(await result.message); 
+		throw new Error(await result.message);
 	} else {
 		return result;
 	}
-	return [];
 }
 
 export async function removeFriend(friendUuid: string) {

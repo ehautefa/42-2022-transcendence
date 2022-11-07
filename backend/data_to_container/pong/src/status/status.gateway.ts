@@ -34,30 +34,25 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	sendAlert(sendAlert: SendAlertDto) {
 		let socket = inline.get(sendAlert.userUuid);
 		if (!socket) {
-			console.log('Error player disconnected');
 			return;
 		}
 		this.server.to(socket).emit('sendAlert', sendAlert.message);
-		console.log("Alert sent to " + sendAlert.userUuid);
 	}
 
 	@OnEvent('game.invite')
 	sendInvitation(sendInvite: SendInviteDto) {
 		let socket = inline.get(sendInvite.invitedUserUuid);
 		if (!socket) {
-			console.log('Error player disconnected');
 			return;
 		}
 		let response: any = { type: 'receive', matchId: sendInvite.matchId, userName: sendInvite.invitedUserName };
 		this.server.to(socket).emit('sendInvite', response);
-		console.log("Invitation sent to " + sendInvite.invitedUserName);
 	}
 
 	@OnEvent('room.invite')
 	handleInviteEvent(userUuid: string) {
 		let socket = inline.get(userUuid);
 		if (!socket) {
-			console.log('Error player disconnected');
 			return;
 		}
 		this.server.to(socket).emit('refreshRequest');
@@ -67,7 +62,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	refreshUserData(user : user) {
 		let socket = inline.get(user.userUuid);
 		if (!socket) {
-			console.log('Error player disconnected');
 			return;
 		}
 		this.server.to(socket).emit('refreshUserData', user);
@@ -77,7 +71,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	refreshUserData2(@Req() req : any) {
 		let socket = inline.get(req.user.userUuid);
 		if (!socket) {
-			console.log('Error player disconnected');
 			return;
 		}
 		this.server.to(socket).emit('refreshUserData2');
@@ -103,7 +96,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			cookie !== null
 			&& cookie !== ""
 			&& cookie.includes('access_token=')) {
-			console.log("cookie in socket", client.handshake.headers.cookie);
 			const userUuid: string = await this.StatusService.handleConnection(cookie);
 			inline.set(userUuid, client.id);
 		}

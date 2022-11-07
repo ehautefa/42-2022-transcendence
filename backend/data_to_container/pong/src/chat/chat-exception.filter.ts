@@ -20,10 +20,10 @@ export class ChatExceptionFilter extends BaseWsExceptionFilter {
     }
     if (exception instanceof QueryFailedError) {
       let error: WsException;
-      console.log(
-        typeof exception.driverError.code,
-        exception.driverError.code,
-      );
+      // console.log(
+      //   typeof exception.driverError.code,
+      //   exception.driverError.code,
+      // );
       const code = exception.driverError.code;
       switch (code) {
         case '23505': {

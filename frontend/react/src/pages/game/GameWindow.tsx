@@ -92,10 +92,12 @@ export class GameWindow extends React.Component<{ id: string }, GameWindowState>
 	render() {
 		return (
 			<>
-				<div className="game-selector">
-					<PaddleSizeSelector paddleSize={this.state.paddleSize} />
-					<ColorSelector ballColor={this.state.ballColor} />
-				</div>
+				{this.state.matchMaking === true &&
+					<div className="game-selector">
+						<PaddleSizeSelector paddleSize={this.state.paddleSize} />
+						<ColorSelector ballColor={this.state.ballColor} />
+					</div>
+				}
 				<div className="GameWindow" id="GameBoard">
 					{this.state.isGameOver
 						&& this.state.playerLeft !== socket.id

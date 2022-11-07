@@ -78,7 +78,7 @@ function AllPlayers() {
 		let newFriends = [];
 		if (friend) {
 			setInvitationSent([...invitationSent, userUuid]);
-			newFriends = await addFriend(userUuid);
+				newFriends = await addFriend(userUuid);
 		} else {
 			newFriends = await removeFriend(userUuid);
 		}
