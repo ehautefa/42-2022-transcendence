@@ -19,6 +19,7 @@ function Chat() {
 	const [selectedRoom, setSelectedRoom] = useState({} as Room);
 	const [newMessage, setNewMessage] = useState("");
 	const [members, setMembers] = useState([] as User[]);
+	const [ tmpRoomName, setTmpRoomName ] = useState("");
 	const roomId = new URLSearchParams(useLocation().search).get('room');
 
 	async function fetchUser() {
@@ -114,12 +115,12 @@ function Chat() {
 		}
 	}
 	function rightName(room: Room) {
-		if (room.type === "dm") {
-			if (room.name === null)
-				room.name = "olozano-ehautefa";
-			var start = room.name.indexOf(user.userName);
-			var end = start + user.userName.length;
-			return room.name.substring(0, start) + room.name.substring(end);
+		if (room.type === "dm" && room.id !== null && room.id !== undefined) {
+			socket.emit("findAllUsersInRoom", { uuid: room.id }, (users: any) => {
+				let user_other : User = users[0].userName === user.userName ? users[1] : users[0];
+				setTmpRoomName(user_other.userName);
+			});
+			return tmpRoomName;
 		}
 		else if (room.name === null)
 			return("null-room");
