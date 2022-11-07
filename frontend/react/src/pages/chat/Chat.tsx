@@ -146,7 +146,7 @@ function Chat() {
 				<h3>Members</h3>
 				<div className="channel members">
 					{members.map((member: any) => (
-						member.bannedTime !== null ?
+						member.bannedTime ?
 						<li className="banned" key={member.userUuid}>
 							<Link to={"/profile?uid=" + member.userUuid}>{member.userName}</Link>
 							<InvitePopUp userName={member.userName} userUuid={member.userUuid} user={user} />
