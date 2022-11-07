@@ -70,6 +70,7 @@ export class PongService {
                     } else {
                         server.to(game.matchId).emit('leaveGame', game.playerRightName);
                     }
+                    this.MatchService.deleteMatch(game.matchId);
                 }
                 games.delete(game.matchId);
             }
