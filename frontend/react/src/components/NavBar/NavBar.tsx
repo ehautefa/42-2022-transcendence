@@ -27,7 +27,7 @@ function NavBar() {
 		})
 		getMyRequests().then(
 			(response) => {
-				if (response.length > 0) {
+				if (response && response.length > 0) {
 					setIsBellExpanded(true);
 				}
 			});

@@ -29,7 +29,6 @@ function Chat() {
 	useEffect(() => {
 		fetchUser();
 		socket.emit('findAllJoinedRooms', (rooms: any) => {
-			console.log("findAllJoined", rooms);
 			setChannels(rooms)
 			if (roomId) {
 				let tofindRoom: Room = rooms.find((room: Room) => room.id === roomId);
@@ -55,7 +54,6 @@ function Chat() {
 		if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
 			socket.emit('findAllMessagesInRoom', { uuid: selectedRoom.id }, (msgs: any) => {
 				setMessages(msgs);
-				console.log("findAllMessagesInRoom", msgs);
 			});
 			socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 				setMembers(users);
@@ -73,7 +71,6 @@ function Chat() {
 		function refreshOneRoom() {
 			setSelectedRoom({} as Room);
 			socket.emit('findAllJoinedRooms', (rooms: any) => {
-				console.log("findAllJoined", rooms);
 				setChannels(rooms)
 			});
 		}
@@ -87,18 +84,13 @@ function Chat() {
 
 	useEffect(() => {
 		function updateRooms() {
-			console.log('getting information');
 			socket.emit('findAllJoinedRooms', (rooms: Room[]) => {
-				console.log("findAllJoined", rooms);
 				setChannels(rooms);
 				if (selectedRoom && selectedRoom.id !== undefined && selectedRoom.id !== "") {
-					console.log("room before: ", selectedRoom);
 					let aux = rooms.find(obj => { return obj.id === selectedRoom.id});
 					if (aux !== undefined && aux !== null){
 						setSelectedRoom(aux);
-						console.log("got in");
 					}
-					console.log("room after: ", selectedRoom);
 					socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 						setMembers(users);
 					});
@@ -112,13 +104,11 @@ function Chat() {
 	}, [socket, selectedRoom, channels]);
 
 	async function chooseRoom(thisRoom: Room) {
-		console.log("You chose room ", thisRoom);
 		setSelectedRoom(thisRoom);
 	}
 
 	async function sendMessage() {
 		if (selectedRoom.id !== "" && newMessage !== "") {
-			console.log('sending message: ', newMessage);
 			socket.emit('createMessage', { message: newMessage, roomId: selectedRoom.id });
 			setNewMessage("");
 		}
@@ -131,6 +121,8 @@ function Chat() {
 			var end = start + user.userName.length;
 			return room.name.substring(0, start) + room.name.substring(end);
 		}
+		else if (room.name === null)
+			return("null-room");
 		return room.name;
 	}
 

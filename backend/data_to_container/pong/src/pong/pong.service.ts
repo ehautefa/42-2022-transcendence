@@ -34,7 +34,6 @@ export class PongService {
     }
 
     editPaddleSize(game: GameWindowState, paddleSize: string): GameWindowState {
-        console.log("paddleSize", paddleSize, game);
         if (game === null || game === undefined)
             return game;
         switch (paddleSize) {
@@ -51,7 +50,6 @@ export class PongService {
                 game.paddleSize = 20;
                 break;
         }
-        console.log("Paddle size changed to", game.paddleSize);
         return game;
     }
 
@@ -73,7 +71,6 @@ export class PongService {
                         server.to(game.matchId).emit('leaveGame', game.playerRightName);
                     }
                 }
-                console.log("DELETING GAME", game.matchId);
                 games.delete(game.matchId);
             }
         }

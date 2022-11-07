@@ -84,7 +84,6 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async makeFriendRequest(@Req() { user } : {user : user}, @Body() userToHandle: HandleFriendDto) {
-		console.log("makeFriendRequest");
 		return await this.UserService.makeFriendRequest(user, await this.UserService.getCompleteUser(userToHandle.userUuid));
 	}
 
@@ -93,7 +92,6 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async acceptFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-		console.log("acceptFriendRequest", userToHandle);
 		res.send(await this.UserService.acceptFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid)));
 	}
 
@@ -102,7 +100,6 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async refuseFriendRequest(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-		console.log("refuseFriendRequest", userToHandle);
 		res.send(await this.UserService.refuseFriendRequest(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid)));
 	}
 
@@ -131,7 +128,6 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async isBlocked(@Req() req, @Res() res, @Body() userToHandle: HandleFriendDto) {
-		console.log("ismyblocked", userToHandle);
 		return await this.UserService.isBlocked(req.user, await this.UserService.getCompleteUser(userToHandle.userUuid));
 	}
 
@@ -200,7 +196,6 @@ export class UserController {
 			storage: diskStorage({
 				destination: './uploads/pp',
 				filename: (req, file, cb) => {
-					console.log("file", file);
 					if (file.mimetype !== 'image/jpeg'
 						&& file.mimetype !== 'image/png'
 						&&  file.mimetype !== 'image/jpg') {
@@ -212,7 +207,6 @@ export class UserController {
 			})
 		}))
 	uploadPicture(@Req() req) {
-		console.log("uploadPicture");
 	}
 
 	@Get('myPicture')
@@ -221,7 +215,6 @@ export class UserController {
 	async getMyPicture(@Req() req, @Res() res) {
 		const path: string = join(process.cwd(), `uploads/pp/${req.user.userUuid}.jpeg`);
 		if (fs.existsSync(path)) {
-			console.log("getMyPicture", path);
 			res.sendFile(path);
 		} else {
 			res.sendFile(join(process.cwd(), `uploads/default_avatar.png`));
@@ -233,7 +226,6 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async getPicture(@Res() res, @Param('userUid') userUid: string) {
-		console.log("getPicture", userUid);
 		const path: string = join(process.cwd(), `uploads/pp/${userUid}.jpeg`);
 		if (fs.existsSync(path)) {
 			res.sendFile(path);
@@ -248,7 +240,6 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@UsePipes(ValidationPipe)
 	async getCompleteUser(@Param('userUid') userUid: string): Promise<user> {
-		//   console.log("getCompleteUser conrtoller", userUid)
 		return await this.UserService.getCompleteUser(userUid);
 	}
 }

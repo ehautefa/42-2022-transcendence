@@ -359,8 +359,6 @@ export class ChatService {
     endPunishment.setTime(
       endPunishment.getTime() + punishUserDto.duration * 1000,
     );
-    console.log(new Date());
-    console.log(endPunishment);
     chatMember.mutedTime = endPunishment;
     if (punishUserDto.isBanned === true) chatMember.bannedTime = endPunishment;
     return await this.chatMembersRepository.save(chatMember);
@@ -523,8 +521,6 @@ export class ChatService {
       } else if (member.mutedTime !== null)
         chatMembers.splice(chatMembers.indexOf(member));
     });
-    // this.logger.debug('MutableUsers');
-    // console.log(chatMembers.map((member) => member.user));
     return chatMembers.map((member) => member.user);
   }
 
@@ -545,8 +541,9 @@ export class ChatService {
         (member.bannedTime as Date).getTime() < new Date().getTime()
       ) {
         member.bannedTime = null;
-        this.roomsRepository.save(member);
-      } else if (member.bannedTime !== null)
+        this.chatMembersRepository.save(member);
+      } 
+      else if (member.bannedTime !== null)
         chatMembers.splice(chatMembers.indexOf(member));
     });
     // this.logger.debug('BannableUsers');

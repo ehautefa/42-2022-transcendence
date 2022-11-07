@@ -1,6 +1,6 @@
 import NavBar from "../../components/NavBar/NavBar"
 import "./Profil.css"
-import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth } from "./request"
+import { GetMatchHistory, getMyFriends, getMe, disableTwoFactorAuth, logout } from "./request"
 import { User } from "../../type";
 import { useEffect, useState } from "react";
 import { getSocketStatus } from "../../Home";
@@ -8,7 +8,6 @@ import star from "../../assets/star.jpg";
 import starEmpty from "../../assets/starEmpty.jpg";
 import EditUsernamePopUp from "../../components/EditUsernamePopUp/EditUsernamePopUp"
 import InvitePopUp from "../../components/InvitePopUp/InvitePopUp";
-import Cookies from "js-cookie";
 import Active2FAPopUp from "../../components/Active2FAPopUp/Active2FAPopUp";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -54,8 +53,8 @@ function MyProfile() {
 		setUser(new_user);
 	}
 
-	function logOut() {
-		Cookies.remove('access_token');
+	async function logOut() {
+		await logout()
 		navigate("/");
 	}
 

@@ -52,7 +52,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@UseGuards(JwtAuthGuard)
 	joinGame(@Req() req, @Body() matchId: string): void {
 		req.join(matchId);
-		console.log("MAtchid ", matchId, this.games[matchId]);
 		if (this.games.get(matchId).playerLeftUid === req.user.userUuid)
 			this.games.get(matchId).playerLeft = req.id;
 		else if (this.games.get(matchId).playerRightUid === req.user.userUuid)
@@ -87,7 +86,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			invitedUserUuid: invitePlayer.invitedUserUuid
 		};
 		this.eventEmitter.emit('game.invite', response);
-		console.log("GAME: ", game.matchId, "/n", game);
 		return game.matchId;
 	}
 
@@ -121,7 +119,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.launch_game = false;
 			this.GameLoop(); // start game loop
 		}
-		console.log("ACCEPT INVITE", this.games.get(matchId))
 		if (this.games.get(matchId) == undefined) {
 			return "The other player destroyed his invitation";
 		} else if (req.user.userUuid !== this.games.get(matchId).playerRightUid) {
@@ -146,19 +143,16 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		if (this.players.length == 0) { // no player in the queue
 			this.players.push(player);
-			console.log("Player added to queue", this.players);
 			return "";
 		} else {
 			for (var i: number = 0; i < this.players.length; i++) {
 				if (this.players[i].userUuid == player.userUuid) { // player already in the queue
-					console.log("Player already in queue");
 					return "";
 				}
 			}
 			game = await this.PongService.initGame(player, this.players.shift());
 			this.games.set(game.matchId, game);
 			this.server.to(game.matchId).emit('beginGame');
-			console.log("GAME: ", game.matchId, "/n", game);
 		}
 		game.begin = true; // start game
 		return game.matchId;
@@ -178,7 +172,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			try {
 				this.server.to(matchId).emit('game', game);
 			} catch (error) {
-				console.log("ERROR IN SEND GAME TO ROOM", error);
 			}
 			return;
 		}
@@ -186,7 +179,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		try {
 			this.server.to(matchId).emit('game', game);
 		} catch (error) {
-			console.log("ERROR IN SEND GAME TO ROOM", error);
 		}
 	}
 

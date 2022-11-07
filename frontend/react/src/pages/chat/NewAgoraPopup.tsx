@@ -16,7 +16,8 @@ function NewAgoraPopup() {
 
 	const makeRoom = (e: any) => {
 		e.preventDefault();
-		console.log('creating room ', newChannel);
+		if (/^\s*$/.test(newChannel))
+			return ;
 		socket.emit('createRoom', {
 			name: newChannel, isProtected: false,
 			password: "", type: roomType,

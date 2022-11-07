@@ -13,7 +13,7 @@ export async function getMe() {
 
 	let user =  await (await fetch(url, requestOptions)).json();
 	if (await user.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 		return ;
 	}
 	return user;

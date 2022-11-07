@@ -102,14 +102,14 @@ export class UserService {
         }
         //already in pending
         else
-            throw new UserFriendRequestAlreadyPendingException();
+            return completeMe.friends;
+            // throw new UserFriendRequestAlreadyPendingException();
     }
 
     async becomeFriend(completeMe: user, completeUser2: user): Promise<user[]> {
         this.checkUsers(completeMe, completeUser2);
         if (this.isBlocked(completeUser2, completeMe))
             throw new UserIsBlockedException(completeMe.userName, completeUser2.userName);
-        console.log("become friend");
         if (this.isMyFriend(completeMe, completeUser2) || this.isMyFriend(completeUser2, completeMe))
             throw new UserAreAlreadyFriends(completeMe.userName, completeUser2.userName)
 

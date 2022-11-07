@@ -77,7 +77,6 @@ function AddOrRemoveAdmin(param: any) {
             roomId: room.id,
             isAdmin: AddAdmin,
         }
-        console.log("Add Admin emit : ", param);
         socketChat.emit('setAdmin', param);
         setOpen(false);
     }

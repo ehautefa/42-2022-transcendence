@@ -28,7 +28,6 @@ export class ColorSelector extends React.Component<{ballColor : string}, {}> {
     constructor(props: any) {
         super(props);
         this.onChangeValue = this.onChangeValue.bind(this);
-        console.log("BALL COLOR : " + this.props.ballColor);
     }
 
     onChangeValue(event: any) {

@@ -24,7 +24,6 @@ function JoinAgoraPopup() {
 				let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
 				setRooms(selectTab);
 				setCompleteRooms(rooms);
-				console.log("find room//update", rooms);
 			});
 		}
 		
@@ -32,7 +31,6 @@ function JoinAgoraPopup() {
 			let selectTab: SelectClass[] = rooms.map((room) => new SelectClass(room));
 			setRooms(selectTab);
 			setCompleteRooms(rooms);
-			console.log("find room", rooms);
 		})
 
 		socket.on('updateRooms', findRooms);
@@ -97,7 +95,6 @@ function JoinAgoraPopup() {
 			roomId: newRoomId,
 			password: password
 		}
-		console.log("Join ROOM : ", param);
 		socket.emit('joinRoom', param);
 		setOpen(false);
 	}

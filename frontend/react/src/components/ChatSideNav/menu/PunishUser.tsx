@@ -78,7 +78,12 @@ function PunishUser(param: any) {
 
     }
 
+    function isNumber(n : any) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
+
     function Submit() {
+        if (duration < 1)
+            return;
+        console.log("Ban for this long:: ", duration);
         let param = {
             userId: newPunish,
             roomId: room.id,
@@ -86,7 +91,13 @@ function PunishUser(param: any) {
             isBanned: ban
         }
         socket.emit('punishUser', param);
+        setDuration(0);
         setOpen(false);
+    }
+
+    function handleDuration(e : any){
+        if (e.target.value !== null && e.target.value !== undefined && isNumber(e.target.value))
+            setDuration(e.target.value)
     }
 
 
@@ -108,7 +119,7 @@ function PunishUser(param: any) {
                     styles={customStyles}
                     options={users} />
                 <input type="text" id="messagePopup" name="password"
-                    onChange={(e: { target: { value: any; }; }) => setDuration(e.target.value)}
+                    onChange={handleDuration}
                     autoFocus
                     autoCorrect="off"
                     placeholder="Duration"
