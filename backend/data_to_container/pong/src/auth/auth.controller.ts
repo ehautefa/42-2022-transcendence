@@ -20,19 +20,19 @@ export class AuthController {
         private readonly authService: AuthService,
     ) { }
 
-    @Get('localLogin/:userName')
-    @ApiOperation({ summary: 'Create a new user' })
-    @UsePipes(ValidationPipe)
-    async localLogin(@Res({ passthrough: true }) res: Response, @Body() tfaCode: LoginDto, @Param('userName') userName: string) {
-
-        const user: user = await this.userService.FindOrCreateUserLocal(userName);
-        // if(user.twoFactorAuth)
-        // res.redirect('/2fa');
-        const access_token: string = await this.authService.login2fa(user, tfaCode.twoFactorAuthenticationCode);
-        res.setHeader('Set-Cookie', access_token);
-        return `user : #${user.userName} is logged-in`
-    }
-
+    // @Get('localLogin/:userName')
+    // @ApiOperation({ summary: 'Create a new user' })
+    // @UsePipes(ValidationPipe)
+    // async localLogin(@Res({ passthrough: true }) res: Response, @Body() tfaCode: LoginDto, @Param('userName') userName: string) {
+// 
+        // const user: user = await this.userService.FindOrCreateUserLocal(userName);
+   ////     if(user.twoFactorAuth)
+      ////  res.redirect('/2fa');
+        // const access_token: string = await this.authService.login2fa(user, tfaCode.twoFactorAuthenticationCode);
+        // res.setHeader('Set-Cookie', access_token);
+        // return `user : #${user.userName} is logged-in`
+    // }
+// 
     @ApiOperation({ summary: 'CallBack after authentification with fortyTwoStrategy)' })
     @UseGuards(FortyTwoAuthGuard)
     @Get('login')
@@ -81,9 +81,9 @@ export class AuthController {
     @Post('logout')
     @UseGuards(JwtAuthGuard)
     async logout(@Req() { user }: { user: user }, @Res({ passthrough: true }) res) {
-        // const cookie = 'access_token=none; SameSite=none; secure; HttpOnly; Path=/; Expires=0'
-		// res.setHeader('Set-Cookie', cookie);
-        res.clearCookie('access_token', {SameSite:'none', secure:true, HttpOnly:true, Path:'/', expires:0}); 
+        const cookie = 'access_token=; SameSite=none; secure; HttpOnly; Path=/; Expires=0'
+		res.setHeader('Set-Cookie', cookie);
+        // res.clearCookie('access_token', {SameSite:'none', secure:true, HttpOnly:true, Path:'/', expires:0}); 
         return ``
     }
 
