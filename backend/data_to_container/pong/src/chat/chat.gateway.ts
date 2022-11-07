@@ -21,7 +21,6 @@ import { ChatMember, Message, Room, user } from 'src/bdd/index';
 import { ChatExceptionFilter } from './chat-exception.filter';
 import { ChatService } from './chat.service';
 import { Authorized } from './decorator/authorized.decorator';
-import { Roles } from './decorator/roles.decorator';
 import {
   CreateMessageDto,
   CreateRoomDto,
@@ -75,8 +74,8 @@ export class ChatGateway
       createMessageDto,
       user,
     );
-    this.logger.debug('Creating a message');
-    this.logger.debug(message.sender.room.id);
+    // this.logger.debug('Creating a message');
+    // this.logger.debug(message.sender.room.id);
     this.server
       .in(message.sender.room.id)
       .emit('updateMessages', message.sender.room.id);
@@ -157,7 +156,6 @@ export class ChatGateway
     @MessageBody() roomId: UuidDto,
     @Req() { user }: { user: user },
   ): Promise<user[]> {
-    this.logger.debug('DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD');
     return await this.chatService.findBannableUsersInRoom(
       user.userUuid,
       roomId.uuid,
@@ -176,7 +174,7 @@ export class ChatGateway
   }
 
   // @Roles('owner', 'admin')
-  // @UseGuards(ProtectedRoomGuard) // je suis vraiment désolé Romain 
+  // @UseGuards(ProtectedRoomGuard) // je suis vraiment désolé Romain
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
     const chatMember = await this.chatService.setAdmin(setAdminDto);
@@ -223,9 +221,15 @@ export class ChatGateway
   ): Promise<ChatMember> {
     const chatMember = await this.chatService.punishUser(punishUserDto);
     chatMember.bannedTime =
-      (chatMember.bannedTime !== null && (chatMember.bannedTime as Date).getTime() > new Date().getTime()) ? true : false;
+      chatMember.bannedTime !== null &&
+      (chatMember.bannedTime as Date).getTime() > new Date().getTime()
+        ? true
+        : false;
     chatMember.mutedTime =
-      (chatMember.mutedTime !== null && (chatMember.mutedTime as Date).getTime() > new Date().getTime()) ? true : false;
+      chatMember.mutedTime !== null &&
+      (chatMember.mutedTime as Date).getTime() > new Date().getTime()
+        ? true
+        : false;
     chatMember.id = chatMember.room.id;
     this.server.to(chatMember.room.id).emit('updateRooms');
     return chatMember;
@@ -240,9 +244,15 @@ export class ChatGateway
       removePunishmentDto,
     );
     chatMember.bannedTime =
-      (chatMember.bannedTime !== null && (chatMember.bannedTime as Date).getTime() > new Date().getTime()) ? true : false;
+      chatMember.bannedTime !== null &&
+      (chatMember.bannedTime as Date).getTime() > new Date().getTime()
+        ? true
+        : false;
     chatMember.mutedTime =
-      (chatMember.mutedTime !== null && (chatMember.mutedTime as Date).getTime() > new Date().getTime()) ? true : false;
+      chatMember.mutedTime !== null &&
+      (chatMember.mutedTime as Date).getTime() > new Date().getTime()
+        ? true
+        : false;
     chatMember.id = chatMember.room.id;
     this.server.to(chatMember.room.id).emit('updateRooms');
     return chatMember;
@@ -360,8 +370,7 @@ export class ChatGateway
       respondToInvitationDto,
       user,
     );
-    if (respondToInvitationDto.acceptInvitation === true)
-    {
+    if (respondToInvitationDto.acceptInvitation === true) {
       this.server.socketsJoin(respondToInvitationDto.roomId);
       this.server.to(respondToInvitationDto.roomId).emit('updateRooms');
     }
@@ -370,7 +379,7 @@ export class ChatGateway
   }
 
   async handleConnection(client: Socket): Promise<void> {
-    this.logger.debug(`client connected: ${client.id}`);
+    this.logger.log(`client connected: ${client.id}`);
     const cookie: string = client.handshake.headers.cookie;
     if (
       cookie !== undefined &&

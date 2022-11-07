@@ -7,45 +7,6 @@ import { JwtConfig } from '../config/Jwt.config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-<<<<<<< HEAD
-    constructor(
-        private readonly userService: UserService,
-    ) {
-        super({
-            failureRedirect: '/auth/login',
-            jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-                let data: string = null;
-                if (request?.cookies && request.cookies['access_token']) {
-                    // check if access_token is in cookies
-                    data = request.cookies['access_token'];
-                } else if (request['handshake']
-                && request['handshake']['headers']
-                && request['handshake']['headers']['access_token']) {
-                    // if access_token is not in cookie check if it is in headers
-                    data = request['handshake']['headers']['access_token'];
-                } else if (request['handshake']
-                && request['handshake']['headers']
-                && request['handshake']['headers'].cookie) {
-                    data = request['handshake']['headers'].cookie.split(';').find(c => c.trim().startsWith('access_token=')).split('=')[1];
-                }
-                return data
-            }]),
-            ignoreExpiration: false,
-            secretOrKey: JwtConfig.secret //Protect in env file
-        }, async (jwt_paylod, done) => {
-            const user = await userService.getCompleteUser(jwt_paylod.userUuid);
-            if (user !== undefined
-                && user !== null
-                && user.twoFactorAuth !== undefined
-                && !user.twoFactorAuth)
-                return done(null, user);
-            if (user !== undefined
-                && user !== null
-                && user.twoFactorAuth !== undefined
-                && user.twoFactorAuth
-                && jwt_paylod.isTwoFactorAuthenticated)
-                return done(null, user);
-=======
   constructor(private readonly userService: UserService) {
     super(
       {
@@ -85,7 +46,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           return done(null, user);
         if (user.twoFactorAuth && jwt_paylod.isTwoFactorAuthenticated)
           return done(null, user);
->>>>>>> a03d58d (WIP)
 
         console.log('WARNING JWT - TwoFactorAuth ENABLE');
         console.log(jwt_paylod);

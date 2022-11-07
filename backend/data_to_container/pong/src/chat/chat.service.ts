@@ -56,8 +56,8 @@ export class ChatService {
       sender: chatMember,
       time: new Date(),
     });
-    this.logger.debug('createMessage is OK');
-    this.logger.debug(chatMember);
+    // this.logger.debug('createMessage is OK');
+    // this.logger.debug(chatMember);
     return await this.messagesRepository.save(newMessage);
   }
 
@@ -463,17 +463,28 @@ export class ChatService {
     userId: string,
   ): Promise<ChatMember[]> {
     // TO DO : remove owner from the list
-    return await this.chatMembersRepository.find({
-      relations: { room: true, user: true },
+    const chatMembers: ChatMember[] = await this.chatMembersRepository.find({
+      relations: { room: { owner: { user: true } }, user: true },
       select: {
         user: { userName: true, userUuid: true },
       },
       where: {
+        room: {
+          id: filterByAdminRightsDto.roomId,
+        },
         isAdmin: filterByAdminRightsDto.isAdmin,
-        room: { id: filterByAdminRightsDto.roomId },
         user: { userUuid: Not(userId) },
       },
     });
+
+    chatMembers.forEach((member) => {
+      if (member.room.owner.user.userUuid == member.user.userUuid)
+        chatMembers.splice(chatMembers.indexOf(member));
+    });
+    // const user: user {userName }
+    this.logger.debug('FILTER BY ADMIN RIGHTS');
+    console.log(chatMembers);
+    return chatMembers;
   }
 
   async findBannedUsersInRoom(roomId: string): Promise<ChatMember[]> {
@@ -512,8 +523,8 @@ export class ChatService {
       } else if (member.mutedTime !== null)
         chatMembers.splice(chatMembers.indexOf(member));
     });
-    this.logger.debug('MutableUsers');
-    console.log(chatMembers.map((member) => member.user));
+    // this.logger.debug('MutableUsers');
+    // console.log(chatMembers.map((member) => member.user));
     return chatMembers.map((member) => member.user);
   }
 
@@ -538,8 +549,8 @@ export class ChatService {
       } else if (member.bannedTime !== null)
         chatMembers.splice(chatMembers.indexOf(member));
     });
-    this.logger.debug('BannableUsers');
-    console.log(chatMembers.map((member) => member.user));
+    // this.logger.debug('BannableUsers');
+    // console.log(chatMembers.map((member) => member.user));
     return chatMembers.map((member) => member.user);
   }
 
