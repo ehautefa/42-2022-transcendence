@@ -15,8 +15,8 @@ export class ChatExceptionFilter extends BaseWsExceptionFilter {
     if (exception instanceof BadRequestException) {
       // const error: WsException = new WsException(exception.message);
       // super.catch(exception, host);
-      console.error(host.getArgByIndex(1));
-      console.error(exception.getResponse());
+      // console.error(host.getArgByIndex(1));
+      // console.error(exception.getResponse());
     }
     if (exception instanceof QueryFailedError) {
       let error: WsException;
