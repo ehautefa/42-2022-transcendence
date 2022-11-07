@@ -38,8 +38,10 @@ export class MatchService {
 				user2: true
 			},
 			where: [
-				{ user1: { userName: userName } },
-				{ user2: { userName: userName } }
+				{ user1: { userName: userName }, score1: 10 },
+				{ user2: { userName: userName }, score1: 10 },
+				{ user1: { userName: userName }, score2: 10 },
+				{ user2: { userName: userName }, score2: 10 },
 			]
 		});
 	}
