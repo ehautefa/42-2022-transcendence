@@ -83,7 +83,6 @@ function AllPlayers() {
 			newFriends = await removeFriend(userUuid);
 		}
 		setFriends(newFriends);
-		console.log("newFriends", newFriends);
 		const myBlocked = await getMyBlocked();
 		setBlocked(myBlocked);
 	}

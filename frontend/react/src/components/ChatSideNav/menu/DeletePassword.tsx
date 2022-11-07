@@ -11,7 +11,6 @@ function DeletePassword({ room }: any) {
 
     const Yes = (e: any) => {
         e.preventDefault();
-        console.log('set password ', password);
         let param = {
             roomId: room.id,
             password: password,
