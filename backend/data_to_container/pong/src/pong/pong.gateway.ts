@@ -93,14 +93,15 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('refuseInvite')
 	@UseGuards(JwtAuthGuard)
-	refuseInvite(@Req() req, @Body() matchId: string): void {
+	refuseInvite(@Req() req, @Body() matchId: string): string {
 		if (this.launch_game == true) {
 			this.launch_game = false;
 			this.GameLoop(); // start game loop
 		}
+		if (this.games.get(matchId) === undefined)
+			return "";
 		if (req.user.userUuid !== this.games.get(matchId).playerRightUid) {
-			console.log("ERROR: USER IS NOT THE INVITED ONE");
-			return;
+			return "You are not the invited player";
 		} else {
 			var param: SendAlertDto = {
 				userUuid: this.games.get(matchId).playerLeftUid,
@@ -110,19 +111,23 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.games.delete(matchId);
 		}
 		this.PongService.refuseInvite(matchId);
+		return "";
 	}
 
 	@SubscribeMessage('acceptInvite')
 	@UseGuards(JwtAuthGuard)
-	acceptInvite(@Req() req, @Body() matchId: string): void {
+	acceptInvite(@Req() req, @Body() matchId: string): string {
 		if (this.launch_game == true) {
 			this.launch_game = false;
 			this.GameLoop(); // start game loop
 		}
-		if (req.user.userUuid !== this.games.get(matchId).playerRightUid) {
-			console.log("ERROR: USER IS NOT THE INVITED ONE");
-			return;
+		console.log("ACCEPT INVITE", this.games.get(matchId))
+		if (this.games.get(matchId) == undefined) {
+			return "The other player destroyed his invitation";
+		} else if (req.user.userUuid !== this.games.get(matchId).playerRightUid) {
+			return "You are not the invited player";
 		}
+		return "";
 	}
 
 	// Launch a game and find a match for the player
@@ -227,7 +232,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('leaveGame')
 	@UseGuards(JwtAuthGuard)
 	leaveGame(@Req() req): void {
-		console.log("LEAVE GAME");
 		this.PongService.leaveGame(req.id, this.server, this.games, this.players);
 	}
 

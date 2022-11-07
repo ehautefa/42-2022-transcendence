@@ -55,7 +55,7 @@ export default class PictureUploader extends React.Component<{}, MyState>{
 
         let result = await fetch(url, requestOptions);
         if (result.status === 401) {
-            window.location.assign("/auth/login");
+            window.location.assign("/");
         } else if (result.status === 403) {
             alert("Wrong format : format must be png, jpg or jpeg");
         } else if (result.status !== 201) {

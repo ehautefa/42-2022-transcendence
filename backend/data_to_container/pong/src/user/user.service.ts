@@ -300,7 +300,6 @@ export class UserService {
             throw new TwoFactorAuthAlreadyEnableException()
         user.twoFactorAuth = true;
         await this.UserRepository.save(user);
-        this.eventEmitter.emit('user.refresh', user);
         return user;
     }
 

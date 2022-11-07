@@ -14,7 +14,6 @@ function GiveOwnership({room}: any) {
     useEffect(() => {
         if (room && room !== undefined && room.id !== undefined) {
             socket.emit("findAllUsersInRoom", {uuid: room.id}, (users: any) => {
-                // console.log("GIVE OWNERSHIP", users);
                 let selectTab: SelectClass[] = users.map((user: any) => new SelectClass(user));
                 setUsers(selectTab);
             });
@@ -71,7 +70,6 @@ function GiveOwnership({room}: any) {
             userId: newOwner,
             roomId: room.id,
         }
-        console.log("Give OwnerShip emit : ", param);
         socket.emit('giveOwnership', param);
         setOpen(false);
     }

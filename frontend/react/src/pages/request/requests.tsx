@@ -17,7 +17,7 @@ export async function acceptFriendRequest(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
 		return [];
@@ -39,7 +39,7 @@ export async function refuseFriendRequest(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
 		return [];
@@ -67,7 +67,7 @@ export async function getMyRequests() {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 		return;
 	}
 	return result;

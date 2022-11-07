@@ -13,9 +13,6 @@ function ChangePassword({ room }: any) {
 
 	const SendPassword = (e: any) => {
 		e.preventDefault();
-		console.log('set password ', password);
-		console.log('new password ', newPassword);
-		console.log('room ', room.id);
 
 		let param = {
 			roomId: room.id,
@@ -34,7 +31,7 @@ function ChangePassword({ room }: any) {
 			}}>
 				<div className='side-menu-popup'>
 					<h3>Edit password :</h3>
-					<input type="password" id="messagePopup" name="password"
+					<input type="password" name="password"
 						onChange={(e: { target: { value: any; }; }) => setPassword(e.target.value)}
 						autoFocus
 						autoCorrect="off"
@@ -42,7 +39,7 @@ function ChangePassword({ room }: any) {
 						minLength={1}
 						maxLength={30}
 						size={30} />
-					<input type="password" id="messagePopup" name="password"
+					<input type="password" name="password"
 						onChange={(e: { target: { value: any; }; }) => setNewPassword(e.target.value)}
 						autoFocus
 						autoCorrect="off"

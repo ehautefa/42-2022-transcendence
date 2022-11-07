@@ -8,7 +8,6 @@ import Canvas from "./Canvas"
 const socket = getSocketPong();
 
 const PADDLE_DEP = 2;
-// TO DO : understand why env variable is not working
 
 export class GameWindow extends React.Component<{ id: string }, GameWindowState> {
 	constructor(props: any) {

@@ -174,7 +174,7 @@ export class ChatGateway
   }
 
   // @Roles('owner', 'admin')
-  @UseGuards(ProtectedRoomGuard)
+  // @UseGuards(ProtectedRoomGuard) // je suis vraiment désolé Romain 
   @SubscribeMessage('setAdmin')
   async addAdmin(@MessageBody() setAdminDto: SetAdminDto): Promise<ChatMember> {
     const chatMember = await this.chatService.setAdmin(setAdminDto);
@@ -183,7 +183,7 @@ export class ChatGateway
   }
 
   //@Roles('owner')
-  @UseGuards(ProtectedRoomGuard)
+  //@UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('giveOwnership')
   async giveOwnership(
     @MessageBody() giveOwnershipDto: DoubleUuidDto,
@@ -282,6 +282,7 @@ export class ChatGateway
       roomId.uuid,
     );
     this.server.to(client.id).emit('refreshSelectedRoom');
+    this.server.to(roomId.uuid).emit('updateRooms');
     return chatMember;
   }
 
@@ -358,7 +359,10 @@ export class ChatGateway
       user,
     );
     if (respondToInvitationDto.acceptInvitation === true)
+    {
       this.server.socketsJoin(respondToInvitationDto.roomId);
+      this.server.to(respondToInvitationDto.roomId).emit('updateRooms');
+    }
     this.server.to(client.id).emit('updatePending');
     return usr;
   }

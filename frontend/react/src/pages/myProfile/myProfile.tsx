@@ -39,6 +39,13 @@ function MyProfile() {
 		socketStatus.on('refreshUserData', (updatedUser: User) => {
 			setUser(updatedUser);
 		})
+		socketStatus.on('refreshUserData2', () => {
+			const fetchData = async () => {
+				const user = await getMe();
+				setUser(user);
+			}
+			fetchData();
+		})
 	}, []);
 
 

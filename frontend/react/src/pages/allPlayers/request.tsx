@@ -9,7 +9,7 @@ export async function getAllUuidWithUserNameWithoutMe(myUserUuid: string) {
 
 	let users = await (await fetch(url, requestOptions)).json();
 	if (await users.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 		return ;
 	}
 	for (let i = 0; i < users.length; i++) {
@@ -35,7 +35,7 @@ export async function addFriend(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
 	} else {
@@ -58,7 +58,7 @@ export async function removeFriend(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
 	} else 
@@ -75,7 +75,7 @@ export async function getMyBlocked() {
 
 	let users = await (await fetch(url, requestOptions)).json();
 	if (await users.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 		return ;
 	} 
 	return await users;
@@ -95,7 +95,7 @@ export async function addBlocked(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
 		return [];
@@ -118,7 +118,7 @@ export async function removeBlocked(friendUuid: string) {
 
 	let result = await (await fetch(url, requestOptions)).json();
 	if (await result.statusCode === 401) {
-		window.location.assign("/auth/login");
+		window.location.assign("/");
 	} else if (await result.statusCode === 403) {
 		alert(await result.message);
 		return [];

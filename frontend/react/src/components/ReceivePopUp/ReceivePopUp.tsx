@@ -13,9 +13,16 @@ function ReceivePopUp(modal: any) {
     }
 
     function joinGame() {
-        socket.emit("acceptInvite", modal.modal.matchId);
-        document.getElementById("ReceivePopupBackground")!.style.display = "none";
-        window.location.href = "/game?id=" + modal.modal.matchId;
+        socket.emit("acceptInvite", modal.modal.matchId, (msg: string) => {
+            document.getElementById("ReceivePopupBackground")!.style.display = "none";
+            if (msg === "") {
+                window.location.href = "/game?id=" + modal.modal.matchId;
+            } else {
+                alert(msg);
+            }
+
+        });
+
     }
 
     return (<>
