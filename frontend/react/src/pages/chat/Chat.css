@@ -37,6 +37,10 @@
     justify-content: space-around;
 }
 
+.members .banned {
+    text-decoration: line-through;
+}
+
 .members a {
     margin: 10px 0;
 }

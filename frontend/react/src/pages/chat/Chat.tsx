@@ -93,6 +93,7 @@ function Chat() {
 					}
 					socket.emit("findAllUsersInRoom", { uuid: selectedRoom.id }, (users: any) => {
 						setMembers(users);
+						console.log (users);
 					});
 				}
 			});
@@ -144,7 +145,12 @@ function Chat() {
 				</div>
 				<h3>Members</h3>
 				<div className="channel members">
-					{members.map((member: User) => (
+					{members.map((member: any) => (
+						member.bannedTime !== null ?
+						<li className="banned" key={member.userUuid}>
+							<Link to={"/profile?uid=" + member.userUuid}>{member.userName}</Link>
+							<InvitePopUp userName={member.userName} userUuid={member.userUuid} user={user} />
+						</li> :
 						<li key={member.userUuid}>
 							<Link to={"/profile?uid=" + member.userUuid}>{member.userName}</Link>
 							<InvitePopUp userName={member.userName} userUuid={member.userUuid} user={user} />
