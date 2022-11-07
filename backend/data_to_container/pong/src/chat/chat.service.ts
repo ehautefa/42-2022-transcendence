@@ -504,7 +504,7 @@ export class ChatService {
       if (member.bannedTime !== null && 
         (member.bannedTime as Date).getTime() < new Date().getTime()) {
         member.bannedTime = null;
-        this.roomsRepository.save(member);
+        this.chatMembersRepository.save(member);
       } 
       else if (member.bannedTime !== null)
         chatMembers.splice(chatMembers.indexOf(member));

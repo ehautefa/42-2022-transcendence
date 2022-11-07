@@ -121,6 +121,8 @@ function Chat() {
 			var end = start + user.userName.length;
 			return room.name.substring(0, start) + room.name.substring(end);
 		}
+		else if (room.name === null)
+			return("null-room");
 		return room.name;
 	}
 
