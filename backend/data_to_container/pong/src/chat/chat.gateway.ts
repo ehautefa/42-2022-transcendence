@@ -184,7 +184,7 @@ export class ChatGateway
   }
 
   //@Roles('owner')
-  @UseGuards(ProtectedRoomGuard)
+  //@UseGuards(ProtectedRoomGuard)
   @SubscribeMessage('giveOwnership')
   async giveOwnership(
     @MessageBody() giveOwnershipDto: DoubleUuidDto,
