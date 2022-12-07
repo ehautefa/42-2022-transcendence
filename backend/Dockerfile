@@ -41,7 +41,8 @@ RUN         echo -n "REMOVE DEV PACKAGE: " && \
             echo -n "FORCE CLEAN CACHE TO REDUCE IMAGE SPACE: " && \
             npm cache clean --force && \
             echo -n "AUDIT PROD :" && \
-            npm audit --omit=dev
+            npm audit --omit=dev || \
+            npm audit fix
 
 USER        node
 
