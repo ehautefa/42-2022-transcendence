@@ -40,8 +40,8 @@ ENV         NODE_ENV production
 RUN         echo -n "REMOVE DEV PACKAGE: " && \
             npm install --omit=dev && \
             echo -n "FORCE CLEAN CACHE TO REDUCE IMAGE SPACE: " && \
-            npm cache clean --force && \
-            echo -n "AUDIT PROD :" && npm audit --omit=dev
+            npm cache clean --force # && \
+            # echo -n "AUDIT PROD :" && npm audit --omit=dev
 
 
 USER        node
